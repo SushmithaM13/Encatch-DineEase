@@ -1,11 +1,15 @@
+import React from 'react';
+
 import './App.css'
+
+import SuperAdminRegistration from './components/super/SuperAdminRegistration';
 
 function App() {
 
   return (
-    <>
-    <h1>DineEase</h1>
-    </>
+   <div className="App">
+      <SuperAdminRegistration /> 
+    </div>
   )
 }
 
