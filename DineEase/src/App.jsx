@@ -1,5 +1,6 @@
 import { Routes, Route, } from 'react-router-dom'
 import './App.css'
+
 import Login from './components/Auth/login'
 import SuperAdminDashboard from './pages/superAdminDashboard'
 import AdminDashboard from './pages/adminDashboard'
@@ -28,6 +29,7 @@ function App() {
     <Footer/>
     </>
   );
+
 }
 
 export default App;
