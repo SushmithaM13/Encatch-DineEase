@@ -11,6 +11,7 @@ const SuperAdminRegistration = () => {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -63,28 +64,33 @@ const SuperAdminRegistration = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSuccess(false);
+
     if (validateForm()) {
       setIsLoading(true);
+
       // Simulate API call
       setTimeout(() => {
         setIsLoading(false);
+        setIsSuccess(true);
         console.log('Super Admin Registration:', formData);
-        alert('Registration successful!');
+
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          password: '',
+          confirmPassword: ''
+        });
+
+        setTimeout(() => setIsSuccess(false), 2000); // hide success after 2s
       }, 2000);
     }
   };
 
   return (
-    <div className="registration-container">
-      <div className="background-animation">
-        <div className="floating-shape shape-1"></div>
-        <div className="floating-shape shape-2"></div>
-        <div className="floating-shape shape-3"></div>
-        <div className="floating-shape shape-4"></div>
-        <div className="floating-shape shape-5"></div>
-        <div className="floating-shape shape-6"></div>
-      </div>
-      
+    <div className="registration">
       <div className="registration-card">
         <div className="card-header">
           <div className="admin-icon">
@@ -97,6 +103,7 @@ const SuperAdminRegistration = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="registration-form">
+          {/* Full Name */}
           <div className="form-group">
             <div className="input-container">
               <input
@@ -106,7 +113,6 @@ const SuperAdminRegistration = () => {
                 value={formData.name}
                 onChange={handleInputChange}
                 className={`form-input ${formData.name ? 'has-value' : ''} ${errors.name ? 'error' : ''}`}
-                required
               />
               <label htmlFor="name" className="form-label">Full Name</label>
               <div className="input-highlight"></div>
@@ -114,6 +120,7 @@ const SuperAdminRegistration = () => {
             {errors.name && <span className="error-message">{errors.name}</span>}
           </div>
 
+          {/* Email */}
           <div className="form-group">
             <div className="input-container">
               <input
@@ -123,7 +130,6 @@ const SuperAdminRegistration = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 className={`form-input ${formData.email ? 'has-value' : ''} ${errors.email ? 'error' : ''}`}
-                required
               />
               <label htmlFor="email" className="form-label">Email Address</label>
               <div className="input-highlight"></div>
@@ -131,6 +137,7 @@ const SuperAdminRegistration = () => {
             {errors.email && <span className="error-message">{errors.email}</span>}
           </div>
 
+          {/* Phone */}
           <div className="form-group">
             <div className="input-container">
               <input
@@ -140,7 +147,6 @@ const SuperAdminRegistration = () => {
                 value={formData.phone}
                 onChange={handleInputChange}
                 className={`form-input ${formData.phone ? 'has-value' : ''} ${errors.phone ? 'error' : ''}`}
-                required
               />
               <label htmlFor="phone" className="form-label">Phone Number</label>
               <div className="input-highlight"></div>
@@ -148,6 +154,7 @@ const SuperAdminRegistration = () => {
             {errors.phone && <span className="error-message">{errors.phone}</span>}
           </div>
 
+          {/* Password */}
           <div className="form-group">
             <div className="input-container">
               <input
@@ -157,7 +164,6 @@ const SuperAdminRegistration = () => {
                 value={formData.password}
                 onChange={handleInputChange}
                 className={`form-input ${formData.password ? 'has-value' : ''} ${errors.password ? 'error' : ''}`}
-                required
               />
               <label htmlFor="password" className="form-label">Password</label>
               <div className="input-highlight"></div>
@@ -165,6 +171,7 @@ const SuperAdminRegistration = () => {
             {errors.password && <span className="error-message">{errors.password}</span>}
           </div>
 
+          {/* Confirm Password */}
           <div className="form-group">
             <div className="input-container">
               <input
@@ -174,7 +181,6 @@ const SuperAdminRegistration = () => {
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
                 className={`form-input ${formData.confirmPassword ? 'has-value' : ''} ${errors.confirmPassword ? 'error' : ''}`}
-                required
               />
               <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
               <div className="input-highlight"></div>
@@ -182,7 +188,12 @@ const SuperAdminRegistration = () => {
             {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
           </div>
 
-          <button type="submit" className={`submit-button ${isLoading ? 'loading' : ''}`} disabled={isLoading}>
+          {/* Button */}
+          <button
+            type="submit"
+            className={`submit-button ${isLoading ? 'loading' : ''} ${isSuccess ? 'success' : ''}`}
+            disabled={isLoading}
+          >
             <span className="button-text">
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </span>
@@ -196,9 +207,28 @@ const SuperAdminRegistration = () => {
         </form>
 
         <div className="form-footer">
-          <p>Already have an account? <a href="/login" className="login-link">Login here</a></p>
+          <p>Already have an account? <a href="/login" className="login-link">LOGIN HEAR</a></p>
         </div>
       </div>
+
+      {/* Success Popup */}
+      {isSuccess && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <div className="popup-icon">
+              <div className="success-checkmark">✓</div>
+            </div>
+            <h3 className="popup-title">Registration Successful!</h3>
+            <p className="popup-message">Your account has been created successfully.</p>
+            <button 
+              className="popup-button"
+              onClick={() => setIsSuccess(false)}
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
