@@ -1,19 +1,20 @@
-
-import { Routes, Route } from 'react-router-dom';
-import './App.css';
+import { Routes, Route, } from 'react-router-dom'
+import './App.css'
 import Login from './components/Auth/login'
-import SuperAdminRegistration from './components/super/SuperAdminRegistration';
 import SuperAdminDashboard from './pages/superAdminDashboard'
 import AdminDashboard from './pages/adminDashboard'
 import StaffDashboard from './pages/staffDashboard'
 import ProtectedRoute from './components/Auth/protectedRoute'
 import ForgotPassword from './components/Auth/forgotPassword'
 import ResetPassword from './components/Auth/resetPassword'
+import SuperAdminRegistration from './components/super/SuperAdminRegistration';
+import Footer from "./components/footer/Footer"
+
 
 function App() {
-
   return (
-    
+    <>
+    <SuperAdminRegistration/>
     <Routes>
       <Route path='/' element={<Login/>}/>
       <Route path='/forgotPassword' element={<ForgotPassword/>}/>
@@ -24,12 +25,9 @@ function App() {
       <Route path='adminDashboard' element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard/></ProtectedRoute>}/>
       <Route path='staffDashboard' element={<ProtectedRoute allowedRoles={["staff"]}><StaffDashboard/></ProtectedRoute>}/>
     </Routes>
-  )
+    <Footer/>
+    </>
+  );
 }
 
-export default App
-
-
-
-
-
+export default App;
