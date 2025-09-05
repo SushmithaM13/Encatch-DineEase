@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import React, { useState, } from 'react';
+import { BrowserRouter as Router, Routes, Route, } from 'react-router-dom';
 import './App.css'
 import Navbar from "./components/navbar/Navbar";
 import Sidebar from "./components/sidebar/Sidebar";
-import SuperAdminRegistration from './components/super/SuperAdminRegistration';
+import SuperAdminRegistration from './components/signup/SuperAdminRegistration';
 import Footer from "./components/footer/Footer"
 
 // Dashboard component (placeholder)
