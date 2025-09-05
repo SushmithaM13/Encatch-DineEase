@@ -1,6 +1,8 @@
-import { Route, Routes } from 'react-router-dom'
+
+import { Routes, Route } from 'react-router-dom';
 import './App.css';
 import Login from './components/Auth/login'
+import SuperAdminRegistration from './components/super/SuperAdminRegistration';
 import SuperAdminDashboard from './pages/superAdminDashboard'
 import AdminDashboard from './pages/adminDashboard'
 import StaffDashboard from './pages/staffDashboard'
@@ -26,3 +28,8 @@ function App() {
 }
 
 export default App
+
+
+
+
+
