@@ -9,24 +9,22 @@ import ProtectedRoute from './components/Auth/protectedRoute'
 import ForgotPassword from './components/Auth/forgotPassword'
 import ResetPassword from './components/Auth/resetPassword'
 import SuperAdminRegistration from './components/super/SuperAdminRegistration';
-import Footer from "./components/footer/Footer"
 
 
 function App() {
   return (
     <>
-    <SuperAdminRegistration/>
     <Routes>
       <Route path='/' element={<Login/>}/>
       <Route path='/forgotPassword' element={<ForgotPassword/>}/>
       <Route path='/resetPassword' element={<ResetPassword/>}/>
+      <Route path='/SuperAdminRegistration' element={<SuperAdminRegistration/>}/>
       
       {/* Privat Route */}
       <Route path='superAdminDashboard' element={<ProtectedRoute allowedRoles={["superAdmin"]}><SuperAdminDashboard/></ProtectedRoute>}/>
       <Route path='adminDashboard' element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard/></ProtectedRoute>}/>
       <Route path='staffDashboard' element={<ProtectedRoute allowedRoles={["staff"]}><StaffDashboard/></ProtectedRoute>}/>
     </Routes>
-    <Footer/>
     </>
   );
 

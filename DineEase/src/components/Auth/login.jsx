@@ -10,17 +10,20 @@ const Login = () => {
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
+        console.log("jjjjjj")
         e.preventDefault();
         try {
             const response = await fetch(
-                "https://dineease-9ad58-default-rtdb.asia-southeast1.firebasedatabase.app/auth/login",
+                "http://localhost:8082/dine-ease/api/v1/users/login",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ email, password }),
                 }
             );
+            console.log("fetching ...")
             const data = await response.json();
+            console.log("response data: ",data)
 
             if (response.ok) {
                 // Save token & role in localstorage
@@ -54,11 +57,13 @@ const Login = () => {
         <div className="auth-container">
             {/* Left Section */}
             <div className="auth-container-left">
-  <div className="auth-overlay-text">
-    <h2>Welcome Back to Flavorful Moments</h2>
-    <p>Where every login takes you closer to great food and great service.</p>
-  </div>
-</div>
+                <div className="auth-overlay-text">
+                    <h2>Welcome Back to Flavorful Moments</h2>
+                    <p>
+                        Where every login takes you closer to great food and great service.
+                    </p>
+                </div>
+            </div>
 
             {/* Right Section */}
             <div className="auth-container-right">
@@ -66,7 +71,7 @@ const Login = () => {
                     <h2 className="login-title">Login</h2>
                     {error && <p className="error-text">{error}</p>}
 
-                    <input 
+                    <input
                         type="text"
                         name="email"
                         placeholder="Email address"
@@ -97,13 +102,17 @@ const Login = () => {
                             />
                             Remember me
                         </label>
-                        <Link to="/forgotPassword" className="forgot-password-link">Forgot password?</Link>
+                        <Link to="/forgotPassword" className="forgot-password-link">
+                            Forgot password?
+                        </Link>
                     </div>
 
-                    <button type="submit" className="login-btn">Login</button>
+                    <button type="submit" className="login-btn">
+                        Login
+                    </button>
 
                     <p className="auth-footer">
-                        Not a member? <Link to="/signUp">Sign up</Link>
+                        Not a member? <Link to="/SuperAdminRegistration">Sign up</Link>
                     </p>
                 </form>
             </div>

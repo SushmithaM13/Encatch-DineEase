@@ -207,7 +207,7 @@ const SuperAdminRegistration = () => {
         </form>
 
         <div className="form-footer">
-          <p>Already have an account? <a href="/login" className="login-link">LOGIN HEAR</a></p>
+          <p>Already have an account? <a href="/" className="login-link">LOGIN HEAR</a></p>
         </div>
       </div>
 
