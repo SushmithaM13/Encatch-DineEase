@@ -113,7 +113,7 @@ const SuperAdminRegistration = () => {
               <div className="crown-jewel"></div>
             </div>
           </div>
-          <h2 className="title">Registration</h2>
+          <h2 className="title">SIGN-UP</h2>
         </div>
 
         <form onSubmit={handleSubmit} className="registration-form">

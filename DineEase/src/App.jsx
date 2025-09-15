@@ -16,6 +16,7 @@ function App() {
   return (
     <>
     <SuperAdminRegistration/>
+  
 
     <Routes>
       <Route path='/' element={<Login/>}/>

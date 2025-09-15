@@ -13,17 +13,16 @@ import {
   FaUtensils,
   FaCog,
   FaSignOutAlt,
-  FaTimes,
 } from "react-icons/fa";
 
-  const SuperAdminDashboard = () => {
+const SuperAdminDashboard = () => {
   const [hotels, setHotels] = useState([]);
   const [users, setUsers] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true); // expanded by default
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // mobile menu state
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // ✅ Load users from localStorage
   useEffect(() => {
-    // Load initial users from localStorage
     const loadUsers = () => {
       const localUsers = JSON.parse(localStorage.getItem("users") || "[]");
       setUsers(localUsers);
@@ -31,63 +30,48 @@ import {
 
     loadUsers();
 
-    // Listen for user management events
-    const handleUserAdded = (event) => {
-      setUsers(event.detail.users);
-    };
+    const handleUserAdded = (e) => setUsers(e.detail.users);
+    const handleUserDeleted = (e) => setUsers(e.detail.users);
+    const handleUserUpdated = (e) => setUsers(e.detail.users);
 
-    const handleUserDeleted = (event) => {
-      setUsers(event.detail.users);
-    };
+    window.addEventListener("userAdded", handleUserAdded);
+    window.addEventListener("userDeleted", handleUserDeleted);
+    window.addEventListener("userUpdated", handleUserUpdated);
 
-    const handleUserUpdated = (event) => {
-      setUsers(event.detail.users);
-    };
-
-    window.addEventListener('userAdded', handleUserAdded);
-    window.addEventListener('userDeleted', handleUserDeleted);
-    window.addEventListener('userUpdated', handleUserUpdated);
-
-    // Cleanup event listeners
     return () => {
-      window.removeEventListener('userAdded', handleUserAdded);
-      window.removeEventListener('userDeleted', handleUserDeleted);
-      window.removeEventListener('userUpdated', handleUserUpdated);
+      window.removeEventListener("userAdded", handleUserAdded);
+      window.removeEventListener("userDeleted", handleUserDeleted);
+      window.removeEventListener("userUpdated", handleUserUpdated);
     };
   }, []);
 
-  // Handle body scroll lock when mobile menu is open
+  // ✅ Load hotels from localStorage (or replace with API later)
   useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
+    setHotels(storedHotels);
+  }, []);
 
-    // Cleanup on unmount
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
+  // Prevent scroll when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? "hidden" : "unset";
+    return () => (document.body.style.overflow = "unset");
   }, [mobileMenuOpen]);
 
-  // Mobile menu handlers
-  const handleMobileMenuToggle = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
-  const handleMobileMenuClose = () => {
-    setMobileMenuOpen(false);
-  };
-
-  const handleDesktopSidebarToggle = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  const handleMobileMenuToggle = () => setMobileMenuOpen(!mobileMenuOpen);
+  const handleMobileMenuClose = () => setMobileMenuOpen(false);
+  const handleDesktopSidebarToggle = () => setSidebarOpen(!sidebarOpen);
 
   // Stats
   const totalStaff = users.length;
-  const activeUsers = users.filter((u) => u.status?.toLowerCase() === "active").length;
-  const inactiveUsers = users.filter((u) => ["inactive", "pending"].includes((u.status || "").toLowerCase())).length;
-  const pendingInvites = users.filter((u) => u.status?.toLowerCase() === "pending").length;
+  const activeUsers = users.filter(
+    (u) => u.status?.toLowerCase() === "active"
+  ).length;
+  const inactiveUsers = users.filter((u) =>
+    ["inactive", "pending"].includes((u.status || "").toLowerCase())
+  ).length;
+  const pendingInvites = users.filter(
+    (u) => u.status?.toLowerCase() === "pending"
+  ).length;
 
   return (
     <div className={`dashboard ${sidebarOpen ? "expanded" : "collapsed"}`}>
@@ -98,27 +82,33 @@ import {
       ></div>
 
       {/* Sidebar */}
-      <aside className={`sidebar ${sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed"} ${mobileMenuOpen ? "mobile-open" : ""}`}>
-        {/* Mobile Close Button */}
-        {/* <button
-          className="mobile-close-btn"
-          onClick={handleMobileMenuClose}
-        >
-          <FaTimes />
-        </button> */}
-
+      <aside
+        className={`sidebar ${
+          sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed"
+        } ${mobileMenuOpen ? "mobile-open" : ""}`}
+      >
         <div className="sidebar-header">
           <h2 className="logo">{sidebarOpen ? "Super Admin" : "SA"}</h2>
           <button className="toggle-btn" onClick={handleDesktopSidebarToggle}>
-            {/* {sidebarOpen ? "«" : "»"} */}
+            {/* icon optional */}
           </button>
         </div>
         <ul>
-          <li><FaHome /> {sidebarOpen && <span>Dashboard</span>}</li>
-          <li><FaUsers /> {sidebarOpen && <span>Users</span>}</li>
-          <li><FaUtensils /> {sidebarOpen && <span>Food Items</span>}</li>
-          <li><FaCog /> {sidebarOpen && <span>Settings</span>}</li>
-          <li><FaSignOutAlt /> {sidebarOpen && <span>Logout</span>}</li>
+          <li>
+            <FaHome /> {sidebarOpen && <span>Dashboard</span>}
+          </li>
+          <li>
+            <FaUsers /> {sidebarOpen && <span>Users</span>}
+          </li>
+          <li>
+            <FaUtensils /> {sidebarOpen && <span>Food Items</span>}
+          </li>
+          <li>
+            <FaCog /> {sidebarOpen && <span>Settings</span>}
+          </li>
+          <li>
+            <FaSignOutAlt /> {sidebarOpen && <span>Logout</span>}
+          </li>
         </ul>
       </aside>
 
@@ -139,10 +129,6 @@ import {
         <div className="dashboard-header">
           <h1>Super Admin Dashboard</h1>
           <div className="stats">
-            {/* <div className="stat-card">
-              <h3>{hotels.length}</h3>
-              <p>Total Hotels</p>
-            </div> */}
             <div className="stat-card">
               <div className="icon-container">
                 <FaUsers size={32} color="#10b981" />
@@ -183,23 +169,42 @@ import {
           <h2>Hotel Details</h2>
           <div className="hotel-list">
             {hotels.length > 0 ? (
-              hotels.map((hotel, index) => (
-                <div key={hotel.id || index} className="hotel-card">
+              hotels.map((hotel, idx) => (
+                <div key={hotel.id || idx} className="hotel-card">
                   <h3>{hotel.hotelName || hotel.name}</h3>
                   <div className="hotel-details">
-                    <p><strong>Owner:</strong> {hotel.ownerName || "N/A"}</p>
-                    <p><strong>Hotel Name:</strong> {hotel.HotelName || "N/A"}</p>
-                    <p><strong>Email:</strong> {hotel.email || "N/A"}</p>
-                    <p><strong>Phone:</strong> {hotel.phone || "N/A"}</p>
-                    <p><strong>Location:</strong> {hotel.location || hotel.city || "N/A"}</p>
-                    <p><strong>Address:</strong> {hotel.address || "N/A"}</p>
-                    <p><strong>Registration Date:</strong> {hotel.registrationDate || hotel.createdAt || "N/A"}</p>
+                    <p>
+                      <strong>Owner:</strong> {hotel.ownerName || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Hotel Name:</strong> {hotel.HotelName || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Email:</strong> {hotel.email || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Phone:</strong> {hotel.phone || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Location:</strong>{" "}
+                      {hotel.location || hotel.city || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Address:</strong> {hotel.address || "N/A"}
+                    </p>
+                    <p>
+                      <strong>Registration Date:</strong>{" "}
+                      {hotel.registrationDate || hotel.createdAt || "N/A"}
+                    </p>
                   </div>
                 </div>
               ))
             ) : (
               <div className="no-data">
-                <p>No hotel data available. Hotels will appear here when owners sign up.</p>
+                <p>
+                  No hotel data available. Hotels will appear here when owners
+                  sign up.
+                </p>
               </div>
             )}
           </div>
