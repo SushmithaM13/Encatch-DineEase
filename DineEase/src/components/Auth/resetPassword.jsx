@@ -1,50 +1,112 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const ResetPassword=()=>{
-    const {token}=useParams(); //get token from url
-    const navigate=useNavigate();
+const ResetPassword = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const email = location.state?.email || "";
 
-    const [password, setPassword]=useState("");
-    const [confirmPassword, setConfirmPassword]=useState("");
-    const [message, setMessage]=useState("");
+  const [otp, setOtp] = useState("");
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [message, setMessage] = useState("");
 
-    const handleResetPassword=async(e)=>{
-        e.preventDefault();
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-        if(password !== confirmPassword){
-            setMessage("Password do not match!");
-            return;
+  // API: Verify OTP
+  const handleVerifyOtp=async()=>{
+    setMessage("");
+    try {
+        const response=await fetch("url",{
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({email, otp}),
+        });
+        const data=await response.json();
+
+        if(response.ok){
+            setOtpVerified(true);
+            setMessage("OTP verified! You can now reset your password.");
+        }else{
+            setMessage(data.message || "Invalid OTP");
         }
+    } catch (err) {
+       setMessage("Server error, please try again later.", err) 
+    }
+  };
 
-        try {
-            const response=await fetch(`url/${token}`,{
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({password}),
-            });
-            const data=await response.json();
-            if(response.ok){
-                setMessage("Password reset successful! Redirecting to login...");
-                setTimeout(()=>navigate("/"), 2000); // redirect to login
-            }else{
-                setMessage(data.message || "Something went wrong.");
-            }
-        } catch (err) {
-           setMessage("Server error, Please try again.", err) 
+  // API: Reset Password
+  const handleResetPassword=async(e)=>{
+    e.preventDefault();
+    setMessage("");
+
+    if(newPassword !== confirmPassword){
+        setMessage("Password do not match");
+        return;
+    }
+
+    try {
+        const response=await fetch("",{
+            method: "POST",
+            headers :{"Content-Type": "application/json"},
+            body: JSON.stringify({email, otp, newPassword}),
+        });
+
+        const data=await response.json();
+        if(response.ok){
+            setMessage("Password reset successful!");
+            setTimeout(()=>navigate("/login"), 1500);
+        }else{
+            setMessage(data.message || "Failed to reset password");
         }
-    };
+    } catch (err) {
+       setMessage("Server error, please try again later.",err) 
+    }
+  };
 
-    return(
-        <div className="flex justify-center items-center h-screen bg-gray-100">
-            <form onSubmit={handleResetPassword} className="bg-white p-6 rounded-lg shadow-md w-80">
-                <h2 className="text-xl font-bold mb-4 text-center">Reset Password</h2>
-                <input type="password" placeholder="New Password" className="border w-full p-2 mb-3 rounded" value={password} onChange={(e)=>setPassword(e.target.value)} required/>
-                <input type="password" placeholder="Confirm New Password" className="border w-full p-2 mb-3 rounded" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)} required/>
-                <button type="submit" className="bg-blue-600 text-white w-full p-2 rounded hover:bg-blue-700">Reset Password</button>
-                {message && <p className="text-green-600 mt-3">{message}</p>}
-            </form>
-        </div>
-    )
-}
+  return (
+    <div className="auth-container">
+      <div className="auth-container-right">
+        <form onSubmit={handleResetPassword} className="auth-form">
+          <h2>Reset Password</h2>
+          {message && <p>{message}</p>}
+
+          <input
+            type="text"
+            placeholder="Enter OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+            required
+          />
+          <button type="button" onClick={handleVerifyOtp}>
+            Verify OTP
+          </button>
+
+          <input
+            type="password"
+            placeholder="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            disabled={!otpVerified}
+            required
+          />
+
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            disabled={!otpVerified}
+            required
+          />
+
+          <button type="submit" disabled={!otpVerified}>
+            Reset Password
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export default ResetPassword;
