@@ -103,7 +103,7 @@ const Login = () => {
                     <button type="submit" className="login-btn">Login</button>
 
                     <p className="auth-footer">
-                        Not a member? <Link to="/signUp">Sign up</Link>
+                        Not a member? <Link to="/signup">Sign up</Link>
                     </p>
                 </form>
             </div>

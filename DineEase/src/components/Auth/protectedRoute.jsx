@@ -5,6 +5,7 @@ const ProtectedRoute=({children, allowedRoles})=>{
     const role=localStorage.getItem("role");
 
     // Not logged in → go back to login
+    
     if(!token){
         return <Navigate to="/" replace/>;
     }
