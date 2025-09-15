@@ -10,7 +10,6 @@ const Login = () => {
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
-        console.log("jjjjjj")
         e.preventDefault();
         try {
             const response = await fetch(
@@ -21,9 +20,7 @@ const Login = () => {
                     body: JSON.stringify({ email, password }),
                 }
             );
-            console.log("fetching ...")
             const data = await response.json();
-            console.log("response data: ",data)
 
             if (response.ok) {
                 // Save token & role in localstorage
