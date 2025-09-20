@@ -219,7 +219,7 @@ const SuperAdminRegistration = () => {
         // Redirect after 5 seconds
         setTimeout(() => {
           navigate("/");
-        }, 5000);
+        }, 2000);
       } catch (err) {
         console.error(err);
         setApiError("Something went wrong. Please try again later.");

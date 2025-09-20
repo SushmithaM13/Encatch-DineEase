@@ -53,7 +53,7 @@ const Login = () => {
                     } else {
                         navigate("/"); // fallback
                     }
-                }, 1500);
+                }, 1000);
 
             } else {
                 // Handle backend error messages
