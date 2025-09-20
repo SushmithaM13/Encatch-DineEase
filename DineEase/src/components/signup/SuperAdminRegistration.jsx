@@ -1,104 +1,228 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // for redirect
 import "./SuperAdminRegistration.css";
 
 const SuperAdminRegistration = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
     password: "",
     confirmPassword: "",
     businessType: "",
-    businessName: "",
-    gst: "",
-    address: "",
+    customBusinessType: "",
+    organizationName: "",
+    gstNumber: "",
+    organizationAddress: "",
   });
 
   const [errors, setErrors] = useState({});
+  const [apiError, setApiError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [businessTypes, setBusinessTypes] = useState([]);
+
+  // Fetch business types from backend
+  useEffect(() => {
+    const fetchBusinessTypes = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8082/dine-ease/api/v1/admin/business-types"
+        );
+        if (!response.ok) throw new Error("Failed to load business types");
+        const data = await response.json();
+        // Extract only keys (business type names)
+        const keys = Object.keys(data);
+        console.log("busines types", data);
+        setBusinessTypes(keys); // assuming backend returns an array of strings
+      } catch (err) {
+        console.error("Error fetching business types:", err);
+      }
+    };
+    fetchBusinessTypes();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let newValue = value;
+
+    // Convert custom business type input to uppercase
+    if (name === "customBusinessType") {
+      newValue = value.toUpperCase();
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+    if (apiError) setApiError(""); // clear backend error when user types
   };
 
   const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
+    let formErrors = {};
 
-    if (!formData.email.trim())
-      newErrors.email = "Email is required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
-      newErrors.email = "Invalid email format";
+    if (!formData.fullName.trim()) {
+      formErrors.fullName = "Full name is required";
+    } else if (formData.fullName.trim().length < 3) {
+      formErrors.fullName = "Full name must be at least 3 characters";
+    }
 
-    if (!formData.phone.trim())
-      newErrors.phone = "Phone number is required";
-    else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, "")))
-      newErrors.phone = "Phone number must be 10 digits";
+    if (!formData.email.trim()) {
+      formErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      formErrors.email = "Enter a valid email address";
+    }
 
-    if (!formData.password)
-      newErrors.password = "Password is required";
-    else if (formData.password.length < 8)
-      newErrors.password = "Password must be at least 8 characters";
+    if (!formData.phoneNumber.trim()) {
+      formErrors.phoneNumber = "Phone number is required";
+    } else if (!/^[0-9]{10,15}$/.test(formData.phoneNumber)) {
+      formErrors.phoneNumber = "Phone number must be 10–15 digits";
+    }
 
-    if (!formData.confirmPassword)
-      newErrors.confirmPassword = "Confirm password is required";
-    else if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match";
+    if (!formData.password) {
+      formErrors.password = "Password is required";
+    } else if (
+      !/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\S+$).{8,}$/.test(
+        formData.password
+      )
+    ) {
+      formErrors.password =
+        "Password must be ≥8 chars, include uppercase, lowercase, digit, and special char";
+    }
 
-    if (!formData.businessType)
-      newErrors.businessType = "Business type is required";
-    if (!formData.businessName.trim())
-      newErrors.businessName = "Business name is required";
-    if (!formData.gst.trim())
-      newErrors.gst = "GST number is required";
-    if (!formData.address.trim())
-      newErrors.address = "Address is required";
+    if (!formData.confirmPassword) {
+      formErrors.confirmPassword = "Confirm password is required";
+    } else if (formData.password !== formData.confirmPassword) {
+      formErrors.confirmPassword = "Passwords do not match";
+    }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (!formData.organizationName.trim()) {
+      formErrors.organizationName = "Organization name is required";
+    }
+
+    if (!formData.gstNumber.trim()) {
+      formErrors.gstNumber = "GST number is required";
+    }
+
+    if (!formData.organizationAddress.trim()) {
+      formErrors.organizationAddress = "Organization address is required";
+    }
+
+    if (!formData.businessType.trim()) {
+      formErrors.businessType = "Business type is required";
+    }
+    // if "Other" is selected but no input given
+    if (
+      formData.businessType === "OTHER" &&
+      !formData.customBusinessType.trim()
+    ) {
+      formErrors.customBusinessType = "Please enter your business type";
+    }
+
+    setErrors(formErrors);
+    return Object.keys(formErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSuccess(false);
+    setApiError("");
 
     if (validateForm()) {
       setIsLoading(true);
       try {
+        let selectedBusinessType = formData.businessType;
+        if (formData.businessType === "OTHER") {
+          selectedBusinessType =
+            formData.customBusinessType.toUpperCase();
+            console.log(selectedBusinessType);
+
+          const payload = {
+            businessTypeName: selectedBusinessType,
+            description: "No description provided", // default if empty
+          };
+
+          // POST new business type to backend
+          const postResponse = await fetch(
+            "http://localhost:8082/dine-ease/api/v1/admin/add/businessType",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            }
+          );
+
+          if (!postResponse.ok) {
+            const errorData = await postResponse.json().catch(() => ({}));
+            throw new Error(
+              errorData?.message || "Failed to add business type"
+            );
+          }
+
+          // Refresh dropdown so next time user sees the new type too
+          const refresh = await fetch(
+            "http://localhost:8082/dine-ease/api/v1/admin/business-types"
+          );
+          const updatedTypes = await refresh.json();
+          setBusinessTypes(Object.keys(updatedTypes));
+          // Set selected business type for registration
+        } else {
+          selectedBusinessType = selectedBusinessType.toUpperCase();
+        }
+        // prepare request body
+        const requestBody = {
+          fullName: formData.fullName,
+          phoneNumber: formData.phoneNumber,
+          email: formData.email,
+          password: formData.password,
+          organizationName: formData.organizationName,
+          gstNumber: formData.gstNumber,
+          organizationAddress: formData.organizationAddress,
+          businessType: selectedBusinessType, // always uppercase
+        };
+
+        console.log("request:", requestBody)
         const response = await fetch(
-          "http://localhost:8080/api/super-admin/register",
+          "http://localhost:8082/dine-ease/api/v1/users/sign-up",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
+            body: JSON.stringify(requestBody),
           }
         );
 
-        if (!response.ok) throw new Error("Registration failed");
-        await response.text(); // or response.json() if backend sends JSON
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          console.error("Backend validation error:", errorData);
+          setApiError(errorData?.message || "Registration failed");
+          setIsLoading(false);
+          return;
+        }
 
+        await response.json();
         setIsLoading(false);
         setIsSuccess(true);
 
         setFormData({
-          name: "",
+          fullName: "",
           email: "",
-          phone: "",
+          phoneNumber: "",
           password: "",
           confirmPassword: "",
           businessType: "",
-          businessName: "",
-          gst: "",
-          address: "",
+          customBusinessType: "",
+          organizationName: "",
+          gstNumber: "",
+          organizationAddress: "",
         });
 
-        setTimeout(() => setIsSuccess(false), 3000);
+        // Redirect after 5 seconds
+        setTimeout(() => {
+          navigate("/");
+        }, 5000);
       } catch (err) {
         console.error(err);
-        alert("Registration failed! Check backend connection.");
+        setApiError("Something went wrong. Please try again later.");
         setIsLoading(false);
       }
     }
@@ -120,13 +244,15 @@ const SuperAdminRegistration = () => {
           <div className="form-group">
             <input
               type="text"
-              name="name"
+              name="fullName"
               placeholder="Full Name"
-              value={formData.name}
+              value={formData.fullName}
               onChange={handleInputChange}
-              className={`form-input ${errors.name ? "error" : ""}`}
+              className={`form-input ${errors.fullName ? "error" : ""}`}
             />
-            {errors.name && <span className="error-message">{errors.name}</span>}
+            {errors.fullName && (
+              <span className="error-message">{errors.fullName}</span>
+            )}
           </div>
 
           <div className="form-group">
@@ -138,21 +264,25 @@ const SuperAdminRegistration = () => {
               onChange={handleInputChange}
               className={`form-input ${errors.email ? "error" : ""}`}
             />
-            {errors.email && <span className="error-message">{errors.email}</span>}
+            {errors.email && (
+              <span className="error-message">{errors.email}</span>
+            )}
           </div>
 
           <div className="form-group">
             <input
               type="tel"
-              name="phone"
+              name="phoneNumber"
               placeholder="Phone Number"
-              value={formData.phone}
+              value={formData.phoneNumber}
               onChange={handleInputChange}
-              className={`form-input ${errors.phone ? "error" : ""}`}
+              className={`form-input ${errors.phoneNumber ? "error" : ""}`}
             />
-            {errors.phone && <span className="error-message">{errors.phone}</span>}
+            {errors.phoneNumber && (
+              <span className="error-message">{errors.phoneNumber}</span>
+            )}
           </div>
-
+          {/*  Business Type Dropdown */}
           <div className="form-group">
             <select
               name="businessType"
@@ -161,53 +291,81 @@ const SuperAdminRegistration = () => {
               className={`form-input ${errors.businessType ? "error" : ""}`}
             >
               <option value="">Select Business Type</option>
-              <option value="Hotel">Hotel</option>
-              <option value="Restaurant">Restaurant</option>
-              <option value="Retail">Retail</option>
-              <option value="Other">Other</option>
+              {businessTypes.map((type, idx) => (
+                <option key={idx} value={type}>
+                  {type}
+                </option>
+              ))}
+              <option value="OTHER">Other</option>
             </select>
             {errors.businessType && (
               <span className="error-message">{errors.businessType}</span>
             )}
           </div>
+          {/* Show input only if OTHER is selected */}
+          {formData.businessType === "OTHER" && (
+            <div className="form-group">
+              <input
+                type="text"
+                name="customBusinessType"
+                placeholder="Enter your business type"
+                value={formData.customBusinessType}
+                onChange={handleInputChange}
+                className={`form-input ${
+                  errors.customBusinessType ? "error" : ""
+                }`}
+              />
+              {errors.customBusinessType && (
+                <span className="error-message">
+                  {errors.customBusinessType}
+                </span>
+              )}
+            </div>
+          )}
 
           <div className="form-group">
             <input
               type="text"
-              name="businessName"
-              placeholder="Business Name"
-              value={formData.businessName}
+              name="organizationName"
+              placeholder="Organization Name"
+              value={formData.organizationName}
               onChange={handleInputChange}
-              className={`form-input ${errors.businessName ? "error" : ""}`}
+              className={`form-input ${errors.organizationName ? "error" : ""}`}
             />
-            {errors.businessName && (
-              <span className="error-message">{errors.businessName}</span>
+            {errors.organizationName && (
+              <span className="error-message">{errors.organizationName}</span>
             )}
           </div>
 
           <div className="form-group">
             <input
               type="text"
-              name="gst"
+              name="gstNumber"
               placeholder="GST Number"
-              value={formData.gst}
+              value={formData.gstNumber}
               onChange={handleInputChange}
-              className={`form-input ${errors.gst ? "error" : ""}`}
+              className={`form-input ${errors.gstNumber ? "error" : ""}`}
             />
-            {errors.gst && <span className="error-message">{errors.gst}</span>}
+            {errors.gstNumber && (
+              <span className="error-message">{errors.gstNumber}</span>
+            )}
           </div>
 
           <div className="form-group">
             <textarea
-              name="address"
+              name="organizationAddress"
               placeholder="Business Address"
               rows="3"
-              value={formData.address}
+              value={formData.organizationAddress}
               onChange={handleInputChange}
-              className={`form-input ${errors.address ? "error" : ""}`}
+              className={`form-input ${
+                errors.organizationAddress ? "error" : ""
+              }`}
             />
-            {errors.address && (
-              <span className="error-message">{errors.address}</span>
+            {errors.organizationAddress && (
+              <span className="error-message">
+                {errors.organizationAddress}
+              </span>
             )}
           </div>
 
@@ -239,6 +397,8 @@ const SuperAdminRegistration = () => {
             )}
           </div>
 
+          {apiError && <p className="error-message">{apiError}</p>}
+
           <button
             type="submit"
             className={`submit-button ${isLoading ? "loading" : ""} ${
@@ -257,15 +417,6 @@ const SuperAdminRegistration = () => {
             </div>
           </button>
         </form>
-
-        <div className="form-footer">
-          <p>
-            Already have an account?{" "}
-            <a href="/" className="login-link">
-              LOGIN HERE
-            </a>
-          </p>
-        </div>
       </div>
 
       {isSuccess && (
@@ -276,14 +427,8 @@ const SuperAdminRegistration = () => {
             </div>
             <h3 className="popup-title">Registration Successful!</h3>
             <p className="popup-message">
-              Your account has been created successfully.
+              Your account has been created successfully. Redirecting to login…
             </p>
-            <button
-              className="popup-button"
-              onClick={() => setIsSuccess(false)}
-            >
-              Continue
-            </button>
           </div>
         </div>
       )}

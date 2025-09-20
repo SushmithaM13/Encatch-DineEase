@@ -3,23 +3,28 @@ import { useNavigate, Link } from "react-router-dom";
 import "../Auth/styles/login.css";
 
 const Login = () => {
-    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [remember, setRemember] = useState(false);
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");  // Success message
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError(""); 
+        setSuccess(""); 
+
         try {
             const response = await fetch(
                 "http://localhost:8082/dine-ease/api/v1/users/login",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password }),
+                    body: JSON.stringify({ username, password }),
                 }
             );
+
             const data = await response.json();
 
             if (response.ok) {
@@ -27,54 +32,67 @@ const Login = () => {
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("role", data.role);
 
-                // handel remember password
+                // handle remember password
                 if (remember) {
-                    localStorage.setItem("rememberEmail", email);
+                    localStorage.setItem("rememberEmail", username);
                 } else {
                     localStorage.removeItem("rememberEmail");
                 }
 
-                // Redirect based on role
-                if (data.role === "superadmin") {
-                    navigate("/superAdminDashboard");
-                } else if (data.role === "admin") {
-                    navigate("/adminDashboard");
-                } else if (data.role === "staff") {
-                    navigate("/staffDashboard");
-                }
+                // Show success message
+                setSuccess("Login successful! Redirecting...");
+
+                // Redirect based on role after 1.5s
+                setTimeout(() => {
+                    if (data.role === "SUPER_ADMIN") {
+                        navigate("/superAdminDashboard");
+                    } else if (data.role === "ADMIN") {
+                        navigate("/adminDashboard");
+                    } else if (data.role === "STAFF") {
+                        navigate("/staffDashboard");
+                    } else {
+                        navigate("/"); // fallback
+                    }
+                }, 1500);
+
             } else {
-                setEmail(data.message || "Invalid credentials");
+                // Handle backend error messages
+                if (data.message?.toLowerCase().includes("not found")) {
+                    setError("User not found. Please register first.");
+                } else if (data.message?.toLowerCase().includes("invalid password")) {
+                    setError("Please enter the correct password.");
+                } else if (data.message?.toLowerCase().includes("verify")) {
+                    setError("Please verify your email before login.");
+                } else {
+                    setError(data.message || "Invalid credentials. Please try again.");
+                }
             }
         } catch (err) {
-            setError("Server error, Please try again later", err);
+            setError("Server error, Please try again later",err);
         }
     };
 
     return (
         <div className="auth-container">
             {/* Left Section */}
-            <div className="auth-container-left">
-                <div className="auth-overlay-text">
-                    <h2>Welcome Back to Flavorful Moments</h2>
-                    <p>
-                        Where every login takes you closer to great food and great service.
-                    </p>
-                </div>
-            </div>
+            <div className="auth-container-left"></div>
 
             {/* Right Section */}
             <div className="auth-container-right">
                 <form onSubmit={handleLogin} className="auth-form">
                     <h2 className="login-title">Login</h2>
+
+                    {/* Show error & success messages outside inputs */}
                     {error && <p className="error-text">{error}</p>}
+                    {success && <p className="success-text">{success}</p>}
 
                     <input
                         type="text"
                         name="email"
                         placeholder="Email address"
                         className="login-input"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         required
                     />
 
