@@ -23,11 +23,10 @@ function App() {
       <Route path='/SuperAdminRegistration' element={<SuperAdminRegistration/>}/>
       
       {/* Private Routes */}
-      {/* <Route path='superAdminDashboard' element={<ProtectedRoute allowedRoles={["superAdmin"]}><SuperAdminDashboard/></ProtectedRoute>}/> */}
-      <Route path='adminDashboard' element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard/></ProtectedRoute>}/>
-      <Route path='staffDashboard' element={<ProtectedRoute allowedRoles={["staff"]}><StaffDashboard/></ProtectedRoute>}/>
+      <Route path='superAdminDashboard' element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}><SuperAdminDashboard/></ProtectedRoute>}/>
+      <Route path='adminDashboard' element={<ProtectedRoute allowedRoles={["ADMIN"]}><AdminDashboard/></ProtectedRoute>}/>
+      <Route path='staffDashboard' element={<ProtectedRoute allowedRoles={["STAFF"]}><StaffDashboard/></ProtectedRoute>}/>
     </Routes>
-    <SuperAdminDashboard/>
     <Footer/>
     </>
   );
