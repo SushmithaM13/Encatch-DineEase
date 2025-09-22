@@ -216,7 +216,7 @@ const SuperAdminRegistration = () => {
           organizationAddress: "",
         });
 
-        // Redirect after 5 seconds
+        // Redirect after 2 seconds
         setTimeout(() => {
           navigate("/");
         }, 2000);
