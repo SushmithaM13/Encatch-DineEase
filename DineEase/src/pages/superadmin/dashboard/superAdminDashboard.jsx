@@ -21,7 +21,7 @@ const SuperAdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // ✅ Load users from localStorage
+  // Load users from localStorage
   useEffect(() => {
     const loadUsers = () => {
       const localUsers = JSON.parse(localStorage.getItem("users") || "[]");
@@ -45,7 +45,7 @@ const SuperAdminDashboard = () => {
     };
   }, []);
 
-  // ✅ Load hotels from localStorage (or replace with API later)
+  // Load hotels from localStorage
   useEffect(() => {
     const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
     setHotels(storedHotels);
@@ -57,9 +57,9 @@ const SuperAdminDashboard = () => {
     return () => (document.body.style.overflow = "unset");
   }, [mobileMenuOpen]);
 
-  const handleMobileMenuToggle = () => setMobileMenuOpen(!mobileMenuOpen);
+  const handleMobileMenuToggle = () => setMobileMenuOpen((prev) => !prev);
   const handleMobileMenuClose = () => setMobileMenuOpen(false);
-  const handleDesktopSidebarToggle = () => setSidebarOpen(!sidebarOpen);
+  const handleDesktopSidebarToggle = () => setSidebarOpen((prev) => !prev);
 
   // Stats
   const totalStaff = users.length;
@@ -90,7 +90,7 @@ const SuperAdminDashboard = () => {
         <div className="sidebar-header">
           <h2 className="logo">{sidebarOpen ? "Super Admin" : "SA"}</h2>
           <button className="toggle-btn" onClick={handleDesktopSidebarToggle}>
-            {/* icon optional */}
+            {/* <FaBars /> */}
           </button>
         </div>
         <ul>
@@ -116,7 +116,16 @@ const SuperAdminDashboard = () => {
       <main className="main-content">
         {/* Top Bar */}
         <div className="topbar">
-          <button className="menu-btn" onClick={handleMobileMenuToggle}>
+          <button
+            className="menu-btn"
+            onClick={() => {
+              if (window.innerWidth <= 768) {
+                handleMobileMenuToggle();
+              } else {
+                handleDesktopSidebarToggle();
+              }
+            }}
+          >
             <FaBars size={22} />
           </button>
           <div className="profile-info">

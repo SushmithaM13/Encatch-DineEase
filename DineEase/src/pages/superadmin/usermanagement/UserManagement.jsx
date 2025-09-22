@@ -22,18 +22,18 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem("token");
+      //const token = localStorage.getItem("token");
       const response = await fetch("http://localhost:8080/api/users", {
-        headers: { Authorization: `Bearer ${token}` },
+      //  headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
       setUsers(data || []);
       setFilteredUsers(data || []);
     } catch (err) {
       console.error("Error fetching users:", err);
-      const localUsers = JSON.parse(localStorage.getItem("users") || "[]");
-      setUsers(localUsers);
-      setFilteredUsers(localUsers);
+     // const localUsers = JSON.parse(localStorage.getItem("users") || "[]");
+      // setUsers(localUsers);
+      // setFilteredUsers(localUsers);
     }
   };
 
@@ -224,10 +224,10 @@ const UserManagement = () => {
                 </div>
               </div>
               <div className="user-row">
-                <div className="user-cell">
+                <div className="user-cell">     
                   <span className="cell-label">Join Date</span>
                   <span className="cell-value">
-                    {user.joinDate ? new Date(user.joinDate).toLocaleDateString() : 'N/A'}
+                  {user.joinDate ? new Date(user.joinDate).toLocaleDateString() : 'N/A'}
                   </span>
                 </div>
                 <div className="user-cell actions-cell">
