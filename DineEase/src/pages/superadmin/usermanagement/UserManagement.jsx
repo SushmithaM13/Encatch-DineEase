@@ -22,9 +22,9 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      //const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8080/api/users", {
-      //  headers: { Authorization: `Bearer ${token}` },
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:8082/api/users", {
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
       setUsers(data || []);
