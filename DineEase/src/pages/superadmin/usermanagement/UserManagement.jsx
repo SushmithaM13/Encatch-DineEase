@@ -31,9 +31,7 @@ const UserManagement = () => {
       setFilteredUsers(data || []);
     } catch (err) {
       console.error("Error fetching users:", err);
-     // const localUsers = JSON.parse(localStorage.getItem("users") || "[]");
-      // setUsers(localUsers);
-      // setFilteredUsers(localUsers);
+     
     }
   };
 
@@ -127,7 +125,7 @@ const UserManagement = () => {
   return (
     <div className="user-management">
       <div className="user-header">
-        <h2>User Management</h2>
+        <h2>Staff Management</h2>
         <button className="add-btn" onClick={() => setShowForm(true)}>
           + Add New User
         </button>

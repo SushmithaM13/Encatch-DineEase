@@ -8,6 +8,15 @@ import ProtectedRoute from './components/Auth/protectedRoute';
 import ForgotPassword from './components/Auth/forgotPassword';
 import ResetPassword from './components/Auth/resetPassword';
 import SuperAdminRegistration from './components/signup/SuperAdminRegistration';
+
+
+import UserManagement from "./pages/superadmin/usermanagement/UserManagement";
+import Items from "./pages/superadmin/items/FoodItems";
+import DashboardHome from "./pages/superadmin/dashboard/DashboardHome";
+import AddStaffRole  from './pages/superadmin/staffroles/AddStaffRole'; 
+// import Settings from "./pages/superadmin/Settings";
+// import Logout from "./pages/superadmin/Logout";
+
 import Footer from './components/footer/Footer';
 
 
@@ -23,9 +32,17 @@ function App() {
       <Route path='/SuperAdminRegistration' element={<SuperAdminRegistration/>}/>
       
       {/* Private Routes */}
-      <Route path='superAdminDashboard' element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}><SuperAdminDashboard/></ProtectedRoute>}/>
+      <Route path='superAdminDashboard/*' element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}><SuperAdminDashboard/></ProtectedRoute>}>
+        <Route index element={<DashboardHome />} />
+        <Route path="staff" element={<UserManagement />} />
+        <Route path="food-items" element={<Items />} />
+        <Route path="staffrole" element={<AddStaffRole />} />
+        {/* <Route path="settings" element={<Settings />} />
+        <Route path="logout" element={<Logout />} /> */}
+      </Route>
       <Route path='adminDashboard' element={<ProtectedRoute allowedRoles={["ADMIN"]}><AdminDashboard/></ProtectedRoute>}/>
       <Route path='staffDashboard' element={<ProtectedRoute allowedRoles={["STAFF"]}><StaffDashboard/></ProtectedRoute>}/>
+
     </Routes>
     <Footer/>
     </>
