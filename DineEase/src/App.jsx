@@ -10,7 +10,6 @@ import ResetPassword from './components/Auth/resetPassword';
 import SuperAdminRegistration from './components/signup/SuperAdminRegistration';
 import Footer from './components/footer/Footer';
 
-
 function App() {
   
   return (
