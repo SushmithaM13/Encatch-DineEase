@@ -21,22 +21,6 @@
   text-align: center;
 }
 
-/* Dark overlay for readability */
-/* .auth-container-left::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: 1;
-} */
-
-/* Overlay text */
-/* .auth-overlay-text {
-  position: relative;
-  z-index: 2;
-   max-width: 400px;
-}  */
-
 .auth-overlay-text h2 {
   font-size: 36px;
   margin-bottom: 16px;
@@ -53,14 +37,6 @@
   opacity: 0.8;
   text-shadow: 1px 1px 6px rgba(0, 0, 0, 0.5);
 }
-
-/* Responsive  hide image section on small screens*/
-/* @media (max-width: 768px) {
-  .auth-container-left { */
-    /* display: none;  */
-  /* }
-} */
-
 
 /* ====== Right Section ====== */
 .auth-container-right {

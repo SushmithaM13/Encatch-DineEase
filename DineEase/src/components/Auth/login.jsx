@@ -1,19 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../Auth/styles/login.css";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+
+  // Pre-fill username if "remember me" was checked
+  useEffect(() => {
+    const remembered = localStorage.getItem("rememberEmail");
+    if (remembered) setUsername(remembered);
+  }, []);
+
+
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
     try {
       const response = await fetch(
@@ -37,15 +44,15 @@ const Login = () => {
           localStorage.setItem("waiterName", data.name);
         }
 
-        // Remember email
         if (remember) {
           localStorage.setItem("rememberEmail", username);
         } else {
           localStorage.removeItem("rememberEmail");
         }
 
-        setSuccess("Login successful! Redirecting...");
+        toast.success("Login successful! Redirecting...");
 
+        // Redirect based on role after 1s
         setTimeout(() => {
           switch (data.role) {
             case "SUPER_ADMIN":
@@ -62,22 +69,22 @@ const Login = () => {
               navigate("/");
           }
         }, 1500);
-
       } else {
-        const msg = data.message?.toLowerCase() || "";
-        if (msg.includes("not found")) {
-          setError("User not found. Please register first.");
-        } else if (msg.includes("invalid password")) {
-          setError("Please enter the correct password.");
-        } else if (msg.includes("verify")) {
-          setError("Please verify your email before login.");
-        } else {
-          setError(data.message || "Invalid credentials. Please try again.");
+        // Backend error handling
+        let errorMsg = "Invalid credentials. Please try again.";
+        if (data.message?.toLowerCase().includes("not found")) {
+          errorMsg = "User not found. Please register first.";
+        } else if (data.message?.toLowerCase().includes("invalid password")) {
+          errorMsg = "Please enter the correct password.";
+        } else if (data.message?.toLowerCase().includes("verify")) {
+          errorMsg = "Please verify your email before login.";
         }
+
+        toast.error(errorMsg);
       }
     } catch (err) {
-      setError("Server error. Please try again later.");
-      console.error("Login error:", err);
+      console.error(err);
+      toast.error("Server error. Please try again later.");
     }
   };
 
@@ -88,9 +95,6 @@ const Login = () => {
       <div className="auth-container-right">
         <form onSubmit={handleLogin} className="auth-form">
           <h2 className="login-title">Login</h2>
-
-          {error && <p className="error-text">{error}</p>}
-          {success && <p className="success-text">{success}</p>}
 
           <input
             type="text"
@@ -128,11 +132,15 @@ const Login = () => {
             Login
           </button>
 
+
           <p className="auth-footer">
             Not a member? <Link to="/SuperAdminRegistration">Sign up</Link>
           </p>
         </form>
       </div>
+
+      {/* Toast container */}
+      <ToastContainer position="top-center" autoClose={2000} />
     </div>
   );
 };
