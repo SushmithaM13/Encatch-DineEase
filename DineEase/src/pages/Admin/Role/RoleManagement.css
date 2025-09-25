@@ -1,0 +1,59 @@
+.role-management {
+  padding: 20px;
+}
+
+.role-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.role-form input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  flex: 1;
+}
+
+.role-form button {
+  background: #3b82f6;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.roles-list {
+  display: grid;
+  gap: 12px;
+}
+
+.role-card {
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.role-card h4 {
+  margin: 0 0 4px;
+}
+
+.actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+}
+
+.actions button {
+  background: #f1f1f1;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.actions button:hover {
+  background: #e0e0e0;
+}

@@ -1,0 +1,57 @@
+.settings-page {
+  padding: 20px;
+}
+
+.settings-tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.settings-tabs button {
+  padding: 8px 16px;
+  border: none;
+  background-color: #eee;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.settings-tabs button.active {
+  background-color: #454545;
+  color: white;
+}
+
+.settings-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.tab-content label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.tab-content input[type="text"],
+.tab-content input[type="email"],
+.tab-content input[type="password"],
+.tab-content select {
+  width: 100%;
+  padding: 6px 10px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.tab-content button {
+  padding: 8px 16px;
+  background-color: #454545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}

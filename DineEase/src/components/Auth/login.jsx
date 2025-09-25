@@ -3,135 +3,138 @@ import { useNavigate, Link } from "react-router-dom";
 import "../Auth/styles/login.css";
 
 const Login = () => {
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const [remember, setRemember] = useState(false);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");  // Success message
-    const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setError(""); 
-        setSuccess(""); 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
 
-        try {
-            const response = await fetch(
-                "http://localhost:8082/dine-ease/api/v1/users/login",
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, password }),
-                }
-            );
-
-            const data = await response.json();
-
-            if (response.ok) {
-                // Save token & role in localstorage
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("role", data.role);
-
-                // handle remember password
-                if (remember) {
-                    localStorage.setItem("rememberEmail", username);
-                } else {
-                    localStorage.removeItem("rememberEmail");
-                }
-
-                // Show success message
-                setSuccess("Login successful! Redirecting...");
-
-                // Redirect based on role after 1.5s
-                setTimeout(() => {
-                    if (data.role === "SUPER_ADMIN") {
-                        navigate("/superAdminDashboard");
-                    } else if (data.role === "ADMIN") {
-                        navigate("/adminDashboard");
-                    } else if (data.role === "STAFF") {
-                        navigate("/staffDashboard");
-                    } else {
-                        navigate("/"); // fallback
-                    }
-                }, 1500);
-
-            } else {
-                // Handle backend error messages
-                if (data.message?.toLowerCase().includes("not found")) {
-                    setError("User not found. Please register first.");
-                } else if (data.message?.toLowerCase().includes("invalid password")) {
-                    setError("Please enter the correct password.");
-                } else if (data.message?.toLowerCase().includes("verify")) {
-                    setError("Please verify your email before login.");
-                } else {
-                    setError(data.message || "Invalid credentials. Please try again.");
-                }
-            }
-        } catch (err) {
-            setError("Server error, Please try again later",err);
+    try {
+      const response = await fetch(
+        "http://localhost:8082/dine-ease/api/v1/users/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
         }
-    };
+      );
 
-    return (
-        <div className="auth-container">
-            {/* Left Section */}
-            <div className="auth-container-left"></div>
+      const data = await response.json();
 
-            {/* Right Section */}
-            <div className="auth-container-right">
-                <form onSubmit={handleLogin} className="auth-form">
-                    <h2 className="login-title">Login</h2>
+      if (response.ok) {
+        // Save token & role
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("role", data.role);
 
-                    {/* Show error & success messages outside inputs */}
-                    {error && <p className="error-text">{error}</p>}
-                    {success && <p className="success-text">{success}</p>}
+        // Save waiter name if role is WAITER
+        if (data.role === "WAITER" && data.name) {
+          localStorage.setItem("waiterName", data.name);
+        }
 
-                    <input
-                        type="text"
-                        name="email"
-                        placeholder="Email address"
-                        className="login-input"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                    />
+        // Remember email
+        if (remember) {
+          localStorage.setItem("rememberEmail", username);
+        } else {
+          localStorage.removeItem("rememberEmail");
+        }
 
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                        className="login-input"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
+        setSuccess("Login successful! Redirecting...");
 
-                    <div className="auth-row">
-                        <label className="auth-checkbox-label">
-                            <input
-                                type="checkbox"
-                                name="remember"
-                                className="checkbox-input"
-                                checked={remember}
-                                onChange={(e) => setRemember(e.target.checked)}
-                            />
-                            Remember me
-                        </label>
-                        <Link to="/forgotPassword" className="forgot-password-link">
-                            Forgot password?
-                        </Link>
-                    </div>
+        setTimeout(() => {
+          switch (data.role) {
+            case "SUPER_ADMIN":
+              navigate("/superAdminDashboard");
+              break;
+            case "ADMIN":
+              navigate("/AdminDashboard");
+              break;
+            case "WAITER":
+              navigate("/WaiterDashboard");
+              console.log("login as waiter");
+              break;
+            default:
+              navigate("/");
+          }
+        }, 1500);
 
-                    <button type="submit" className="login-btn">
-                        Login
-                    </button>
+      } else {
+        const msg = data.message?.toLowerCase() || "";
+        if (msg.includes("not found")) {
+          setError("User not found. Please register first.");
+        } else if (msg.includes("invalid password")) {
+          setError("Please enter the correct password.");
+        } else if (msg.includes("verify")) {
+          setError("Please verify your email before login.");
+        } else {
+          setError(data.message || "Invalid credentials. Please try again.");
+        }
+      }
+    } catch (err) {
+      setError("Server error. Please try again later.");
+      console.error("Login error:", err);
+    }
+  };
 
-                    <p className="auth-footer">
-                        Not a member? <Link to="/SuperAdminRegistration">Sign up</Link>
-                    </p>
-                </form>
-            </div>
-        </div>
-    );
+  return (
+    <div className="auth-container">
+      <div className="auth-container-left"></div>
+
+      <div className="auth-container-right">
+        <form onSubmit={handleLogin} className="auth-form">
+          <h2 className="login-title">Login</h2>
+
+          {error && <p className="error-text">{error}</p>}
+          {success && <p className="success-text">{success}</p>}
+
+          <input
+            type="text"
+            placeholder="Email address"
+            className="login-input"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            className="login-input"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <div className="auth-row">
+            <label className="auth-checkbox-label">
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+              />
+              Remember me
+            </label>
+            <Link to="/forgotPassword" className="forgot-password-link">
+              Forgot password?
+            </Link>
+          </div>
+
+          <button type="submit" className="login-btn">
+            Login
+          </button>
+
+          <p className="auth-footer">
+            Not a member? <Link to="/SuperAdminRegistration">Sign up</Link>
+          </p>
+        </form>
+      </div>
+    </div>
+  );
 };
+
 export default Login;
