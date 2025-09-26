@@ -94,3 +94,367 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+
+
+/* swxsadcds */
+/* ============ Global ============ */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background-color: #f5f6fa;
+  color: #333;
+}
+
+/* Make the app fill the entire viewport */
+.app {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* ============ Sidebar ============ */
+.sidebar {
+  width: 240px;                     /* fixed width */
+  background-color: #243447;        /* dark blue */
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding-top: 1rem;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar h1,
+.sidebar-logo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 0 1rem;
+  margin-bottom: 1rem;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+}
+
+.sidebar li {
+  margin: 0.2rem 0;
+}
+
+.sidebar a {
+  display: block;
+  padding: 0.7rem 1rem;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+  background-color: #3a516b;
+}
+
+/* ============ Main Content ============ */
+.content {
+  flex: 1;                       /* fill remaining space */
+  padding: 1.5rem;
+  overflow-y: auto;
+  background-color: #f5f6fa;
+  box-sizing: border-box;
+}
+
+/* Headings inside content */
+.content h1,
+.content h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #243447;
+}
+
+/* ============ Dashboard & Pages ============ */
+.page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.page-card {
+  background: #fff;
+  color: #333;
+  border-radius: 10px;
+  padding: 1rem;
+  min-height: 100px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ============ Tables (MenuCatalog / Inventory) ============ */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table th,
+.table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+/* ============ Status Badges (for Inventory) ============ */
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-badge.adequate {
+  background: #e6f4ea;
+  color: #2e7d32;
+}
+
+.status-badge.low {
+  background: #fff8e1;
+  color: #f57f17;
+}
+
+.status-badge.out-of-stock {
+  background: #fdecea;
+  color: #d33;
+}
+
+/* ============ Buttons ============ */
+.btn {
+  display: inline-block;
+  background: #2e7d32;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
+}
+
+.btn:hover {
+  background: #256628;
+}
+
+/* Secondary style */
+.btn-secondary {
+  background: #fff;
+  border: 1px solid #2e7d32;
+  color: #2e7d32;
+}
+
+.btn-secondary:hover {
+  background: #2e7d32;
+  color: #fff;
+}
+
+/* ============ Responsive Sidebar ============ */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 180px;
+  }
+
+  .page-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* App.css or index.css */
+html {
+  scroll-behavior: smooth;
+}
+
+/* orderqueue */
+.order-queue {
+  padding: 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.order-queue h2 {
+  margin-bottom: 1rem;
+}
+
+/* Add order form */
+.add-order-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.add-order-form input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.add-order-form .btn {
+  padding: 0.5rem 1rem;
+  background: #2e7d32;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.add-order-form .btn:hover {
+  background: #256628;
+}
+
+/* Queue sections */
+.queue-section {
+  margin-top: 1.5rem;
+}
+
+.queue-section h3 {
+  margin-bottom: 0.5rem;
+}
+
+/* Each order card */
+.queue-card {
+  background: #fff;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.queue-card .time {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 0.2rem;
+}
+
+.note {
+  color: #d33;
+  font-size: 0.85rem;
+}
+
+/* Buttons */
+button.accept,
+button.mark-ready {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+}
+
+button.accept {
+  background: green;
+}
+
+button.mark-ready {
+  background: orange;
+}
+
+@media (max-width: 600px) {
+  .add-order-form {
+    flex-direction: column;
+  }
+}
+
+/* side bar */
+/* Sidebar main styles */
+.sidebar {
+  background-color: #2e7d32; /* green */
+  color: #fff;
+  width: 220px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  box-sizing: border-box;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+
+/* Logo/title */
+.sidebar .logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Navigation links */
+.sidebar nav a {
+  display: block;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+  font-weight: 500;
+}
+
+.sidebar nav a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar nav a.active {
+  background-color: #1b5e20; /* darker green for active link */
+}
+
+/* Make sure main content pushes aside correctly */
+.content {
+  margin-left: 220px;
+  padding: 1rem;
+  width: calc(100% - 220px);
+}
+
+/* Responsive: collapse sidebar on small screens */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px;
+    padding: 1rem 0.5rem;
+  }
+
+  .sidebar .logo {
+    font-size: 1rem;
+    justify-content: center;
+  }
+
+  .sidebar nav a {
+    text-align: center;
+    padding: 0.6rem 0;
+    font-size: 0.85rem;
+  }
+
+  .content {
+    margin-left: 60px;
+    width: calc(100% - 60px);
+  }
+}
