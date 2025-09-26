@@ -27,11 +27,24 @@ import Reservation from "./pages/Waiter/Reservation/Reservation";
 
 // ===== Footer =====
 import Footer from './components/footer/Footer';
+import ChefDashboard from './pages/Chef/Components/ChefDashboard/ChefDashboard.jsx'
+import Inventory from './pages/Chef/Components/Inventory/Inventory';
+import OrderQueue from './pages/Chef/Components/OrderQueue/OrderQueue';
+import Sidebar from './pages/Chef/Components/Sidebar/Sidebar';
+import Topbar from './pages/Chef/Components/Topbar/Topbar';
+import ChefMenuCatlog from './pages/Chef/Components/ChefMenucatlog/ChefMenuCatalog.jsx';
+
+
 
 function App() {
   return (
     <>
       <Routes>
+       
+
+        
+                
+                 
         {/* ===== Public Routes ===== */}
         <Route path='/' element={<Login />} />
         <Route path='/forgotPassword' element={<ForgotPassword />} />
@@ -83,6 +96,16 @@ function App() {
 
         {/* ===== Catch-all 404 ===== */}
         <Route path="*" element={<h2 className="text-center mt-10">404 - Page Not Found</h2>} />
+       
+       
+       
+        {/* 👇 Chef dashboard routes */}
+        <Route path="/ChefDashboard"element={<ChefDashboard />}/>
+        <Route path='/ChefMenuCatalog' element={<ChefMenuCatlog />}/>
+        <Route path='/inventory' element={<Inventory />}/>
+        <Route path='/orderQueue' element={<OrderQueue />}/>
+        <Route path='/sidebar' element={<Sidebar />}/>
+        <Route path='/topbar' element={<Topbar />}/>  
       </Routes>
       <Footer />
     </>

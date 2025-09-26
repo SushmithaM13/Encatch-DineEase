@@ -1,0 +1,176 @@
+/* src/components/MenuCatalog/MenuCatalog.css */
+
+/* Container */
+.menu-catalog {
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+}
+
+.menu-catalog h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Filter Buttons */
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.chip {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-size: 14px;
+}
+
+.chip:hover {
+  background-color: #ddd;
+}
+
+.chip.active {
+  background-color: #4caf50;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Menu Grid */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+/* Menu Card */
+.menu-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.menu-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Out of Stock */
+.menu-card.out {
+  opacity: 0.5;
+}
+
+/* Image Placeholder */
+.image-placeholder {
+  height: 150px;
+  width: 100%;
+  background-size: contain;       /* fit the whole image in the box */
+  background-repeat: no-repeat;   /* don’t tile */
+  background-position: center;    /* center image */
+}
+
+/* Card Body */
+.menu-body {
+  padding: 15px;
+}
+
+.menu-body h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: #333;
+}
+
+.menu-body .desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+/* Price & Stock */
+.price-stock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-weight: bold;
+  color: #222;
+}
+
+.stock-badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.stock-badge.in {
+  background-color: #4caf50;
+}
+
+.stock-badge.out {
+  background-color: #f44336;
+}
+
+/* Toggle Stock Button */
+.toggle-stock-btn {
+  margin-top: 10px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  display: inline-block;
+}
+
+.toggle-stock-btn:hover {
+  background-color: #0056b3;
+}
+
+/* No Items Message */
+.no-items {
+  grid-column: 1/-1;
+  text-align: center;
+  font-size: 16px;
+  color: #999;
+  padding: 20px;
+}
+
+/* Report Out of Stock Button */
+.report-out {
+  display: block;
+  margin: 30px auto 0;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  background-color: #ff9800;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.report-out:hover {
+  background-color: #e68a00;
+}
+
+/* Optional: use this if you want <img> tag instead of background */
+.menu-image {
+  width: 100%;
+  height: 150px;
+  object-fit: cover; /* fill the box; crop if needed */
+  display: block;
+}
