@@ -1,6 +1,6 @@
 .user-management {
-  padding: 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 14px;
+  background: linear-gradient(135deg, #fafafa 0%, #764ba2 100%);
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -9,8 +9,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  padding: 32px;
+  background: linear-gradient(145deg, #aef0ff 0%, #90beeb00 100%);
+  padding: 10px;
   border-radius: 20px;
   margin-bottom: 32px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
@@ -33,7 +33,7 @@
   background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
   color: white;
   border: none;
-  padding: 14px 28px;
+  padding: 10px 18px;
   border-radius: 50px;
   font-size: 16px;
   font-weight: 600;
@@ -48,7 +48,7 @@
 .add-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 35px rgba(72, 187, 120, 0.4);
-  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+  background: linear-gradient(135deg, #e1ff1d 0%, #ff5252 100%);
 }
 
 .add-btn:active {
@@ -94,7 +94,7 @@
   display: none;
 }
 
-table {
+.user-management table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
@@ -106,23 +106,22 @@ table {
   border: 1px solid #e2e8f0;
 }
 
-
-thead {
+.user-management thead {
   background: #f3f4f6;
 }
 
-thead th {
-  font-size: 16px;
-  border-bottom: 2px solid #0e51d5;
+.user-management thead th {
+   font-size: 12px;
+    border-bottom: 2px solid #ffffff;
 }
 
-tbody td {
-  font-size: 14px;
+.user-management tbody td {
+  font-size: 13.5px;
   border-top: 1px solid #0e51d5;
 }
 
 @media (max-width: 768px) {
-  table {
+  .user-management table {
     display: none !important;
     visibility: hidden !important;
     width: 0 !important;
@@ -131,13 +130,13 @@ tbody td {
   }
 }
 
-table th, table td {
+.user-management table th, table td {
   padding: 16px 20px;
   text-align: left;
   border-bottom: 1px solid #f1f5f9;
 }
 
-table th {
+.user-management table th {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-weight: 700;
@@ -147,32 +146,32 @@ table th {
   position: relative;
 }
 
-table th:first-child {
+.user-management table th:first-child {
   border-top-left-radius: 20px;
 }
 
-table th:last-child {
+.user-management table th:last-child {
   border-top-right-radius: 20px;
 }
 
-table tbody tr {
+.user-management table tbody tr {
   transition: all 0.3s ease;
 }
 
-table tbody tr:hover {
+ .user-management table tbody tr:hover {
   background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
   transform: scale(1.01);
 }
 
-table tbody tr:last-child td:first-child {
+.user-management table tbody tr:last-child td:first-child {
   border-bottom-left-radius: 20px;
 }
 
-table tbody tr:last-child td:last-child {
+.user-management table tbody tr:last-child td:last-child {
   border-bottom-right-radius: 20px;
 }
 
-table td {
+.user-management table td {
   color: #4a5568;
   font-weight: 500;
 }

@@ -56,8 +56,8 @@ export default function AdminStaffManagement() {
       const staffData = Array.isArray(data)
         ? data
         : Array.isArray(data.content)
-        ? data.content
-        : [];
+          ? data.content
+          : [];
 
       const mappedStaff = staffData.map((s) => ({
         id: s.id,
@@ -74,7 +74,8 @@ export default function AdminStaffManagement() {
         status: s.staffStatus,
       }));
 
-      setStaffList(mappedStaff);
+      // ✅ Ensure ascending order
+      setStaffList(mappedStaff.sort((a, b) => a.staffId - b.staffId));
 
       const newlyActivated = mappedStaff.filter(
         (s) =>
@@ -130,7 +131,10 @@ export default function AdminStaffManagement() {
       setPopupOpen(false);
 
       if (method === "POST") {
-        setStaffList((prev) => [...prev, data]);
+        // ✅ Keep ascending order when adding
+        setStaffList((prev) =>
+          [...prev, data].sort((a, b) => a.staffId - b.staffId)
+        );
         toast.info("Staff added! Check email to activate account.", {
           position: "top-center",
         });
@@ -201,13 +205,13 @@ export default function AdminStaffManagement() {
     activeTab === "All Staff"
       ? staffList
       : staffList.filter((s) =>
-          activeTab.toLowerCase() === "chef"
-            ? s.staffRoleType?.toLowerCase().includes("chef")
-            : activeTab.toLowerCase() === "waiters"
+        activeTab.toLowerCase() === "chef"
+          ? s.staffRoleType?.toLowerCase().includes("chef")
+          : activeTab.toLowerCase() === "waiters"
             ? s.staffRoleType?.toLowerCase().includes("waiter")
             : !s.staffRoleType?.toLowerCase().includes("chef") &&
-              !s.staffRoleType?.toLowerCase().includes("waiter")
-        );
+            !s.staffRoleType?.toLowerCase().includes("waiter")
+      );
 
   return (
     <div className="user-management">
@@ -458,6 +462,19 @@ export default function AdminStaffManagement() {
                   value={form.contractEndDate}
                   onChange={handleChange}
                 />
+              </div>
+              <div className="form-group">
+                <label>Status</label>
+                <select
+                  name="status"
+                  value={form.status || ""}
+                  onChange={handleChange}
+                >
+                  <option value="">Select Status</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="Pending">Pending</option>
+                </select>
               </div>
               <div className="form-group">
                 <label>Password</label>

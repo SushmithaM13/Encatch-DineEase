@@ -24,8 +24,8 @@
   z-index: 1000;
 }
 
-.sidebar-expanded { width: 240px; }
-.sidebar-collapsed { width: 70px; }
+.sidebar-expanded { width: 160px; }
+.sidebar-collapsed { width: 80px; }
 
 .sidebar-collapsed {
  
@@ -138,6 +138,120 @@
 .profile-name {
   font-weight: bold;
   font-size: 16px;
+}
+/* Profile Section */
+.profile-info {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-name {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0;
+  z-index: 1000;
+}
+
+.profile-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 10px 16px;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+  color: #2d3748;
+  transition: background 0.2s;
+}
+
+.profile-dropdown button:hover {
+  background: #f7fafc;
+}
+
+.profile-dropdown .logout-btn {
+  color: #e53e3e;
+  font-weight: 600;
+}
+/* Profile Section */
+.profile-info {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-name {
+  font-weight: 600;
+  color: #e8ff3d;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0;
+  z-index: 1000;
+}
+
+.profile-dropdown button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 10px 16px;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+  color: #2d3748;
+  transition: background 0.2s;
+}
+
+.profile-dropdown button:hover {
+  background: #f7fafc;
+}
+
+.profile-dropdown .logout-btn {
+  color: #e53e3e;
+  font-weight: 600;
 }
 
 /* -------------------- DASHBOARD HEADER + STATS -------------------- */
