@@ -42,7 +42,6 @@ export default function AdminStaffManagement() {
   }, [previousActiveIds]);
 
   // Fetch staff
-
   const fetchStaff = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE}/all`, {
@@ -57,8 +56,8 @@ export default function AdminStaffManagement() {
       const staffData = Array.isArray(data)
         ? data
         : Array.isArray(data.content)
-          ? data.content
-          : [];
+        ? data.content
+        : [];
 
       const mappedStaff = staffData.map((s) => ({
         id: s.id,
@@ -98,7 +97,7 @@ export default function AdminStaffManagement() {
       console.error("Error fetching staff:", err);
       setStaffList([]);
     }
-  }, [API_BASE, TOKEN, previousActiveIds]); // dependencies
+  }, [API_BASE, TOKEN, previousActiveIds]);
 
   // Add or Update
   const handleAddOrUpdate = async () => {
@@ -138,8 +137,6 @@ export default function AdminStaffManagement() {
       } else {
         toast.success("Staff updated successfully!", { position: "top-center" });
       }
-
-
     } catch (err) {
       console.error("Error saving staff:", err);
       alert("Error saving staff: " + err.message);
@@ -204,13 +201,13 @@ export default function AdminStaffManagement() {
     activeTab === "All Staff"
       ? staffList
       : staffList.filter((s) =>
-        activeTab.toLowerCase() === "chef"
-          ? s.staffRoleType?.toLowerCase().includes("chef")
-          : activeTab.toLowerCase() === "waiters"
+          activeTab.toLowerCase() === "chef"
+            ? s.staffRoleType?.toLowerCase().includes("chef")
+            : activeTab.toLowerCase() === "waiters"
             ? s.staffRoleType?.toLowerCase().includes("waiter")
             : !s.staffRoleType?.toLowerCase().includes("chef") &&
-            !s.staffRoleType?.toLowerCase().includes("waiter")
-      );
+              !s.staffRoleType?.toLowerCase().includes("waiter")
+        );
 
   return (
     <div className="user-management">
@@ -312,7 +309,9 @@ export default function AdminStaffManagement() {
             <div key={staff.id} className="user-card-mobile">
               <div className="user-row user-name-cell">
                 <span className="cell-label">Name</span>
-                <span className="cell-value">{staff.firstName} {staff.lastName}</span>
+                <span className="cell-value">
+                  {staff.firstName} {staff.lastName}
+                </span>
               </div>
               <div className="user-row">
                 <span className="cell-label">Email</span>
@@ -332,14 +331,22 @@ export default function AdminStaffManagement() {
               </div>
               <div className="user-row">
                 <span className="cell-label">Status</span>
-                <span className={`status ${staff.status?.toLowerCase()}`}>{staff.status || 'Inactive'}</span>
+                <span className={`status ${staff.status?.toLowerCase()}`}>
+                  {staff.status || "Inactive"}
+                </span>
               </div>
               <div className="user-row actions-cell">
                 <div className="user-actions">
-                  <button className="action-btn edit" onClick={() => handleEdit(staff)}>
+                  <button
+                    className="action-btn edit"
+                    onClick={() => handleEdit(staff)}
+                  >
                     <Edit size={16} />
                   </button>
-                  <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
+                  <button
+                    className="action-btn delete"
+                    onClick={() => handleRemove(staff.id)}
+                  >
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -352,8 +359,6 @@ export default function AdminStaffManagement() {
           </div>
         )}
       </div>
-
-
 
       {/* Popup */}
       {popupOpen && (

@@ -19,7 +19,7 @@ const ResetPassword = () => {
   const handleVerifyOtp=async()=>{
     if(!otp) return toast.error("Please enter OTP");
 
-    setLoading(true);
+    setLoading(true);   
     try {
         const response=await fetch("http://localhost:8082/dine-ease/api/v1/users/verify-temp-password",
           {
@@ -37,7 +37,7 @@ const ResetPassword = () => {
         }
     } catch (err) {
       console.log(err);
-       toast.error("Server error, please try again later.")
+       toast.error("Server error, please try again later.") 
     }finally{
       setLoading(false);
     }
