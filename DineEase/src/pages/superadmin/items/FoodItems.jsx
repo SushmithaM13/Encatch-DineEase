@@ -50,49 +50,25 @@ const FoodItems = () => {
   });
 
   const toggleAvailability = (itemId, category, subCat = null) => {
-    console.log('Toggle clicked:', { itemId, category, subCat });
-
     setItemsData(prevData => {
-      const newData = JSON.parse(JSON.stringify(prevData)); // Deep copy
-
-      try {
-        if (subCat) {
-          // Handle subcategory items
-          if (newData[category] && newData[category][subCat]) {
-            newData[category][subCat] = newData[category][subCat].map(item => {
-              if (item.id === itemId) {
-                console.log(`Toggling item ${item.name} from ${item.available} to ${!item.available}`);
-                return { ...item, available: !item.available };
-              }
-              return item;
-            });
-          }
-        } else {
-          // Handle direct category items
-          if (newData[category] && Array.isArray(newData[category])) {
-            newData[category] = newData[category].map(item => {
-              if (item.id === itemId) {
-                console.log(`Toggling item ${item.name} from ${item.available} to ${!item.available}`);
-                return { ...item, available: !item.available };
-              }
-              return item;
-            });
-          }
-        }
-
-        console.log('Toggle completed, new data:', newData);
-        return newData;
-      } catch (error) {
-        console.error('Error toggling availability:', error);
-        return prevData;
+      const newData = JSON.parse(JSON.stringify(prevData));
+      if (subCat) {
+        newData[category][subCat] = newData[category][subCat].map(item =>
+          item.id === itemId ? { ...item, available: !item.available } : item
+        );
+      } else {
+        newData[category] = newData[category].map(item =>
+          item.id === itemId ? { ...item, available: !item.available } : item
+        );
       }
+      return newData;
     });
   };
 
   const renderItems = () => {
     if (!activeCategory) return <p>Select a category</p>;
-
     const categoryData = itemsData[activeCategory];
+
     if (typeof categoryData === "object" && !Array.isArray(categoryData)) {
       if (!subCategory) return <p>Select a sub-category</p>;
       return categoryData[subCategory].map((item) => (
@@ -112,7 +88,6 @@ const FoodItems = () => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Button clicked for item:', item.name, 'Current state:', item.available);
                     toggleAvailability(item.id, activeCategory, subCategory);
                   }}
                 >
@@ -127,6 +102,7 @@ const FoodItems = () => {
         </div>
       ));
     }
+
     return categoryData.map((item) => (
       <div key={item.id} className={`food-item-card ${!item.available ? 'unavailable' : ''}`}>
         <div className="item-image">
@@ -144,7 +120,6 @@ const FoodItems = () => {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log('Button clicked for item:', item.name, 'Current state:', item.available);
                   toggleAvailability(item.id, activeCategory);
                 }}
               >
@@ -162,52 +137,31 @@ const FoodItems = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Prevent multiple submissions
     if (!formData.name.trim() || !formData.price || !formData.image.trim()) {
       alert('Please fill in all required fields');
       return;
     }
 
     const newItem = {
-      id: Date.now() + Math.random(), // More unique ID generation
+      id: Date.now() + Math.random(),
       name: formData.name.trim(),
       price: parseFloat(formData.price),
       image: formData.image.trim(),
       available: formData.available
     };
 
-    console.log('Adding new item:', newItem);
-    console.log('Current category:', activeCategory, 'Subcategory:', subCategory);
-
-    // Update the data only once
     setItemsData(prevData => {
-      const newData = JSON.parse(JSON.stringify(prevData)); // Deep copy to avoid mutations
-
+      const newData = JSON.parse(JSON.stringify(prevData));
       if (subCategory) {
-        // Adding to subcategory (Main Course, Starters, Tiffins)
-        console.log('Adding to subcategory:', activeCategory, subCategory);
-        if (newData[activeCategory] && newData[activeCategory][subCategory]) {
-          newData[activeCategory][subCategory] = [...newData[activeCategory][subCategory], newItem];
-        }
-      } else {
-        // Adding to direct category (Breads, Desserts)
-        console.log('Adding to direct category:', activeCategory);
-        if (newData[activeCategory] && Array.isArray(newData[activeCategory])) {
-          newData[activeCategory] = [...newData[activeCategory], newItem];
-        }
+        newData[activeCategory][subCategory] = [...newData[activeCategory][subCategory], newItem];
+      } else if (newData[activeCategory] && Array.isArray(newData[activeCategory])) {
+        newData[activeCategory] = [...newData[activeCategory], newItem];
       }
-
-      console.log('Updated data:', newData);
       return newData;
     });
 
-    // Reset form and close popup
     setFormData({ name: "", price: "", image: "", available: true });
     setShowPopup(false);
-
-    // Show success message
-    console.log(`Item "${newItem.name}" added to ${activeCategory}${subCategory ? ' - ' + subCategory : ''}`);
   };
 
   return (
@@ -232,22 +186,17 @@ const FoodItems = () => {
         </div>
 
         {/* Sub-category dropdown */}
-        {activeCategory === "Main Course" && (
+        {["Main Course", "Starters", "Tiffins"].includes(activeCategory) && (
           <div className="dropdowns">
-            <button onClick={() => setSubCategory("Veg")}>Veg</button>
-            <button onClick={() => setSubCategory("Non Veg")}>Non Veg</button>
-          </div>
-        )}
-        {activeCategory === "Starters" && (
-          <div className="dropdowns">
-            <button onClick={() => setSubCategory("Veg")}>Veg</button>
-            <button onClick={() => setSubCategory("Non Veg")}>Non Veg</button>
-          </div>
-        )}
-        {activeCategory === "Tiffins" && (
-          <div className="dropdowns">
-            <button onClick={() => setSubCategory("North")}>North</button>
-            <button onClick={() => setSubCategory("South")}>South</button>
+            <select
+              value={subCategory}
+              onChange={(e) => setSubCategory(e.target.value)}
+            >
+              <option value="">Select {activeCategory} type</option>
+              {Object.keys(itemsData[activeCategory]).map((sub) => (
+                <option key={sub} value={sub}>{sub}</option>
+              ))}
+            </select>
           </div>
         )}
 

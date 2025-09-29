@@ -95,7 +95,7 @@ const DashboardHome = () => {
               <FaUserPlus size={32} color="#f59e0b" />
             </div>
             {/* <h3>{stats.pendingInvites}</h3> */}
-            <p>Pending Staff</p>
+            <p>Pending Staff </p>
           </div>
           <div className="stat-card">
             <div className="icon-container">

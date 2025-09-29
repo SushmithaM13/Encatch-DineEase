@@ -834,3 +834,121 @@
     padding: 10px;
   }
 }
+
+.dropdowns {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: center;
+}
+
+.dropdowns select {
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 12px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  background: white;
+  color: #2c3e50;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dropdowns select:hover {
+  border-color: #42a5f5;
+  box-shadow: 0 6px 20px rgba(66, 165, 245, 0.2);
+}
+
+.dropdowns select:focus {
+  outline: none;
+  border-color: #27ae60;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.25);
+}
+
+
+/* Container for the dropdown */
+.select-category {
+  display: inline-block;
+  margin: 10px 0;
+}
+
+/* Style the select element */
+.select-category select {
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.select-category select:hover {
+  border-color: #007bff;
+  background-color: #f0f8ff;
+}
+
+/* Focus effect */
+.select-category select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Optional: change the color of the selected option */
+.select-category option {
+  color: #333;
+  background-color: #fff;
+}
+.header-bar {
+  display: flex;
+  gap: 10px;
+}
+
+.category-btn-wrapper {
+  position: relative;
+}
+
+.category-btn {
+  padding: 8px 16px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #fff;
+  border-radius: 4px;
+  user-select: none;
+  position: relative;
+}
+
+.category-btn.active {
+  background: #007bff;
+  color: #fff;
+}
+
+.subcategory-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 120px;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.subcategory-item {
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.subcategory-item:hover {
+  background: #007bff;
+  color: #fff;
+}
+
+.subcategory-item.selected {
+  font-weight: bold;
+  background: #007bff;
+  color: #fff;
+}

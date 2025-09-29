@@ -1,143 +1,241 @@
-import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import "./UserManagement.css";
+import { useState, useEffect, useCallback } from "react";
+import { Plus, Edit, Trash2, UserCog } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./Usermanagement.css";
 
-const UserManagement = () => {
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [activeTab, setActiveTab] = useState("All Users");
-  const [showForm, setShowForm] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
-  const [formData, setFormData] = useState({
-    name: "",
+export default function AdminStaffManagement() {
+  const API_BASE = "http://localhost:8082/dine-ease/api/v1/staff";
+  const ROLES_API = "http://localhost:8082/dine-ease/api/v1/staff-role/all";
+  const TOKEN = localStorage.getItem("token");
+
+  if (!TOKEN) console.warn("No token found! Please login first.");
+
+  const initialForm = {
+    firstName: "",
+    lastName: "",
     email: "",
-    role: "",
-    status: "Active",
-    joinDate: new Date().toISOString().split("T")[0], // default today
+    phone: "",
+    staffRoleType: "",
+    shiftTiming: "",
+    salary: 0,
+    contractStartDate: "",
+    contractEndDate: "",
+    password: "",
+  };
+
+  const [staffList, setStaffList] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [form, setForm] = useState(initialForm);
+  const [editId, setEditId] = useState(null);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("All Staff");
+
+  // Persist active IDs
+  const [previousActiveIds, setPreviousActiveIds] = useState(() => {
+    const stored = localStorage.getItem("activeStaffIds");
+    return stored ? JSON.parse(stored) : [];
   });
 
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    localStorage.setItem("activeStaffIds", JSON.stringify(previousActiveIds));
+  }, [previousActiveIds]);
 
-  const fetchUsers = async () => {
+  // Fetch staff
+
+  const fetchStaff = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:8082/api/users", {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await fetch(`${API_BASE}/all`, {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
+        },
       });
-      const data = await response.json();
-      setUsers(data || []);
-      setFilteredUsers(data || []);
-    } catch (err) {
-      console.error("Error fetching users:", err);
-     
-    }
-  };
+      if (!res.ok) throw new Error("Failed to fetch staff");
+      const data = await res.json();
 
-  const tabs = ["All Users", "Admins", "Chefs", "Waiters", "Accountants"];
+      const staffData = Array.isArray(data)
+        ? data
+        : Array.isArray(data.content)
+          ? data.content
+          : [];
 
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-    if (tab === "All Users") {
-      setFilteredUsers(users);
-    } else {
-      const roleMap = {
-        Admins: "Admin",
-        Chefs: "Chef",
-        Waiters: "Waiter",
-        Accountants: "Accountant",
-      };
-      setFilteredUsers(users.filter((u) => u.role === roleMap[tab]));
-    }
-  };
+      const mappedStaff = staffData.map((s) => ({
+        id: s.id,
+        staffId: s.id,
+        firstName: s.firstName,
+        lastName: s.lastName,
+        email: s.email,
+        phone: s.phoneNumber,
+        staffRoleType: s.staffRoleName,
+        shiftTiming: s.shiftTiming,
+        salary: s.salary,
+        contractStartDate: s.contractStartDate,
+        contractEndDate: s.contractEndDate,
+        status: s.staffStatus,
+      }));
 
-  const handleAddUser = (e) => {
-    e.preventDefault();
-    
-    if (editingUser) {
-      // Update existing user
-      const updatedUsers = users.map(user => 
-        user.id === editingUser.id ? { ...formData, id: editingUser.id } : user
+      setStaffList(mappedStaff);
+
+      const newlyActivated = mappedStaff.filter(
+        (s) =>
+          s.status?.toLowerCase() === "active" &&
+          !previousActiveIds.includes(s.id)
       );
-      setUsers(updatedUsers);
-      setFilteredUsers(updatedUsers);
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
-      
-      // Dispatch custom event to notify other components
-      window.dispatchEvent(new CustomEvent('userUpdated', {
-        detail: { users: updatedUsers }
-      }));
-      
-      setEditingUser(null);
-    } else {
-      // Add new user
-      const newUser = {
-        ...formData,
-        id: Date.now(),
-      };
-      const updatedUsers = [...users, newUser];
-      setUsers(updatedUsers);
-      setFilteredUsers(updatedUsers);
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
-      
-      // Dispatch custom event to notify other components
-      window.dispatchEvent(new CustomEvent('userAdded', {
-        detail: { users: updatedUsers, newUser }
-      }));
+
+      if (newlyActivated.length > 0) {
+        newlyActivated.forEach((s) =>
+          toast.success(`Staff ${s.firstName} ${s.lastName} activated!`, {
+            position: "top-center",
+          })
+        );
+        setPreviousActiveIds((prev) => [
+          ...prev,
+          ...newlyActivated.map((s) => s.id),
+        ]);
+      }
+    } catch (err) {
+      console.error("Error fetching staff:", err);
+      setStaffList([]);
     }
-    
-    setShowForm(false);
-    setFormData({
-      name: "",
-      email: "",
-      role: "",
-      status: "Active",
-      joinDate: new Date().toISOString().split("T")[0],
-    });
+  }, [API_BASE, TOKEN, previousActiveIds]); // dependencies
+
+  // Add or Update
+  const handleAddOrUpdate = async () => {
+    if (!form.firstName || !form.lastName || !form.email || !form.phone) {
+      alert("Please fill all required fields.");
+      return;
+    }
+    const payload = { ...form, salary: Number(form.salary) };
+    try {
+      let url = `${API_BASE}/add`;
+      let method = "POST";
+      if (editId) {
+        url = `${API_BASE}/update-staff/${editId}`;
+        method = "PUT";
+      }
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(await res.text());
+
+      const data = await res.json();
+      await fetchStaff();
+      setForm(initialForm);
+      setEditId(null);
+      setPopupOpen(false);
+
+      if (method === "POST") {
+        setStaffList((prev) => [...prev, data]);
+        toast.info("Staff added! Check email to activate account.", {
+          position: "top-center",
+        });
+      } else {
+        toast.success("Staff updated successfully!", { position: "top-center" });
+      }
+
+
+    } catch (err) {
+      console.error("Error saving staff:", err);
+      alert("Error saving staff: " + err.message);
+    }
   };
 
-  const handleDelete = (id) => {
-    const updated = users.filter((u) => u.id !== id);
-    setUsers(updated);
-    setFilteredUsers(updated);
-    localStorage.setItem("users", JSON.stringify(updated));
-    
-    // Dispatch custom event to notify other components
-   
-    window.dispatchEvent(new CustomEvent('userDeleted', {
-      detail: { users: updated }
-    }));
+  // Fetch staff + roles
+  useEffect(() => {
+    if (TOKEN) fetchStaff();
+  }, [TOKEN, fetchStaff]);
+
+  useEffect(() => {
+    if (!TOKEN) return;
+    const fetchRoles = async () => {
+      try {
+        const res = await fetch(ROLES_API, {
+          headers: { Authorization: `Bearer ${TOKEN}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch roles");
+        const data = await res.json();
+        setRoles(data);
+      } catch (err) {
+        console.error("Error fetching roles:", err);
+        setRoles([]);
+      }
+    };
+    fetchRoles();
+  }, [TOKEN]);
+
+  useEffect(() => {
+    if (!popupOpen && TOKEN) {
+      fetchStaff();
+    }
+  }, [popupOpen, TOKEN, fetchStaff]);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleEdit = (user) => {
-    setEditingUser(user);
-    setFormData({
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      status: user.status,
-      joinDate: user.joinDate,
-    });
-    setShowForm(true);
+  const handleEdit = (staff) => {
+    setForm({ ...initialForm, ...staff });
+    setEditId(staff.id);
+    setPopupOpen(true);
   };
+
+  const handleRemove = async (id) => {
+    if (!window.confirm("Are you sure to delete this staff?")) return;
+    try {
+      const res = await fetch(`${API_BASE}/delete/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${TOKEN}` },
+      });
+      if (!res.ok) throw new Error(await res.text());
+      await fetchStaff();
+    } catch (err) {
+      console.error("Error deleting staff:", err);
+      alert("Error deleting staff: " + err.message);
+    }
+  };
+
+  const filteredStaff =
+    activeTab === "All Staff"
+      ? staffList
+      : staffList.filter((s) =>
+        activeTab.toLowerCase() === "chef"
+          ? s.staffRoleType?.toLowerCase().includes("chef")
+          : activeTab.toLowerCase() === "waiters"
+            ? s.staffRoleType?.toLowerCase().includes("waiter")
+            : !s.staffRoleType?.toLowerCase().includes("chef") &&
+            !s.staffRoleType?.toLowerCase().includes("waiter")
+      );
 
   return (
     <div className="user-management">
       <div className="user-header">
-        <h2>Staff Management</h2>
-        <button className="add-btn" onClick={() => setShowForm(true)}>
-          + Add New User
+        <h2>
+          <UserCog size={26} /> Staff Management
+        </h2>
+        <button
+          className="add-btn"
+          onClick={() => {
+            setForm(initialForm);
+            setEditId(null);
+            setPopupOpen(true);
+          }}
+        >
+          <Plus size={18} /> Add Staff
         </button>
       </div>
 
-      {/* Tabs */}
       <div className="tab-navigation">
-        {tabs.map((tab) => (
+        {["All Staff", "Chef", "Waiters", "Other"].map((tab) => (
           <div
             key={tab}
             className={`tab ${activeTab === tab ? "active" : ""}`}
-            onClick={() => handleTabClick(tab)}
+            onClick={() => setActiveTab(tab)}
           >
             {tab}
           </div>
@@ -148,207 +246,238 @@ const UserManagement = () => {
       <table>
         <thead>
           <tr>
-            <th>User</th>
-            <th>Role</th>
+            <th>Staff ID</th>
+            <th>Name</th>
             <th>Email</th>
+            <th>Phone</th>
+            <th>Role</th>
+            <th>Shift</th>
+            <th>Salary</th>
+            <th>Start</th>
+            <th>End</th>
             <th>Status</th>
-            <th>Join Date</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {filteredUsers.length > 0 ? (
-            filteredUsers.map((user) => (
-              <tr key={user.id}>
-                <td>{user.name}</td>
-                <td>{user.role}</td>
-                <td>{user.email}</td>
+          {filteredStaff.length > 0 ? (
+            filteredStaff.map((staff) => (
+              <tr key={staff.id}>
+                <td>{staff.staffId}</td>
                 <td>
-                  <span className={`status ${(user.status || 'Active').toLowerCase()}`}>
-                    {user.status || 'Active'}
+                  {staff.firstName} {staff.lastName}
+                </td>
+                <td>{staff.email}</td>
+                <td>{staff.phone}</td>
+                <td>{staff.staffRoleType}</td>
+                <td>{staff.shiftTiming}</td>
+                <td>{staff.salary}</td>
+                <td>{staff.contractStartDate}</td>
+                <td>{staff.contractEndDate}</td>
+                <td>
+                  <span className={`status ${staff.status?.toLowerCase()}`}>
+                    {staff.status || "Inactive"}
                   </span>
                 </td>
-                <td>{user.joinDate ? new Date(user.joinDate).toLocaleDateString() : 'N/A'}</td>
                 <td>
-                  <button className="action-btn edit" onClick={() => handleEdit(user)}>
-                    <FaEdit />
+                  <button
+                    className="action-btn edit"
+                    onClick={() => handleEdit(staff)}
+                  >
+                    <Edit size={16} />
                   </button>
                   <button
                     className="action-btn delete"
-                    onClick={() => handleDelete(user.id)}
+                    onClick={() => handleRemove(staff.id)}
                   >
-                    <FaTrash />
+                    <Trash2 size={16} />
                   </button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="6" style={{ textAlign: "center" }}>
-                No users found
+              <td colSpan={11} style={{ textAlign: "center", padding: "20px" }}>
+                No staff in {activeTab}.
               </td>
             </tr>
           )}
         </tbody>
       </table>
 
-      {/* Mobile Card Layout */}
+      {/* Mobile Cards */}
       <div className="mobile-user-cards">
-        {filteredUsers.length > 0 ? (
-          filteredUsers.map((user) => (
-            <div key={user.id} className="user-card-mobile">
-              <div className="user-row">
-                <div className="user-cell user-name-cell">
-                  <span className="cell-label">User</span>
-                  <span className="cell-value">{user.name}</span>
-                </div>
-                <div className="user-cell">
-                  <span className="cell-label">Role</span>
-                  <span className="cell-value">{user.role}</span>
-                </div>
+        {filteredStaff.length > 0 ? (
+          filteredStaff.map((staff) => (
+            <div key={staff.id} className="user-card-mobile">
+              <div className="user-row user-name-cell">
+                <span className="cell-label">Name</span>
+                <span className="cell-value">{staff.firstName} {staff.lastName}</span>
               </div>
               <div className="user-row">
-                <div className="user-cell">
-                  <span className="cell-label">Email</span>
-                  <span className="cell-value">{user.email}</span>
-                </div>
-                <div className="user-cell">
-                  <span className="cell-label">Status</span>
-                  <span className="cell-value">
-                    <span className={`status ${(user.status || 'Active').toLowerCase()}`}>
-                      {user.status || 'Active'}
-                    </span>
-                  </span>
-                </div>
+                <span className="cell-label">Email</span>
+                <span className="cell-value">{staff.email}</span>
               </div>
               <div className="user-row">
-                <div className="user-cell">     
-                  <span className="cell-label">Join Date</span>
-                  <span className="cell-value">
-                  {user.joinDate ? new Date(user.joinDate).toLocaleDateString() : 'N/A'}
-                  </span>
-                </div>
-                <div className="user-cell actions-cell">
-                  <span className="cell-label">Actions</span>
-                  <div className="user-actions">
-                    <button className="action-btn edit" onClick={() => handleEdit(user)}>
-                      <FaEdit />
-                    </button>
-                    <button
-                      className="action-btn delete"
-                      onClick={() => handleDelete(user.id)}
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
+                <span className="cell-label">Phone</span>
+                <span className="cell-value">{staff.phone}</span>
+              </div>
+              <div className="user-row">
+                <span className="cell-label">Role</span>
+                <span className="cell-value">{staff.staffRoleType}</span>
+              </div>
+              <div className="user-row">
+                <span className="cell-label">Shift</span>
+                <span className="cell-value">{staff.shiftTiming}</span>
+              </div>
+              <div className="user-row">
+                <span className="cell-label">Status</span>
+                <span className={`status ${staff.status?.toLowerCase()}`}>{staff.status || 'Inactive'}</span>
+              </div>
+              <div className="user-row actions-cell">
+                <div className="user-actions">
+                  <button className="action-btn edit" onClick={() => handleEdit(staff)}>
+                    <Edit size={16} />
+                  </button>
+                  <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
             </div>
           ))
         ) : (
           <div className="no-users-mobile">
-            <p>No users found</p>
+            No staff available in {activeTab}.
           </div>
         )}
       </div>
 
-      {/* Popup Form */}
-      {showForm && (
+
+
+      {/* Popup */}
+      {popupOpen && (
         <div className="popup">
           <div className="popup-content">
-            <h3>{editingUser ? 'Edit User' : 'Add New User'}</h3>
-            <form onSubmit={handleAddUser}>
+            <h3>{editId ? "Edit Staff" : "Add Staff"}</h3>
+            <form>
               <div className="form-group">
-                <label>Full Name</label>
+                <label>First Name</label>
                 <input
                   type="text"
-                  placeholder="Enter full name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
+                  name="firstName"
+                  value={form.firstName}
+                  onChange={handleChange}
+                  placeholder="First Name"
                 />
               </div>
-
               <div className="form-group">
-                <label>Email Address</label>
+                <label>Last Name</label>
+                <input
+                  type="text"
+                  name="lastName"
+                  value={form.lastName}
+                  onChange={handleChange}
+                  placeholder="Last Name"
+                />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
                 <input
                   type="email"
-                  placeholder="Enter email address"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                  required
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="Email"
                 />
               </div>
-
+              <div className="form-group">
+                <label>Phone</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  placeholder="Phone"
+                />
+              </div>
               <div className="form-group">
                 <label>Role</label>
                 <select
-                  value={formData.role}
-                  onChange={(e) =>
-                    setFormData({ ...formData, role: e.target.value })
-                  }
-                  required
+                  name="staffRoleType"
+                  value={form.staffRoleType}
+                  onChange={handleChange}
                 >
                   <option value="">Select Role</option>
-                  <option value="Admin">Admin</option>
-                  <option value="Chef">Chef</option>
-                  <option value="Waiter">Waiter</option>
-                  <option value="Accountant">Accountant</option>
-                  <option value="Cleaner">Cleaner</option>
+                  {roles.map((role) => (
+                    <option key={role.id} value={role.staffRoleName}>
+                      {role.staffRoleName}
+                    </option>
+                  ))}
                 </select>
               </div>
-
               <div className="form-group">
-                <label>Status</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) =>
-                    setFormData({ ...formData, status: e.target.value })
-                  }
-                >
-                    <option value="Active">Select Status</option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                  <option value="Pending">Pending</option>
-                </select>
+                <label>Shift Timing</label>
+                <input
+                  type="text"
+                  name="shiftTiming"
+                  value={form.shiftTiming}
+                  onChange={handleChange}
+                  placeholder="Shift Timing"
+                />
               </div>
-
               <div className="form-group">
-                <label>Join Date</label>
+                <label>Salary</label>
+                <input
+                  type="number"
+                  name="salary"
+                  value={form.salary}
+                  onChange={handleChange}
+                  placeholder="Salary"
+                />
+              </div>
+              <div className="form-group">
+                <label>Contract Start</label>
                 <input
                   type="date"
-                  value={formData.joinDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, joinDate: e.target.value })
-                  }
+                  name="contractStartDate"
+                  value={form.contractStartDate}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Contract End</label>
+                <input
+                  type="date"
+                  name="contractEndDate"
+                  value={form.contractEndDate}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="form-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Password"
                 />
               </div>
               <div className="form-buttons">
-                <button type="button" onClick={() => {
-                  setShowForm(false);
-                  setEditingUser(null);
-                  setFormData({
-                    name: "",
-                    email: "",
-                    role: "",
-                    status: "Active",
-                    joinDate: new Date().toISOString().split("T")[0],
-                  });
-                }}>
+                <button type="button" onClick={() => setPopupOpen(false)}>
                   Cancel
                 </button>
-                <button type="submit">{editingUser ? 'Update User' : 'Add User'}</button>
+                <button type="button" onClick={handleAddOrUpdate}>
+                  {editId ? "Update" : "Add"}
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      <ToastContainer />
     </div>
   );
-};
-
-export default UserManagement;
+}

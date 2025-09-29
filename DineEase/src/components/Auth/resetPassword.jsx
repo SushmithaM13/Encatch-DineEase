@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./styles/forgotPassword.css";
 
 const ResetPassword = () => {
   const location = useLocation();
@@ -8,79 +11,99 @@ const ResetPassword = () => {
 
   const [otp, setOtp] = useState("");
   const [otpVerified, setOtpVerified] = useState(false);
-  const [message, setMessage] = useState("");
-
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // API: Verify OTP
+  // Verify OTP (Temporary password)
   const handleVerifyOtp=async()=>{
-    setMessage("");
+    if(!otp) return toast.error("Please enter OTP");
+
+    setLoading(true);
     try {
-        const response=await fetch("url",{
+        const response=await fetch("http://localhost:8082/dine-ease/api/v1/users/verify-temp-password",
+          {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({email, otp}),
+            body: JSON.stringify({email, tempPassword: otp}),
         });
         const data=await response.json();
 
-        if(response.ok){
+        if(response.ok && data.status==="SUCCESS"){
             setOtpVerified(true);
-            setMessage("OTP verified! You can now reset your password.");
+            toast.success(data.message || "OTP verified! You can now reset your password.");
         }else{
-            setMessage(data.message || "Invalid OTP");
+            toast.error(data.message || "Invalid OTP");
         }
     } catch (err) {
-       setMessage("Server error, please try again later.", err) 
+      console.log(err);
+       toast.error("Server error, please try again later.")
+    }finally{
+      setLoading(false);
     }
   };
 
   // API: Reset Password
   const handleResetPassword=async(e)=>{
     e.preventDefault();
-    setMessage("");
 
     if(newPassword !== confirmPassword){
-        setMessage("Password do not match");
+        toast.error("Password do not match");
         return;
     }
 
+    setLoading(true);
     try {
-        const response=await fetch("",{
+        const response=await fetch("http://localhost:8082/dine-ease/api/v1/users/reset-password",
+          {
             method: "POST",
             headers :{"Content-Type": "application/json"},
-            body: JSON.stringify({email, otp, newPassword}),
+            body: JSON.stringify({email, newPassword}),
         });
 
         const data=await response.json();
-        if(response.ok){
-            setMessage("Password reset successful!");
-            setTimeout(()=>navigate("/login"), 1500);
+        if(response.ok && data.status==="SUCCESS"){
+            toast.success(data.message || "Password reset successful!");
+            setTimeout(()=>navigate("/"), 1500);
         }else{
-            setMessage(data.message || "Failed to reset password");
+            toast.error(data.message || "Failed to reset password");
         }
     } catch (err) {
-       setMessage("Server error, please try again later.",err) 
+      console.log(err);
+       toast.error("Server error, please try again later.");
+    }finally{
+      setLoading(false);
     }
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-container-right">
-        <form onSubmit={handleResetPassword} className="auth-form">
+    <div className="forgot-container">
+      <div className="forgot-container-box">
+        <form onSubmit={handleResetPassword} className="forgotpassword-form">
           <h2>Reset Password</h2>
-          {message && <p>{message}</p>}
 
-          <input
-            type="text"
-            placeholder="Enter OTP"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            required
-          />
-          <button type="button" onClick={handleVerifyOtp}>
-            Verify OTP
-          </button>
+           {/* OTP Section */}
+          <div className="otp-section">
+            <input
+              type="text"
+              placeholder="Enter OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              required
+              disabled={otpVerified}
+            />
+            <button
+              type="button"
+              onClick={handleVerifyOtp}
+              disabled={otpVerified || loading}
+            >
+              {loading && !otpVerified
+                ? "Verifying..."
+                : otpVerified
+                ? "Verified"
+                : "Verify OTP"}
+            </button>
+          </div>
 
           <input
             type="password"
@@ -100,10 +123,11 @@ const ResetPassword = () => {
             required
           />
 
-          <button type="submit" disabled={!otpVerified}>
-            Reset Password
+          <button type="submit" disabled={!otpVerified || loading}>
+            {loading && otpVerified ? "Resetting..." : "Reset Password"}
           </button>
         </form>
+        <ToastContainer position="top-center" autoClose={2000}/>
       </div>
     </div>
   );

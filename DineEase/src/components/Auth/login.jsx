@@ -1,19 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../Auth/styles/login.css";
 
 const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [remember, setRemember] = useState(false);
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");  // Success message
     const navigate = useNavigate();
+
+    // Pre-fill username if "remember me" was checked
+    useEffect(() => {
+        const remembered = localStorage.getItem("rememberEmail");
+        if (remembered) setUsername(remembered);
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        setError(""); 
-        setSuccess(""); 
 
         try {
             const response = await fetch(
@@ -28,63 +32,51 @@ const Login = () => {
             const data = await response.json();
 
             if (response.ok) {
-                // Save token & role in localstorage
+                // Save token & role
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("role", data.role);
 
-                // handle remember password
                 if (remember) {
                     localStorage.setItem("rememberEmail", username);
                 } else {
                     localStorage.removeItem("rememberEmail");
                 }
 
-                // Show success message
-                setSuccess("Login successful! Redirecting...");
+                toast.success("Login successful! Redirecting...");
 
-                // Redirect based on role after 1.5s
+                // Redirect based on role after 1s
                 setTimeout(() => {
-                    if (data.role === "SUPER_ADMIN") {
-                        navigate("/superAdminDashboard");
-                    } else if (data.role === "ADMIN") {
-                        navigate("/adminDashboard");
-                    } else if (data.role === "STAFF") {
-                        navigate("/staffDashboard");
-                    } else {
-                        navigate("/"); // fallback
-                    }
-                }, 1500);
-
+                    if (data.role === "SUPER_ADMIN") navigate("/superAdminDashboard");
+                    else if (data.role === "ADMIN") navigate("/adminDashboard");
+                    else if (data.role === "STAFF") navigate("/staffDashboard");
+                    else navigate("/");
+                }, 1000);
             } else {
-                // Handle backend error messages
+                // Backend error handling
+                let errorMsg = "Invalid credentials. Please try again.";
                 if (data.message?.toLowerCase().includes("not found")) {
-                    setError("User not found. Please register first.");
+                    errorMsg = "User not found. Please register first.";
                 } else if (data.message?.toLowerCase().includes("invalid password")) {
-                    setError("Please enter the correct password.");
+                    errorMsg = "Please enter the correct password.";
                 } else if (data.message?.toLowerCase().includes("verify")) {
-                    setError("Please verify your email before login.");
-                } else {
-                    setError(data.message || "Invalid credentials. Please try again.");
+                    errorMsg = "Please verify your email before login.";
                 }
+
+                toast.error(errorMsg);
             }
         } catch (err) {
-            setError("Server error, Please try again later",err);
+            console.error(err);
+            toast.error("Server error. Please try again later.");
         }
     };
 
     return (
         <div className="auth-container">
-            {/* Left Section */}
             <div className="auth-container-left"></div>
 
-            {/* Right Section */}
             <div className="auth-container-right">
                 <form onSubmit={handleLogin} className="auth-form">
                     <h2 className="login-title">Login</h2>
-
-                    {/* Show error & success messages outside inputs */}
-                    {error && <p className="error-text">{error}</p>}
-                    {success && <p className="success-text">{success}</p>}
 
                     <input
                         type="text"
@@ -131,7 +123,11 @@ const Login = () => {
                     </p>
                 </form>
             </div>
+
+            {/* Toast container */}
+            <ToastContainer position="top-center" autoClose={2000} />
         </div>
     );
 };
+
 export default Login;
