@@ -273,6 +273,32 @@
   justify-content: space-between;
 }
 
+
+.hotel-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.hotel-table th,
+.hotel-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+.hotel-table th {
+  background-color: #f4f4f4;
+  width: 200px;
+}
+
+.hotel-card {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 15px;
+  border-radius: 8px;
+  background: #fff;
+}
+
 /* ==================== DESIGN VARIATIONS ==================== */
 
 /* Default Modern Design (Current) */

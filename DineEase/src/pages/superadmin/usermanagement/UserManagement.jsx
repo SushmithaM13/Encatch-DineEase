@@ -22,6 +22,7 @@ export default function AdminStaffManagement() {
     contractStartDate: "",
     contractEndDate: "",
     password: "",
+    status: "Pending",
   };
 
   const [staffList, setStaffList] = useState([]);
@@ -106,7 +107,7 @@ export default function AdminStaffManagement() {
       alert("Please fill all required fields.");
       return;
     }
-    const payload = { ...form, salary: Number(form.salary) };
+    const payload = { ...form, salary: Number(form.salary),staffStatus: form.status || "Pending" };
     try {
       let url = `${API_BASE}/add`;
       let method = "POST";
