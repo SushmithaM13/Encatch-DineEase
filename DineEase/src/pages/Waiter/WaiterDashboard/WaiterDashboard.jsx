@@ -1,54 +1,80 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import { LayoutDashboard, Utensils, LogOut, CalendarDays } from "lucide-react";
+import {
+  LayoutDashboard,
+  Utensils,
+  ShoppingCart,
+  Newspaper,
+  LogOut,
+  Users,
+  Settings,
+  CalendarDays
+} from "lucide-react";
 import "./WaiterDashboard.css";
 
-export default function WaiterDashboard() {
-  const [waiterName, setWaiterName] = useState("Waiter");
+export default function AdminDashboard() {
+  const [adminName, setAdminName] = useState("Waiter");
+  const [restaurantName, setRestaurantName] = useState("Restaurant");
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [profilePic, setProfilePic] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const dropdownRef = useRef(null);
+
   const navigate = useNavigate();
 
-  // Redirect if not logged in or not a WAITER
+  // ✅ Resize handler
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-    if (!token || role !== "WAITER") {
-      navigate("/", { replace: true });
-    }
-  }, [navigate]);
-
-  // Resize sidebar
-  useEffect(() => {
-    const handleResize = () => setSidebarOpen(window.innerWidth > 768);
+    const handleResize = () => {
+      setSidebarOpen(window.innerWidth > 768);
+    };
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Dropdown outside click
+  // ✅ Dropdown close on outside click
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    function handleClickOutside(event) {
+      if (
+        dropdownRef.current &&
+        event.target instanceof Node &&
+        !dropdownRef.current.contains(event.target)
+      ) {
         setDropdownOpen(false);
       }
-    };
+    }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Load waiter name from localStorage
+  // ✅ Search (currently static/dummy data)
   useEffect(() => {
-    const name = localStorage.getItem("waiterName") || "Waiter John";
-    setWaiterName(name);
-  }, []);
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
 
+    const dummyResults = [
+      { type: "Staff", label: "John Doe (Chef)" },
+      { type: "Menu", label: "Pasta - ₹250" },
+      { type: "Table", label: "Table 5 (Available)" },
+    ];
+
+    setSearchResults(
+      dummyResults.filter((res) =>
+        res.label.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    );
+  }, [searchQuery]);
+
+  // ✅ Logout clears UI state and navigates to home
   const handleLogout = () => {
-    localStorage.removeItem("waiterName");
-    localStorage.removeItem("assignedTables");
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    navigate("/", { replace: true });
+    setAdminName("Admin");
+    setRestaurantName("Restaurant");
+    setProfilePic(null);
+    navigate("/");
   };
 
   return (
@@ -90,7 +116,49 @@ export default function WaiterDashboard() {
             <CalendarDays size={18} />
             {sidebarOpen && <span>Reservations</span>}
           </Link>
+
+          <Link
+            to="/WaiterDashboard/menu"
+            onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
+          >
+            <Newspaper size={22} />
+            {sidebarOpen && <span>Menu</span>}
+          </Link>
+
+          <Link
+            to="/WaiterDashboard/orders"
+            onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
+          >
+            <ShoppingCart size={22} />
+            {sidebarOpen && <span>Orders</span>}
+          </Link>
+
+
+          <Link
+            to="/WaiterDashboard/customers"
+            onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
+          >
+            <Users size={22} />
+            {sidebarOpen && <span>Customers</span>}
+          </Link>
+
+          {/* <Link
+    to="/WaiterDashboard/revenue"
+    onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
+  >
+    <IndianRupee size={22} />
+    {sidebarOpen && <span>Revenue Management</span>}
+  </Link> */}
+
+          <Link
+            to="/WaiterDashboard/settings"
+            onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
+          >
+            <Settings size={22} />
+            {sidebarOpen && <span>Settings</span>}
+          </Link>
         </nav>
+
       </aside>
 
       {/* Main Content */}
@@ -105,22 +173,62 @@ export default function WaiterDashboard() {
             <span></span>
           </button>
 
-          <div className="header-left">Welcome, {waiterName}</div>
+          <div className="header-left">Welcome, {adminName}</div>
+
+          <div className="header-center">
+            <div className="restaurant-display">
+              <Utensils size={18} color="black" />
+              <span>{restaurantName}</span>
+            </div>
+          </div>
 
           <div className="header-right" ref={dropdownRef}>
-            <div
-              className="profile-circle"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-            >
-              {waiterName.charAt(0).toUpperCase()}
+            {/* Search Bar */}
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="🔍 Search..."
+                className="search-bar"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchResults.length > 0 && (
+                <div className="search-results">
+                  {searchResults.map((res, i) => (
+                    <div key={i} className="search-item">
+                      <strong>{res.type}:</strong> {res.label}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            {dropdownOpen && (
-              <div className="dropdown-menu">
-                <button onClick={handleLogout}>
-                  <LogOut size={16} /> Logout
-                </button>
+
+            {/* Profile Dropdown */}
+            <div className="profile-dropdown">
+              <div
+                className="profile-circle"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
+                {profilePic ? (
+                  <img src={profilePic} alt="Profile" className="circle-img" />
+                ) : (
+                  adminName.charAt(0).toUpperCase()
+                )}
               </div>
-            )}
+              {dropdownOpen && (
+                <div className="dropdown-menu">
+                  <button onClick={() => navigate("/WaiterDashboard/profile")}>
+                    <User size={16} /> Profile
+                  </button>
+                  <button onClick={() => navigate("/WaiterDashboard/settings")}>
+                    <Settings size={16} /> Settings
+                  </button>
+                  <button onClick={handleLogout}>
+                    <LogOut size={16} /> Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

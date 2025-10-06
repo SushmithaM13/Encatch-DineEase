@@ -374,7 +374,7 @@ export default function AdminHome() {
 
         {/* Show More → only if staff.length > 3 */}
         {staff.length > 3 && (
-          <div className="staff-more-card" onClick={() => navigate("/pages/staff")}>
+          <div className="staff-more-card" onClick={() => navigate("/AdminDashboard/staff")}>
             <h4>More →</h4>
         </div>
         )}
@@ -401,7 +401,7 @@ export default function AdminHome() {
         {menu.length > 4 && (
           <div
             className="menu-card small-card more-card"
-            onClick={() => navigate("/pages/items")}
+            onClick={() => navigate("/AdminDashboard/Menu")}
           >
             <h4>More →</h4>
           </div>
@@ -425,7 +425,7 @@ export default function AdminHome() {
         {tables.length > 4 && (
           <div
             className="table-box"
-            onClick={() => navigate("/pages/table")}
+            onClick={() => navigate("/AdminDashboard/table")}
             style={{
               cursor: "pointer",
               display: "flex",
@@ -489,7 +489,7 @@ export default function AdminHome() {
           {/* More → card */}
           <div
             className="revenue-card small-card more-card"
-            onClick={() => navigate("/pages/revenue")}
+            onClick={() => navigate("/AdminDashboard/revenue")}
           >
             <h4>More →</h4>
           </div>

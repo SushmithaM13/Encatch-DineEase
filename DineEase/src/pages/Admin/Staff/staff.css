@@ -143,37 +143,46 @@
 }
 
 /* Action Buttons */
-.action-btn {
+/* Container for action icons */
+.action-icons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Circular icon buttons */
+.icon-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.85rem;
-  margin-right: 6px;
   transition: 0.2s;
 }
 
-.action-btn.edit {
+/* Edit button (yellow) */
+.icon-btn.edit {
   background: #fef9c3;
   color: #854d0e;
 }
-
-.action-btn.delete {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.action-btn.edit:hover {
+.icon-btn.edit:hover {
   background: #fde047;
 }
 
-.action-btn.delete:hover {
+/* Delete button (red) */
+.icon-btn.delete {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.icon-btn.delete:hover {
   background: #f87171;
   color: white;
 }
+
 
 /* ============================= */
 /* Modal / Popup Styles          */
@@ -196,6 +205,8 @@
   border-radius: 8px;
   width: 100%;
   max-width: 500px;
+  max-height: 90vh;
+  overflow:hidden;
   padding: 20px;
   box-shadow: 0 5px 20px rgba(0,0,0,0.2);
   display: flex;
@@ -209,6 +220,12 @@
   align-items: center;
   font-weight: bold;
   font-size: 1.2rem;
+}
+
+.modal-body {
+  padding: 16px;
+  flex: 1;
+  overflow-y: auto; /* 🔥 scrollable area */
 }
 
 .close-btn {
@@ -258,6 +275,37 @@
 .modal-footer .cancel-btn:hover {
   background: #222;
 }
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.password-field input {
+  flex: 1;
+  padding-right: 35px; /* space for eye icon */
+  height: 35px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding-left: 10px;
+}
+
+.eye-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+}
+
 
 /* Responsive */
 @media (max-width: 768px) {

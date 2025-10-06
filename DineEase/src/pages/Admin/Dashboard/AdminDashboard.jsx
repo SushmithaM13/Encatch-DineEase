@@ -16,28 +16,34 @@ import "./AdminDashboard.css";
 export default function AdminDashboard() {
   const [adminName, setAdminName] = useState("Admin");
   const [restaurantName, setRestaurantName] = useState("Restaurant");
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [profilePic, setProfilePic] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const dropdownRef = useRef(null);
-
   const navigate = useNavigate();
 
-  // ✅ Resize handler
+  // ✅ Handle responsive sidebar
   useEffect(() => {
     const handleResize = () => {
-      setSidebarOpen(window.innerWidth > 768);
+      if (window.innerWidth <= 768) {
+        setIsMobile(true);
+        setSidebarOpen(false);
+      } else {
+        setIsMobile(false);
+        setSidebarOpen(true);
+      }
     };
-    handleResize();
     window.addEventListener("resize", handleResize);
+    handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // ✅ Dropdown close on outside click
+  // ✅ Close profile dropdown on outside click
   useEffect(() => {
-    function handleClickOutside(event) {
+    const handleClickOutside = (event) => {
       if (
         dropdownRef.current &&
         event.target instanceof Node &&
@@ -45,24 +51,22 @@ export default function AdminDashboard() {
       ) {
         setDropdownOpen(false);
       }
-    }
+    };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ Search (currently static/dummy data)
+  // ✅ Dummy search results for UI demo
   useEffect(() => {
     if (!searchQuery.trim()) {
       setSearchResults([]);
       return;
     }
-
     const dummyResults = [
       { type: "Staff", label: "John Doe (Chef)" },
       { type: "Menu", label: "Pasta - ₹250" },
       { type: "Table", label: "Table 5 (Available)" },
     ];
-
     setSearchResults(
       dummyResults.filter((res) =>
         res.label.toLowerCase().includes(searchQuery.toLowerCase())
@@ -70,17 +74,48 @@ export default function AdminDashboard() {
     );
   }, [searchQuery]);
 
-  // ✅ Logout clears UI state and navigates to home
-  const handleLogout = () => {
-    setAdminName("Admin");
-    setRestaurantName("Restaurant");
-    setProfilePic(null);
-    navigate("/");
+  // ✅ Proper Logout API call (works with Spring Boot + session cookies)
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("token"); // ✅ get the token
+      if (!token) throw new Error("No token found");
+
+      const response = await fetch(
+        "http://localhost:8082/dine-ease/api/v1/users/logout",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`, // ✅ send token
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Clear user info
+        setAdminName("Admin");
+        setRestaurantName("Restaurant");
+        setProfilePic(null);
+        sessionStorage.clear();
+        localStorage.removeItem("token");
+
+        window.alert("✅ Successfully logged out!");
+        navigate("/");
+      } else {
+        const data = await response.json().catch(() => ({}));
+        window.alert("⚠️ Logout failed: " + (data.message || "Try again"));
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      window.alert("❌ Error during logout. Please try again later.");
+    }
   };
+
 
   return (
     <div className="layout-container">
-      {window.innerWidth <= 768 && sidebarOpen && (
+      {/* Mobile overlay */}
+      {isMobile && sidebarOpen && (
         <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
       )}
 
@@ -89,90 +124,55 @@ export default function AdminDashboard() {
         <div className="sidebar-header">
           <div className="sidebar-title">
             <Utensils size={22} />
-            {sidebarOpen && <span style={{ marginLeft: "8px" }}>Dineease</span>}
+            {sidebarOpen && <span style={{ marginLeft: 8 }}>Dineease</span>}
           </div>
-          <button
-            className="hamburger desktop-only"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
+          {!isMobile && (
+            <button
+              className="hamburger desktop-only"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          )}
         </div>
 
         <nav>
-  <Link
-    to="/AdminDashboard/dashboard"
-    onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-  >
-    <LayoutDashboard size={18} />
-    {sidebarOpen && <span>Dashboard</span>}
-  </Link>
-
-  <Link
-  to="/AdminDashboard/roles"
-  onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
->
-  <User size={22} />
-  {sidebarOpen && <span>Role Management</span>}
-</Link>
-
-
-  <Link
-    to="/AdminDashboard/staff"
-    onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-  >
-    <Users size={22} />
-    {sidebarOpen && <span>Staff Management</span>}
-  </Link>
-
-  <Link
-    to="/AdminDashboard/menu"
-    onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-  >
-    <Newspaper size={22} />
-    {sidebarOpen && <span>Menu Management</span>}
-  </Link>
-
-  <Link
-    to="/AdminDashboard/table"
-    onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-  >
-    <Sofa size={22} />
-    {sidebarOpen && <span>Table Management</span>}
-  </Link>
-
-  <Link
-    to="/AdminDashboard/revenue"
-    onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-  >
-    <IndianRupee size={22} />
-    {sidebarOpen && <span>Revenue Management</span>}
-  </Link>
-
-  <Link
-    to="/AdminDashboard/settings"
-    onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-  >
-    <Settings size={22} />
-    {sidebarOpen && <span>Settings</span>}
-  </Link>
-</nav>
-
+          {[
+            { to: "dashboard", icon: <LayoutDashboard size={18} />, label: "Dashboard" },
+            { to: "roles", icon: <User size={22} />, label: "Role Management" },
+            { to: "staff", icon: <Users size={22} />, label: "Staff Management" },
+            { to: "menu", icon: <Newspaper size={22} />, label: "Menu Management" },
+            { to: "table", icon: <Sofa size={22} />, label: "Table Management" },
+            { to: "revenue", icon: <IndianRupee size={22} />, label: "Revenue Management" },
+            { to: "settings", icon: <Settings size={22} />, label: "Settings" },
+          ].map((item, i) => (
+            <Link
+              key={i}
+              to={`/AdminDashboard/${item.to}`}
+              onClick={() => isMobile && setSidebarOpen(false)}
+            >
+              {item.icon}
+              {sidebarOpen && <span>{item.label}</span>}
+            </Link>
+          ))}
+        </nav>
       </aside>
 
-      {/* Main Content */}
+      {/* Main content */}
       <div className="main-content">
         <header className="dashboard-header">
-          <button
-            className="hamburger mobile-only"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
+          {isMobile && (
+            <button
+              className="hamburger mobile-only"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          )}
 
           <div className="header-left">Welcome, {adminName}</div>
 
@@ -184,7 +184,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="header-right" ref={dropdownRef}>
-            {/* Search Bar */}
+            {/* Search */}
             <div className="search-container">
               <input
                 type="text"
@@ -204,24 +204,24 @@ export default function AdminDashboard() {
               )}
             </div>
 
-            {/* Profile Dropdown */}
+            {/* Profile dropdown */}
             <div className="profile-dropdown">
               <div
                 className="profile-circle"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
                 {profilePic ? (
-                  <img src={profilePic} alt="Profile" className="circle-img" />
+                  <img src={profilePic} alt="Profile" className="profile-pic" />
                 ) : (
                   adminName.charAt(0).toUpperCase()
                 )}
               </div>
               {dropdownOpen && (
                 <div className="dropdown-menu">
-                  <button onClick={() => navigate("/pages/profile")}>
+                  <button onClick={() => navigate("/AdminDashboard/profile")}>
                     <User size={16} /> Profile
                   </button>
-                  <button onClick={() => navigate("/pages/settings")}>
+                  <button onClick={() => navigate("/AdminDashboard/settings")}>
                     <Settings size={16} /> Settings
                   </button>
                   <button onClick={handleLogout}>

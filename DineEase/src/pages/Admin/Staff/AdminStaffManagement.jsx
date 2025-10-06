@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, UserCog, X } from "lucide-react";
+import { Plus, Edit, Trash2, UserCog, X, Eye, EyeOff } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./staff.css";
@@ -30,6 +30,14 @@ export default function AdminStaffManagement() {
   const [editId, setEditId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("All Staff");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "-";
+    const date = new Date(dateStr);
+    const options = { day: "2-digit", month: "short", year: "numeric" };
+    return date.toLocaleDateString("en-GB", options).replace(/ /g, "-");
+  };
 
   // ✅ Persist previousActiveIds in localStorage
   const [previousActiveIds, setPreviousActiveIds] = useState(() => {
@@ -57,25 +65,38 @@ export default function AdminStaffManagement() {
       const staffData = Array.isArray(data)
         ? data
         : Array.isArray(data.content)
-        ? data.content
-        : [];
+          ? data.content
+          : [];
 
-      const mappedStaff = staffData.map((s) => ({
-        id: s.id,
-        staffId: s.id,
-        firstName: s.firstName,
-        lastName: s.lastName,
-        email: s.email,
-        phone: s.phoneNumber,
-        staffRoleType: s.staffRoleName,
-        shiftTiming: s.shiftTiming,
-        salary: s.salary,
-        contractStartDate: s.contractStartDate,
-        contractEndDate: s.contractEndDate,
-        status: s.staffStatus,
-      }));
+      const mappedStaff = staffData
+  .map((s) => ({
+    id: s.id,
+    staffId: s.id,
+    firstName: s.firstName,
+    lastName: s.lastName,
+    email: s.email,
+    phone: s.phoneNumber,
+    staffRoleType: s.staffRoleName,
+    shiftTiming: s.shiftTiming,
+    salary: s.salary,
+    contractStartDate: s.contractStartDate,
+    contractEndDate: s.contractEndDate,
+    status: s.staffStatus,
+  }))
+  // 🚫 exclude Admins
+  .filter((s) => s.staffRoleType?.toUpperCase() !== "ADMIN")
+  // ✅ sort by staffId ascending
+  .sort((a, b) => a.staffId - b.staffId);
 
+      
+
+
+
+
+
+      // ✅ Save in state + localStorage
       setStaffList(mappedStaff);
+      localStorage.setItem("staffList", JSON.stringify(mappedStaff));
 
       // 🔔 Detect newly activated staff only once
       const newlyActivated = mappedStaff.filter(
@@ -100,61 +121,63 @@ export default function AdminStaffManagement() {
     } catch (err) {
       console.error("Error fetching staff:", err);
       setStaffList([]);
+      localStorage.removeItem("staffList"); // clear broken cache
     }
   };
 
   // ✅ Add or Update Staff
-
   const handleAddOrUpdate = async () => {
-  if (!form.firstName || !form.lastName || !form.email || !form.phone) {
-    alert("Please fill all required fields.");
-    return;
-  }
-
-  const payload = { ...form, salary: Number(form.salary) };
-
-  try {
-    let url = `${API_BASE}/add`;
-    let method = "POST"; // default for adding
-
-    if (editId) {
-      url = `${API_BASE}/update-staff/${editId}`; // PUT endpoint for update
-      method = "PUT"; // ✅ must use PUT for update
+    if (!form.firstName || !form.lastName || !form.email || !form.phone) {
+      alert("Please fill all required fields.");
+      return;
     }
 
-    const res = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${TOKEN}`,
-      },
-      body: JSON.stringify(payload),
-    });
+    const payload = { ...form, salary: Number(form.salary) };
 
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || "Failed to save staff");
+    try {
+      let url = `${API_BASE}/add`;
+      let method = "POST"; // default for adding
+
+      if (editId) {
+        url = `${API_BASE}/update-staff/${editId}`;
+        method = "PUT";
+      }
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Failed to save staff");
+      }
+
+      await res.json();
+      await fetchStaff(); // refresh list + localStorage
+
+      setForm(initialForm);
+      setEditId(null);
+      setModalOpen(false);
+
+      if (method === "POST") {
+        toast.info("Staff added! Check email to activate account.", {
+          position: "top-center",
+        });
+      } else {
+        toast.success("Staff updated successfully!", {
+          position: "top-center",
+        });
+      }
+    } catch (err) {
+      console.error("Error saving staff:", err);
+      alert("Error saving staff: " + err.message);
     }
-
-    await res.json();
-    await fetchStaff();
-
-    setForm(initialForm);
-    setEditId(null);
-    setModalOpen(false);
-
-    if (method === "POST") {
-      toast.info("Staff added! Check email to activate account.", { position: "top-center" });
-    } else {
-      toast.success("Staff updated successfully!", { position: "top-center" });
-    }
-  } catch (err) {
-    console.error("Error saving staff:", err);
-    alert("Error saving staff: " + err.message);
-  }
-};
-
-
+  };
 
   // ✅ Fetch Staff + Roles on load
   useEffect(() => {
@@ -207,7 +230,7 @@ export default function AdminStaffManagement() {
         throw new Error(text || "Failed to delete staff");
       }
 
-      await fetchStaff();
+      await fetchStaff(); // refresh list + localStorage
     } catch (err) {
       console.error("Error deleting staff:", err);
       alert("Error deleting staff: " + err.message);
@@ -217,14 +240,17 @@ export default function AdminStaffManagement() {
   const filteredStaff =
     activeTab === "All Staff"
       ? staffList
-      : staffList.filter((s) =>
-          activeTab.toLowerCase() === "chef"
-            ? s.staffRoleType?.toLowerCase().includes("chef")
-            : activeTab.toLowerCase() === "waiters"
-            ? s.staffRoleType?.toLowerCase().includes("waiter")
-            : !s.staffRoleType?.toLowerCase().includes("chef") &&
-              !s.staffRoleType?.toLowerCase().includes("waiter")
-        );
+      : staffList.filter((s) => {
+        const role = s.staffRoleType?.toLowerCase() || "";
+
+        if (activeTab.toLowerCase() === "chef") return role.includes("chef");
+        if (activeTab.toLowerCase() === "waiters") return role.includes("waiter");
+        if (activeTab.toLowerCase() === "accountant") return role.includes("accountant");
+
+        // "Other" tab: anything that is not chef, waiter, accountant
+        return !role.includes("chef") && !role.includes("waiter") && !role.includes("accountant");
+      });
+
 
   return (
     <div className="staff-page">
@@ -234,7 +260,7 @@ export default function AdminStaffManagement() {
 
       <div className="tabs-add-container">
         <div className="staff-tabs">
-          {["All Staff", "Chef", "Waiters", "Other"].map((tab) => (
+          {["All Staff", "Chef", "Waiters", "Accountant", "Other"].map((tab) => (
             <button
               key={tab}
               className={`tab-btn ${activeTab === tab ? "active" : ""}`}
@@ -261,6 +287,7 @@ export default function AdminStaffManagement() {
       <table className="staff-table">
         <thead>
           <tr>
+            <th>Sl. No.</th> 
             <th>Staff ID</th>
             <th>Name</th>
             <th>Email</th>
@@ -278,6 +305,7 @@ export default function AdminStaffManagement() {
           {filteredStaff.length > 0 ? (
             filteredStaff.map((staff, index) => (
               <tr key={staff.id || index}>
+                <td>{index + 1}</td>
                 <td>{staff.staffId}</td>
                 <td>
                   {staff.firstName} {staff.lastName}
@@ -287,8 +315,9 @@ export default function AdminStaffManagement() {
                 <td>{staff.staffRoleType}</td>
                 <td>{staff.shiftTiming}</td>
                 <td>{staff.salary}</td>
-                <td>{staff.contractStartDate}</td>
-                <td>{staff.contractEndDate}</td>
+                <td>{formatDate(staff.contractStartDate)}</td>
+                <td>{formatDate(staff.contractEndDate)}</td>
+
                 <td>
                   <span
                     className={`status ${staff.status?.toLowerCase() || ""}`}
@@ -296,20 +325,22 @@ export default function AdminStaffManagement() {
                     {staff.status || "Inactive"}
                   </span>
                 </td>
-                <td>
-                  <button
-                    className="action-btn edit"
-                    onClick={() => handleEdit(staff)}
-                  >
-                    <Edit size={14} /> Edit
-                  </button>
-                  <button
-                    className="action-btn delete"
-                    onClick={() => handleRemove(staff.id)}
-                  >
-                    <Trash2 size={14} /> Remove
-                  </button>
-                </td>
+                <td className="action-icons">
+  <button
+    className="icon-btn edit"
+    onClick={() => handleEdit(staff)}
+    title="Edit"
+  >
+    <Edit size={16} />
+  </button>
+  <button
+    className="icon-btn delete"
+    onClick={() => handleRemove(staff.id)}
+    title="Remove"
+  >
+    <Trash2 size={16} />
+  </button>
+</td>
               </tr>
             ))
           ) : (
@@ -399,19 +430,29 @@ export default function AdminStaffManagement() {
                 value={form.contractEndDate}
                 onChange={handleChange}
               />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={form.password}
-                onChange={handleChange}
-              />
-            </div>
+              <div className="password-field">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Password"
+                  value={form.password}
+                  onChange={handleChange}
+                />
+                <button
+                  type="button"
+                  className="eye-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div> {/* <-- This was missing! modal-body closing */}
             <div className="modal-footer">
               <button className="add-btn" onClick={handleAddOrUpdate}>
                 <Plus size={16} /> {editId ? "Update Staff" : "Add Staff"}
               </button>
             </div>
+
           </div>
         </div>
       )}

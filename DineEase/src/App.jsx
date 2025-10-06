@@ -24,6 +24,8 @@ import AdminRevenueManagement from "./pages/Admin/Revenue/AdminRevenueManagement
 import WaiterDashboard from "./pages/Waiter/WaiterDashboard/WaiterDashboard";
 import WaiterHome from "./pages/Waiter/Home/WaiterHome";
 import Reservation from "./pages/Waiter/Reservation/Reservation";
+import WaiterSettings from "./pages/Waiter/Settings/WaiterSettings";
+import WaiterProfile from "./pages/Waiter/Profile/WaiterProfile";
 
 // ===== Footer =====
 import Footer from './components/footer/Footer';
@@ -50,7 +52,7 @@ function App() {
 
         {/* ===== Admin Dashboard Routes ===== */}
         <Route 
-          path="/adminDashboard" 
+          path="/AdminDashboard" 
           element={
             <ProtectedRoute allowedRoles={["ADMIN"]}>
               <AdminDashboard />
@@ -58,6 +60,8 @@ function App() {
           }
         >
           <Route index element={<AdminHome />} />
+          <Route path="home" element={<AdminHome />} />
+          <Route path="dashboard" element={<AdminHome />} />  
           <Route path="profile" element={<AdminProfile />} />
           <Route path="menu" element={<AdminMenu />} />
           <Route path="table" element={<AdminTableManagement />} />
@@ -79,6 +83,8 @@ function App() {
           <Route index element={<WaiterHome />} /> 
           <Route path="home" element={<WaiterHome />} />
           <Route path="reservations" element={<Reservation />} />
+          <Route path="settings" element={<WaiterSettings />} />
+          <Route path="profile" element={<WaiterProfile />} />
         </Route>
 
         {/* ===== Catch-all 404 ===== */}

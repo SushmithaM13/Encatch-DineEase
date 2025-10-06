@@ -388,18 +388,22 @@
     padding: 10px;
   }
 
+  /* Welcome Section */
   .welcome {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    font-weight: 700;
     text-align: center;
+    margin-bottom: 4px;
   }
 
   .restaurant {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     text-align: center;
     margin-bottom: 15px;
+    color: #666;
   }
 
-  /* Stats Cards stack with smaller padding */
+  /* Stats Cards stack */
   .stats-cards {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -417,16 +421,27 @@
     font-size: 12px;
   }
 
-  /* Analytics & Revenue section */
+  /* Analytics section */
   .analytics-section {
     padding: 12px;
+    margin-top: 25px;
   }
 
   .analytics-section h3 {
     font-size: 1rem;
     text-align: center;
+    margin-bottom: 12px;
   }
 
+  /* Scroll charts horizontally */
+  .analytics-section > div[style] {
+    overflow-x: auto;
+  }
+  .analytics-section .recharts-wrapper {
+    min-width: 450px; /* ensure scroll for small screens */
+  }
+
+  /* Revenue grid */
   .revenue-grid {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -436,57 +451,46 @@
     padding: 12px;
   }
 
-  /* Staff table -> scroll horizontally on mobile */
+  /* Staff table -> scrollable */
   .staff-table {
     display: block;
     overflow-x: auto;
     white-space: nowrap;
+    font-size: 0.75rem;
   }
 
   .staff-table th,
   .staff-table td {
-    font-size: 0.75rem;
-    padding: 5px 8px;
+    padding: 6px 8px;
   }
 
-  /* Menu section */
+  /* Menu Section */
   .menu-grid {
     grid-template-columns: 1fr;
     gap: 10px;
   }
-  .menu-grid p {
-  text-align: center;
-  width: 100%;
-  margin: 0 auto;
-  font-size: 1rem;
-  color: #888;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 80px;
-}
 
   .menu-card.small-card {
-    font-size: 0.75rem;
-    padding: 8px;
+    font-size: 0.8rem;
+    padding: 10px;
   }
 
   .menu-card .menu-img {
-    height: 70px;
+    height: 90px;
   }
 
-  /* Table section */
+  /* Table Section */
   .table-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 10px;
   }
 
   .table-box {
-    padding: 10px;
+    padding: 12px;
     font-size: 0.85rem;
   }
 
   .table-box span {
-    font-size: 10px;
+    font-size: 11px;
   }
 }
