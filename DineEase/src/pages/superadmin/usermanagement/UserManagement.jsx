@@ -107,7 +107,7 @@ export default function AdminStaffManagement() {
       alert("Please fill all required fields.");
       return;
     }
-    const payload = { ...form, salary: Number(form.salary),staffStatus: form.status || "Pending" };
+    const payload = { ...form, salary: Number(form.salary), staffStatus: form.status || "Pending" };
     try {
       let url = `${API_BASE}/add`;
       let method = "POST";
@@ -176,6 +176,18 @@ export default function AdminStaffManagement() {
       fetchStaff();
     }
   }, [popupOpen, TOKEN, fetchStaff]);
+
+  const formatDateForInput = (dateString, type = "date") => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    if (isNaN(date)) return "";
+    if (type === "datetime") {
+      const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+      return local.toISOString().slice(0, 16);
+    }
+    return date.toISOString().split("T")[0];
+  };
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -253,7 +265,7 @@ export default function AdminStaffManagement() {
             <th>Email</th>
             <th>Phone</th>
             <th>Role</th>
-            <th>Shift</th>
+            <th>Shift<br />am/pm</th>
             <th>Salary</th>
             <th>Start</th>
             <th>End</th>
@@ -274,8 +286,8 @@ export default function AdminStaffManagement() {
                 <td>{staff.staffRoleType}</td>
                 <td>{staff.shiftTiming}</td>
                 <td>{staff.salary}</td>
-                <td>{staff.contractStartDate}</td>
-                <td>{staff.contractEndDate}</td>
+                <td>{new Date(staff.contractStartDate).toLocaleDateString()}</td>
+                <td>{new Date(staff.contractEndDate).toLocaleDateString()}</td>
                 <td>
                   <span className={`status ${staff.status?.toLowerCase()}`}>
                     {staff.status || "Inactive"}
@@ -429,11 +441,10 @@ export default function AdminStaffManagement() {
               <div className="form-group">
                 <label>Shift Timing</label>
                 <input
-                  type="text"
+                  type="datetime-local"
                   name="shiftTiming"
-                  value={form.shiftTiming}
+                  value={formatDateForInput(form.shiftTiming, "datetime")}
                   onChange={handleChange}
-                  placeholder="Shift Timing"
                 />
               </div>
               <div className="form-group">
@@ -451,7 +462,7 @@ export default function AdminStaffManagement() {
                 <input
                   type="date"
                   name="contractStartDate"
-                  value={form.contractStartDate}
+                  value={formatDateForInput(form.contractStartDate)}
                   onChange={handleChange}
                 />
               </div>
@@ -460,7 +471,7 @@ export default function AdminStaffManagement() {
                 <input
                   type="date"
                   name="contractEndDate"
-                  value={form.contractEndDate}
+                  value={formatDateForInput(form.contractEndDate)}
                   onChange={handleChange}
                 />
               </div>
