@@ -110,7 +110,7 @@ const SuperAdminDashboard = () => {
         } ${mobileMenuOpen ? "mobile-open" : ""}`}
       >
         <div className="sidebar-header">
-          <h2 className="logo">{sidebarOpen ? "DINE _ EASE" : ""}</h2>
+          <h2 className="logo">{sidebarOpen ? "DINE _ EASE" : "DE"}</h2>
           <button className="toggle-btn" onClick={handleDesktopSidebarToggle}>
             {/* <FaBars /> */}
           </button>
@@ -138,6 +138,12 @@ const SuperAdminDashboard = () => {
             <NavLink to="/superAdminDashboard/food-items">
               <FaUtensils />
               {sidebarOpen && <span>Food Items</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/superAdminDashboard/table">
+              <FaUtensils />
+              {sidebarOpen && <span>Table Management</span>}
             </NavLink>
           </li>
         </ul>

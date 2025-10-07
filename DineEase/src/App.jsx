@@ -10,7 +10,7 @@ import ResetPassword from './components/Auth/resetPassword';
 import SuperAdminRegistration from './components/signup/SuperAdminRegistration';
 import UserManagement from "./pages/superadmin/usermanagement/UserManagement";
 import Items from "./pages/superadmin/items/FoodItems";
-
+import TableManagement from "./pages/superadmin/tablemanagemnet/TableManagement";
 
 import SuperAdminHome from "./pages/superadmin/dashboard/SuperAdminHome";
 
@@ -38,6 +38,9 @@ function App() {
         <Route path="staff" element={<UserManagement />} />
         <Route path="food-items" element={<Items />} />
         <Route path="staffrole" element={<AddStaffRole />} />
+        <Route path="table" element={<TableManagement />} />
+
+
         {/* <Route path="settings" element={<Settings />} />
         <Route path="logout" element={<Logout />} /> */}
       </Route>

@@ -1,0 +1,122 @@
+.table-management-container {
+  padding: 20px;
+  text-align: center;
+}
+
+.page-heading {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.table-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+  justify-items: center;
+}
+
+.table-card {
+  width: 160px;
+  height: 150px;
+  border-radius: 12px;
+  color: #fff;
+  cursor: pointer;
+  padding: 10px;
+  transition: transform 0.3s ease, background 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.table-card:hover {
+  transform: scale(1.05);
+}
+
+.available {
+  background: #2ecc71;
+}
+
+.assigned {
+  background: #f39c12;
+}
+
+.not-available {
+  background: #e74c3c;
+}
+
+.toggle-btn {
+  background: #34495e;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  cursor: pointer;
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+.toggle-btn:hover {
+  background: #2c3e50;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 300px;
+  text-align: center;
+  animation: fade-in 0.3s ease;
+}
+
+.popup-content input {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.assign-btn {
+  background: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.cancel-btn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

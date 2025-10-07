@@ -12,9 +12,11 @@ export default function RoleManagement() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showRoles, setShowRoles] = useState(false); // 👈 toggle state
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -118,7 +120,6 @@ export default function RoleManagement() {
     }
   };
 
-  // Cancel editing
   const handleCancelEdit = () => {
     setFormData({ staffRoleName: "", staffRoleDescription: "" });
     setEditingId(null);
@@ -128,12 +129,22 @@ export default function RoleManagement() {
 
   return (
     <div className="role-management">
-      <h2>Role Management</h2>
+      <div className="role-header">
+        <h2>Role Management</h2>
+        <div className="role-header-buttons">
+          <button
+            className="toggle-roles-btn"
+            onClick={() => setShowRoles(!showRoles)}
+          >
+            {showRoles ? "Hide Roles" : "Roles"}
+          </button>
+        </div>
+      </div>
 
       {error && <p className="error">{error}</p>}
       {success && <p className="success">{success}</p>}
 
-      {/* Role Form */}
+      {/* Add / Edit Role Form */}
       <form onSubmit={handleSubmit} className="role-form">
         <input
           type="text"
@@ -167,36 +178,48 @@ export default function RoleManagement() {
         </div>
       </form>
 
-      {/* Roles List */}
-      <h3>Existing Roles ({roles.length})</h3>
-      {loading ? (
-        <p>Loading roles...</p>
-      ) : roles.length === 0 ? (
-        <p>No roles available.</p>
-      ) : (
-        <div className="roles-list">
-          {roles.map((role) => (
-            <div key={role.id} className="role-card">
-              <h4>{role.staffRoleName}</h4>
-              <p>{role.staffRoleDescription}</p>
-              <div className="role-actions">
-                <button onClick={() => {
-                  setFormData({
-                    staffRoleName: role.staffRoleName,
-                    staffRoleDescription: role.staffRoleDescription,
-                  });
-                  setEditingId(role.id);
-                }}>Edit</button>
-                <button onClick={() => handleDelete(role.id)} className="delete-btn">
-                  Delete
-                </button>
-              </div>
-              <small>ID: {role.id}</small>
+      {/* Roles Section */}
+      {showRoles && (
+        <>
+          <h3>Existing Roles ({roles.length})</h3>
+          {loading ? (
+            <p>Loading roles...</p>
+          ) : roles.length === 0 ? (
+            <p>No roles available.</p>
+          ) : (
+            <div className="roles-list">
+              {roles.map((role) => (
+                <div key={role.id} className="role-card">
+                  <h4>{role.staffRoleName}</h4>
+                  <p>{role.staffRoleDescription}</p>
+                  <div className="role-actions">
+                    <button
+                      onClick={() => {
+                        setFormData({
+                          staffRoleName: role.staffRoleName,
+                          staffRoleDescription: role.staffRoleDescription,
+                        });
+                        setEditingId(role.id);
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(role.id)}
+                      className="delete-btn"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  <small>ID: {role.id}</small>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
 
       <button onClick={fetchRoles} className="refresh-btn">Refresh Roles</button>
     </div>
-  );}
+  );
+}
