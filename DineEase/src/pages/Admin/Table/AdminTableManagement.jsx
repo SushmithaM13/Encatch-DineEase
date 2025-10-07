@@ -1,44 +1,65 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, Brush, Plus, Sofa, MoreVertical, X } from "lucide-react";
+import {
+  CheckCircle,
+  XCircle,
+  Brush,
+  Plus,
+  Sofa,
+  MoreVertical,
+  X,
+  User,
+} from "lucide-react";
 import "./tables.css";
 
 export default function AdminTableManagement() {
   const [tables, setTables] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
+  const [showWaiterPopup, setShowWaiterPopup] = useState(false);
   const [editTableId, setEditTableId] = useState(null);
-  const [newTable, setNewTable] = useState({
-    capacity: 4,
-    waiterId: "",
-    waiterName: "",
-    status: "available",
-  });
   const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [currentTableId, setCurrentTableId] = useState(null);
 
+  const [newTable, setNewTable] = useState({
+    tableNumber: "",
+    tableStatus: "AVAILABLE",
+    capacity: 1,
+    section: "",
+    locationDescription: "",
+  });
+
+  const [waiter, setWaiter] = useState({
+    waiterName: "",
+    waiterEmail: "",
+  });
+
+  // Load tables from localStorage
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("tables") || "[]");
     setTables(stored);
   }, []);
 
-  const saveTables = (newTables) => {
-    setTables(newTables);
-    localStorage.setItem("tables", JSON.stringify(newTables));
+  const saveTables = (updatedTables) => {
+    setTables(updatedTables);
+    localStorage.setItem("tables", JSON.stringify(updatedTables));
   };
 
   const handleOpenPopup = (table = null) => {
     if (table) {
       setNewTable({
+        tableNumber: table.tableNumber,
+        tableStatus: table.tableStatus,
         capacity: table.capacity,
-        waiterId: table.waiterId,
-        waiterName: table.waiterName,
-        status: table.status,
+        section: table.section,
+        locationDescription: table.locationDescription,
       });
       setEditTableId(table.id);
     } else {
       setNewTable({
-        capacity: 4,
-        waiterId: "",
-        waiterName: "",
-        status: "available",
+        tableNumber: "",
+        tableStatus: "AVAILABLE",
+        capacity: 1,
+        section: "",
+        locationDescription: "",
       });
       setEditTableId(null);
     }
@@ -47,66 +68,83 @@ export default function AdminTableManagement() {
   };
 
   const handleSaveTable = () => {
+    if (!newTable.tableNumber.trim()) {
+      alert("Please enter a table number");
+      return;
+    }
+
+    let newTableId;
     if (editTableId) {
       const updated = tables.map((t) =>
         t.id === editTableId ? { ...t, ...newTable } : t
       );
       saveTables(updated);
+      newTableId = editTableId;
     } else {
-      const tableToAdd = {
-        id: tables.length + 1,
-        ...newTable,
-      };
-      saveTables([...tables, tableToAdd]);
+      const newId = tables.length ? tables[tables.length - 1].id + 1 : 1;
+      const newEntry = { id: newId, ...newTable };
+      saveTables([...tables, newEntry]);
+      newTableId = newId;
     }
+
     setShowPopup(false);
+    setCurrentTableId(newTableId);
+    setShowWaiterPopup(true); // Open waiter popup next
+  };
+
+  const handleSaveWaiter = () => {
+    if (!waiter.waiterName.trim() || !waiter.waiterEmail.trim()) {
+      alert("Please fill waiter name and email");
+      return;
+    }
+
+    const updated = tables.map((t) =>
+      t.id === currentTableId
+        ? { ...t, waiterName: waiter.waiterName, waiterEmail: waiter.waiterEmail }
+        : t
+    );
+
+    saveTables(updated);
+    setShowWaiterPopup(false);
+    setWaiter({ waiterName: "", waiterEmail: "" });
   };
 
   const handleDeleteTable = (id) => {
     const updated = tables.filter((t) => t.id !== id);
     saveTables(updated);
-    setDropdownOpen(null);
   };
 
   const handleChangeStatus = (id, newStatus) => {
     const updated = tables.map((t) =>
-      t.id === id ? { ...t, status: newStatus } : t
+      t.id === id ? { ...t, tableStatus: newStatus } : t
     );
     saveTables(updated);
   };
 
   return (
     <div className="tables-page">
-      <h2 className="page-title"><Sofa size={22} /> Table Management</h2>
+      <h2 className="page-title">
+        <Sofa size={22} /> Table Management
+      </h2>
 
-      {/* Add Table Button aligned to right */}
       <div className="add-table-section right-align">
         <button onClick={() => handleOpenPopup()}>
           <Plus size={16} /> Add Table
         </button>
       </div>
 
-      {/* Stats */}
-<div className="stats">
-  <p className="stat-total">Total: {tables.length}</p>
-  <p className="stat-available">
-    Available: {tables.filter((t) => t.status === "available").length}
-  </p>
-  <p className="stat-booked">
-    Booked: {tables.filter((t) => t.status === "booked").length}
-  </p>
-  <p className="stat-cleaning">
-    Cleaning: {tables.filter((t) => t.status === "cleaning").length}
-  </p>
-</div>
+      <div className="stats">
+        <p>Total: {tables.length}</p>
+        <p>Available: {tables.filter((t) => t.tableStatus === "AVAILABLE").length}</p>
+        <p>Booked: {tables.filter((t) => t.tableStatus === "BOOKED").length}</p>
+        <p>Cleaning: {tables.filter((t) => t.tableStatus === "CLEANING").length}</p>
+      </div>
 
-
-      {/* Table Grid */}
       <div className="tables-grid">
         {tables.map((table) => (
-          <div key={table.id} className={`table-card ${table.status}`}>
+          <div key={table.id} className={`table-card ${table.tableStatus.toLowerCase()}`}>
             <div className="table-card-header">
-              <h3>Table {table.id}</h3>
+              <h3>{table.tableNumber}</h3>
               <div className="dropdown-container">
                 <button
                   className="dots-btn"
@@ -125,22 +163,29 @@ export default function AdminTableManagement() {
               </div>
             </div>
 
-            <p>
-              {table.status === "booked"
-                ? `🚨 Table ${table.id} (${table.capacity}-seater) booked! Waiter ${table.waiterName || "—"} (${table.waiterId || "N/A"}) be ready to serve.`
-                : `Status: ${table.status}`}
-            </p>
+            <p>Status: {table.tableStatus}</p>
             <p>Capacity: {table.capacity}</p>
-            <p>Waiter: {table.waiterName || "—"} ({table.waiterId || "N/A"})</p>
+            <p>Section: {table.section || "—"}</p>
+            <p>Location: {table.locationDescription || "—"}</p>
+            <p>
+              Waiter:{" "}
+              {table.waiterName ? (
+                <>
+                  <User size={14} /> {table.waiterName}
+                </>
+              ) : (
+                "—"
+              )}
+            </p>
 
             <div className="actions">
-              <button onClick={() => handleChangeStatus(table.id, "available")}>
+              <button onClick={() => handleChangeStatus(table.id, "AVAILABLE")}>
                 <CheckCircle size={16} /> Available
               </button>
-              <button onClick={() => handleChangeStatus(table.id, "booked")}>
+              <button onClick={() => handleChangeStatus(table.id, "BOOKED")}>
                 <XCircle size={16} /> Booked
               </button>
-              <button onClick={() => handleChangeStatus(table.id, "cleaning")}>
+              <button onClick={() => handleChangeStatus(table.id, "CLEANING")}>
                 <Brush size={16} /> Cleaning
               </button>
             </div>
@@ -148,72 +193,93 @@ export default function AdminTableManagement() {
         ))}
       </div>
 
-      {/* Popup Modal */}
+      {/* === Table Form Popup === */}
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup">
-            {/* Close button top-right */}
             <button className="popup-close" onClick={() => setShowPopup(false)}>
               <X size={18} />
             </button>
+            <h3>{editTableId ? "Edit Table" : "Add Table"}</h3>
 
-            <h3>{editTableId ? "Edit Table" : "Add New Table"}</h3>
+            <label>
+              Table Number:
+              <input
+                type="text"
+                value={newTable.tableNumber}
+                onChange={(e) => setNewTable({ ...newTable, tableNumber: e.target.value })}
+              />
+            </label>
 
             <label>
               Capacity:
-              <select
+              <input
+                type="number"
+                min="1"
                 value={newTable.capacity}
                 onChange={(e) =>
                   setNewTable({ ...newTable, capacity: Number(e.target.value) })
                 }
-              >
-                <option value="2">2-seater</option>
-                <option value="4">4-seater</option>
-                <option value="6">6-seater</option>
-                <option value="8">8-seater</option>
-                <option value="10">10-seater</option>
-                <option value="12">12-seater</option>
-              </select>
+              />
             </label>
 
             <label>
-              Waiter ID:
+              Section:
               <input
                 type="text"
-                value={newTable.waiterId}
+                value={newTable.section}
+                onChange={(e) => setNewTable({ ...newTable, section: e.target.value })}
+              />
+            </label>
+
+            <label>
+              Location Description:
+              <textarea
+                value={newTable.locationDescription}
                 onChange={(e) =>
-                  setNewTable({ ...newTable, waiterId: e.target.value })
+                  setNewTable({ ...newTable, locationDescription: e.target.value })
                 }
               />
             </label>
+
+            <div className="popup-actions">
+              <button onClick={handleSaveTable}>Save & Assign Waiter</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* === Waiter Assign Popup === */}
+      {showWaiterPopup && (
+        <div className="popup-overlay">
+          <div className="popup">
+            <button className="popup-close" onClick={() => setShowWaiterPopup(false)}>
+              <X size={18} />
+            </button>
+            <h3>Assign Waiter to Table</h3>
 
             <label>
               Waiter Name:
               <input
                 type="text"
-                value={newTable.waiterName}
-                onChange={(e) =>
-                  setNewTable({ ...newTable, waiterName: e.target.value })
-                }
+                placeholder="e.g. Yassin"
+                value={waiter.waiterName}
+                onChange={(e) => setWaiter({ ...waiter, waiterName: e.target.value })}
               />
             </label>
 
             <label>
-              Status:
-              <select
-                value={newTable.status}
-                onChange={(e) =>
-                  setNewTable({ ...newTable, status: e.target.value })
-                }
-              >
-                <option value="available">Available</option>
-                <option value="booked">Booked</option>
-                <option value="cleaning">Cleaning</option>
-              </select>
+              Waiter Email:
+              <input
+                type="email"
+                placeholder="e.g. yassin@yopmail.com"
+                value={waiter.waiterEmail}
+                onChange={(e) => setWaiter({ ...waiter, waiterEmail: e.target.value })}
+              />
             </label>
 
             <div className="popup-actions">
-              <button onClick={handleSaveTable}>Save</button>
+              <button onClick={handleSaveWaiter}>Save Waiter</button>
             </div>
           </div>
         </div>

@@ -16,9 +16,6 @@ const Login = () => {
     if (remembered) setUsername(remembered);
   }, []);
 
-
-
-
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -44,6 +41,7 @@ const Login = () => {
           localStorage.setItem("waiterName", data.name);
         }
 
+        // Remember email if checkbox is ticked
         if (remember) {
           localStorage.setItem("rememberEmail", username);
         } else {
@@ -52,7 +50,7 @@ const Login = () => {
 
         toast.success("Login successful! Redirecting...");
 
-        // Redirect based on role after 1s
+        // Redirect based on role after 1.5s
         setTimeout(() => {
           switch (data.role) {
             case "SUPER_ADMIN":
@@ -63,14 +61,14 @@ const Login = () => {
               break;
             case "WAITER":
               navigate("/WaiterDashboard");
-              console.log("login as waiter");
+              console.log("Logged in as Waiter");
               break;
             default:
               navigate("/");
           }
         }, 1500);
       } else {
-        // Backend error handling
+        // Handle backend error messages
         let errorMsg = "Invalid credentials. Please try again.";
         if (data.message?.toLowerCase().includes("not found")) {
           errorMsg = "User not found. Please register first.";
@@ -132,14 +130,12 @@ const Login = () => {
             Login
           </button>
 
-
           <p className="auth-footer">
             Not a member? <Link to="/SuperAdminRegistration">Sign up</Link>
           </p>
         </form>
       </div>
 
-      {/* Toast container */}
       <ToastContainer position="top-center" autoClose={2000} />
     </div>
   );

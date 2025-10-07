@@ -288,7 +288,7 @@ export default function AdminStaffManagement() {
         <thead>
           <tr>
             <th>Sl. No.</th> 
-            <th>Staff ID</th>
+            {/* <th>Staff ID</th> */}
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
@@ -306,7 +306,7 @@ export default function AdminStaffManagement() {
             filteredStaff.map((staff, index) => (
               <tr key={staff.id || index}>
                 <td>{index + 1}</td>
-                <td>{staff.staffId}</td>
+                {/* <td>{staff.staffId}</td> */}
                 <td>
                   {staff.firstName} {staff.lastName}
                 </td>

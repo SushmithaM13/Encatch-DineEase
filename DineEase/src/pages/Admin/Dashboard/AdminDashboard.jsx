@@ -11,6 +11,8 @@ import {
   Settings,
   IndianRupee,
 } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
@@ -25,23 +27,18 @@ export default function AdminDashboard() {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // ✅ Handle responsive sidebar
+  // Handle responsive sidebar
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth <= 768) {
-        setIsMobile(true);
-        setSidebarOpen(false);
-      } else {
-        setIsMobile(false);
-        setSidebarOpen(true);
-      }
+      setIsMobile(window.innerWidth <= 768);
+      setSidebarOpen(window.innerWidth > 768);
     };
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // ✅ Close profile dropdown on outside click
+  // Close profile dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -56,7 +53,7 @@ export default function AdminDashboard() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ Dummy search results for UI demo
+  // Dummy search results for UI demo
   useEffect(() => {
     if (!searchQuery.trim()) {
       setSearchResults([]);
@@ -74,10 +71,10 @@ export default function AdminDashboard() {
     );
   }, [searchQuery]);
 
-  // ✅ Proper Logout API call (works with Spring Boot + session cookies)
+  // Logout function
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem("token"); // ✅ get the token
+      const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
 
       const response = await fetch(
@@ -85,7 +82,7 @@ export default function AdminDashboard() {
         {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${token}`, // ✅ send token
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
@@ -99,15 +96,20 @@ export default function AdminDashboard() {
         sessionStorage.clear();
         localStorage.removeItem("token");
 
-        window.alert("✅ Successfully logged out!");
-        navigate("/");
+        // ✅ Show toast first
+        toast.success("✅ Successfully logged out!");
+
+        // Wait a bit before navigating so the toast is visible
+        setTimeout(() => {
+          navigate("/");
+        }, 1500); // 1.5 seconds delay
       } else {
         const data = await response.json().catch(() => ({}));
-        window.alert("⚠️ Logout failed: " + (data.message || "Try again"));
+        toast.error("⚠️ Logout failed: " + (data.message || "Try again"));
       }
     } catch (error) {
       console.error("Logout error:", error);
-      window.alert("❌ Error during logout. Please try again later.");
+      toast.error("❌ Error during logout. Please try again later.");
     }
   };
 
@@ -237,6 +239,9 @@ export default function AdminDashboard() {
           <Outlet />
         </main>
       </div>
+
+      {/* Toast notifications */}
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

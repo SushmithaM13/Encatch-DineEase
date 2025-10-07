@@ -23,7 +23,7 @@ import AdminRevenueManagement from "./pages/Admin/Revenue/AdminRevenueManagement
 // ===== Waiter Pages =====
 import WaiterDashboard from "./pages/Waiter/WaiterDashboard/WaiterDashboard";
 import WaiterHome from "./pages/Waiter/Home/WaiterHome";
-import Reservation from "./pages/Waiter/Reservation/Reservation";
+import WaiterReservation from "./pages/Waiter/WaiterReservation/WaiterReservation";
 import WaiterSettings from "./pages/Waiter/Settings/WaiterSettings";
 import WaiterProfile from "./pages/Waiter/Profile/WaiterProfile";
 
@@ -82,7 +82,7 @@ function App() {
         >
           <Route index element={<WaiterHome />} /> 
           <Route path="home" element={<WaiterHome />} />
-          <Route path="reservations" element={<Reservation />} />
+          <Route path="reservations" element={<WaiterReservation />} />
           <Route path="settings" element={<WaiterSettings />} />
           <Route path="profile" element={<WaiterProfile />} />
         </Route>
