@@ -1,0 +1,175 @@
+/* --- Container --- */
+.admin-role-management-page {
+  padding: 20px;
+  color: #000;
+  background: #fff;
+  font-family: Arial, sans-serif;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* --- Header --- */
+.admin-role-management-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.admin-page-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- Buttons --- */
+.admin-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background-color: #000;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.admin-add-btn:hover {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #000;
+}
+
+/* --- Search Bar --- */
+.admin-search-bar {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.admin-search-bar input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #000;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+/* --- Table --- */
+.admin-roles-table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+}
+
+.admin-roles-table th,
+.admin-roles-table td {
+  border: 1px solid #000;
+  padding: 10px;
+  text-align: left;
+}
+
+.admin-roles-table th {
+  background: #000;
+  color: #fff;
+}
+
+.admin-roles-table tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.admin-roles-table tr:hover {
+  background: #eaeaea;
+}
+
+/* --- Table Actions --- */
+.admin-action-icons {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-icon-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px;
+  transition: 0.2s;
+}
+
+.admin-icon-btn.admin-edit {
+  color: #fbbf24;
+}
+
+.admin-icon-btn.admin-edit:hover {
+  color: #b45309;
+}
+
+.admin-icon-btn.admin-delete {
+  color: #ef4444;
+}
+
+.admin-icon-btn.admin-delete:hover {
+  color: #b91c1c;
+}
+
+/* --- Modal --- */
+.admin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.admin-modal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.admin-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.admin-modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.admin-close-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #000;
+}
+
+.admin-modal-body input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #000;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.admin-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+}

@@ -16,8 +16,6 @@ export default function RoleManagement() {
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-
-  // ✅ Wrap fetchRoles in useCallback
   const fetchRoles = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -41,7 +39,7 @@ export default function RoleManagement() {
     }
   }, [token]);
 
-  // ✅ useEffect with stable fetchRoles
+  // useEffect with stable fetchRoles
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -219,8 +217,8 @@ export default function RoleManagement() {
           )}
         </>
       )}
-
       <button onClick={fetchRoles} className="refresh-btn">Refresh Roles</button>
     </div>
   );
 }
+
