@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AddStaffRole.css";
 
@@ -12,21 +12,13 @@ export default function RoleManagement() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [showRoles, setShowRoles] = useState(false); // 👈 toggle state
+  const [showRoles, setShowRoles] = useState(false);
 
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/login");
-    } else {
-      fetchRoles();
-    }
-  }, [token, navigate]);
-
-  // Fetch all roles
-  const fetchRoles = async () => {
+  // ✅ Wrap fetchRoles in useCallback
+  const fetchRoles = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
@@ -47,7 +39,16 @@ export default function RoleManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [token]);
+
+  // ✅ useEffect with stable fetchRoles
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    } else {
+      fetchRoles();
+    }
+  }, [token, navigate, fetchRoles]);
 
   // Add or Update role
   const handleSubmit = async (e) => {

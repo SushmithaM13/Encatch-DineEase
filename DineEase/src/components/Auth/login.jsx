@@ -66,6 +66,7 @@ const Login = () => {
         setMessage("✅ Login successful .....! ...");
 
         setTimeout(() => {
+          
           if (data.role === "SUPER_ADMIN") navigate("/superAdminDashboard");
           else if (data.role === "ADMIN") navigate("/adminDashboard");
           else if (data.role === "STAFF") navigate("/staffDashboard");
