@@ -15,6 +15,7 @@ import TableManagement from "./pages/superadmin/tablemanagemnet/TableManagement"
 import AddStaffRole  from './pages/superadmin/staffroles/AddStaffRole'; 
 
 
+
 import Footer from './components/footer/Footer';
 
 function App() {
@@ -26,16 +27,23 @@ function App() {
       <Route path='/forgotPassword' element={<ForgotPassword/>}/>
       <Route path='/resetPassword' element={<ResetPassword/>}/>
       <Route path='/SuperAdminRegistration' element={<SuperAdminRegistration/>}/>
+
+
       
       {/* Private Routes */}
       <Route path='superAdminDashboard/*' element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}><SuperAdminDashboard/></ProtectedRoute>}>
+
         <Route index element={<SuperAdminHome />} />
         <Route path="staff" element={<UserManagement />} />
         <Route path="food-items" element={<Items />} />
         <Route path="staffrole" element={<AddStaffRole />} />
         <Route path="table" element={<TableManagement />} />
+        
       </Route>
-     
+
+             
+
+
     </Routes>
     <Footer/>
     </>
