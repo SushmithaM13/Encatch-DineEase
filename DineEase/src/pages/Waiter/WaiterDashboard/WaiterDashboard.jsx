@@ -8,11 +8,12 @@ import {
   LogOut,
   Users,
   Settings,
-  CalendarDays
+  CalendarDays,
+  User
 } from "lucide-react";
 import "./WaiterDashboard.css";
 
-export default function AdminDashboard() {
+export default function WaiterDashboard() {
   const [adminName, setAdminName] = useState("Waiter");
   const [restaurantName, setRestaurantName] = useState("Restaurant");
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
@@ -24,7 +25,7 @@ export default function AdminDashboard() {
 
   const navigate = useNavigate();
 
-  // ✅ Resize handler
+  // Resize handler
   useEffect(() => {
     const handleResize = () => {
       setSidebarOpen(window.innerWidth > 768);
@@ -34,7 +35,7 @@ export default function AdminDashboard() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // ✅ Dropdown close on outside click
+  // Dropdown close on outside click
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -49,7 +50,7 @@ export default function AdminDashboard() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ Search (currently static/dummy data)
+  // Search logic
   useEffect(() => {
     if (!searchQuery.trim()) {
       setSearchResults([]);
@@ -69,7 +70,7 @@ export default function AdminDashboard() {
     );
   }, [searchQuery]);
 
-  // ✅ Logout clears UI state and navigates to home
+  // Logout
   const handleLogout = () => {
     setAdminName("Admin");
     setRestaurantName("Restaurant");
@@ -78,20 +79,23 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="layout-container">
+    <div className="waiter-layout-container">
       {window.innerWidth <= 768 && sidebarOpen && (
-        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="waiter-sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
       {/* Sidebar */}
-      <aside className={`sidebar ${sidebarOpen ? "open" : "collapsed"}`}>
-        <div className="sidebar-header">
-          <div className="sidebar-title">
+      <aside className={`waiter-sidebar ${sidebarOpen ? "open" : "collapsed"}`}>
+        <div className="waiter-sidebar-header">
+          <div className="waiter-sidebar-title">
             <Utensils size={22} />
             {sidebarOpen && <span style={{ marginLeft: "8px" }}>Dineease</span>}
           </div>
           <button
-            className="hamburger desktop-only"
+            className="waiter-hamburger desktop-only"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             <span></span>
@@ -100,7 +104,7 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        <nav>
+        <nav className="waiter-sidebar-nav">
           <Link
             to="/WaiterDashboard"
             onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
@@ -133,7 +137,6 @@ export default function AdminDashboard() {
             {sidebarOpen && <span>Orders</span>}
           </Link>
 
-
           <Link
             to="/WaiterDashboard/customers"
             onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
@@ -141,14 +144,6 @@ export default function AdminDashboard() {
             <Users size={22} />
             {sidebarOpen && <span>Customers</span>}
           </Link>
-
-          {/* <Link
-    to="/WaiterDashboard/revenue"
-    onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-  >
-    <IndianRupee size={22} />
-    {sidebarOpen && <span>Revenue Management</span>}
-  </Link> */}
 
           <Link
             to="/WaiterDashboard/settings"
@@ -158,14 +153,13 @@ export default function AdminDashboard() {
             {sidebarOpen && <span>Settings</span>}
           </Link>
         </nav>
-
       </aside>
 
       {/* Main Content */}
-      <div className="main-content">
-        <header className="dashboard-header">
+      <div className="waiter-main-content">
+        <header className="waiter-dashboard-header">
           <button
-            className="hamburger mobile-only"
+            className="waiter-hamburger mobile-only"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             <span></span>
@@ -173,29 +167,29 @@ export default function AdminDashboard() {
             <span></span>
           </button>
 
-          <div className="header-left">Welcome, {adminName}</div>
+          <div className="waiter-header-left">Welcome, {adminName}</div>
 
-          <div className="header-center">
-            <div className="restaurant-display">
+          <div className="waiter-header-center">
+            <div className="waiter-restaurant-display">
               <Utensils size={18} color="black" />
               <span>{restaurantName}</span>
             </div>
           </div>
 
-          <div className="header-right" ref={dropdownRef}>
+          <div className="waiter-header-right" ref={dropdownRef}>
             {/* Search Bar */}
-            <div className="search-container">
+            <div className="waiter-search-container">
               <input
                 type="text"
                 placeholder="🔍 Search..."
-                className="search-bar"
+                className="waiter-search-bar"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               {searchResults.length > 0 && (
-                <div className="search-results">
+                <div className="waiter-search-results">
                   {searchResults.map((res, i) => (
-                    <div key={i} className="search-item">
+                    <div key={i} className="waiter-search-item">
                       <strong>{res.type}:</strong> {res.label}
                     </div>
                   ))}
@@ -204,19 +198,19 @@ export default function AdminDashboard() {
             </div>
 
             {/* Profile Dropdown */}
-            <div className="profile-dropdown">
+            <div className="waiter-profile-dropdown">
               <div
-                className="profile-circle"
+                className="waiter-profile-circle"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
                 {profilePic ? (
-                  <img src={profilePic} alt="Profile" className="circle-img" />
+                  <img src={profilePic} alt="Profile" className="waiter-circle-img" />
                 ) : (
                   adminName.charAt(0).toUpperCase()
                 )}
               </div>
               {dropdownOpen && (
-                <div className="dropdown-menu">
+                <div className="waiter-dropdown-menu">
                   <button onClick={() => navigate("/WaiterDashboard/profile")}>
                     <User size={16} /> Profile
                   </button>
@@ -232,7 +226,7 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        <main className="dashboard-content">
+        <main className="waiter-dashboard-content">
           <Outlet />
         </main>
       </div>

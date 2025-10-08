@@ -1,193 +1,191 @@
 /* ============================= */
-/* Staff Management Page Styles  */
+/* Admin Staff Management Styles */
 /* ============================= */
 
-.staff-page {
+.admin-staff-page {
   padding: 20px;
-  font-family: sans-serif;
+  font-family: "Inter", sans-serif;
   max-width: 1200px;
-  margin: 0 auto; /* Center the page */
+  margin: 0 auto;
+  background: #fafafa;
 }
 
 /* Page Title */
-.page-title {
-  font-size: 1.6rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #333;
+.admin-page-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #222;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  justify-content: center; /* Center title */
+  margin-bottom: 24px;
+}
+
+/* Tabs + Add Button Container */
+.admin-tabs-add-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 /* Tabs */
-.staff-tabs {
+.admin-staff-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 20px;
 }
 
-.tab-btn {
+.admin-tab-btn {
   padding: 8px 14px;
   border: 1px solid #ccc;
   border-radius: 6px;
   background: #f5f5f5;
   cursor: pointer;
-  transition: 0.2s;
   font-size: 0.9rem;
   font-weight: 500;
+  transition: all 0.2s;
 }
 
-/* Tabs + Add Button Container */
-.tabs-add-container {
-  display: flex;
-  justify-content: space-between; /* Tabs left, button right */
-  align-items: center;
-  margin-bottom: 20px;
+.admin-tab-btn.active,
+.admin-tab-btn:hover {
+  background: #000;
+  color: #fff;
+  border-color: #000;
 }
 
-.tab-btn.active {
-  background: black;
-  color: white;
-  border-color: black;
-}
-
-.tab-btn:hover {
-  background: black;
-  color: white;
-  border-color: black;
-}
-
-/* Add Staff Button */
-.add-btn {
+/* Add Button */
+.admin-add-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
-  background: black;
-  color: white;
+  gap: 6px;
+  background: #000;
+  color: #fff;
   border: none;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
-  transition: 0.2s;
-  margin-bottom: 20px;
+  font-weight: 500;
+  transition: all 0.2s;
 }
 
-.add-btn:hover {
+.admin-add-btn:hover {
   background: #222;
 }
 
-/* Staff Table */
-.staff-table {
+/* ============================= */
+/* Staff Table                   */
+/* ============================= */
+
+.admin-staff-table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: #fff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.staff-table th,
-.staff-table td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+.admin-staff-table th,
+.admin-staff-table td {
+  padding: 12px;
   text-align: left;
+  border-bottom: 1px solid #ddd;
   font-size: 0.9rem;
+  color: #333;
 }
 
-.staff-table th {
-  background: black; /* Header background black */
-  color: white; /* Header text white */
-  font-weight: bold;
+.admin-staff-table th {
+  background: #000;
+  color: #fff;
+  font-weight: 600;
   white-space: nowrap;
 }
 
-/* Staff Info */
-.staff-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.admin-staff-table tr:last-child td {
+  border-bottom: none;
 }
 
-.staff-initials {
-  background: black;
-  color: white;
-  font-weight: bold;
-  border-radius: 50%;
-  padding: 8px 12px;
-  font-size: 0.8rem;
+.admin-staff-table tr:hover td {
+  background: #f9f9f9;
 }
 
-/* Status Colors */
-.status {
+/* ============================= */
+/* Status Labels                 */
+/* ============================= */
+
+.admin-status {
+  display: inline-block;
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 0.85rem;
-  font-weight: bold;
-  text-align: center;
-  display: inline-block;
+  font-weight: 600;
+  text-transform: capitalize;
 }
 
-.status.active {
+.admin-status.active {
   background: #dcfce7;
   color: #166534;
 }
 
-.status.pending {
-  background: #fef9c3;
-  color: #854d0e;
-}
-
-.status.inactive {
+.admin-status.inactive {
   background: #fee2e2;
   color: #991b1b;
 }
 
-/* Action Buttons */
-/* Container for action icons */
-.action-icons {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  align-items: center;
+.admin-status.pending {
+  background: #fef9c3;
+  color: #854d0e;
 }
 
-/* Circular icon buttons */
-.icon-btn {
+/* ============================= */
+/* Action Buttons                */
+/* ============================= */
+
+.admin-action-icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.admin-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: none;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.2s;
 }
 
-/* Edit button (yellow) */
-.icon-btn.edit {
+.admin-icon-btn.admin-edit {
   background: #fef9c3;
   color: #854d0e;
 }
-.icon-btn.edit:hover {
+
+.admin-icon-btn.admin-edit:hover {
   background: #fde047;
 }
 
-/* Delete button (red) */
-.icon-btn.delete {
+.admin-icon-btn.admin-delete {
   background: #fee2e2;
   color: #991b1b;
 }
-.icon-btn.delete:hover {
+
+.admin-icon-btn.admin-delete:hover {
   background: #f87171;
-  color: white;
+  color: #fff;
 }
 
+/* ============================= */
+/* Modal Overlay                 */
+/* ============================= */
 
-/* ============================= */
-/* Modal / Popup Styles          */
-/* ============================= */
-.modal-overlay {
+.admin-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -200,122 +198,126 @@
   z-index: 1000;
 }
 
-.modal {
-  background: white;
-  border-radius: 8px;
+/* ============================= */
+/* Modal Box                     */
+/* ============================= */
+
+.admin-modal {
+  background: #fff;
+  border-radius: 10px;
   width: 100%;
-  max-width: 500px;
+  max-width: 520px;
   max-height: 90vh;
-  overflow:hidden;
-  padding: 20px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
 
-.modal-header {
+.admin-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: bold;
+  background: #000;
+  color: #fff;
+  padding: 14px 18px;
   font-size: 1.2rem;
+  font-weight: 600;
 }
 
-.modal-body {
-  padding: 16px;
-  flex: 1;
-  overflow-y: auto; /* 🔥 scrollable area */
-}
-
-.close-btn {
-  background: black;
-  color: white;
+.admin-close-btn {
+  background: #fff;
+  color: #000;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   padding: 4px 6px;
+  transition: 0.2s;
 }
 
-.modal-body {
+.admin-close-btn:hover {
+  background: #ddd;
+}
+
+.admin-modal-body {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 18px;
+  overflow-y: auto;
 }
 
-.modal-body input,
-.modal-body select {
-  padding: 8px;
+.admin-modal-body input,
+.admin-modal-body select {
+  padding: 8px 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 0.9rem;
   width: 100%;
+  transition: border-color 0.2s;
 }
 
-.modal-footer {
+.admin-modal-body input:focus,
+.admin-modal-body select:focus {
+  border-color: #000;
+  outline: none;
+}
+
+.admin-modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 10px;
+  padding: 14px 18px;
+  background: #f9f9f9;
+  border-top: 1px solid #eee;
 }
 
-/* Modal Buttons */
-.modal-footer .save-btn,
-.modal-footer .cancel-btn {
-  background: black;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: 0.2s;
-}
+/* ============================= */
+/* Password Field                */
+/* ============================= */
 
-.modal-footer .save-btn:hover,
-.modal-footer .cancel-btn:hover {
-  background: #222;
-}
-.password-field {
+.admin-password-field {
   position: relative;
   display: flex;
   align-items: center;
-  margin-top: 10px;
 }
 
-.password-field input {
+.admin-password-field input {
   flex: 1;
-  padding-right: 35px; /* space for eye icon */
-  height: 35px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  padding-left: 10px;
+  padding-right: 40px;
 }
 
-.eye-btn {
+.admin-eye-btn {
   position: absolute;
   right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: #333;
 }
 
+/* ============================= */
+/* Responsive Design             */
+/* ============================= */
 
-/* Responsive */
 @media (max-width: 768px) {
-  .staff-table th,
-  .staff-table td {
+  .admin-page-title {
+    font-size: 1.4rem;
+  }
+
+  .admin-staff-table th,
+  .admin-staff-table td {
     padding: 8px;
     font-size: 0.85rem;
   }
 
-  .modal {
+  .admin-modal {
     width: 90%;
+  }
+
+  .admin-tabs-add-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 }

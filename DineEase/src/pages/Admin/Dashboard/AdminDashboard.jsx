@@ -6,7 +6,7 @@ import {
   User,
   Newspaper,
   LogOut,
-  Sofa,
+  Sofa,   
   Users,
   Settings,
   IndianRupee,
@@ -96,13 +96,11 @@ export default function AdminDashboard() {
         sessionStorage.clear();
         localStorage.removeItem("token");
 
-        // ✅ Show toast first
         toast.success("✅ Successfully logged out!");
 
-        // Wait a bit before navigating so the toast is visible
         setTimeout(() => {
           navigate("/");
-        }, 1500); // 1.5 seconds delay
+        }, 1500);
       } else {
         const data = await response.json().catch(() => ({}));
         toast.error("⚠️ Logout failed: " + (data.message || "Try again"));
@@ -113,24 +111,26 @@ export default function AdminDashboard() {
     }
   };
 
-
   return (
-    <div className="layout-container">
+    <div className="admin-layout-container">
       {/* Mobile overlay */}
       {isMobile && sidebarOpen && (
-        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="admin-sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
       {/* Sidebar */}
-      <aside className={`sidebar ${sidebarOpen ? "open" : "collapsed"}`}>
-        <div className="sidebar-header">
-          <div className="sidebar-title">
+      <aside className={`admin-sidebar ${sidebarOpen ? "admin-open" : "admin-collapsed"}`}>
+        <div className="admin-sidebar-header">
+          <div className="admin-sidebar-title">
             <Utensils size={22} />
             {sidebarOpen && <span style={{ marginLeft: 8 }}>Dineease</span>}
           </div>
           {!isMobile && (
             <button
-              className="hamburger desktop-only"
+              className="admin-hamburger admin-desktop-only"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
               <span></span>
@@ -140,7 +140,7 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        <nav>
+        <nav className="admin-sidebar-nav">
           {[
             { to: "dashboard", icon: <LayoutDashboard size={18} />, label: "Dashboard" },
             { to: "roles", icon: <User size={22} />, label: "Role Management" },
@@ -153,6 +153,7 @@ export default function AdminDashboard() {
             <Link
               key={i}
               to={`/AdminDashboard/${item.to}`}
+              className="admin-sidebar-link"
               onClick={() => isMobile && setSidebarOpen(false)}
             >
               {item.icon}
@@ -163,11 +164,11 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main content */}
-      <div className="main-content">
-        <header className="dashboard-header">
+      <div className="admin-main-content">
+        <header className="admin-dashboard-header">
           {isMobile && (
             <button
-              className="hamburger mobile-only"
+              className="admin-hamburger admin-mobile-only"
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
               <span></span>
@@ -176,29 +177,29 @@ export default function AdminDashboard() {
             </button>
           )}
 
-          <div className="header-left">Welcome, {adminName}</div>
+          <div className="admin-header-left">Welcome, {adminName}</div>
 
-          <div className="header-center">
-            <div className="restaurant-display">
+          <div className="admin-header-center">
+            <div className="admin-restaurant-display">
               <Utensils size={18} color="black" />
               <span>{restaurantName}</span>
             </div>
           </div>
 
-          <div className="header-right" ref={dropdownRef}>
+          <div className="admin-header-right" ref={dropdownRef}>
             {/* Search */}
-            <div className="search-container">
+            <div className="admin-search-container">
               <input
                 type="text"
                 placeholder="🔍 Search..."
-                className="search-bar"
+                className="admin-search-bar"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               {searchResults.length > 0 && (
-                <div className="search-results">
+                <div className="admin-search-results">
                   {searchResults.map((res, i) => (
-                    <div key={i} className="search-item">
+                    <div key={i} className="admin-search-item">
                       <strong>{res.type}:</strong> {res.label}
                     </div>
                   ))}
@@ -207,26 +208,35 @@ export default function AdminDashboard() {
             </div>
 
             {/* Profile dropdown */}
-            <div className="profile-dropdown">
+            <div className="admin-profile-dropdown">
               <div
-                className="profile-circle"
+                className="admin-profile-circle"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
                 {profilePic ? (
-                  <img src={profilePic} alt="Profile" className="profile-pic" />
+                  <img src={profilePic} alt="Profile" className="admin-profile-pic" />
                 ) : (
                   adminName.charAt(0).toUpperCase()
                 )}
               </div>
               {dropdownOpen && (
-                <div className="dropdown-menu">
-                  <button onClick={() => navigate("/AdminDashboard/profile")}>
+                <div className="admin-dropdown-menu">
+                  <button
+                    className="admin-dropdown-item"
+                    onClick={() => navigate("/AdminDashboard/profile")}
+                  >
                     <User size={16} /> Profile
                   </button>
-                  <button onClick={() => navigate("/AdminDashboard/settings")}>
+                  <button
+                    className="admin-dropdown-item"
+                    onClick={() => navigate("/AdminDashboard/settings")}
+                  >
                     <Settings size={16} /> Settings
                   </button>
-                  <button onClick={handleLogout}>
+                  <button
+                    className="admin-dropdown-item"
+                    onClick={handleLogout}
+                  >
                     <LogOut size={16} /> Logout
                   </button>
                 </div>
@@ -235,7 +245,7 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        <main className="dashboard-content">
+        <main className="admin-dashboard-content">
           <Outlet />
         </main>
       </div>

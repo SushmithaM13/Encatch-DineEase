@@ -39,7 +39,6 @@ export default function AdminStaffManagement() {
     return date.toLocaleDateString("en-GB", options).replace(/ /g, "-");
   };
 
-  // ✅ Persist previousActiveIds in localStorage
   const [previousActiveIds, setPreviousActiveIds] = useState(() => {
     const stored = localStorage.getItem("activeStaffIds");
     return stored ? JSON.parse(stored) : [];
@@ -49,7 +48,6 @@ export default function AdminStaffManagement() {
     localStorage.setItem("activeStaffIds", JSON.stringify(previousActiveIds));
   }, [previousActiveIds]);
 
-  // ✅ Fetch Staff
   const fetchStaff = async () => {
     try {
       const res = await fetch(`${API_BASE}/all`, {
@@ -65,40 +63,30 @@ export default function AdminStaffManagement() {
       const staffData = Array.isArray(data)
         ? data
         : Array.isArray(data.content)
-          ? data.content
-          : [];
+        ? data.content
+        : [];
 
       const mappedStaff = staffData
-  .map((s) => ({
-    id: s.id,
-    staffId: s.id,
-    firstName: s.firstName,
-    lastName: s.lastName,
-    email: s.email,
-    phone: s.phoneNumber,
-    staffRoleType: s.staffRoleName,
-    shiftTiming: s.shiftTiming,
-    salary: s.salary,
-    contractStartDate: s.contractStartDate,
-    contractEndDate: s.contractEndDate,
-    status: s.staffStatus,
-  }))
-  // 🚫 exclude Admins
-  .filter((s) => s.staffRoleType?.toUpperCase() !== "ADMIN")
-  // ✅ sort by staffId ascending
-  .sort((a, b) => a.staffId - b.staffId);
+        .map((s) => ({
+          id: s.id,
+          staffId: s.id,
+          firstName: s.firstName,
+          lastName: s.lastName,
+          email: s.email,
+          phone: s.phoneNumber,
+          staffRoleType: s.staffRoleName,
+          shiftTiming: s.shiftTiming,
+          salary: s.salary,
+          contractStartDate: s.contractStartDate,
+          contractEndDate: s.contractEndDate,
+          status: s.staffStatus,
+        }))
+        .filter((s) => s.staffRoleType?.toUpperCase() !== "ADMIN")
+        .sort((a, b) => a.staffId - b.staffId);
 
-      
-
-
-
-
-
-      // ✅ Save in state + localStorage
       setStaffList(mappedStaff);
       localStorage.setItem("staffList", JSON.stringify(mappedStaff));
 
-      // 🔔 Detect newly activated staff only once
       const newlyActivated = mappedStaff.filter(
         (s) =>
           s.status?.toLowerCase() === "active" &&
@@ -121,11 +109,10 @@ export default function AdminStaffManagement() {
     } catch (err) {
       console.error("Error fetching staff:", err);
       setStaffList([]);
-      localStorage.removeItem("staffList"); // clear broken cache
+      localStorage.removeItem("staffList");
     }
   };
 
-  // ✅ Add or Update Staff
   const handleAddOrUpdate = async () => {
     if (!form.firstName || !form.lastName || !form.email || !form.phone) {
       alert("Please fill all required fields.");
@@ -136,7 +123,7 @@ export default function AdminStaffManagement() {
 
     try {
       let url = `${API_BASE}/add`;
-      let method = "POST"; // default for adding
+      let method = "POST";
 
       if (editId) {
         url = `${API_BASE}/update-staff/${editId}`;
@@ -158,7 +145,7 @@ export default function AdminStaffManagement() {
       }
 
       await res.json();
-      await fetchStaff(); // refresh list + localStorage
+      await fetchStaff();
 
       setForm(initialForm);
       setEditId(null);
@@ -179,7 +166,6 @@ export default function AdminStaffManagement() {
     }
   };
 
-  // ✅ Fetch Staff + Roles on load
   useEffect(() => {
     if (TOKEN) fetchStaff();
   }, [TOKEN]);
@@ -230,7 +216,7 @@ export default function AdminStaffManagement() {
         throw new Error(text || "Failed to delete staff");
       }
 
-      await fetchStaff(); // refresh list + localStorage
+      await fetchStaff();
     } catch (err) {
       console.error("Error deleting staff:", err);
       alert("Error deleting staff: " + err.message);
@@ -241,29 +227,29 @@ export default function AdminStaffManagement() {
     activeTab === "All Staff"
       ? staffList
       : staffList.filter((s) => {
-        const role = s.staffRoleType?.toLowerCase() || "";
-
-        if (activeTab.toLowerCase() === "chef") return role.includes("chef");
-        if (activeTab.toLowerCase() === "waiters") return role.includes("waiter");
-        if (activeTab.toLowerCase() === "accountant") return role.includes("accountant");
-
-        // "Other" tab: anything that is not chef, waiter, accountant
-        return !role.includes("chef") && !role.includes("waiter") && !role.includes("accountant");
-      });
-
+          const role = s.staffRoleType?.toLowerCase() || "";
+          if (activeTab.toLowerCase() === "chef") return role.includes("chef");
+          if (activeTab.toLowerCase() === "waiters") return role.includes("waiter");
+          if (activeTab.toLowerCase() === "accountant") return role.includes("accountant");
+          return (
+            !role.includes("chef") &&
+            !role.includes("waiter") &&
+            !role.includes("accountant")
+          );
+        });
 
   return (
-    <div className="staff-page">
-      <h2 className="page-title">
+    <div className="admin-staff-page">
+      <h2 className="admin-page-title">
         <UserCog size={22} /> Staff Management
       </h2>
 
-      <div className="tabs-add-container">
-        <div className="staff-tabs">
+      <div className="admin-tabs-add-container">
+        <div className="admin-staff-tabs">
           {["All Staff", "Chef", "Waiters", "Accountant", "Other"].map((tab) => (
             <button
               key={tab}
-              className={`tab-btn ${activeTab === tab ? "active" : ""}`}
+              className={`admin-tab-btn ${activeTab === tab ? "active" : ""}`}
               onClick={() => setActiveTab(tab)}
             >
               {tab}
@@ -272,7 +258,7 @@ export default function AdminStaffManagement() {
         </div>
 
         <button
-          className="add-btn"
+          className="admin-add-btn"
           onClick={() => {
             setForm(initialForm);
             setEditId(null);
@@ -283,12 +269,10 @@ export default function AdminStaffManagement() {
         </button>
       </div>
 
-      {/* Staff Table */}
-      <table className="staff-table">
+      <table className="admin-staff-table">
         <thead>
           <tr>
-            <th>Sl. No.</th> 
-            {/* <th>Staff ID</th> */}
+            <th>Sl. No.</th>
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
@@ -306,7 +290,6 @@ export default function AdminStaffManagement() {
             filteredStaff.map((staff, index) => (
               <tr key={staff.id || index}>
                 <td>{index + 1}</td>
-                {/* <td>{staff.staffId}</td> */}
                 <td>
                   {staff.firstName} {staff.lastName}
                 </td>
@@ -317,30 +300,29 @@ export default function AdminStaffManagement() {
                 <td>{staff.salary}</td>
                 <td>{formatDate(staff.contractStartDate)}</td>
                 <td>{formatDate(staff.contractEndDate)}</td>
-
                 <td>
                   <span
-                    className={`status ${staff.status?.toLowerCase() || ""}`}
+                    className={`admin-status ${staff.status?.toLowerCase() || ""}`}
                   >
                     {staff.status || "Inactive"}
                   </span>
                 </td>
-                <td className="action-icons">
-  <button
-    className="icon-btn edit"
-    onClick={() => handleEdit(staff)}
-    title="Edit"
-  >
-    <Edit size={16} />
-  </button>
-  <button
-    className="icon-btn delete"
-    onClick={() => handleRemove(staff.id)}
-    title="Remove"
-  >
-    <Trash2 size={16} />
-  </button>
-</td>
+                <td className="admin-action-icons">
+                  <button
+                    className="admin-icon-btn admin-edit"
+                    onClick={() => handleEdit(staff)}
+                    title="Edit"
+                  >
+                    <Edit size={16} />
+                  </button>
+                  <button
+                    className="admin-icon-btn admin-delete"
+                    onClick={() => handleRemove(staff.id)}
+                    title="Remove"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </td>
               </tr>
             ))
           ) : (
@@ -353,17 +335,19 @@ export default function AdminStaffManagement() {
         </tbody>
       </table>
 
-      {/* Modal */}
       {modalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <div className="admin-modal-header">
               <h3>{editId ? "Edit Staff" : "Add Staff"}</h3>
-              <button className="close-btn" onClick={() => setModalOpen(false)}>
+              <button
+                className="admin-close-btn"
+                onClick={() => setModalOpen(false)}
+              >
                 <X size={18} />
               </button>
             </div>
-            <div className="modal-body">
+            <div className="admin-modal-body">
               <input
                 type="text"
                 name="firstName"
@@ -430,7 +414,7 @@ export default function AdminStaffManagement() {
                 value={form.contractEndDate}
                 onChange={handleChange}
               />
-              <div className="password-field">
+              <div className="admin-password-field">
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -440,19 +424,18 @@ export default function AdminStaffManagement() {
                 />
                 <button
                   type="button"
-                  className="eye-btn"
+                  className="admin-eye-btn"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-            </div> {/* <-- This was missing! modal-body closing */}
-            <div className="modal-footer">
-              <button className="add-btn" onClick={handleAddOrUpdate}>
+            </div>
+            <div className="admin-modal-footer">
+              <button className="admin-add-btn" onClick={handleAddOrUpdate}>
                 <Plus size={16} /> {editId ? "Update Staff" : "Add Staff"}
               </button>
             </div>
-
           </div>
         </div>
       )}

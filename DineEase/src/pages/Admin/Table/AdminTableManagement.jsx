@@ -122,32 +122,32 @@ export default function AdminTableManagement() {
   };
 
   return (
-    <div className="tables-page">
-      <h2 className="page-title">
+    <div className="admin-tables-page">
+      <h2 className="admin-page-title">
         <Sofa size={22} /> Table Management
       </h2>
 
-      <div className="add-table-section right-align">
+      <div className="admin-add-table-section admin-right-align">
         <button onClick={() => handleOpenPopup()}>
           <Plus size={16} /> Add Table
         </button>
       </div>
 
-      <div className="stats">
+      <div className="admin-stats">
         <p>Total: {tables.length}</p>
         <p>Available: {tables.filter((t) => t.tableStatus === "AVAILABLE").length}</p>
         <p>Booked: {tables.filter((t) => t.tableStatus === "BOOKED").length}</p>
         <p>Cleaning: {tables.filter((t) => t.tableStatus === "CLEANING").length}</p>
       </div>
 
-      <div className="tables-grid">
+      <div className="admin-tables-grid">
         {tables.map((table) => (
-          <div key={table.id} className={`table-card ${table.tableStatus.toLowerCase()}`}>
-            <div className="table-card-header">
+          <div key={table.id} className={`admin-table-card ${table.tableStatus.toLowerCase()}`}>
+            <div className="admin-table-card-header">
               <h3>{table.tableNumber}</h3>
-              <div className="dropdown-container">
+              <div className="admin-dropdown-container">
                 <button
-                  className="dots-btn"
+                  className="admin-dots-btn"
                   onClick={() =>
                     setDropdownOpen(dropdownOpen === table.id ? null : table.id)
                   }
@@ -155,7 +155,7 @@ export default function AdminTableManagement() {
                   <MoreVertical size={18} />
                 </button>
                 {dropdownOpen === table.id && (
-                  <div className="dropdown-menu">
+                  <div className="admin-dropdown-menu">
                     <button onClick={() => handleOpenPopup(table)}>Edit</button>
                     <button onClick={() => handleDeleteTable(table.id)}>Delete</button>
                   </div>
@@ -178,7 +178,7 @@ export default function AdminTableManagement() {
               )}
             </p>
 
-            <div className="actions">
+            <div className="admin-actions">
               <button onClick={() => handleChangeStatus(table.id, "AVAILABLE")}>
                 <CheckCircle size={16} /> Available
               </button>
@@ -195,9 +195,9 @@ export default function AdminTableManagement() {
 
       {/* === Table Form Popup === */}
       {showPopup && (
-        <div className="popup-overlay">
-          <div className="popup">
-            <button className="popup-close" onClick={() => setShowPopup(false)}>
+        <div className="admin-popup-overlay">
+          <div className="admin-popup">
+            <button className="admin-popup-close" onClick={() => setShowPopup(false)}>
               <X size={18} />
             </button>
             <h3>{editTableId ? "Edit Table" : "Add Table"}</h3>
@@ -242,7 +242,7 @@ export default function AdminTableManagement() {
               />
             </label>
 
-            <div className="popup-actions">
+            <div className="admin-popup-actions">
               <button onClick={handleSaveTable}>Save & Assign Waiter</button>
             </div>
           </div>
@@ -251,9 +251,9 @@ export default function AdminTableManagement() {
 
       {/* === Waiter Assign Popup === */}
       {showWaiterPopup && (
-        <div className="popup-overlay">
-          <div className="popup">
-            <button className="popup-close" onClick={() => setShowWaiterPopup(false)}>
+        <div className="admin-popup-overlay">
+          <div className="admin-popup">
+            <button className="admin-popup-close" onClick={() => setShowWaiterPopup(false)}>
               <X size={18} />
             </button>
             <h3>Assign Waiter to Table</h3>
@@ -278,7 +278,7 @@ export default function AdminTableManagement() {
               />
             </label>
 
-            <div className="popup-actions">
+            <div className="admin-popup-actions">
               <button onClick={handleSaveWaiter}>Save Waiter</button>
             </div>
           </div>

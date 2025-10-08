@@ -1,44 +1,58 @@
-.settings-page {
+/* Container */
+.waiter-settings-page {
   padding: 20px;
+  font-family: sans-serif;
+  background: #f9fafb;
+  min-height: 100vh;
 }
 
-.settings-tabs {
+/* Heading */
+.waiter-settings-heading {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* Tabs */
+.waiter-settings-tabs {
   display: flex;
   gap: 15px;
   margin-bottom: 20px;
 }
 
-.settings-tabs button {
+.waiter-settings-tabs button {
   padding: 8px 16px;
   border: none;
   background-color: #eee;
   cursor: pointer;
   border-radius: 6px;
   font-weight: bold;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
-.settings-tabs button.active {
+.waiter-settings-tabs button.waiter-active {
   background-color: #454545;
   color: white;
 }
 
-.settings-content {
+/* Tab Content */
+.waiter-settings-content {
   background: #fff;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-.tab-content label {
+.waiter-tab-content label {
   display: block;
   margin-bottom: 12px;
   font-weight: 500;
 }
 
-.tab-content input[type="text"],
-.tab-content input[type="email"],
-.tab-content input[type="password"],
-.tab-content select {
+.waiter-tab-content input[type="text"],
+.waiter-tab-content input[type="email"],
+.waiter-tab-content input[type="password"],
+.waiter-tab-content select {
   width: 100%;
   padding: 6px 10px;
   margin-top: 5px;
@@ -46,7 +60,16 @@
   border: 1px solid #ccc;
 }
 
-.tab-content button {
+.waiter-tab-content input[type="checkbox"] {
+  margin-left: 10px;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+/* Buttons */
+.waiter-tab-content button,
+.waiter-save-btn,
+.waiter-logout-btn {
   padding: 8px 16px;
   background-color: #454545;
   color: white;
@@ -54,4 +77,22 @@
   border-radius: 6px;
   cursor: pointer;
   margin-top: 10px;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.waiter-tab-content button:hover,
+.waiter-save-btn:hover,
+.waiter-logout-btn:hover {
+  background-color: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .waiter-settings-page {
+    padding: 15px;
+  }
+  .waiter-settings-tabs {
+    flex-wrap: wrap;
+  }
 }

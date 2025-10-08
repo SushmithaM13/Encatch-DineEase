@@ -99,15 +99,15 @@ export default function WaiterProfile() {
   };
 
   return (
-    <div className="profile-page">
+    <div className="waiter-profile-page">
       {/* Heading with User Icon */}
-      <h2 className="profile-heading">
-        <User size={28} className="user-icon" /> Waiter Profile
+      <h2 className="waiter-profile-heading">
+        <User size={28} className="waiter-user-icon" /> Waiter Profile
       </h2>
 
-      <div className="profile-container">
+      <div className="waiter-profile-container">
         {/* Left Side */}
-        <div className="profile-details">
+        <div className="waiter-profile-details">
           <section>
             <h3>Basic Info</h3>
             <label>
@@ -141,7 +141,7 @@ export default function WaiterProfile() {
               <input type="text" value={role} disabled />
             </label>
 
-            <div className="password-box">
+            <div className="waiter-password-box">
               <h4>Change Password</h4>
               <input
                 type="password"
@@ -181,60 +181,73 @@ export default function WaiterProfile() {
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
                       />
-                      <button onClick={handlePasswordChange}>
+                      <button
+                        className="waiter-save-password-btn"
+                        onClick={handlePasswordChange}
+                      >
                         Save Password
                       </button>
-                      <button onClick={() => setOtpSent(false)}>Cancel</button>
+                      <button
+                        className="waiter-cancel-otp-btn"
+                        onClick={() => setOtpSent(false)}
+                      >
+                        Cancel
+                      </button>
                     </>
                   ) : (
-                    <button onClick={sendOtp}>Send OTP</button>
+                    <button
+                      className="waiter-send-otp-btn"
+                      onClick={sendOtp}
+                    >
+                      Send OTP
+                    </button>
                   )}
                 </>
               )}
 
               {passwordSuccess && (
-                <p style={{ color: "green" }}>
+                <p className="waiter-password-success">
                   ✅ Password changed successfully!
                 </p>
               )}
             </div>
           </section>
 
-          <div className="action-buttons">
+          <div className="waiter-action-buttons">
             {isEditing ? (
               <>
-                <button onClick={handleSave}>Save Changes</button>
-                <button onClick={() => setIsEditing(false)}>Cancel</button>
+                <button className="waiter-save-btn" onClick={handleSave}>Save Changes</button>
+                <button className="waiter-cancel-btn" onClick={() => setIsEditing(false)}>Cancel</button>
               </>
             ) : (
-              <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+              <button className="waiter-edit-btn" onClick={() => setIsEditing(true)}>Edit Profile</button>
             )}
           </div>
         </div>
 
         {/* Right Side Profile Picture */}
-        <div className="profile-picture">
-          <div className="image-wrapper">
+        <div className="waiter-profile-picture">
+          <div className="waiter-image-wrapper">
             {profilePic ? (
-              <img src={profilePic} alt="Profile" className="circle-img" />
+              <img src={profilePic} alt="Profile" className="waiter-circle-img" />
             ) : (
-              <div className="circle-img placeholder">
+              <div className="waiter-circle-img placeholder">
                 {name ? name[0].toUpperCase() : "W"}
               </div>
             )}
 
             {/* 3 Dots Menu */}
-            <div className="menu-container">
+            <div className="waiter-menu-container">
               <button
-                className="menu-button"
+                className="waiter-menu-button"
                 onClick={() => setShowMenu((prev) => !prev)}
               >
                 <MoreVertical size={20} />
               </button>
 
               {showMenu && (
-                <div className="dropdown-menu">
-                  <label className="dropdown-item">
+                <div className="waiter-dropdown-menu">
+                  <label className="waiter-dropdown-item">
                     <Pencil size={16} />
                     Edit Photo
                     <input
@@ -246,7 +259,7 @@ export default function WaiterProfile() {
                   </label>
                   {profilePic && (
                     <button
-                      className="dropdown-item"
+                      className="waiter-dropdown-item"
                       onClick={handleRemoveImage}
                     >
                       <Trash2 size={16} /> Remove Photo

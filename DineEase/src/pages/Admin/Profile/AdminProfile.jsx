@@ -3,7 +3,6 @@ import { Pencil, Trash2, MoreVertical, User } from "lucide-react";
 import "./AdminProfile.css";
 
 export default function AdminProfile() {
-  // Profile details
   const [name, setName] = useState("");
   const [adminEmail, setAdminEmail] = useState("");
   const [contact, setContact] = useState("");
@@ -13,14 +12,10 @@ export default function AdminProfile() {
   const [restaurantDesc, setRestaurantDesc] = useState("");
   const [role] = useState("Admin");
 
-  // Profile pic
   const [profilePic, setProfilePic] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
-
-  // Edit state
   const [isEditing, setIsEditing] = useState(false);
 
-  // Password change
   const [passwordForm, setPasswordForm] = useState({
     current: "",
     newPass: "",
@@ -31,7 +26,6 @@ export default function AdminProfile() {
   const [otpSent, setOtpSent] = useState(false);
   const [passwordSuccess, setPasswordSuccess] = useState(false);
 
-  // Load stored values
   useEffect(() => {
     setName(localStorage.getItem("adminName") || "");
     setAdminEmail(localStorage.getItem("adminEmail") || "");
@@ -43,7 +37,6 @@ export default function AdminProfile() {
     setProfilePic(localStorage.getItem("adminProfilePic"));
   }, []);
 
-  // Save profile
   const handleSave = () => {
     localStorage.setItem("adminName", name);
     localStorage.setItem("adminEmail", adminEmail);
@@ -52,22 +45,19 @@ export default function AdminProfile() {
     localStorage.setItem("restaurantLocation", restaurantAddress);
     localStorage.setItem("restaurantPhone", restaurantPhone);
     localStorage.setItem("restaurantDescription", restaurantDesc);
-    if (profilePic) {
-      localStorage.setItem("adminProfilePic", profilePic);
-    } else {
-      localStorage.removeItem("adminProfilePic");
-    }
+    if (profilePic) localStorage.setItem("adminProfilePic", profilePic);
+    else localStorage.removeItem("adminProfilePic");
+
     setIsEditing(false);
     alert("Profile updated successfully!");
   };
 
-  // Change profile picture
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        setProfilePic(event.target?.result);
-        localStorage.setItem("adminProfilePic", event.target?.result);
+        setProfilePic(event.target.result);
+        localStorage.setItem("adminProfilePic", event.target.result);
       };
       reader.readAsDataURL(e.target.files[0]);
     }
@@ -80,7 +70,6 @@ export default function AdminProfile() {
     setShowMenu(false);
   };
 
-  // OTP + Password change
   const sendOtp = () => {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     setGeneratedOtp(code);
@@ -111,15 +100,14 @@ export default function AdminProfile() {
   };
 
   return (
-    <div className="profile-page">
-      {/* Heading with User Icon */}
-      <h2 className="profile-heading">
-        <User size={28} className="user-icon" /> Admin Profile
+    <div className="admin-profile-page">
+      <h2 className="admin-profile-heading">
+        <User size={28} className="admin-user-icon" /> Admin Profile
       </h2>
 
-      <div className="profile-container">
+      <div className="admin-profile-container">
         {/* Left Side */}
-        <div className="profile-details">
+        <div className="admin-profile-details">
           <section>
             <h3>Basic Info</h3>
             <label>
@@ -192,7 +180,7 @@ export default function AdminProfile() {
               <input type="text" value={role} disabled />
             </label>
 
-            <div className="password-box">
+            <div className="admin-password-box">
               <h4>Change Password</h4>
               <input
                 type="password"
@@ -251,7 +239,7 @@ export default function AdminProfile() {
             </div>
           </section>
 
-          <div className="action-buttons">
+          <div className="admin-action-buttons">
             {isEditing ? (
               <>
                 <button onClick={handleSave}>Save Changes</button>
@@ -263,29 +251,28 @@ export default function AdminProfile() {
           </div>
         </div>
 
-        {/* Right Side Profile Picture */}
-        <div className="profile-picture">
-          <div className="image-wrapper">
+        {/* Right Side */}
+        <div className="admin-profile-picture">
+          <div className="admin-image-wrapper">
             {profilePic ? (
-              <img src={profilePic} alt="Profile" className="circle-img" />
+              <img src={profilePic} alt="Profile" className="admin-circle-img" />
             ) : (
-              <div className="circle-img placeholder">
+              <div className="admin-circle-img placeholder">
                 {name ? name[0].toUpperCase() : "A"}
               </div>
             )}
 
-            {/* 3 Dots Menu (always visible) */}
-            <div className="menu-container">
+            <div className="admin-menu-container">
               <button
-                className="menu-button"
+                className="admin-menu-button"
                 onClick={() => setShowMenu((prev) => !prev)}
               >
                 <MoreVertical size={20} />
               </button>
 
               {showMenu && (
-                <div className="dropdown-menu">
-                  <label className="dropdown-item">
+                <div className="admin-dropdown-menu">
+                  <label className="admin-dropdown-item">
                     <Pencil size={16} />
                     Edit Photo
                     <input
@@ -297,7 +284,7 @@ export default function AdminProfile() {
                   </label>
                   {profilePic && (
                     <button
-                      className="dropdown-item"
+                      className="admin-dropdown-item"
                       onClick={handleRemoveImage}
                     >
                       <Trash2 size={16} /> Remove Photo

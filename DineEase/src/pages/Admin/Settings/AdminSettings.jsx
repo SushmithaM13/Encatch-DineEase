@@ -5,31 +5,31 @@ export default function AdminSettings() {
   const [activeTab, setActiveTab] = useState("profile");
 
   return (
-    <div className="settings-page">
-      <h2>Admin Settings</h2>
+    <div className="admin-settings-page">
+      <h2 className="admin-settings-heading">Admin Settings</h2>
 
       {/* Tabs */}
-      <div className="settings-tabs">
+      <div className="admin-settings-tabs">
         <button
-          className={activeTab === "profile" ? "active" : ""}
+          className={activeTab === "profile" ? "admin-active" : ""}
           onClick={() => setActiveTab("profile")}
         >
           Profile
         </button>
         <button
-          className={activeTab === "security" ? "active" : ""}
+          className={activeTab === "security" ? "admin-active" : ""}
           onClick={() => setActiveTab("security")}
         >
           Security
         </button>
         <button
-          className={activeTab === "notifications" ? "active" : ""}
+          className={activeTab === "notifications" ? "admin-active" : ""}
           onClick={() => setActiveTab("notifications")}
         >
           Notifications
         </button>
         <button
-          className={activeTab === "theme" ? "active" : ""}
+          className={activeTab === "theme" ? "admin-active" : ""}
           onClick={() => setActiveTab("theme")}
         >
           Theme
@@ -37,9 +37,9 @@ export default function AdminSettings() {
       </div>
 
       {/* Tab Content */}
-      <div className="settings-content">
+      <div className="admin-settings-content">
         {activeTab === "profile" && (
-          <div className="tab-content">
+          <div className="admin-tab-content">
             <h3>Profile</h3>
             <label>
               Name:
@@ -57,12 +57,12 @@ export default function AdminSettings() {
               Change Password:
               <input type="password" placeholder="New Password" />
             </label>
-            <button>Save Profile</button>
+            <button className="admin-save-btn">Save Profile</button>
           </div>
         )}
 
         {activeTab === "security" && (
-          <div className="tab-content">
+          <div className="admin-tab-content">
             <h3>Security</h3>
             <label>
               Two-Factor Authentication:
@@ -73,13 +73,13 @@ export default function AdminSettings() {
             </label>
             <label>
               Logout from other devices:
-              <button>Logout All</button>
+              <button className="admin-logout-btn">Logout All</button>
             </label>
           </div>
         )}
 
         {activeTab === "notifications" && (
-          <div className="tab-content">
+          <div className="admin-tab-content">
             <h3>Notifications</h3>
             <label>
               New Orders
@@ -97,7 +97,7 @@ export default function AdminSettings() {
         )}
 
         {activeTab === "theme" && (
-          <div className="tab-content">
+          <div className="admin-tab-content">
             <h3>Theme</h3>
             <label>
               Dark Mode

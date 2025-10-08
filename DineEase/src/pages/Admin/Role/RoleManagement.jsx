@@ -4,7 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./RoleManagement.css";
 
-export default function RoleManagement() {
+export default function AdminRoleManagement() {
   const API_BASE = "http://localhost:8082/dine-ease/api/v1/staff-role";
   const TOKEN = localStorage.getItem("token");
 
@@ -16,7 +16,7 @@ export default function RoleManagement() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (!TOKEN) console.warn("No token found! You must login first.");
+  if (!TOKEN) console.warn("No token found! Please login first.");
 
   const fetchRoles = async () => {
     setLoading(true);
@@ -36,8 +36,7 @@ export default function RoleManagement() {
   };
 
   useEffect(() => {
-    if (!TOKEN) return;
-    fetchRoles();
+    if (TOKEN) fetchRoles();
   }, [TOKEN]);
 
   const handleChange = (e) => {
@@ -51,7 +50,6 @@ export default function RoleManagement() {
       return;
     }
 
-    // Check duplicate role
     const duplicate = roles.some(
       (r) =>
         r.staffRoleName.toLowerCase() === form.staffRoleName.toLowerCase() &&
@@ -120,14 +118,14 @@ export default function RoleManagement() {
   );
 
   return (
-    <div className="role-management-page">
+    <div className="admin-role-management-page">
       {/* Header */}
-      <div className="role-management-header">
-        <h2 className="page-title">
+      <div className="admin-role-management-header">
+        <h2 className="admin-page-title">
           <User size={20} /> Role Management
         </h2>
         <button
-          className="add-btn"
+          className="admin-add-btn"
           onClick={() => {
             setForm(initialForm);
             setEditId(null);
@@ -139,7 +137,7 @@ export default function RoleManagement() {
       </div>
 
       {/* Search */}
-      <div className="search-bar">
+      <div className="admin-search-bar">
         <input
           type="search"
           placeholder="Search role..."
@@ -149,7 +147,7 @@ export default function RoleManagement() {
       </div>
 
       {/* Table */}
-      <table className="roles-table">
+      <table className="admin-roles-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -177,9 +175,9 @@ export default function RoleManagement() {
                 <td>{role.id}</td>
                 <td>{role.staffRoleName}</td>
                 <td>{role.staffRoleDescription}</td>
-                <td className="action-icons">
+                <td className="admin-action-icons">
                   <button
-                    className="icon-btn edit"
+                    className="admin-icon-btn admin-edit"
                     onClick={() => {
                       setForm(role);
                       setEditId(role.id);
@@ -190,7 +188,7 @@ export default function RoleManagement() {
                     <Edit size={16} />
                   </button>
                   <button
-                    className="icon-btn delete"
+                    className="admin-icon-btn admin-delete"
                     onClick={() => handleDelete(role.id)}
                     title="Delete"
                   >
@@ -205,15 +203,18 @@ export default function RoleManagement() {
 
       {/* Modal */}
       {modalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <div className="admin-modal-header">
               <h3>{editId ? "Edit Role" : "Add Role"}</h3>
-              <button className="close-btn" onClick={() => setModalOpen(false)}>
+              <button
+                className="admin-close-btn"
+                onClick={() => setModalOpen(false)}
+              >
                 <X size={18} />
               </button>
             </div>
-            <div className="modal-body">
+            <div className="admin-modal-body">
               <input
                 type="text"
                 name="staffRoleName"
@@ -229,8 +230,8 @@ export default function RoleManagement() {
                 onChange={handleChange}
               />
             </div>
-            <div className="modal-footer">
-              <button className="add-btn" onClick={handleAddOrUpdate}>
+            <div className="admin-modal-footer">
+              <button className="admin-add-btn" onClick={handleAddOrUpdate}>
                 <Plus size={16} /> {editId ? "Update Role" : "Add Role"}
               </button>
             </div>

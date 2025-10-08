@@ -232,11 +232,6 @@ const SuperAdminRegistration = () => {
     <div className="registration">
       <div className="registration-card">
         <div className="card-header">
-          <div className="admin-icon">
-            <div className="crown">
-              <div className="crown-jewel"></div>
-            </div>
-          </div>
           <h2 className="title">SIGN-UP</h2>
         </div>
 

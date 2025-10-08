@@ -1,11 +1,11 @@
 /* ===== Profile Page Layout ===== */
-.profile-page {
+.waiter-profile-page {
   padding: 20px;
   font-family: Arial, sans-serif;
   color: #333;
 }
 
-.profile-heading {
+.waiter-profile-heading {
   display: flex;
   align-items: center;
   font-size: 24px;
@@ -13,26 +13,26 @@
   margin-bottom: 20px;
 }
 
-.user-icon {
+.waiter-user-icon {
   margin-right: 8px;
   color: black;
 }
 
-.profile-container {
+.waiter-profile-container {
   display: flex;
   justify-content: space-between;
   gap: 20px;
 }
 
 /* ===== Left Side (Details) ===== */
-.profile-details {
+.waiter-profile-details {
   flex: 2;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.profile-details section {
+.waiter-profile-details section {
   border: 1px solid #ddd;
   padding: 15px;
   border-radius: 8px;
@@ -40,21 +40,21 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.profile-details h3 {
+.waiter-profile-details h3 {
   margin-bottom: 10px;
   color: #444;
   font-size: 18px;
 }
 
-.profile-details label {
+.waiter-profile-details label {
   display: block;
   margin-bottom: 12px;
   font-size: 14px;
   font-weight: 500;
 }
 
-.profile-details input,
-.profile-details textarea {
+.waiter-profile-details input,
+.waiter-profile-details textarea {
   margin-left: 10px;
   padding: 6px 10px;
   border: 1px solid #ccc;
@@ -63,36 +63,46 @@
   font-size: 14px;
 }
 
-.profile-details textarea {
+.waiter-profile-details textarea {
   width: 100%;
   resize: vertical;
   min-height: 60px;
 }
 
 /* ===== Password Section ===== */
-.password-box {
+.waiter-password-box {
   margin-top: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.password-box h4 {
+.waiter-password-box h4 {
   margin-bottom: 5px;
   font-size: 15px;
   font-weight: 600;
 }
 
-.password-box input {
+.waiter-password-box input {
   width: 100%;
 }
 
+/* ===== Password Success Message ===== */
+.waiter-password-success {
+  color: green;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
 /* ===== Buttons ===== */
-.action-buttons {
+.waiter-action-buttons {
   margin-top: 15px;
 }
 
-.action-buttons button {
+.waiter-action-buttons button,
+.waiter-save-password-btn,
+.waiter-cancel-otp-btn,
+.waiter-send-otp-btn {
   margin-right: 10px;
   padding: 8px 14px;
   border: none;
@@ -105,31 +115,35 @@
   transition: background 0.2s ease;
 }
 
-.action-buttons button:hover {
+.waiter-action-buttons button:hover,
+.waiter-save-password-btn:hover,
+.waiter-send-otp-btn:hover {
   background: #454545;
 }
 
-.action-buttons button:nth-child(2) {
+.waiter-cancel-btn,
+.waiter-cancel-otp-btn {
   background: #9e9e9e;
 }
 
-.action-buttons button:nth-child(2):hover {
+.waiter-cancel-btn:hover,
+.waiter-cancel-otp-btn:hover {
   background: #757575;
 }
 
 /* ===== Right Side (Profile Picture) ===== */
-.profile-picture {
+.waiter-profile-picture {
   flex: 1;
   display: flex;
   align-items: flex-start;
   justify-content: center;
 }
 
-.image-wrapper {
+.waiter-image-wrapper {
   position: relative;
 }
 
-.circle-img {
+.waiter-circle-img {
   width: 120px;
   height: 120px;
   border-radius: 50%;
@@ -144,47 +158,17 @@
   border: 2px solid #ddd;
 }
 
-.circle-img.placeholder {
+.waiter-circle-img.placeholder {
   background: #e5e7eb;
   color: #555;
 }
 
-/* ===== Remove Photo Button ===== */
-.remove-photo {
-  margin-top: 10px;
-  padding: 6px 12px;
-  background-color: #ef4444; /* red */
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px; /* space between icon and text */
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.remove-photo:hover {
-  background-color: #dc2626; /* darker red */
-}
-
-.remove-photo svg {
-  flex-shrink: 0;
-}
-
-/* ===== Edit Icon / 3 Dots Menu ===== */
-.image-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.menu-container {
+/* ===== 3 Dots Menu ===== */
+.waiter-menu-container {
   position: absolute;
   top: 6px;
   right: 6px;
-  background: rgba(0, 0, 0, 0.5); /* dark circle */
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 50%;
   padding: 4px;
   display: flex;
@@ -192,22 +176,21 @@
   justify-content: center;
 }
 
-.menu-button {
+.waiter-menu-button {
   background: none;
   border: none;
-  color: #fff; /* white icon on dark background */
+  color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.menu-button:hover {
+.waiter-menu-button:hover {
   color: #ddd;
 }
 
-
-.dropdown-menu {
+.waiter-dropdown-menu {
   position: absolute;
   top: 30px;
   right: 0;
@@ -219,7 +202,7 @@
   z-index: 10;
 }
 
-.dropdown-item {
+.waiter-dropdown-item {
   width: 100%;
   padding: 8px 12px;
   font-size: 14px;
@@ -232,6 +215,6 @@
   cursor: pointer;
 }
 
-.dropdown-item:hover {
+.waiter-dropdown-item:hover {
   background: #f3f4f6;
 }

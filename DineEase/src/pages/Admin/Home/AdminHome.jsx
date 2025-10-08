@@ -152,54 +152,45 @@ export default function AdminHome() {
   };
 
   return (
-    <div className="dashboard-page">
+    <div className="admin-dashboard-page">
       {/* Welcome */}
-      <h2 className="welcome">Welcome, {adminName}</h2>
-      <h3 className="restaurant">{restaurant}</h3>
+      <h2 className="admin-welcome">Welcome, {adminName}</h2>
+      <h3 className="admin-restaurant">{restaurant}</h3>
 
       {/* Stats Cards */}
-      <div className="stats-cards">
-        <div className="card bounce-card" onClick={() => navigate("/AdminDashboard/staff")}>
-          <Users size={28} className="card-icon" />
+      <div className="admin-stats-cards">
+        <div className="admin-card bounce-card" onClick={() => navigate("/AdminDashboard/staff")}>
+          <Users size={28} className="admin-card-icon" />
           <h4>{staff.length}</h4>
           <p>Staff Members</p>
         </div>
-        <div className="card bounce-card" onClick={() => navigate("/AdminDashboard/menu")}>
-          <Newspaper size={28} className="card-icon" />
+        <div className="admin-card bounce-card" onClick={() => navigate("/AdminDashboard/menu")}>
+          <Newspaper size={28} className="admin-card-icon" />
           <h4>{menu.length}</h4>
           <p>Menu Items</p>
         </div>
-        <div className="card bounce-card" onClick={() => navigate("/AdminDashboard/table")}>
-          <Sofa size={28} className="card-icon" />
-          <h4>
-            {occupiedTables}/{tables.length}
-          </h4>
+        <div className="admin-card bounce-card" onClick={() => navigate("/AdminDashboard/table")}>
+          <Sofa size={28} className="admin-card-icon" />
+          <h4>{occupiedTables}/{tables.length}</h4>
           <p>Tables Occupied</p>
         </div>
-        <div className="card bounce-card" onClick={() => navigate("/AdminDashboard/revenue")}>
-          <IndianRupee size={28} className="card-icon" />
+        <div className="admin-card bounce-card" onClick={() => navigate("/AdminDashboard/revenue")}>
+          <IndianRupee size={28} className="admin-card-icon" />
           <h4>₹{revenue.toLocaleString()}</h4>
           <p>Today's Revenue</p>
         </div>
       </div>
 
       {/* Analytics Section */}
-      <div className="analytics-section">
+      <div className="admin-analytics-section">
         {/* Revenue Analysis */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "15px",
-          }}
-        >
+        <div className="admin-analytics-header">
           <h3>Revenue Analysis</h3>
-          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <div className="admin-analytics-controls">
             <select
               value={revenueFilter}
               onChange={(e) => setRevenueFilter(e.target.value)}
-              style={{ padding: "6px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+              className="admin-analytics-select"
             >
               <option value="Weekly">Weekly</option>
               <option value="Monthly">Monthly</option>
@@ -232,51 +223,35 @@ export default function AdminHome() {
           </div>
         </div>
 
-        {/* Scrollable Revenue Chart */}
-        <div style={{ width: "100%", overflowX: "auto" }}>
-          <div
-            style={{
-              minWidth: revenueFilter === "Monthly" ? 900 : "100%",
-              height: 250,
-            }}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={getRevenueData()}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey={
-                    revenueFilter === "Weekly"
-                      ? "day"
-                      : revenueFilter === "Monthly"
-                      ? "month"
-                      : "year"
-                  }
-                />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="revenue" stroke="#4caf50" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="admin-chart-container">
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={getRevenueData()}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey={
+                  revenueFilter === "Weekly"
+                    ? "day"
+                    : revenueFilter === "Monthly"
+                    ? "month"
+                    : "year"
+                }
+              />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="revenue" stroke="#4caf50" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
 
         {/* Table Occupancy */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginTop: "30px",
-            marginBottom: "15px",
-          }}
-        >
+        <div className="admin-analytics-header">
           <h3>Table Occupancy</h3>
-          <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+          <div className="admin-analytics-controls">
             <select
               value={tableFilter}
               onChange={(e) => setTableFilter(e.target.value)}
-              style={{ padding: "6px 12px", borderRadius: "6px", border: "1px solid #ccc" }}
+              className="admin-analytics-select"
             >
               <option value="Weekly">Weekly</option>
               <option value="Monthly">Monthly</option>
@@ -309,41 +284,33 @@ export default function AdminHome() {
           </div>
         </div>
 
-        {/* Scrollable Table Chart */}
-        <div style={{ width: "100%", overflowX: "auto" }}>
-          <div
-            style={{
-              minWidth: tableFilter === "Monthly" ? 900 : "100%",
-              height: 250,
-            }}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={getTableData()}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey={
-                    tableFilter === "Weekly"
-                      ? "day"
-                      : tableFilter === "Monthly"
-                      ? "month"
-                      : "year"
-                  }
-                />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="booked" fill="#f44336" />
-                <Bar dataKey="available" fill="#4caf50" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="admin-chart-container">
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={getTableData()}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey={
+                  tableFilter === "Weekly"
+                    ? "day"
+                    : tableFilter === "Monthly"
+                    ? "month"
+                    : "year"
+                }
+              />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="booked" fill="#f44336" />
+              <Bar dataKey="available" fill="#4caf50" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
       {/* Staff Section */}
-      <div className="staff-section">
-        <div className="section-header">Staff Management</div>
-        <table className="staff-table">
+      <div className="admin-staff-section">
+        <div className="admin-section-header">Staff Management</div>
+        <table className="admin-staff-table">
           <thead>
             <tr>
               <th>Staff Member</th>
@@ -358,7 +325,7 @@ export default function AdminHome() {
                   <td>{s.firstName}</td>
                   <td>{s.role}</td>
                   <td>
-                    <span className={`status ${s.status.toLowerCase()}`}>{s.status}</span>
+                    <span className={`admin-status ${s.status.toLowerCase()}`}>{s.status}</span>
                   </td>
                 </tr>
               ))
@@ -372,123 +339,98 @@ export default function AdminHome() {
           </tbody>
         </table>
 
-        {/* Show More → only if staff.length > 3 */}
         {staff.length > 3 && (
-          <div className="staff-more-card" onClick={() => navigate("/AdminDashboard/staff")}>
+          <div className="admin-staff-more-card" onClick={() => navigate("/AdminDashboard/staff")}>
             <h4>More →</h4>
-        </div>
+          </div>
         )}
       </div>
 
       {/* Menu Section */}
-<div className="menu-section">
-  <div className="section-header">Menu Items</div>
-  <div className="menu-grid">
-    {menu.length === 0 ? (
-      <p>No menu items yet</p>
-    ) : (
-      <>
-        {menu.slice(0, 4).map((item, i) => (
-          <div key={i} className="menu-card small-card">
-            {item.imageUrl && (
-              <img src={item.imageUrl} alt={item.dishName} className="menu-img" />
-            )}
-            <h4>{item.dishName}</h4>
-            <p>₹ {item.cost}</p>
-            <div className={`veg-nonveg-circle ${item.type}`}></div>
-          </div>
-        ))}
-        {menu.length > 4 && (
-          <div
-            className="menu-card small-card more-card"
-            onClick={() => navigate("/AdminDashboard/Menu")}
-          >
-            <h4>More →</h4>
-          </div>
-        )}
-      </>
-    )}
-  </div>
-</div>
+      <div className="admin-menu-section">
+        <div className="admin-section-header">Menu Items</div>
+        <div className="admin-menu-grid">
+          {menu.length === 0 ? (
+            <p>No menu items yet</p>
+          ) : (
+            <>
+              {menu.slice(0, 4).map((item, i) => (
+                <div key={i} className="admin-menu-card admin-small-card">
+                  {item.imageUrl && (
+                    <img src={item.imageUrl} alt={item.dishName} className="admin-menu-img" />
+                  )}
+                  <h4>{item.dishName}</h4>
+                  <p>₹ {item.cost}</p>
+                  <div className={`admin-veg-nonveg-circle ${item.type}`}></div>
+                </div>
+              ))}
+              {menu.length > 4 && (
+                <div
+                  className="admin-menu-card admin-small-card admin-more-card"
+                  onClick={() => navigate("/AdminDashboard/Menu")}
+                >
+                  <h4>More →</h4>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
 
       {/* Table Section */}
-<div className="table-section">
-  <div className="section-header">Table Management</div>
-  <div className="table-grid">
-    {tables.length > 0 ? (
-      <>
-        {tables.slice(0, 4).map((t) => (
-          <div key={t.id} className={`table-box ${t.status}`}>
-            T{t.id} <span>({t.status})</span>
-          </div>
-        ))}
-        {tables.length > 4 && (
-          <div
-            className="table-box"
-            onClick={() => navigate("/AdminDashboard/table")}
-            style={{
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <h4>More →</h4>
-          </div>
-        )}
-      </>
-    ) : (
-      <p>No tables defined yet</p>
-    )}
-  </div>
-</div>
+      <div className="admin-table-section">
+        <div className="admin-section-header">Table Management</div>
+        <div className="admin-table-grid">
+          {tables.length > 0 ? (
+            <>
+              {tables.slice(0, 4).map((t) => (
+                <div key={t.id} className={`admin-table-box ${t.status}`}>
+                  T{t.id} <span>({t.status})</span>
+                </div>
+              ))}
+              {tables.length > 4 && (
+                <div
+                  className="admin-table-box admin-more-card"
+                  onClick={() => navigate("/AdminDashboard/table")}
+                >
+                  <h4>More →</h4>
+                </div>
+              )}
+            </>
+          ) : (
+            <p>No tables defined yet</p>
+          )}
+        </div>
+      </div>
 
       {/* Revenue Management Section */}
-      <div className="revenue-section">
-        <div className="section-header">Revenue Management</div>
-        <div className="revenue-grid">
-          {/* Daily Revenue */}
-          <div className="revenue-card small-card">
+      <div className="admin-revenue-section">
+        <div className="admin-section-header">Revenue Management</div>
+        <div className="admin-revenue-grid">
+          <div className="admin-revenue-card admin-small-card">
             <h4>₹{(revenue || 0).toLocaleString()}</h4>
             <p>Daily Revenue</p>
           </div>
-
-          {/* Weekly Revenue */}
-          <div className="revenue-card small-card">
+          <div className="admin-revenue-card admin-small-card">
             <h4>
-              ₹
-              {revenueDataWeekly
-                .reduce((sum, d) => sum + d.revenue, 0)
-                .toLocaleString()}
+              ₹{revenueDataWeekly.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()}
             </h4>
             <p>Weekly Revenue</p>
           </div>
-
-          {/* Monthly Revenue */}
-          <div className="revenue-card small-card">
+          <div className="admin-revenue-card admin-small-card">
             <h4>
-              ₹
-              {revenueDataMonthly
-                .reduce((sum, d) => sum + d.revenue, 0)
-                .toLocaleString()}
+              ₹{revenueDataMonthly.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()}
             </h4>
             <p>Monthly Revenue</p>
           </div>
-
-          {/* Yearly Revenue */}
-          <div className="revenue-card small-card">
+          <div className="admin-revenue-card admin-small-card">
             <h4>
-              ₹
-              {revenueDataYearly
-                .reduce((sum, d) => sum + d.revenue, 0)
-                .toLocaleString()}
+              ₹{revenueDataYearly.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()}
             </h4>
             <p>Yearly Revenue</p>
           </div>
-
-          {/* More → card */}
           <div
-            className="revenue-card small-card more-card"
+            className="admin-revenue-card admin-small-card admin-more-card"
             onClick={() => navigate("/AdminDashboard/revenue")}
           >
             <h4>More →</h4>
