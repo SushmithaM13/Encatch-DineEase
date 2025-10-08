@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import "./SuperAdminDashboard.css";
 import {
   FaUsers,
@@ -18,6 +18,7 @@ const SuperAdminDashboard = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   // Load hotels from localStorage
   useEffect(() => {
@@ -43,8 +44,56 @@ const SuperAdminDashboard = () => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Prevent back button from going to login when logged in
+  useEffect(() => {
+    const handlePopState = () => {
+      const token = localStorage.getItem("token");
+      const role = localStorage.getItem("role");
+      if (token && role === "SUPER_ADMIN") {
+        window.history.pushState(null, null, window.location.pathname);
+      }
+    };
+
+    window.history.pushState(null, null, window.location.pathname);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
+  // ✅ Logout function with API call
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      // Replace with your logout API endpoint
+      const response = await fetch(
+        "http://localhost:8082/dine-ease/api/v1/users/logout",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("Logout failed");
+
+      // Clear localStorage and redirect to login
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <div className={`dashboard ${sidebarOpen ? "expanded" : "collapsed"}`}>
@@ -52,8 +101,8 @@ const SuperAdminDashboard = () => {
       <div
         className={`sidebar-overlay ${mobileMenuOpen ? "active" : ""}`}
         onClick={handleMobileMenuClose}
-      >
-      </div>
+      ></div>
+
       {/* Sidebar */}
       <aside
         className={`sidebar ${
@@ -61,7 +110,7 @@ const SuperAdminDashboard = () => {
         } ${mobileMenuOpen ? "mobile-open" : ""}`}
       >
         <div className="sidebar-header">
-          <h2 className="logo">{sidebarOpen ? "DINE _ EASE" : ""}</h2>
+          <h2 className="logo">{sidebarOpen ? "DINE _ EASE" : "DE"}</h2>
           <button className="toggle-btn" onClick={handleDesktopSidebarToggle}>
             {/* <FaBars /> */}
           </button>
@@ -89,6 +138,12 @@ const SuperAdminDashboard = () => {
             <NavLink to="/superAdminDashboard/food-items">
               <FaUtensils />
               {sidebarOpen && <span>Food Items</span>}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/superAdminDashboard/table">
+              <FaUtensils />
+              {sidebarOpen && <span>Table Management</span>}
             </NavLink>
           </li>
         </ul>
@@ -129,7 +184,8 @@ const SuperAdminDashboard = () => {
                 <button>
                   <FaCog /> Settings
                 </button>
-                <button className="logout-btn">
+                {/* Attach logout handler here */}
+                <button className="logout-btn" onClick={handleLogout}>
                   <FaSignOutAlt /> Logout
                 </button>
               </div>

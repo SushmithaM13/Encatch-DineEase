@@ -14,6 +14,34 @@
   font-weight: 700;
 }
 
+.role-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.role-header-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.toggle-roles-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.toggle-roles-btn:hover {
+  background: linear-gradient(135deg, #43cea2, #185a9d);
+  transform: scale(1.05);
+}
+
+
 .role-management h3 {
   color: #374151;
   font-size: 1.5rem;

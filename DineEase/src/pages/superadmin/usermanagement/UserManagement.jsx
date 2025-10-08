@@ -32,7 +32,7 @@ export default function AdminStaffManagement() {
   const [popupOpen, setPopupOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("All Staff");
 
-  // Persist active IDs
+  // Persist active IDs for toast notifications
   const [previousActiveIds, setPreviousActiveIds] = useState(() => {
     const stored = localStorage.getItem("activeStaffIds");
     return stored ? JSON.parse(stored) : [];
@@ -57,8 +57,8 @@ export default function AdminStaffManagement() {
       const staffData = Array.isArray(data)
         ? data
         : Array.isArray(data.content)
-          ? data.content
-          : [];
+        ? data.content
+        : [];
 
       const mappedStaff = staffData.map((s) => ({
         id: s.id,
@@ -75,15 +75,14 @@ export default function AdminStaffManagement() {
         status: s.staffStatus,
       }));
 
-      // ✅ Ensure ascending order
       setStaffList(mappedStaff.sort((a, b) => a.staffId - b.staffId));
 
+      // Show toast for newly activated
       const newlyActivated = mappedStaff.filter(
         (s) =>
           s.status?.toLowerCase() === "active" &&
           !previousActiveIds.includes(s.id)
       );
-
       if (newlyActivated.length > 0) {
         newlyActivated.forEach((s) =>
           toast.success(`Staff ${s.firstName} ${s.lastName} activated!`, {
@@ -101,13 +100,42 @@ export default function AdminStaffManagement() {
     }
   }, [API_BASE, TOKEN, previousActiveIds]);
 
-  // Add or Update
+  // Update staff status
+  const _updateStaffStatus = async (staffId, newStatus) => {
+    try {
+      await fetch(`${API_BASE}/update-status/${staffId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+        body: JSON.stringify({ staffStatus: newStatus }),
+      });
+      await fetchStaff();
+    } catch (err) {
+      console.error("Error updating staff status:", err);
+    }
+  };
+
+  // Add or Update staff
   const handleAddOrUpdate = async () => {
     if (!form.firstName || !form.lastName || !form.email || !form.phone) {
       alert("Please fill all required fields.");
       return;
     }
-    const payload = { ...form, salary: Number(form.salary),staffStatus: form.status || "Pending" };
+
+    const roleLower = form.staffRoleType?.trim().toLowerCase();
+    const inactiveRoles = ["waiter", "chef", "admin", "accountant"];
+    const defaultStatus = inactiveRoles.includes(roleLower)
+      ? "Inactive"
+      : "Active";
+
+    const payload = {
+      ...form,
+      salary: Number(form.salary),
+      staffStatus: form.status || defaultStatus,
+    };
+
     try {
       let url = `${API_BASE}/add`;
       let method = "POST";
@@ -115,6 +143,7 @@ export default function AdminStaffManagement() {
         url = `${API_BASE}/update-staff/${editId}`;
         method = "PUT";
       }
+
       const res = await fetch(url, {
         method,
         headers: {
@@ -125,36 +154,28 @@ export default function AdminStaffManagement() {
       });
       if (!res.ok) throw new Error(await res.text());
 
-      const data = await res.json();
+      const _data = await res.json();
       await fetchStaff();
       setForm(initialForm);
       setEditId(null);
       setPopupOpen(false);
 
-      if (method === "POST") {
-        // ✅ Keep ascending order when adding
-        setStaffList((prev) =>
-          [...prev, data].sort((a, b) => a.staffId - b.staffId)
-        );
-        toast.info("Staff added! Check email to activate account.", {
-          position: "top-center",
-        });
-      } else {
-        toast.success("Staff updated successfully!", { position: "top-center" });
-      }
+      toast.info(
+        method === "POST"
+          ? "Staff added successfully!"
+          : "Staff updated successfully!",
+        { position: "top-center" }
+      );
     } catch (err) {
       console.error("Error saving staff:", err);
       alert("Error saving staff: " + err.message);
     }
   };
 
-  // Fetch staff + roles
+  // Fetch staff and roles on mount
   useEffect(() => {
     if (TOKEN) fetchStaff();
-  }, [TOKEN, fetchStaff]);
 
-  useEffect(() => {
-    if (!TOKEN) return;
     const fetchRoles = async () => {
       try {
         const res = await fetch(ROLES_API, {
@@ -168,13 +189,11 @@ export default function AdminStaffManagement() {
         setRoles([]);
       }
     };
-    fetchRoles();
-  }, [TOKEN]);
+    if (TOKEN) fetchRoles();
+  }, [TOKEN, fetchStaff]);
 
   useEffect(() => {
-    if (!popupOpen && TOKEN) {
-      fetchStaff();
-    }
+    if (!popupOpen && TOKEN) fetchStaff();
   }, [popupOpen, TOKEN, fetchStaff]);
 
   const handleChange = (e) => {
@@ -206,13 +225,13 @@ export default function AdminStaffManagement() {
     activeTab === "All Staff"
       ? staffList
       : staffList.filter((s) =>
-        activeTab.toLowerCase() === "chef"
-          ? s.staffRoleType?.toLowerCase().includes("chef")
-          : activeTab.toLowerCase() === "waiters"
+          activeTab.toLowerCase() === "chef"
+            ? s.staffRoleType?.toLowerCase().includes("chef")
+            : activeTab.toLowerCase() === "waiters"
             ? s.staffRoleType?.toLowerCase().includes("waiter")
             : !s.staffRoleType?.toLowerCase().includes("chef") &&
-            !s.staffRoleType?.toLowerCase().includes("waiter")
-      );
+              !s.staffRoleType?.toLowerCase().includes("waiter")
+        );
 
   return (
     <div className="user-management">
@@ -244,11 +263,11 @@ export default function AdminStaffManagement() {
         ))}
       </div>
 
-      {/* Table */}
+      {/* Desktop Table */}
       <table>
         <thead>
           <tr>
-            <th>Staff ID</th>
+            <th>SL_NO</th>
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
@@ -266,9 +285,7 @@ export default function AdminStaffManagement() {
             filteredStaff.map((staff) => (
               <tr key={staff.id}>
                 <td>{staff.staffId}</td>
-                <td>
-                  {staff.firstName} {staff.lastName}
-                </td>
+                <td>{staff.firstName} {staff.lastName}</td>
                 <td>{staff.email}</td>
                 <td>{staff.phone}</td>
                 <td>{staff.staffRoleType}</td>
@@ -282,16 +299,10 @@ export default function AdminStaffManagement() {
                   </span>
                 </td>
                 <td>
-                  <button
-                    className="action-btn edit"
-                    onClick={() => handleEdit(staff)}
-                  >
+                  <button className="action-btn edit" onClick={() => handleEdit(staff)}>
                     <Edit size={16} />
                   </button>
-                  <button
-                    className="action-btn delete"
-                    onClick={() => handleRemove(staff.id)}
-                  >
+                  <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
                     <Trash2 size={16} />
                   </button>
                 </td>
@@ -314,58 +325,27 @@ export default function AdminStaffManagement() {
             <div key={staff.id} className="user-card-mobile">
               <div className="user-row user-name-cell">
                 <span className="cell-label">Name</span>
-                <span className="cell-value">
-                  {staff.firstName} {staff.lastName}
-                </span>
+                <span className="cell-value">{staff.firstName} {staff.lastName}</span>
               </div>
-              <div className="user-row">
-                <span className="cell-label">Email</span>
-                <span className="cell-value">{staff.email}</span>
-              </div>
-              <div className="user-row">
-                <span className="cell-label">Phone</span>
-                <span className="cell-value">{staff.phone}</span>
-              </div>
-              <div className="user-row">
-                <span className="cell-label">Role</span>
-                <span className="cell-value">{staff.staffRoleType}</span>
-              </div>
-              <div className="user-row">
-                <span className="cell-label">Shift</span>
-                <span className="cell-value">{staff.shiftTiming}</span>
-              </div>
-              <div className="user-row">
-                <span className="cell-label">Status</span>
-                <span className={`status ${staff.status?.toLowerCase()}`}>
-                  {staff.status || "Inactive"}
-                </span>
-              </div>
+              <div className="user-row"><span className="cell-label">Email</span><span className="cell-value">{staff.email}</span></div>
+              <div className="user-row"><span className="cell-label">Phone</span><span className="cell-value">{staff.phone}</span></div>
+              <div className="user-row"><span className="cell-label">Role</span><span className="cell-value">{staff.staffRoleType}</span></div>
+              <div className="user-row"><span className="cell-label">Shift</span><span className="cell-value">{staff.shiftTiming}</span></div>
+              <div className="user-row"><span className="cell-label">Status</span><span className={`status ${staff.status?.toLowerCase()}`}>{staff.status || "Inactive"}</span></div>
               <div className="user-row actions-cell">
                 <div className="user-actions">
-                  <button
-                    className="action-btn edit"
-                    onClick={() => handleEdit(staff)}
-                  >
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    className="action-btn delete"
-                    onClick={() => handleRemove(staff.id)}
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  <button className="action-btn edit" onClick={() => handleEdit(staff)}><Edit size={16} /></button>
+                  <button className="action-btn delete" onClick={() => handleRemove(staff.id)}><Trash2 size={16} /></button>
                 </div>
               </div>
             </div>
           ))
         ) : (
-          <div className="no-users-mobile">
-            No staff available in {activeTab}.
-          </div>
+          <div className="no-users-mobile">No staff available in {activeTab}.</div>
         )}
       </div>
 
-      {/* Popup */}
+      {/* Popup Form */}
       {popupOpen && (
         <div className="popup">
           <div className="popup-content">
@@ -373,127 +353,52 @@ export default function AdminStaffManagement() {
             <form>
               <div className="form-group">
                 <label>First Name</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={form.firstName}
-                  onChange={handleChange}
-                  placeholder="First Name"
-                />
+                <input type="text" name="firstName" value={form.firstName} onChange={handleChange} placeholder="First Name" />
               </div>
               <div className="form-group">
                 <label>Last Name</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={form.lastName}
-                  onChange={handleChange}
-                  placeholder="Last Name"
-                />
+                <input type="text" name="lastName" value={form.lastName} onChange={handleChange} placeholder="Last Name" />
               </div>
               <div className="form-group">
                 <label>Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="Email"
-                />
+                <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="Email" />
               </div>
               <div className="form-group">
                 <label>Phone</label>
-                <input
-                  type="text"
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleChange}
-                  placeholder="Phone"
-                />
+                <input type="text" name="phone" value={form.phone} onChange={handleChange} placeholder="Phone" />
               </div>
               <div className="form-group">
                 <label>Role</label>
-                <select
-                  name="staffRoleType"
-                  value={form.staffRoleType}
-                  onChange={handleChange}
-                >
+                <select name="staffRoleType" value={form.staffRoleType} onChange={handleChange}>
                   <option value="">Select Role</option>
                   {roles.map((role) => (
-                    <option key={role.id} value={role.staffRoleName}>
-                      {role.staffRoleName}
-                    </option>
+                    <option key={role.id} value={role.staffRoleName}>{role.staffRoleName}</option>
                   ))}
                 </select>
               </div>
               <div className="form-group">
                 <label>Shift Timing</label>
-                <input
-                  type="text"
-                  name="shiftTiming"
-                  value={form.shiftTiming}
-                  onChange={handleChange}
-                  placeholder="Shift Timing"
-                />
+                <input type="text" name="shiftTiming" value={form.shiftTiming} onChange={handleChange} placeholder="Shift Timing" />
               </div>
               <div className="form-group">
                 <label>Salary</label>
-                <input
-                  type="number"
-                  name="salary"
-                  value={form.salary}
-                  onChange={handleChange}
-                  placeholder="Salary"
-                />
+                <input type="number" name="salary" value={form.salary} onChange={handleChange} placeholder="Salary" />
               </div>
               <div className="form-group">
                 <label>Contract Start</label>
-                <input
-                  type="date"
-                  name="contractStartDate"
-                  value={form.contractStartDate}
-                  onChange={handleChange}
-                />
+                <input type="date" name="contractStartDate" value={form.contractStartDate} onChange={handleChange} />
               </div>
               <div className="form-group">
                 <label>Contract End</label>
-                <input
-                  type="date"
-                  name="contractEndDate"
-                  value={form.contractEndDate}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="form-group">
-                <label>Status</label>
-                <select
-                  name="status"
-                  value={form.status || ""}
-                  onChange={handleChange}
-                >
-                  <option value="">Select Status</option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                  <option value="Pending">Pending</option>
-                </select>
+                <input type="date" name="contractEndDate" value={form.contractEndDate} onChange={handleChange} />
               </div>
               <div className="form-group">
                 <label>Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  placeholder="Password"
-                />
+                <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="Password" />
               </div>
               <div className="form-buttons">
-                <button type="button" onClick={() => setPopupOpen(false)}>
-                  Cancel
-                </button>
-                <button type="button" onClick={handleAddOrUpdate}>
-                  {editId ? "Update" : "Add"}
-                </button>
+                <button type="button" onClick={() => setPopupOpen(false)}>Cancel</button>
+                <button type="button" onClick={handleAddOrUpdate}>{editId ? "Update" : "Add"}</button>
               </div>
             </form>
           </div>

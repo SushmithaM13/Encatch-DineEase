@@ -8,12 +8,12 @@ import ProtectedRoute from './components/Auth/protectedRoute';
 import ResetPassword from './components/Auth/resetPassword';
 import SuperAdminRegistration from './components/signup/SuperAdminRegistration';
 
-
 // ===== Super Admin Pages =====
 import SuperAdminDashboard from './pages/superadmin/dashboard/superAdminDashboard';
 import UserManagement from "./pages/superadmin/usermanagement/UserManagement";
 import Items from "./pages/superadmin/items/FoodItems";
 import SuperAdminHome from "./pages/superadmin/dashboard/SuperAdminHome";
+import TableManagement from "./pages/superadmin/tablemanagemnet/TableManagement";
 import AddStaffRole  from './pages/superadmin/staffroles/AddStaffRole'; 
 
 // ===== Admin Pages =====
@@ -41,22 +41,24 @@ function App() {
   
   return (
     <>
-   
     <Routes>
       <Route path='/' element={<Login/>}/>
       <Route path='/forgotPassword' element={<ForgotPassword/>}/>
       <Route path='/resetPassword' element={<ResetPassword/>}/>
       <Route path='/SuperAdminRegistration' element={<SuperAdminRegistration/>}/>
+
+
       
       {/* Private Routes */}
       <Route path='superAdminDashboard/*' element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}><SuperAdminDashboard/></ProtectedRoute>}>
+
         <Route index element={<SuperAdminHome />} />
         <Route path="staff" element={<UserManagement />} />
         <Route path="food-items" element={<Items />} />
         <Route path="staffrole" element={<AddStaffRole />} />
+        <Route path="table" element={<TableManagement />} />
+        
       </Route>
-
-
         {/* ===== Admin Dashboard Routes ===== */}
         <Route 
           path="/AdminDashboard" 
@@ -96,8 +98,6 @@ function App() {
 
         {/* ===== Catch-all 404 ===== */}
         <Route path="*" element={<h2 className="text-center mt-10">404 - Page Not Found</h2>} />
-      {/* </Routes>
-      <Footer /> */}
     </Routes>
     <Footer/>
     </>

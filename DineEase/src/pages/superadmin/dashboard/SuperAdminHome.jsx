@@ -4,8 +4,10 @@ import {
   FaUserPlus,
   FaUserCheck,
   FaUserSlash,
+  FaEdit,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import "./SuperAdminDashboard.css";
 
 const DashboardHome = () => {
   const [hotel, setHotel] = useState(null);
@@ -16,6 +18,8 @@ const DashboardHome = () => {
     activeStaff: 0,
     inactiveStaff: 0,
   });
+  const [showPopup, setShowPopup] = useState(false);
+  const [editData, setEditData] = useState({});
 
   const navigate = useNavigate();
 
@@ -38,17 +42,13 @@ const DashboardHome = () => {
         "Content-Type": "application/json",
       },
     })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch staff");
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => {
         const staffData = Array.isArray(data)
           ? data
           : Array.isArray(data.content)
           ? data.content
           : [];
-
         const total = staffData.length;
         const active = staffData.filter(
           (s) => s.staffStatus?.toLowerCase() === "active"
@@ -78,12 +78,10 @@ const DashboardHome = () => {
         "Content-Type": "application/json",
       },
     })
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch hotels");
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => {
         setHotel(data);
+        setEditData(data);
         setLoading(false);
       })
       .catch((err) => {
@@ -91,6 +89,37 @@ const DashboardHome = () => {
         setLoading(false);
       });
   }, [navigate]);
+
+  // ✅ Handle form input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // ✅ Handle Update API call
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    fetch("http://localhost:8082/dine-ease/api/v1/admin/organization/update", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editData),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Update failed");
+        return res.json();
+      })
+      .then((updatedData) => {
+        setHotel(updatedData);
+        setShowPopup(false);
+        alert("Organization details updated successfully!");
+      })
+      .catch((err) => console.error("Error updating:", err));
+  };
 
   return (
     <>
@@ -129,9 +158,21 @@ const DashboardHome = () => {
         </div>
       </div>
 
-      {/* Hotel Details */}
-     <section className="hotels-section">
-        <h2>Hotel Details</h2>
+      {/* Hotel Details Section */}
+      <section className="hotels-section">
+        <h2>
+          Hotel Details{" "}
+          {!loading && hotel && (
+            <button
+              className="update-btn"
+              onClick={() => setShowPopup(true)}
+              title="Edit Organization Details"
+            >
+              <FaEdit /> Update
+            </button>
+          )}
+        </h2>
+
         {loading ? (
           <p>Loading hotel...</p>
         ) : hotel ? (
@@ -181,6 +222,72 @@ const DashboardHome = () => {
           <p>No hotel data available.</p>
         )}
       </section>
+
+      {/* ✅ Popup Form */}
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <h3>Edit Organization Details</h3>
+            <form onSubmit={handleUpdate}>
+              <label>Organization Name:</label>
+              <input
+                name="organizationName"
+                value={editData.organizationName || ""}
+                onChange={handleChange}
+                required
+              />
+              <label>Business Type:</label>
+              <input
+                name="businessType"
+                value={editData.businessType || ""}
+                onChange={handleChange}
+              />
+              <label>Address:</label>
+              <input
+                name="organizationAddress"
+                value={editData.organizationAddress || ""}
+                onChange={handleChange}
+              />
+              <label>Phone:</label>
+              <input
+                name="organizationPhone"
+                value={editData.organizationPhone || ""}
+                onChange={handleChange}
+              />
+              <label>Email:</label>
+              <input
+                name="organizationEmail"
+                value={editData.organizationEmail || ""}
+                onChange={handleChange}
+              />
+              <label>Website:</label>
+              <input
+                name="organizationWebsite"
+                value={editData.organizationWebsite || ""}
+                onChange={handleChange}
+              />
+              <label>GST Number:</label>
+              <input
+                name="gstNumber"
+                value={editData.gstNumber || ""}
+                onChange={handleChange}
+              />
+              <div className="popup-buttons">
+                <button type="submit" className="save-btn">
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setShowPopup(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 };
