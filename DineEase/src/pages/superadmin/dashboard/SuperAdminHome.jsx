@@ -83,11 +83,19 @@ const DashboardHome = () => {
         setHotel(data);
         setEditData(data);
         setLoading(false);
+
+        // ✅ Store organizationId (hotel.id) in localStorage for staff usage
+        if (data?.id) {
+          localStorage.setItem("organizationId", data.id);
+          console.log("✅ Organization ID stored:", data.id);
+        } else {
+          console.warn("⚠ No organization ID found in hotel data");
+        }
       })
       .catch((err) => {
         console.error("Error fetching hotels:", err);
         setLoading(false);
-      });
+});
   }, [navigate]);
 
   // ✅ Handle form input change

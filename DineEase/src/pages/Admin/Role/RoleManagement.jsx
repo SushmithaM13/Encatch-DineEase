@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Edit, Trash2, X, User } from "lucide-react";
+import { Plus, Edit, Trash2, X, User, Eye } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./RoleManagement.css";
@@ -15,20 +15,24 @@ export default function AdminRoleManagement() {
   const [modalOpen, setModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showRoles, setShowRoles] = useState(false); // ✅ Track roles table visibility
 
-  if (!TOKEN) console.warn("No token found! Please login first.");
-
+  // ✅ Fetch all roles
   const fetchRoles = async () => {
+    if (!TOKEN) return;
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/all`, {
         headers: { Authorization: `Bearer ${TOKEN}` },
       });
+
       if (!res.ok) throw new Error("Failed to fetch roles");
+
       const data = await res.json();
-      setRoles(data.sort((a, b) => a.id - b.id));
+      setRoles(Array.isArray(data) ? data.sort((a, b) => a.id - b.id) : []);
     } catch (err) {
-      console.error(err);
+      console.error("Fetch Roles Error:", err);
+      toast.error("Failed to load roles", { position: "top-center" });
       setRoles([]);
     } finally {
       setLoading(false);
@@ -36,14 +40,16 @@ export default function AdminRoleManagement() {
   };
 
   useEffect(() => {
-    if (TOKEN) fetchRoles();
-  }, [TOKEN]);
+    if (showRoles) fetchRoles(); // Only fetch when showing roles
+  }, [showRoles]);
 
+  // ✅ Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
 
+  // ✅ Add or Update Role
   const handleAddOrUpdate = async () => {
     if (!form.staffRoleName || !form.staffRoleDescription) {
       toast.error("Please fill all fields", { position: "top-center" });
@@ -77,7 +83,7 @@ export default function AdminRoleManagement() {
 
       if (!res.ok) throw new Error("Failed to save role");
 
-      fetchRoles();
+      await fetchRoles();
       setForm(initialForm);
       setEditId(null);
       setModalOpen(false);
@@ -89,11 +95,12 @@ export default function AdminRoleManagement() {
         { position: "top-center" }
       );
     } catch (err) {
-      console.error(err);
+      console.error("Add/Update Role Error:", err);
       toast.error("Failed to save role", { position: "top-center" });
     }
   };
 
+  // ✅ Delete Role
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this role?")) return;
 
@@ -102,15 +109,28 @@ export default function AdminRoleManagement() {
         method: "DELETE",
         headers: { Authorization: `Bearer ${TOKEN}` },
       });
-      if (!res.ok) throw new Error("Failed to delete role");
-      fetchRoles();
+
+      const contentType = res.headers.get("content-type");
+      const data = contentType?.includes("application/json")
+        ? await res.json()
+        : await res.text();
+
+      if (!res.ok) {
+        console.error("Delete failed:", data);
+        throw new Error(
+          typeof data === "string" ? data : data.message || "Delete failed"
+        );
+      }
+
+      await fetchRoles();
       toast.success("Role deleted successfully!", { position: "top-center" });
     } catch (err) {
-      console.error(err);
+      console.error("Delete Role Error:", err);
       toast.error("Failed to delete role", { position: "top-center" });
     }
   };
 
+  // ✅ Filter roles by search
   const filteredRoles = roles.filter(
     (r) =>
       r.staffRoleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -119,11 +139,21 @@ export default function AdminRoleManagement() {
 
   return (
     <div className="admin-role-management-page">
-      {/* Header */}
+      {/* ===== Header ===== */}
       <div className="admin-role-management-header">
         <h2 className="admin-page-title">
           <User size={20} /> Role Management
         </h2>
+
+        {/* ===== Toggle Roles Button ===== */}
+        <button
+          className="admin-add-btn"
+          onClick={() => setShowRoles(!showRoles)}
+        >
+          <Eye size={16} /> {showRoles ? "Hide Roles" : "View Roles"}
+        </button>
+
+        {/* ===== Add Role Button ===== */}
         <button
           className="admin-add-btn"
           onClick={() => {
@@ -136,72 +166,76 @@ export default function AdminRoleManagement() {
         </button>
       </div>
 
-      {/* Search */}
-      <div className="admin-search-bar">
-        <input
-          type="search"
-          placeholder="Search role..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+      {/* ===== Search Bar ===== */}
+      {showRoles && (
+        <div className="admin-search-bar">
+          <input
+            type="search"
+            placeholder="Search role..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      )}
 
-      {/* Table */}
-      <table className="admin-roles-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Role Name</th>
-            <th>Role Description</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
+      {/* ===== Roles Table ===== */}
+      {showRoles && (
+        <table className="admin-roles-table">
+          <thead>
             <tr>
-              <td colSpan={4} style={{ textAlign: "center" }}>
-                Loading roles...
-              </td>
+              <th>ID</th>
+              <th>Role Name</th>
+              <th>Role Description</th>
+              <th>Actions</th>
             </tr>
-          ) : filteredRoles.length === 0 ? (
-            <tr>
-              <td colSpan={4} style={{ textAlign: "center" }}>
-                No roles found.
-              </td>
-            </tr>
-          ) : (
-            filteredRoles.map((role) => (
-              <tr key={role.id}>
-                <td>{role.id}</td>
-                <td>{role.staffRoleName}</td>
-                <td>{role.staffRoleDescription}</td>
-                <td className="admin-action-icons">
-                  <button
-                    className="admin-icon-btn admin-edit"
-                    onClick={() => {
-                      setForm(role);
-                      setEditId(role.id);
-                      setModalOpen(true);
-                    }}
-                    title="Edit"
-                  >
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    className="admin-icon-btn admin-delete"
-                    onClick={() => handleDelete(role.id)}
-                    title="Delete"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan={4} style={{ textAlign: "center" }}>
+                  Loading roles...
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : filteredRoles.length === 0 ? (
+              <tr>
+                <td colSpan={4} style={{ textAlign: "center" }}>
+                  No roles found.
+                </td>
+              </tr>
+            ) : (
+              filteredRoles.map((role) => (
+                <tr key={role.id}>
+                  <td>{role.id}</td>
+                  <td>{role.staffRoleName}</td>
+                  <td>{role.staffRoleDescription}</td>
+                  <td className="admin-action-icons">
+                    <button
+                      className="admin-icon-btn admin-edit"
+                      onClick={() => {
+                        setForm(role);
+                        setEditId(role.id);
+                        setModalOpen(true);
+                      }}
+                      title="Edit"
+                    >
+                      <Edit size={16} />
+                    </button>
+                    <button
+                      className="admin-icon-btn admin-delete"
+                      onClick={() => handleDelete(role.id)}
+                      title="Delete"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      )}
 
-      {/* Modal */}
+      {/* ===== Modal ===== */}
       {modalOpen && (
         <div className="admin-modal-overlay">
           <div className="admin-modal">

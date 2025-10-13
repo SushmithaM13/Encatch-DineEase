@@ -139,7 +139,10 @@
   max-width: 90%;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
-
+.admin-header-buttons {
+  display: flex;
+  gap: 10px; /* space between buttons */
+}
 .admin-modal-header {
   display: flex;
   justify-content: space-between;

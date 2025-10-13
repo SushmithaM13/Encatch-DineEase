@@ -70,7 +70,7 @@ export default function AdminProfile() {
     };
 
     if (TOKEN) fetchProfile();
-    else console.warn("⚠ No token found — please log in first.");
+    else console.warn("⚠️ No token found — please log in first.");
   }, [TOKEN]);
 
   // ===== Save (Update) Profile =====

@@ -10,8 +10,8 @@ export default function AdminStaffManagement() {
   const TOKEN = localStorage.getItem("token");
   const ORG_ID = localStorage.getItem("organizationId");
 
-  if (!TOKEN) console.warn("⚠️ No token found! Please login first.");
-  if (!ORG_ID) console.warn("⚠️ No organizationId found! Please login first.");
+  if (!TOKEN) console.warn("⚠ No token found! Please login first.");
+  if (!ORG_ID) console.warn("⚠ No organizationId found! Please login first.");
 
   const initialForm = {
     firstName: "",
@@ -124,69 +124,83 @@ export default function AdminStaffManagement() {
 
   // ===== Add / Update Staff =====
   const handleAddOrUpdate = async () => {
-    if (!form.firstName || !form.lastName || !form.email || !form.phoneNumber) {
-      toast.error("Please fill all required fields.");
-      return;
-    }
+  // ✅ Validate required fields
+  if (!form.firstName || !form.lastName || !form.email || !form.phoneNumber) {
+    toast.error("Please fill all required fields.");
+    return;
+  }
 
-    if (!ORG_ID) {
-      toast.error("Organization ID missing! Please re-login.");
-      return;
-    }
+  if (!ORG_ID) {
+    toast.error("Organization ID missing! Please re-login.");
+    return;
+  }
 
-    // ✅ Fix payload for backend (map phoneNumber → phone)
-    const payload = {
-      ...form,
-      phone: form.phoneNumber,
-      salary: Number(form.salary),
-      staffStatus: form.status || "Pending",
-      organizationId: ORG_ID,
-    };
-    delete payload.phoneNumber;
-
-    try {
-      let url = `${API_BASE}/add`;
-      let method = "POST";
-
-      if (editId) {
-        url = `${API_BASE}/update-staff/${editId}`;
-        method = "PUT";
-      }
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${TOKEN}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      await fetchStaff();
-      setForm(initialForm);
-      setEditId(null);
-      setPopupOpen(false);
-
-      toast.success(
-        method === "POST"
-          ? "✅ Staff added successfully!"
-          : "✅ Staff updated successfully!",
-        { position: "top-center" }
-      );
-    } catch (err) {
-      console.error("Error saving staff:", err);
-      toast.error("Error saving staff: " + err.message);
-    }
+  // ✅ Prepare payload for backend
+  const payload = {
+    firstName: form.firstName,
+    lastName: form.lastName,
+    email: form.email,
+    phone: form.phoneNumber,       // backend expects 'phone'
+    staffRoleType: form.staffRoleType,
+    shiftTiming: form.shiftTiming,
+    salary: Number(form.salary),
+    contractStartDate: form.contractStartDate || null,
+    contractEndDate: form.contractEndDate || null,
+    staffStatus: form.status || "Pending",
+    organizationId: ORG_ID,        // ✅ automatically from logged-in admin
   };
+
+  // Include password only when adding new staff
+  if (!editId && form.password) {
+    payload.password = form.password;
+  }
+
+  try {
+    const url = editId
+      ? `${API_BASE}/update-staff/${editId}`
+      : `${API_BASE}/add`;
+    const method = editId ? "PUT" : "POST";
+
+    const res = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${TOKEN}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(errText || "Failed to save staff");
+    }
+
+    // Refresh staff list
+    await fetchStaff();
+
+    // Reset form & close popup
+    setForm(initialForm);
+    setEditId(null);
+    setPopupOpen(false);
+
+    toast.success(
+      method === "POST"
+        ? "✅ Staff added successfully!"
+        : "✅ Staff updated successfully!",
+      { position: "top-center" }
+    );
+  } catch (err) {
+    console.error("Error saving staff:", err);
+    toast.error("Error saving staff: " + err.message);
+  }
+};
 
   // ===== Fetch Roles =====
   const fetchRoles = useCallback(async () => {
     if (!TOKEN) return;
     try {
       const res = await fetch(ROLES_API, {
-        headers: { Authorization: `Bearer ${TOKEN}` },
+        headers: { Authorization: `Bearer ${TOKEN}`},
       });
       if (!res.ok) throw new Error("Failed to fetch roles");
       const text = await res.text();
@@ -307,7 +321,7 @@ export default function AdminStaffManagement() {
             filteredStaff.map((staff, index) => (
               <tr key={staff.id}>
                 <td>{index + 1}</td>
-                <td>{`${staff.firstName} ${staff.lastName}`}</td>
+                <td>{staff.firstName} {staff.lastName}</td>
                 <td>{staff.email}</td>
                 <td>{staff.phoneNumber}</td>
                 <td>{staff.staffRoleType}</td>
@@ -346,7 +360,7 @@ export default function AdminStaffManagement() {
         </tbody>
       </table>
 
-       {/* Mobile Cards */}
+      {/* Mobile Cards */}
       <div className="mobile-user-cards">
         {filteredStaff.length > 0 ? (
           filteredStaff.map((staff) => (
@@ -372,6 +386,7 @@ export default function AdminStaffManagement() {
           <div className="no-users-mobile">No staff available in {activeTab}.</div>
         )}
       </div>
+
 
       {/* Popup Form */}
       {popupOpen && (
@@ -485,5 +500,3 @@ export default function AdminStaffManagement() {
     </div>
   );
 }
-
-
