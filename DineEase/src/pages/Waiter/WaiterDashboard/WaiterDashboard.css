@@ -104,34 +104,36 @@
 
 /* Dashboard header */
 .waiter-dashboard-header {
-  background: white;
-  padding: 15px 20px;
   display: flex;
   align-items: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  justify-content: space-between; /* keep left/right spaced */
+  padding: 0 16px;
+  height: 60px;
   position: relative;
-  z-index: 10;
 }
+
 .waiter-header-left {
   flex: 1;
-  font-weight: 600;
 }
+
 .waiter-header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 10px;
+  font-weight: 600;
+  font-size: 18px;
+  gap: 4px;
 }
-.waiter-restaurant-display {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+
 .waiter-header-right {
+  flex: 1;
   display: flex;
+  justify-content: flex-end;
   align-items: center;
-  gap: 15px;
-  position: relative;
 }
+
 
 /* Profile circle */
 .waiter-profile-circle {

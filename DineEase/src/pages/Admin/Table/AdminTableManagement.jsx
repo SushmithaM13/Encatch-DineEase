@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import {
-  CheckCircle,
-  XCircle,
-  Brush,
-  Plus,
   Sofa,
-  MoreVertical,
+  Plus,
+  Download,
   X,
   User,
 } from "lucide-react";
@@ -13,23 +10,18 @@ import "./tables.css";
 
 export default function AdminTableManagement() {
   const [tables, setTables] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
-  const [showWaiterPopup, setShowWaiterPopup] = useState(false);
-  const [editTableId, setEditTableId] = useState(null);
+  const [showAddPopup, setShowAddPopup] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(null);
-  const [currentTableId, setCurrentTableId] = useState(null);
 
   const [newTable, setNewTable] = useState({
+    organizationId: "",
     tableNumber: "",
     tableStatus: "AVAILABLE",
     capacity: 1,
     section: "",
     locationDescription: "",
-  });
-
-  const [waiter, setWaiter] = useState({
-    waiterName: "",
     waiterEmail: "",
+    qrCodeUrl: "",
   });
 
   // Load tables from localStorage
@@ -38,75 +30,45 @@ export default function AdminTableManagement() {
     setTables(stored);
   }, []);
 
-  const saveTables = (updatedTables) => {
-    setTables(updatedTables);
-    localStorage.setItem("tables", JSON.stringify(updatedTables));
+  // Save to localStorage helper
+  const saveTables = (data) => {
+    setTables(data);
+    localStorage.setItem("tables", JSON.stringify(data));
   };
 
-  const handleOpenPopup = (table = null) => {
-    if (table) {
-      setNewTable({
-        tableNumber: table.tableNumber,
-        tableStatus: table.tableStatus,
-        capacity: table.capacity,
-        section: table.section,
-        locationDescription: table.locationDescription,
-      });
-      setEditTableId(table.id);
-    } else {
-      setNewTable({
-        tableNumber: "",
-        tableStatus: "AVAILABLE",
-        capacity: 1,
-        section: "",
-        locationDescription: "",
-      });
-      setEditTableId(null);
-    }
-    setShowPopup(true);
-    setDropdownOpen(null);
-  };
-
-  const handleSaveTable = () => {
-    if (!newTable.tableNumber.trim()) {
-      alert("Please enter a table number");
+  // Add a new table
+  const handleAddTable = () => {
+    const { organizationId, tableNumber } = newTable;
+    if (!organizationId.trim() || !tableNumber.trim()) {
+      alert("Please enter Organization ID and Table Number");
       return;
     }
 
-    let newTableId;
-    if (editTableId) {
-      const updated = tables.map((t) =>
-        t.id === editTableId ? { ...t, ...newTable } : t
-      );
-      saveTables(updated);
-      newTableId = editTableId;
-    } else {
-      const newId = tables.length ? tables[tables.length - 1].id + 1 : 1;
-      const newEntry = { id: newId, ...newTable };
-      saveTables([...tables, newEntry]);
-      newTableId = newId;
-    }
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Org-${organizationId}-Table-${encodeURIComponent(
+      tableNumber
+    )}`;
 
-    setShowPopup(false);
-    setCurrentTableId(newTableId);
-    setShowWaiterPopup(true); // Open waiter popup next
-  };
+    const tableData = {
+      id: Date.now(),
+      ...newTable,
+      qrCodeUrl: qrUrl,
+    };
 
-  const handleSaveWaiter = () => {
-    if (!waiter.waiterName.trim() || !waiter.waiterEmail.trim()) {
-      alert("Please fill waiter name and email");
-      return;
-    }
-
-    const updated = tables.map((t) =>
-      t.id === currentTableId
-        ? { ...t, waiterName: waiter.waiterName, waiterEmail: waiter.waiterEmail }
-        : t
-    );
-
+    const updated = [...tables, tableData];
     saveTables(updated);
-    setShowWaiterPopup(false);
-    setWaiter({ waiterName: "", waiterEmail: "" });
+
+    // Reset
+    setNewTable({
+      organizationId: "",
+      tableNumber: "",
+      tableStatus: "AVAILABLE",
+      capacity: 1,
+      section: "",
+      locationDescription: "",
+      waiterEmail: "",
+      qrCodeUrl: "",
+    });
+    setShowAddPopup(false);
   };
 
   const handleDeleteTable = (id) => {
@@ -114,12 +76,32 @@ export default function AdminTableManagement() {
     saveTables(updated);
   };
 
-  const handleChangeStatus = (id, newStatus) => {
-    const updated = tables.map((t) =>
-      t.id === id ? { ...t, tableStatus: newStatus } : t
-    );
-    saveTables(updated);
-  };
+  const handleDownloadQr = async (url, tableNumber) => {
+  if (!url) {
+    alert("QR not generated for this table yet.");
+    return;
+  }
+
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = `${tableNumber}-QR.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Clean up
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    console.error("Download failed:", error);
+    alert("Failed to download QR code.");
+  }
+};
+
 
   return (
     <div className="admin-tables-page">
@@ -128,7 +110,7 @@ export default function AdminTableManagement() {
       </h2>
 
       <div className="admin-add-table-section admin-right-align">
-        <button onClick={() => handleOpenPopup()}>
+        <button onClick={() => setShowAddPopup(true)}>
           <Plus size={16} /> Add Table
         </button>
       </div>
@@ -145,22 +127,22 @@ export default function AdminTableManagement() {
           <div key={table.id} className={`admin-table-card ${table.tableStatus.toLowerCase()}`}>
             <div className="admin-table-card-header">
               <h3>{table.tableNumber}</h3>
-              <div className="admin-dropdown-container">
-                <button
-                  className="admin-dots-btn"
-                  onClick={() =>
-                    setDropdownOpen(dropdownOpen === table.id ? null : table.id)
-                  }
-                >
-                  <MoreVertical size={18} />
-                </button>
-                {dropdownOpen === table.id && (
-                  <div className="admin-dropdown-menu">
-                    <button onClick={() => handleOpenPopup(table)}>Edit</button>
-                    <button onClick={() => handleDeleteTable(table.id)}>Delete</button>
-                  </div>
-                )}
-              </div>
+              <button
+                className="admin-dots-btn"
+                onClick={() =>
+                  setDropdownOpen(dropdownOpen === table.id ? null : table.id)
+                }
+              >
+                ⋮
+              </button>
+              {dropdownOpen === table.id && (
+                <div className="admin-dropdown-menu">
+                  <button onClick={() => handleDeleteTable(table.id)}>Delete</button>
+                  <button onClick={() => handleDownloadQr(table.qrCodeUrl, table.tableNumber)}>
+                    <Download size={14} /> Download QR
+                  </button>
+                </div>
+              )}
             </div>
 
             <p>Status: {table.tableStatus}</p>
@@ -169,46 +151,67 @@ export default function AdminTableManagement() {
             <p>Location: {table.locationDescription || "—"}</p>
             <p>
               Waiter:{" "}
-              {table.waiterName ? (
+              {table.waiterEmail ? (
                 <>
-                  <User size={14} /> {table.waiterName}
+                  <User size={14} /> {table.waiterEmail}
                 </>
               ) : (
                 "—"
               )}
             </p>
 
-            <div className="admin-actions">
-              <button onClick={() => handleChangeStatus(table.id, "AVAILABLE")}>
-                <CheckCircle size={16} /> Available
-              </button>
-              <button onClick={() => handleChangeStatus(table.id, "BOOKED")}>
-                <XCircle size={16} /> Booked
-              </button>
-              <button onClick={() => handleChangeStatus(table.id, "CLEANING")}>
-                <Brush size={16} /> Cleaning
-              </button>
-            </div>
+            {table.qrCodeUrl && (
+              <div className="qr-section">
+                <img src={table.qrCodeUrl} alt="QR Code" className="qr-image" />
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {/* === Table Form Popup === */}
-      {showPopup && (
+      {/* Add Table Popup */}
+      {showAddPopup && (
         <div className="admin-popup-overlay">
           <div className="admin-popup">
-            <button className="admin-popup-close" onClick={() => setShowPopup(false)}>
+            <button className="admin-popup-close" onClick={() => setShowAddPopup(false)}>
               <X size={18} />
             </button>
-            <h3>{editTableId ? "Edit Table" : "Add Table"}</h3>
+            <h3>Add New Table</h3>
+
+            <label>
+              Organization ID:
+              <input
+                type="text"
+                value={newTable.organizationId}
+                onChange={(e) =>
+                  setNewTable({ ...newTable, organizationId: e.target.value })
+                }
+              />
+            </label>
 
             <label>
               Table Number:
               <input
                 type="text"
                 value={newTable.tableNumber}
-                onChange={(e) => setNewTable({ ...newTable, tableNumber: e.target.value })}
+                onChange={(e) =>
+                  setNewTable({ ...newTable, tableNumber: e.target.value })
+                }
               />
+            </label>
+
+            <label>
+              Table Status:
+              <select
+                value={newTable.tableStatus}
+                onChange={(e) =>
+                  setNewTable({ ...newTable, tableStatus: e.target.value })
+                }
+              >
+                <option value="AVAILABLE">AVAILABLE</option>
+                <option value="BOOKED">BOOKED</option>
+                <option value="CLEANING">CLEANING</option>
+              </select>
             </label>
 
             <label>
@@ -228,7 +231,9 @@ export default function AdminTableManagement() {
               <input
                 type="text"
                 value={newTable.section}
-                onChange={(e) => setNewTable({ ...newTable, section: e.target.value })}
+                onChange={(e) =>
+                  setNewTable({ ...newTable, section: e.target.value })
+                }
               />
             </label>
 
@@ -242,44 +247,19 @@ export default function AdminTableManagement() {
               />
             </label>
 
-            <div className="admin-popup-actions">
-              <button onClick={handleSaveTable}>Save & Assign Waiter</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* === Waiter Assign Popup === */}
-      {showWaiterPopup && (
-        <div className="admin-popup-overlay">
-          <div className="admin-popup">
-            <button className="admin-popup-close" onClick={() => setShowWaiterPopup(false)}>
-              <X size={18} />
-            </button>
-            <h3>Assign Waiter to Table</h3>
-
-            <label>
-              Waiter Name:
-              <input
-                type="text"
-                placeholder="e.g. Yassin"
-                value={waiter.waiterName}
-                onChange={(e) => setWaiter({ ...waiter, waiterName: e.target.value })}
-              />
-            </label>
-
             <label>
               Waiter Email:
               <input
                 type="email"
-                placeholder="e.g. yassin@yopmail.com"
-                value={waiter.waiterEmail}
-                onChange={(e) => setWaiter({ ...waiter, waiterEmail: e.target.value })}
+                value={newTable.waiterEmail}
+                onChange={(e) =>
+                  setNewTable({ ...newTable, waiterEmail: e.target.value })
+                }
               />
             </label>
 
             <div className="admin-popup-actions">
-              <button onClick={handleSaveWaiter}>Save Waiter</button>
+              <button onClick={handleAddTable}>Save & Generate QR</button>
             </div>
           </div>
         </div>

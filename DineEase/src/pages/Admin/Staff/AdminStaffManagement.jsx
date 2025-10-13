@@ -8,8 +8,11 @@ export default function AdminStaffManagement() {
   const API_BASE = "http://localhost:8082/dine-ease/api/v1/staff";
   const ROLES_API = "http://localhost:8082/dine-ease/api/v1/staff-role/all";
   const TOKEN = localStorage.getItem("token");
+  const ORGANIZATION_ID = localStorage.getItem("organizationId");
 
-  if (!TOKEN) console.warn("No token found! Please login first.");
+  if (!TOKEN) console.warn("⚠️ No token found! Please login first.");
+  if (!ORGANIZATION_ID)
+    console.warn("⚠️ No organizationId found! Please login as Admin.");
 
   const initialForm = {
     firstName: "",
@@ -32,6 +35,17 @@ export default function AdminStaffManagement() {
   const [activeTab, setActiveTab] = useState("All Staff");
   const [showPassword, setShowPassword] = useState(false);
 
+  const [previousActiveIds, setPreviousActiveIds] = useState(() => {
+    const stored = localStorage.getItem("activeStaffIds");
+    return stored ? JSON.parse(stored) : [];
+  });
+
+  // ✅ Save active staff list in localStorage
+  useEffect(() => {
+    localStorage.setItem("activeStaffIds", JSON.stringify(previousActiveIds));
+  }, [previousActiveIds]);
+
+  // ✅ Format date for display
   const formatDate = (dateStr) => {
     if (!dateStr) return "-";
     const date = new Date(dateStr);
@@ -39,15 +53,7 @@ export default function AdminStaffManagement() {
     return date.toLocaleDateString("en-GB", options).replace(/ /g, "-");
   };
 
-  const [previousActiveIds, setPreviousActiveIds] = useState(() => {
-    const stored = localStorage.getItem("activeStaffIds");
-    return stored ? JSON.parse(stored) : [];
-  });
-
-  useEffect(() => {
-    localStorage.setItem("activeStaffIds", JSON.stringify(previousActiveIds));
-  }, [previousActiveIds]);
-
+  // ✅ Fetch all staff
   const fetchStaff = async () => {
     try {
       const res = await fetch(`${API_BASE}/all`, {
@@ -80,6 +86,7 @@ export default function AdminStaffManagement() {
           contractStartDate: s.contractStartDate,
           contractEndDate: s.contractEndDate,
           status: s.staffStatus,
+          organizationId: s.organizationId,
         }))
         .filter((s) => s.staffRoleType?.toUpperCase() !== "ADMIN")
         .sort((a, b) => a.staffId - b.staffId);
@@ -87,6 +94,7 @@ export default function AdminStaffManagement() {
       setStaffList(mappedStaff);
       localStorage.setItem("staffList", JSON.stringify(mappedStaff));
 
+      // ✅ Toast newly activated staff
       const newlyActivated = mappedStaff.filter(
         (s) =>
           s.status?.toLowerCase() === "active" &&
@@ -113,13 +121,23 @@ export default function AdminStaffManagement() {
     }
   };
 
+  // ✅ Add or update staff (with organizationId)
   const handleAddOrUpdate = async () => {
     if (!form.firstName || !form.lastName || !form.email || !form.phone) {
       alert("Please fill all required fields.");
       return;
     }
 
-    const payload = { ...form, salary: Number(form.salary) };
+    if (!ORGANIZATION_ID) {
+      alert("Organization ID not found! Please log in as Admin again.");
+      return;
+    }
+
+    const payload = {
+      ...form,
+      salary: Number(form.salary),
+      organizationId: ORGANIZATION_ID, // ✅ attach organizationId
+    };
 
     try {
       let url = `${API_BASE}/add`;
@@ -152,11 +170,12 @@ export default function AdminStaffManagement() {
       setModalOpen(false);
 
       if (method === "POST") {
-        toast.info("Staff added! Check email to activate account.", {
-          position: "top-center",
-        });
+        toast.success(
+          "✅ Staff added successfully (linked to organization)!",
+          { position: "top-center" }
+        );
       } else {
-        toast.success("Staff updated successfully!", {
+        toast.info("✏️ Staff updated successfully!", {
           position: "top-center",
         });
       }
@@ -166,6 +185,7 @@ export default function AdminStaffManagement() {
     }
   };
 
+  // ✅ Fetch staff and roles on load
   useEffect(() => {
     if (TOKEN) fetchStaff();
   }, [TOKEN]);
@@ -191,17 +211,20 @@ export default function AdminStaffManagement() {
     fetchRoles();
   }, [TOKEN]);
 
+  // ✅ Input change handler
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
 
+  // ✅ Edit staff
   const handleEdit = (staff) => {
     setForm({ ...initialForm, ...staff });
     setEditId(staff.id);
     setModalOpen(true);
   };
 
+  // ✅ Remove staff
   const handleRemove = async (id) => {
     if (!window.confirm("Are you sure you want to delete this staff?")) return;
 
@@ -217,20 +240,24 @@ export default function AdminStaffManagement() {
       }
 
       await fetchStaff();
+      toast.error("Staff removed successfully.", { position: "top-center" });
     } catch (err) {
       console.error("Error deleting staff:", err);
       alert("Error deleting staff: " + err.message);
     }
   };
 
+  // ✅ Filter by tabs
   const filteredStaff =
     activeTab === "All Staff"
       ? staffList
       : staffList.filter((s) => {
           const role = s.staffRoleType?.toLowerCase() || "";
           if (activeTab.toLowerCase() === "chef") return role.includes("chef");
-          if (activeTab.toLowerCase() === "waiters") return role.includes("waiter");
-          if (activeTab.toLowerCase() === "accountant") return role.includes("accountant");
+          if (activeTab.toLowerCase() === "waiters")
+            return role.includes("waiter");
+          if (activeTab.toLowerCase() === "accountant")
+            return role.includes("accountant");
           return (
             !role.includes("chef") &&
             !role.includes("waiter") &&
@@ -244,6 +271,7 @@ export default function AdminStaffManagement() {
         <UserCog size={22} /> Staff Management
       </h2>
 
+      {/* ===== Tabs + Add Button ===== */}
       <div className="admin-tabs-add-container">
         <div className="admin-staff-tabs">
           {["All Staff", "Chef", "Waiters", "Accountant", "Other"].map((tab) => (
@@ -269,6 +297,7 @@ export default function AdminStaffManagement() {
         </button>
       </div>
 
+      {/* ===== Staff Table ===== */}
       <table className="admin-staff-table">
         <thead>
           <tr>
@@ -335,6 +364,7 @@ export default function AdminStaffManagement() {
         </tbody>
       </table>
 
+      {/* ===== Add/Edit Modal ===== */}
       {modalOpen && (
         <div className="admin-modal-overlay">
           <div className="admin-modal">
