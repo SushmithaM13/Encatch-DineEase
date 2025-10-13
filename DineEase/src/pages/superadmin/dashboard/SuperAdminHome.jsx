@@ -47,8 +47,8 @@ const DashboardHome = () => {
         const staffData = Array.isArray(data)
           ? data
           : Array.isArray(data.content)
-          ? data.content
-          : [];
+            ? data.content
+            : [];
         const total = staffData.length;
         const active = staffData.filter(
           (s) => s.staffStatus?.toLowerCase() === "active"
@@ -83,11 +83,20 @@ const DashboardHome = () => {
         setHotel(data);
         setEditData(data);
         setLoading(false);
+
+        // ✅ Store organizationId (hotel.id) in localStorage for staff usage
+        if (data?.id) {
+          localStorage.setItem("organizationId", data.id);
+          console.log("✅ Organization ID stored:", data.id);
+        } else {
+          console.warn("⚠️ No organization ID found in hotel data");
+        }
       })
       .catch((err) => {
         console.error("Error fetching hotels:", err);
         setLoading(false);
       });
+
   }, [navigate]);
 
   // ✅ Handle form input change
