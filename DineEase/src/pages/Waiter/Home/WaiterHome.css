@@ -1,0 +1,273 @@
+.reservation-container {
+  font-family: "Inter", sans-serif;
+  padding: 30px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.sort-dropdown select {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 12px;
+  background: white;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.create-card {
+  border: 2px dashed #a6c3a3;
+  border-radius: 10px;
+  margin: 20px 0;
+  padding: 40px;
+  text-align: center;
+  background: #fdfdfd;
+}
+
+.create-btn {
+  border: 1px solid #4caf50;
+  color: #4caf50;
+  background: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.create-btn:hover {
+  background: #4caf50;
+  color: white;
+}
+
+.reservation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 20px;
+}
+
+.reservation-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: 0.2s;
+}
+
+.reservation-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status.incoming {
+  background-color: #fff2e5;
+  color: #d47b00;
+}
+
+.status.confirmed {
+  background-color: #e5f7ee;
+  color: #188b4c;
+}
+
+.status.completed {
+  background-color: #e7e9fb;
+  color: #3841a3;
+}
+
+.table-select {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: #fff;
+}
+
+.guest-info {
+  display: flex;
+  align-items: center;
+  margin: 15px 0;
+  flex-wrap: wrap;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background: #4caf50;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.table-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 120px;
+}
+
+.table-shape {
+  width: 90px;
+  height: 90px;
+}
+
+.details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: #555;
+  margin: 10px 0;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.confirm-btn,
+.cancel-btn,
+.create-order-btn,
+.paid-btn {
+  flex: 1;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.confirm-btn {
+  border: 1px solid #4caf50;
+  color: #4caf50;
+  background: white;
+}
+
+.confirm-btn:hover {
+  background: #4caf50;
+  color: white;
+}
+
+.cancel-btn {
+  border: 1px solid #ccc;
+  background: white;
+  color: #666;
+}
+
+.cancel-btn:hover {
+  background: #eee;
+}
+
+.create-order-btn {
+  border: 1px solid #4caf50;
+  color: #4caf50;
+  background: white;
+}
+
+.create-order-btn:hover {
+  background: #4caf50;
+  color: white;
+}
+
+.paid-btn {
+  border: 1px solid #3841a3;
+  background: white;
+  color: #3841a3;
+}
+
+.paid-btn:hover {
+  background: #3841a3;
+  color: white;
+}
+
+/* 🌐 Responsive Design */
+@media (max-width: 900px) {
+  .reservation-container {
+    padding: 20px;
+  }
+
+  .reservation-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+
+  .header h2 {
+    font-size: 1.5rem;
+  }
+
+  .create-card {
+    padding: 25px;
+  }
+}
+
+@media (max-width: 600px) {
+  .reservation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reservation-card {
+    padding: 16px;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .table-shape {
+    width: 70px;
+    height: 70px;
+  }
+
+  .details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .actions button {
+    flex: 1 1 100%;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sort-dropdown select {
+    width: 100%;
+  }
+}
+    

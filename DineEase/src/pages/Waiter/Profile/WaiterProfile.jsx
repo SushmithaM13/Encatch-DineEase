@@ -207,7 +207,7 @@ export default function WaiterProfile() {
 
               {passwordSuccess && (
                 <p className="waiter-password-success">
-                  ✅ Password changed successfully!
+                   Password changed successfully!
                 </p>
               )}
             </div>

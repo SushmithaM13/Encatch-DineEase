@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
-import { CalendarDays, CheckCircle, XCircle, Brush, Plus, X } from "lucide-react";
+import {
+  CalendarDays,
+  Plus,
+  User,
+  Clock,
+  Phone,
+  X,
+  ChevronDown,
+} from "lucide-react";
 import "./WaiterReservation.css";
 
 export default function WaiterTableReservation() {
@@ -7,6 +15,7 @@ export default function WaiterTableReservation() {
   const [reservations, setReservations] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedTable, setSelectedTable] = useState(null);
+  const [filterStatus, setFilterStatus] = useState("New");
 
   const [newReservation, setNewReservation] = useState({
     name: "",
@@ -15,15 +24,26 @@ export default function WaiterTableReservation() {
     time: "",
   });
 
-  // Load tables and reservations from localStorage
   useEffect(() => {
     const storedTables = JSON.parse(localStorage.getItem("tables") || "[]");
     const storedReservations = JSON.parse(localStorage.getItem("reservations") || "[]");
-    setTables(storedTables);
+
+    // 👇 Add some mock tables if none exist (for testing)
+    if (storedTables.length === 0) {
+      const sampleTables = [
+        { id: 1, tableNumber: "T1", tableStatus: "AVAILABLE" },
+        { id: 2, tableNumber: "T2", tableStatus: "BOOKED" },
+        { id: 3, tableNumber: "T3", tableStatus: "COMPLETED" },
+      ];
+      localStorage.setItem("tables", JSON.stringify(sampleTables));
+      setTables(sampleTables);
+    } else {
+      setTables(storedTables);
+    }
+
     setReservations(storedReservations);
   }, []);
 
-  // Update table status
   const updateStatus = (id, newStatus) => {
     const updated = tables.map((t) =>
       t.id === id ? { ...t, tableStatus: newStatus } : t
@@ -32,7 +52,6 @@ export default function WaiterTableReservation() {
     localStorage.setItem("tables", JSON.stringify(updated));
   };
 
-  // Open popup for reservation
   const handleOpenPopup = (table) => {
     setSelectedTable(table);
     setShowPopup(true);
@@ -44,7 +63,6 @@ export default function WaiterTableReservation() {
     });
   };
 
-  // Save reservation
   const handleSaveReservation = () => {
     if (!newReservation.name.trim() || !newReservation.phone.trim() || !newReservation.time) {
       alert("Please fill all required fields.");
@@ -63,90 +81,152 @@ export default function WaiterTableReservation() {
     setReservations(updatedReservations);
     localStorage.setItem("reservations", JSON.stringify(updatedReservations));
 
-    // Update table status to BOOKED
     updateStatus(selectedTable.id, "BOOKED");
     setShowPopup(false);
   };
 
   return (
-    <div className="waiter-reservations-container">
-      <div className="waiter-reservations-header">
-        <h2 className="waiter-reservations-title">
-          <CalendarDays size={22} style={{ marginRight: "8px" }} /> Table Reservations
+    <div className="reservation-container">
+      {/* Header */}
+      <div className="reservation-header">
+        <h2>
+          <CalendarDays size={22} /> Reservation
         </h2>
+
+        {/* ✅ Filter Dropdown */}
+        <div className="reservation-filter">
+          <select
+            className="filter-btn"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="New">All</option>
+            <option value="BOOKED">Incoming</option>
+            <option value="AVAILABLE">Confirmed</option>
+            <option value="COMPLETED">Completed</option>
+          </select>
+          <ChevronDown size={16} />
+        </div>
       </div>
 
-      {tables.length === 0 ? (
-        <p className="waiter-no-tables">No tables added by Admin yet.</p>
-      ) : (
-        <div className="waiter-reservations-grid">
-          {tables.map((table) => {
-            const tableReservation = reservations.find(
-              (r) => r.tableId === table.id
-            );
+      {/* Grid */}
+      <div className="reservation-grid">
+        {/* Create Reservation Card */}
+        <div className="reservation-card create-card" onClick={() => setShowPopup(true)}>
+          <div className="create-icon">
+            <img src="https://cdn-icons-png.flaticon.com/512/2920/2920244.png" alt="bell" />
+          </div>
+          <button className="create-btn">Create reservation +</button>
+        </div>
+
+        {/* ✅ Filtered Table Cards */}
+        {tables
+          .filter((table) => {
+            if (filterStatus === "New") return true; // show all
+            return table.tableStatus.toUpperCase() === filterStatus.toUpperCase();
+          })
+          .map((table) => {
+            const tableReservation = reservations.find((r) => r.tableId === table.id);
+            const status = table.tableStatus;
+
+            const statusLabel =
+              status === "BOOKED"
+                ? "Incoming"
+                : status === "AVAILABLE"
+                ? "Confirmed"
+                : "Completed";
 
             return (
-              <div key={table.id} className={`waiter-reservation-card ${table.tableStatus.toLowerCase()}`}>
-                <span className={`waiter-status ${table.tableStatus.toLowerCase()}`}>
-                  {table.tableStatus}
-                </span>
+              <div key={table.id} className="reservation-card">
+                <div className="reservation-status">
+                  <span className={`status-badge ${status.toLowerCase()}`}>
+                    {statusLabel}
+                  </span>
+                  <select className="table-select" defaultValue={table.tableNumber}>
+                    <option>{table.tableNumber}</option>
+                  </select>
+                </div>
 
-                <div>
-                  <h3>{table.tableNumber}</h3>
-                  <p>Capacity: {table.capacity}</p>
-                  <p>Section: {table.section || "—"}</p>
-                  <p>Location: {table.locationDescription || "—"}</p>
+                <div className="reservation-details">
+                  {tableReservation ? (
+                    <>
+                      <div className="guest-info">
+                        <div className="guest-avatar">
+                          {tableReservation.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <h3>{tableReservation.name}</h3>
+                          <p className="contact-line">
+                            <Phone size={14} /> {tableReservation.phone}
+                          </p>
+                        </div>
+                      </div>
 
-                  {tableReservation && (
-                    <div className="waiter-reservation-details">
-                      <hr />
-                      <p><b>Guest:</b> {tableReservation.name}</p>
-                      <p><b>Time:</b> {tableReservation.time}</p>
-                      <p><b>Persons:</b> {tableReservation.persons}</p>
-                    </div>
+                      <div className="table-info">
+                        <p>
+                          <User size={14} /> {tableReservation.persons} persons
+                        </p>
+                        <p>
+                          <Clock size={14} /> {tableReservation.time}
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="no-reservation">No reservation yet</p>
                   )}
                 </div>
 
-                <div className="waiter-reservation-actions">
-                  <button
-                    onClick={() => handleOpenPopup(table)}
-                    className="waiter-book-btn"
-                    disabled={table.tableStatus === "BOOKED"}
-                  >
-                    <Plus size={16} /> Create Reservation
-                  </button>
-
-                  <button onClick={() => updateStatus(table.id, "AVAILABLE")} className="waiter-confirm">
-                    <CheckCircle size={16} /> Available
-                  </button>
-                  <button onClick={() => updateStatus(table.id, "BOOKED")} className="waiter-cancel">
-                    <XCircle size={16} /> Booked
-                  </button>
-                  <button onClick={() => updateStatus(table.id, "CLEANING")} className="waiter-cleaning">
-                    <Brush size={16} /> Cleaning
-                  </button>
+                <div className="reservation-actions">
+                  {status === "BOOKED" ? (
+                    <>
+                      <button
+                        className="confirm-btn"
+                        onClick={() => updateStatus(table.id, "AVAILABLE")}
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        className="cancel-btn"
+                        onClick={() => updateStatus(table.id, "AVAILABLE")}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : status === "AVAILABLE" ? (
+                    <button
+                      className="create-order-btn"
+                      onClick={() => handleOpenPopup(table)}
+                    >
+                      Create order
+                    </button>
+                  ) : (
+                    <button className="paid-btn" disabled>
+                      Paid
+                    </button>
+                  )}
                 </div>
               </div>
             );
           })}
-        </div>
-      )}
+      </div>
 
-      {/* Reservation Popup */}
+      {/* Popup Form */}
       {showPopup && (
-        <div className="waiter-popup-overlay">
-          <div className="waiter-popup">
-            <button className="waiter-popup-close" onClick={() => setShowPopup(false)}>
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <button className="popup-close" onClick={() => setShowPopup(false)}>
               <X size={18} />
             </button>
-            <h3>Create Reservation - {selectedTable?.tableNumber}</h3>
+            <h3>Create Reservation</h3>
 
             <label>
               Guest Name:
               <input
                 type="text"
                 value={newReservation.name}
-                onChange={(e) => setNewReservation({ ...newReservation, name: e.target.value })}
+                onChange={(e) =>
+                  setNewReservation({ ...newReservation, name: e.target.value })
+                }
               />
             </label>
 
@@ -155,7 +235,9 @@ export default function WaiterTableReservation() {
               <input
                 type="text"
                 value={newReservation.phone}
-                onChange={(e) => setNewReservation({ ...newReservation, phone: e.target.value })}
+                onChange={(e) =>
+                  setNewReservation({ ...newReservation, phone: e.target.value })
+                }
               />
             </label>
 
@@ -166,7 +248,10 @@ export default function WaiterTableReservation() {
                 min="1"
                 value={newReservation.persons}
                 onChange={(e) =>
-                  setNewReservation({ ...newReservation, persons: Number(e.target.value) })
+                  setNewReservation({
+                    ...newReservation,
+                    persons: Number(e.target.value),
+                  })
                 }
               />
             </label>
@@ -176,13 +261,15 @@ export default function WaiterTableReservation() {
               <input
                 type="time"
                 value={newReservation.time}
-                onChange={(e) => setNewReservation({ ...newReservation, time: e.target.value })}
+                onChange={(e) =>
+                  setNewReservation({ ...newReservation, time: e.target.value })
+                }
               />
             </label>
 
-            <div className="waiter-popup-actions">
-              <button onClick={handleSaveReservation}>Save Reservation</button>
-            </div>
+            <button className="popup-save" onClick={handleSaveReservation}>
+              Save Reservation
+            </button>
           </div>
         </div>
       )}
