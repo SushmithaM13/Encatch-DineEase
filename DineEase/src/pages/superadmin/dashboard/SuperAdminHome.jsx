@@ -89,14 +89,13 @@ const DashboardHome = () => {
           localStorage.setItem("organizationId", data.id);
           console.log("✅ Organization ID stored:", data.id);
         } else {
-          console.warn("⚠️ No organization ID found in hotel data");
+          console.warn("⚠ No organization ID found in hotel data");
         }
       })
       .catch((err) => {
         console.error("Error fetching hotels:", err);
         setLoading(false);
-      });
-
+});
   }, [navigate]);
 
   // ✅ Handle form input change

@@ -2,17 +2,24 @@ import React, { useState } from "react";
 import "./TableManagement.css";
 
 export default function TableManagement() {
+  const API_BASE = "http://localhost:8082/dine-ease/api/v1"; // 🔹 Change if needed
+
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [tableRecords, setTableRecords] = useState([]);
+  const [generatedQR, setGeneratedQR] = useState(null);
+  const [selectedTable, setSelectedTable] = useState(null);
+
   const [tableForm, setTableForm] = useState({
     tableNumber: "",
     tableStatus: true,
     capacity: 2,
     section: "",
     locationDescription: "",
+    organizationId: "",
   });
 
+  // Handle input updates
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setTableForm((prev) => ({ ...prev, [name]: value }));
@@ -22,21 +29,85 @@ export default function TableManagement() {
     setTableForm((prev) => ({ ...prev, tableStatus: !prev.tableStatus }));
   };
 
-  const addNewTable = () => {
-    if (!tableForm.tableNumber) return alert("Please enter table number");
-    setTableRecords((prev) => [...prev, tableForm]);
-    setIsFormVisible(false);
-    setIsPopupVisible(true);
+  // 🔹 STEP 1: Add Table API
+  const addNewTable = async () => {
+    if (!tableForm.tableNumber)
+      return alert("Please enter table number");
 
-    setTableForm({
-      tableNumber: "",
-      tableStatus: true,
-      capacity: 2,
-      section: "",
-      locationDescription: "",
-    });
+    try {
+      const response = await fetch(`${API_BASE}/tables`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(tableForm),
+      });
 
-    setTimeout(() => setIsPopupVisible(false), 2500);
+      if (!response.ok) throw new Error("Failed to add table");
+      const data = await response.json();
+
+      setTableRecords((prev) => [...prev, data]);
+      setSelectedTable(data);
+      setIsFormVisible(false);
+      setIsPopupVisible(true);
+
+      setTimeout(() => setIsPopupVisible(false), 2000);
+
+      setTableForm({
+        tableNumber: "",
+        tableStatus: true,
+        capacity: 2,
+        section: "",
+        locationDescription: "",
+        organizationId: "",
+      });
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  // 🔹 STEP 2: Generate QR Code API
+  const generateQRCode = async () => {
+    if (!selectedTable?.tableNumber || !selectedTable?.organizationId)
+      return alert("Please ensure Table Number & Organization ID are filled.");
+
+    try {
+      const response = await fetch(`${API_BASE}/tables/generateQR`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tableNumber: selectedTable.tableNumber,
+          organizationId: selectedTable.organizationId,
+        }),
+      });
+
+      if (!response.ok) throw new Error("QR generation failed");
+      const blob = await response.blob();
+      const qrUrl = URL.createObjectURL(blob);
+      setGeneratedQR(qrUrl);
+      alert("QR Code generated successfully!");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  // 🔹 STEP 3: Assign Table to Waiter API
+  const assignTableToWaiter = async (waiterId) => {
+    if (!selectedTable?.tableNumber) return alert("Please add a table first!");
+
+    try {
+      const response = await fetch(`${API_BASE}/tables/assignWaiter`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tableNumber: selectedTable.tableNumber,
+          waiterId,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to assign waiter");
+      alert("✅ Table assigned to waiter successfully!");
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   return (
@@ -115,6 +186,17 @@ export default function TableManagement() {
             />
           </label>
 
+          <label>
+            Organization ID:
+            <input
+              type="text"
+              name="organizationId"
+              value={tableForm.organizationId}
+              onChange={handleInputChange}
+              placeholder="Enter Organization ID"
+            />
+          </label>
+
           <button className="submit-btn" onClick={addNewTable}>
             Add Table
           </button>
@@ -123,6 +205,26 @@ export default function TableManagement() {
 
       {isPopupVisible && (
         <div className="popup-message fade-in">✅ Table added successfully!</div>
+      )}
+
+      {selectedTable && (
+        <div className="qr-section slide-up">
+          <h3>QR Code Generation</h3>
+          <button className="qr-btn" onClick={generateQRCode}>
+            Generate QR
+          </button>
+          {generatedQR && (
+            <div className="qr-display">
+              <img src={generatedQR} alt="Table QR" />
+              <button
+                className="assign-waiter-btn"
+                onClick={() => assignTableToWaiter("WAIT123")}
+              >
+                Assign Table to Waiter
+              </button>
+            </div>
+          )}
+        </div>
       )}
 
       {tableRecords.length > 0 && (
@@ -136,6 +238,7 @@ export default function TableManagement() {
                 <th>Capacity</th>
                 <th>Section</th>
                 <th>Location</th>
+                <th>Org ID</th>
               </tr>
             </thead>
             <tbody>
@@ -151,6 +254,7 @@ export default function TableManagement() {
                   <td>{table.capacity}</td>
                   <td>{table.section}</td>
                   <td>{table.locationDescription}</td>
+                  <td>{table.organizationId}</td>
                 </tr>
               ))}
             </tbody>

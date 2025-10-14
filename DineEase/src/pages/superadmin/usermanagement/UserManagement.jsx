@@ -10,8 +10,8 @@ export default function AdminStaffManagement() {
   const TOKEN = localStorage.getItem("token");
   const ORG_ID = localStorage.getItem("organizationId");
 
-  if (!TOKEN) console.warn("⚠️ No token found! Please login first.");
-  if (!ORG_ID) console.warn("⚠️ No organizationId found! Please login first.");
+  if (!TOKEN) console.warn("⚠ No token found! Please login first.");
+  if (!ORG_ID) console.warn("⚠ No organizationId found! Please login first.");
 
   const initialForm = {
     firstName: "",
@@ -200,7 +200,7 @@ export default function AdminStaffManagement() {
     if (!TOKEN) return;
     try {
       const res = await fetch(ROLES_API, {
-        headers: { Authorization: `Bearer ${TOKEN}` },
+        headers: { Authorization: `Bearer ${TOKEN}`},
       });
       if (!res.ok) throw new Error("Failed to fetch roles");
       const text = await res.text();
@@ -321,7 +321,7 @@ export default function AdminStaffManagement() {
             filteredStaff.map((staff, index) => (
               <tr key={staff.id}>
                 <td>{index + 1}</td>
-                <td>{`${staff.firstName} ${staff.lastName}`}</td>
+                <td>{staff.firstName} {staff.lastName}</td>
                 <td>{staff.email}</td>
                 <td>{staff.phoneNumber}</td>
                 <td>{staff.staffRoleType}</td>
@@ -360,7 +360,33 @@ export default function AdminStaffManagement() {
         </tbody>
       </table>
 
-      
+      {/* Mobile Cards */}
+      <div className="mobile-user-cards">
+        {filteredStaff.length > 0 ? (
+          filteredStaff.map((staff) => (
+            <div key={staff.id} className="user-card-mobile">
+              <div className="user-row user-name-cell">
+                <span className="cell-label">Name</span>
+                <span className="cell-value">{staff.firstName} {staff.lastName}</span>
+              </div>
+              <div className="user-row"><span className="cell-label">Email</span><span className="cell-value">{staff.email}</span></div>
+              <div className="user-row"><span className="cell-label">Phone</span><span className="cell-value">{staff.phone}</span></div>
+              <div className="user-row"><span className="cell-label">Role</span><span className="cell-value">{staff.staffRoleType}</span></div>
+              <div className="user-row"><span className="cell-label">Shift</span><span className="cell-value">{staff.shiftTiming}</span></div>
+              <div className="user-row"><span className="cell-label">Status</span><span className={`status ${staff.status?.toLowerCase()}`}>{staff.status || "Inactive"}</span></div>
+              <div className="user-row actions-cell">
+                <div className="user-actions">
+                  <button className="action-btn edit" onClick={() => handleEdit(staff)}><Edit size={16} /></button>
+                  <button className="action-btn delete" onClick={() => handleRemove(staff.id)}><Trash2 size={16} /></button>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="no-users-mobile">No staff available in {activeTab}.</div>
+        )}
+      </div>
+
 
       {/* Popup Form */}
       {popupOpen && (

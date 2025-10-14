@@ -1,212 +1,329 @@
-/* Container */
-.waiter-reservations-container {
-  padding: 20px;
-  background: #f9fafb;
+/* ===== Layout ===== */
+.reservation-container {
+  padding: 2rem;
+  background: #f5f7fa;
   min-height: 100vh;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
-/* Header */
-.waiter-reservations-header {
-  margin-bottom: 20px;
+.reservation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
-.waiter-reservations-title {
-  font-size: 24px;
-  font-weight: 700;
+.reservation-header h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== Filter ===== */
+.reservation-filter {
+  position: relative;
   display: flex;
   align-items: center;
 }
 
-/* No tables message */
-.waiter-no-tables {
-  text-align: center;
-  font-size: 16px;
-  color: #666;
-}
-
-/* Grid */
-.waiter-reservations-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 20px;
-}
-
-/* Reservation Card */
-.waiter-reservation-card {
-  background: white;
+.filter-btn {
+  padding: 0.5rem 1.8rem 0.5rem 1rem;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  background: #fff;
+  font-size: 0.95rem;
+  color: #333;
+  appearance: none;
+  cursor: pointer;
+}
+
+.reservation-filter svg {
+  position: absolute;
+  right: 10px;
+  color: #666;
+  pointer-events: none;
+}
+
+/* ===== Grid ===== */
+.reservation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ===== Card Common ===== */
+.reservation-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: 0.3s ease;
+}
+
+.reservation-card:hover {
+  transform: translateY(-3px);
+}
+
+/* ===== Create Card ===== */
+.create-card {
+  border: 2px dashed #c4e1ff;
+  background: #f9fcff;
+  text-align: center;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  position: relative;
-  transition: transform 0.2s ease;
+  align-items: center;
+  justify-content: center;
 }
 
-.waiter-reservation-card:hover {
-  transform: translateY(-2px);
+.create-card img {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 0.8rem;
 }
 
-/* Status */
-.waiter-status {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-  text-transform: uppercase;
+.create-btn {
+  border: none;
+  background: #eaf3ff;
+  color: #2563eb;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.waiter-status.available {
-  background-color: #28a745;
+.create-btn:hover {
+  background: #dbeafe;
 }
 
-.waiter-status.booked {
-  background-color: #dc3545;
-}
-
-.waiter-status.cleaning {
-  background-color: #ffc107;
-}
-
-/* Reservation Details */
-.waiter-reservation-details {
-  font-size: 14px;
-  color: #333;
-}
-
-.waiter-reservation-details hr {
-  margin: 8px 0;
-  border: 0.5px solid #ddd;
-}
-
-/* Actions */
-.waiter-reservation-actions {
+/* ===== Status & Table ===== */
+.reservation-status {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-.waiter-reservation-actions button {
+.status-badge {
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+}
+
+.status-badge.booked {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.status-badge.available {
+  background: #e0f7fa;
+  color: #00897b;
+}
+
+.status-badge.completed {
+  background: #e8eaf6;
+  color: #3949ab;
+}
+
+.table-select {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+}
+
+/* ===== Reservation Details ===== */
+.reservation-details {
+  margin-bottom: 1rem;
+}
+
+.guest-info {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.guest-avatar {
+  background: #dbeafe;
+  color: #2563eb;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.guest-info h3 {
+  font-size: 1rem;
+  margin: 0;
+  color: #1e293b;
+}
+
+.contact-line {
   display: flex;
   align-items: center;
   gap: 5px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.table-info {
+  margin-top: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.table-info p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ===== Buttons ===== */
+.reservation-actions {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.6rem;
+}
+
+.confirm-btn,
+.cancel-btn,
+.create-order-btn,
+.paid-btn {
   border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: background 0.2s ease;
+  transition: all 0.2s;
 }
 
-/* Action button colors */
-.waiter-book-btn {
-  background-color: #454545;
-  color: white;
+.confirm-btn {
+  background: #e0f2fe;
+  color: #0284c7;
 }
 
-.waiter-book-btn:disabled {
-  background-color: #aaa;
+.confirm-btn:hover {
+  background: #bae6fd;
+}
+
+.cancel-btn {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.cancel-btn:hover {
+  background: #fee2e2;
+}
+
+.create-order-btn {
+  background: #e0fbe2;
+  color: #15803d;
+}
+
+.create-order-btn:hover {
+  background: #bbf7d0;
+}
+
+.paid-btn {
+  background: #f1f5f9;
+  color: #64748b;
   cursor: not-allowed;
 }
 
-.waiter-confirm {
-  background-color: #28a745;
-  color: white;
-}
-
-.waiter-cancel {
-  background-color: #dc3545;
-  color: white;
-}
-
-.waiter-cleaning {
-  background-color: #ffc107;
-  color: #111;
-}
-
-/* Popup Overlay */
-.waiter-popup-overlay {
+/* ===== Popup ===== */
+.popup-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 200;
+  justify-content: center;
+  z-index: 999;
 }
 
-/* Popup */
-.waiter-popup {
-  background: white;
-  padding: 25px 20px;
-  border-radius: 8px;
-  width: 100%;
+.popup-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  width: 95%;
   max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   position: relative;
 }
 
-/* Popup Close Button */
-.waiter-popup-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  border: none;
+.popup-close {
   background: none;
+  border: none;
+  position: absolute;
+  top: 15px;
+  right: 15px;
   cursor: pointer;
 }
 
-/* Popup form elements */
-.waiter-popup label {
+.popup-content h3 {
+  margin-bottom: 1rem;
+  color: #1e293b;
+}
+
+.popup-content label {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 0.8rem;
+  color: #334155;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 0.9rem;
 }
 
-.waiter-popup input[type="text"],
-.waiter-popup input[type="number"],
-.waiter-popup input[type="time"] {
+.popup-content input {
   width: 100%;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  margin-top: 5px;
-  box-sizing: border-box;
+  margin-top: 0.3rem;
+  padding: 0.6rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  transition: 0.2s;
 }
 
-/* Popup actions */
-.waiter-popup-actions {
-  margin-top: 15px;
-  display: flex;
-  justify-content: flex-end;
+.popup-content input:focus {
+  border-color: #2563eb;
 }
 
-.waiter-popup-actions button {
-  background-color: #454545;
+.popup-save {
+  background: #2563eb;
   color: white;
   border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  width: 100%;
+  margin-top: 1rem;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 500;
+  transition: 0.2s;
 }
 
-/* Responsive */
+.popup-save:hover {
+  background: #1e40af;
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
-  .waiter-reservations-grid {
+  .reservation-grid {
     grid-template-columns: 1fr;
+  }
+
+  .reservation-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
   }
 }
