@@ -10,14 +10,11 @@ const Login = () => {
   const [remember, setRemember] = useState(false);
   const navigate = useNavigate();
 
-  // Pre-fill username if "remember me" was checked
+  // Load remembered email
   useEffect(() => {
     const remembered = localStorage.getItem("rememberEmail");
     if (remembered) setUsername(remembered);
   }, []);
-
-
-
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -35,15 +32,16 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Save token & role
+        // Save token and role
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.role);
 
-        // Save waiter name if role is WAITER
+        // Save waiter name if applicable
         if (data.role === "WAITER" && data.name) {
           localStorage.setItem("waiterName", data.name);
         }
 
+        // Remember email
         if (remember) {
           localStorage.setItem("rememberEmail", username);
         } else {
@@ -52,7 +50,7 @@ const Login = () => {
 
         toast.success("Login successful! Redirecting...");
 
-        // Redirect based on role after 1s
+        // Redirect based on role
         setTimeout(() => {
           switch (data.role) {
             case "SUPER_ADMIN":
@@ -63,14 +61,16 @@ const Login = () => {
               break;
             case "WAITER":
               navigate("/WaiterDashboard");
-              console.log("login as waiter");
               break;
+  //           case "CHEF":
+  // navigate("/chefDashboard"); 
+  //             break;
             default:
               navigate("/");
           }
         }, 1500);
       } else {
-        // Backend error handling
+        // Handle login errors
         let errorMsg = "Invalid credentials. Please try again.";
         if (data.message?.toLowerCase().includes("not found")) {
           errorMsg = "User not found. Please register first.";
@@ -79,7 +79,6 @@ const Login = () => {
         } else if (data.message?.toLowerCase().includes("verify")) {
           errorMsg = "Please verify your email before login.";
         }
-
         toast.error(errorMsg);
       }
     } catch (err) {
@@ -132,14 +131,12 @@ const Login = () => {
             Login
           </button>
 
-
           <p className="auth-footer">
             Not a member? <Link to="/SuperAdminRegistration">Sign up</Link>
           </p>
         </form>
       </div>
 
-      {/* Toast container */}
       <ToastContainer position="top-center" autoClose={2000} />
     </div>
   );
