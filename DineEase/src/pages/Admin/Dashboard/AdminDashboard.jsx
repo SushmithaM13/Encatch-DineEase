@@ -6,28 +6,44 @@ import {
   User,
   Newspaper,
   LogOut,
-  Sofa,   
+  Sofa,
   Users,
   Settings,
   IndianRupee,
+  Menu,
+  X,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { FaBars } from "react-icons/fa";
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
   const [adminName, setAdminName] = useState("Admin");
-  const [restaurantName, setRestaurantName] = useState("Restaurant");
+  const [_restaurantName, setRestaurantName] = useState("Restaurant");
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [profilePic, setProfilePic] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [profilePic, _setProfilePic] = useState(null);
+  const [searchQuery, _setSearchQuery] = useState("");
+  const [_searchResults, setSearchResults] = useState([]);
+  const [toast, setToast] = useState(null);
+  const [_stats, setStats] = useState({});
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const API_BASE = "http://localhost:8082/dine-ease/api/v1";
 
-  // Handle responsive sidebar
+  // ===============================
+  // Toast Notification
+  // ===============================
+  const showToast = (message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // ===============================
+  // Responsive Sidebar Handling
+  // ===============================
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
@@ -38,7 +54,9 @@ export default function AdminDashboard() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Close profile dropdown on outside click
+  // ===============================
+  // Dropdown Close on Outside Click
+  // ===============================
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -53,7 +71,9 @@ export default function AdminDashboard() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Dummy search results for UI demo
+  // ===============================
+  // Dummy Search Results
+  // ===============================
   useEffect(() => {
     if (!searchQuery.trim()) {
       setSearchResults([]);
@@ -71,49 +91,131 @@ export default function AdminDashboard() {
     );
   }, [searchQuery]);
 
-  // Logout function
+  // ===============================
+  // Fetch Staff Stats
+  // ===============================
+  const fetchStaffStats = async (orgId, token) => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/staff/all?organizationId=${orgId}&pageNumber=0&pageSize=10&sortBy=asc`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+
+      const staffData = Array.isArray(data)
+        ? data
+        : Array.isArray(data.content)
+        ? data.content
+        : [];
+
+      const total = staffData.length;
+      const active = staffData.filter(
+        (s) => s.staffStatus?.toLowerCase() === "active"
+      ).length;
+      const inactive = staffData.filter(
+        (s) => s.staffStatus?.toLowerCase() === "inactive"
+      ).length;
+      const pending = staffData.filter(
+        (s) => s.staffStatus?.toLowerCase() === "pending"
+      ).length;
+
+      setStats({
+        totalStaff: total,
+        activeStaff: active,
+        inactiveStaff: inactive,
+        pendingStaff: pending,
+      });
+
+      console.log("✅ Staff stats updated:", { total, active, inactive, pending });
+    } catch (error) {
+      console.error("Error fetching staff stats:", error);
+    }
+  };
+
+  // ===============================
+  // Fetch Organization + Staff
+  // ===============================
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const orgId = localStorage.getItem("organizationId");
+    const admin = localStorage.getItem("username");
+    const restName = localStorage.getItem("restaurantName");
+
+    if (admin) setAdminName(admin);
+    if (restName) setRestaurantName(restName);
+
+    if (token && orgId) {
+      fetchStaffStats(orgId, token);
+    }
+  }, []);
+
+  // ===============================
+  // Real-time Staff Update
+  // ===============================
+  useEffect(() => {
+    const handleStaffUpdate = () => {
+      const orgId = localStorage.getItem("organizationId");
+      const token = localStorage.getItem("token");
+      if (orgId && token) {
+        fetchStaffStats(orgId, token);
+        showToast("👥 Staff list updated", "info");
+      }
+    };
+
+    window.addEventListener("staffUpdated", handleStaffUpdate);
+    return () => window.removeEventListener("staffUpdated", handleStaffUpdate);
+  }, []);
+
+  // ===============================
+  // Logout Handler
+  // ===============================
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No token found");
 
-      const response = await fetch(
-        "http://localhost:8082/dine-ease/api/v1/users/logout",
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`${API_BASE}/users/logout`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (response.ok) {
-        // Clear user info
-        setAdminName("Admin");
-        setRestaurantName("Restaurant");
-        setProfilePic(null);
         sessionStorage.clear();
         localStorage.removeItem("token");
-
-        toast.success("✅ Successfully logged out!");
-
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
+        showToast("✅ Successfully logged out!");
+        setTimeout(() => navigate("/"), 1500);
       } else {
         const data = await response.json().catch(() => ({}));
-        toast.error("⚠️ Logout failed: " + (data.message || "Try again"));
+        showToast("⚠️ Logout failed: " + (data.message || "Try again"), "error");
       }
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("❌ Error during logout. Please try again later.");
+      showToast("❌ Error during logout. Please try again later.", "error");
     }
   };
 
+  // ===============================
+  // Sidebar Toggle Functions
+  // ===============================
+  const handleMobileMenuToggle = () => {
+    setSidebarOpen((prev) => !prev);
+  };
+
+  const handleDesktopSidebarToggle = () => {
+    setSidebarOpen((prev) => !prev);
+  };
+
+  // ===============================
+  // JSX Layout
+  // ===============================
   return (
     <div className="admin-layout-container">
-      {/* Mobile overlay */}
+      {/* Mobile Overlay */}
       {isMobile && sidebarOpen && (
         <div
           className="admin-sidebar-overlay"
@@ -122,33 +224,27 @@ export default function AdminDashboard() {
       )}
 
       {/* Sidebar */}
-      <aside className={`admin-sidebar ${sidebarOpen ? "admin-open" : "admin-collapsed"}`}>
+      <aside
+        className={`admin-sidebar ${
+          sidebarOpen ? "admin-open" : "admin-collapsed"
+        }`}
+      >
         <div className="admin-sidebar-header">
-          <div className="admin-sidebar-title">
-            <Utensils size={22} />
-            {sidebarOpen && <span style={{ marginLeft: 8 }}>Dineease</span>}
+          <div className="admin-sidebar-logo">
+            <Utensils size={28} className="admin-logo-icon" />
+            {sidebarOpen && <span className="admin-logo-text">DINE_EASE</span>}
           </div>
-          {!isMobile && (
-            <button
-              className="admin-hamburger admin-desktop-only"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
-          )}
         </div>
 
         <nav className="admin-sidebar-nav">
           {[
-            { to: "dashboard", icon: <LayoutDashboard size={18} />, label: "Dashboard" },
-            { to: "roles", icon: <User size={22} />, label: "Role Management" },
-            { to: "staff", icon: <Users size={22} />, label: "Staff Management" },
-            { to: "menu", icon: <Newspaper size={22} />, label: "Menu Management" },
-            { to: "table", icon: <Sofa size={22} />, label: "Table Management" },
-            { to: "revenue", icon: <IndianRupee size={22} />, label: "Revenue Management" },
-            { to: "settings", icon: <Settings size={22} />, label: "Settings" },
+            { to: "dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard" },
+            { to: "roles", icon: <User size={20} />, label: "Staff-role" },
+            { to: "staff", icon: <Users size={20} />, label: "Staff" },
+            { to: "menu", icon: <Newspaper size={20} />, label: "Food Items" },
+            { to: "table", icon: <Sofa size={20} />, label: "Table Management" },
+            { to: "revenue", icon: <IndianRupee size={20} />, label: "Revenue" },
+            { to: "settings", icon: <Settings size={20} />, label: "Settings" },
           ].map((item, i) => (
             <Link
               key={i}
@@ -156,68 +252,51 @@ export default function AdminDashboard() {
               className="admin-sidebar-link"
               onClick={() => isMobile && setSidebarOpen(false)}
             >
-              {item.icon}
-              {sidebarOpen && <span>{item.label}</span>}
+              <span className="admin-nav-icon">{item.icon}</span>
+              {sidebarOpen && (
+                <span className="admin-nav-label">{item.label}</span>
+              )}
             </Link>
           ))}
         </nav>
       </aside>
 
-      {/* Main content */}
+      {/* Main Content */}
       <div className="admin-main-content">
         <header className="admin-dashboard-header">
-          {isMobile && (
+          <div className="admin-header-left">
             <button
-              className="admin-hamburger admin-mobile-only"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="admin-dashboard-header-menu-btn"
+              onClick={() => {
+                if (window.innerWidth <= 768) {
+                  handleMobileMenuToggle();
+                } else {
+                  handleDesktopSidebarToggle();
+                }
+              }}
             >
-              <span></span>
-              <span></span>
-              <span></span>
+              <FaBars size={22} />
             </button>
-          )}
-
-          <div className="admin-header-left">Welcome, {adminName}</div>
-
-          <div className="admin-header-center">
-            <div className="admin-restaurant-display">
-              <Utensils size={18} color="black" />
-              <span>{restaurantName}</span>
-            </div>
+            <h1 className="admin-header-title">Admin Dashboard</h1>
           </div>
 
           <div className="admin-header-right" ref={dropdownRef}>
-            {/* Search */}
-            <div className="admin-search-container">
-              <input
-                type="text"
-                placeholder="🔍 Search..."
-                className="admin-search-bar"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchResults.length > 0 && (
-                <div className="admin-search-results">
-                  {searchResults.map((res, i) => (
-                    <div key={i} className="admin-search-item">
-                      <strong>{res.type}:</strong> {res.label}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Profile dropdown */}
+            {/* Profile Dropdown */}
             <div className="admin-profile-dropdown">
               <div
                 className="admin-profile-circle"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
                 {profilePic ? (
-                  <img src={profilePic} alt="Profile" className="admin-profile-pic" />
+                  <img
+                    src={profilePic}
+                    alt="Profile"
+                    className="admin-profile-pic"
+                  />
                 ) : (
-                  adminName.charAt(0).toUpperCase()
+                  <User size={20} />
                 )}
+                <span className="admin-profile-name">{adminName}</span>
               </div>
               {dropdownOpen && (
                 <div className="admin-dropdown-menu">
@@ -234,7 +313,7 @@ export default function AdminDashboard() {
                     <Settings size={16} /> Settings
                   </button>
                   <button
-                    className="admin-dropdown-item"
+                    className="admin-dropdown-item admin-logout"
                     onClick={handleLogout}
                   >
                     <LogOut size={16} /> Logout
@@ -250,8 +329,25 @@ export default function AdminDashboard() {
         </main>
       </div>
 
-      {/* Toast notifications */}
-      <ToastContainer position="top-right" autoClose={3000} />
+      {/* Toast Notification */}
+      {toast && (
+        <div
+          className={`admin-toast ${
+            toast.type === "error"
+              ? "admin-toast-error"
+              : toast.type === "info"
+              ? "admin-toast-info"
+              : "admin-toast-success"
+          }`}
+        >
+          {toast.type === "error" ? (
+            <AlertCircle size={20} />
+          ) : (
+            <CheckCircle size={20} />
+          )}
+          <span>{toast.message}</span>
+        </div>
+      )}
     </div>
   );
 }

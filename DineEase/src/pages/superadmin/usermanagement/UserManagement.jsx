@@ -44,7 +44,6 @@ export default function AdminStaffManagement() {
     localStorage.setItem("activeStaffIds", JSON.stringify(previousActiveIds));
   }, [previousActiveIds]);
 
-  // ✅ Date Formatter (fixes substring error)
   const formatDate = (dateValue) => {
     if (!dateValue) return "";
     if (typeof dateValue === "string") return dateValue.substring(0, 10);
@@ -62,9 +61,9 @@ export default function AdminStaffManagement() {
 
   // ===== Fetch All Staff =====
   const fetchStaff = useCallback(async () => {
-    if (!TOKEN) return;
+    if (!TOKEN || !ORG_ID) return;
     try {
-      const res = await fetch(`${API_BASE}/all`, {
+      const res = await fetch(`${API_BASE}/all?organizationId=${ORG_ID}&page=0&size=50`, {
         headers: {
           Authorization: `Bearer ${TOKEN}`,
           "Content-Type": "application/json",
@@ -72,9 +71,8 @@ export default function AdminStaffManagement() {
       });
 
       if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-
       const text = await res.text();
-      const data = text ? JSON.parse(text) : [];
+      const data = text ? JSON.parse(text) : {};
 
       const staffData = Array.isArray(data)
         ? data
@@ -120,87 +118,82 @@ export default function AdminStaffManagement() {
       console.error("Error fetching staff:", err);
       setStaffList([]);
     }
-  }, [API_BASE, TOKEN, previousActiveIds]);
+  }, [API_BASE, TOKEN, ORG_ID, previousActiveIds]);
 
   // ===== Add / Update Staff =====
   const handleAddOrUpdate = async () => {
-  // ✅ Validate required fields
-  if (!form.firstName || !form.lastName || !form.email || !form.phoneNumber) {
-    toast.error("Please fill all required fields.");
-    return;
-  }
-
-  if (!ORG_ID) {
-    toast.error("Organization ID missing! Please re-login.");
-    return;
-  }
-
-  // ✅ Prepare payload for backend
-  const payload = {
-    firstName: form.firstName,
-    lastName: form.lastName,
-    email: form.email,
-    phone: form.phoneNumber,       // backend expects 'phone'
-    staffRoleType: form.staffRoleType,
-    shiftTiming: form.shiftTiming,
-    salary: Number(form.salary),
-    contractStartDate: form.contractStartDate || null,
-    contractEndDate: form.contractEndDate || null,
-    staffStatus: form.status || "Pending",
-    organizationId: ORG_ID,        // ✅ automatically from logged-in admin
-  };
-
-  // Include password only when adding new staff
-  if (!editId && form.password) {
-    payload.password = form.password;
-  }
-
-  try {
-    const url = editId
-      ? `${API_BASE}/update-staff/${editId}`
-      : `${API_BASE}/add`;
-    const method = editId ? "PUT" : "POST";
-
-    const res = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${TOKEN}`,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(errText || "Failed to save staff");
+    if (!form.firstName || !form.lastName || !form.email || !form.phoneNumber) {
+      toast.error("Please fill all required fields.");
+      return;
     }
 
-    // Refresh staff list
-    await fetchStaff();
+    if (!ORG_ID) {
+      toast.error("Organization ID missing! Please re-login.");
+      return;
+    }
 
-    // Reset form & close popup
-    setForm(initialForm);
-    setEditId(null);
-    setPopupOpen(false);
+    const payload = {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phoneNumber,
+      staffRoleType: form.staffRoleType,
+      shiftTiming: form.shiftTiming,
+      salary: Number(form.salary),
+      contractStartDate: form.contractStartDate || null,
+      contractEndDate: form.contractEndDate || null,
+      staffStatus: form.status || "Pending",
+      organizationId: ORG_ID,
+    };
 
-    toast.success(
-      method === "POST"
-        ? "✅ Staff added successfully!"
-        : "✅ Staff updated successfully!",
-      { position: "top-center" }
-    );
-  } catch (err) {
-    console.error("Error saving staff:", err);
-    toast.error("Error saving staff: " + err.message);
-  }
-};
+    if (!editId && form.password) payload.password = form.password;
+
+    try {
+      const url = editId
+        ? `${API_BASE}/update-staff/${editId}?organizationId=${ORG_ID}`
+        : `${API_BASE}/add?organizationId=${ORG_ID}`;
+      const method = editId ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || "Failed to save staff");
+      }
+
+      await fetchStaff();
+      setForm(initialForm);
+      setEditId(null);
+      setPopupOpen(false);
+
+      // ✅ Dispatch event so dashboards/components can refresh automatically
+      window.dispatchEvent(new Event("staffUpdated"));
+
+      toast.success(
+        method === "POST"
+          ? "✅ Staff added successfully!"
+          : "✅ Staff updated successfully!",
+        { position: "top-center" }
+      );
+    } catch (err) {
+      console.error("Error saving staff:", err);
+      toast.error("Error saving staff: " + err.message);
+    }
+  };
 
   // ===== Fetch Roles =====
   const fetchRoles = useCallback(async () => {
-    if (!TOKEN) return;
+    if (!TOKEN || !ORG_ID) return;
     try {
-      const res = await fetch(ROLES_API, {
-        headers: { Authorization: `Bearer ${TOKEN}`},
+      const res = await fetch(`${ROLES_API}?organizationId=${ORG_ID}`, {
+        headers: { Authorization: `Bearer ${TOKEN}` },
       });
       if (!res.ok) throw new Error("Failed to fetch roles");
       const text = await res.text();
@@ -210,9 +203,8 @@ export default function AdminStaffManagement() {
       console.error("Error fetching roles:", err);
       setRoles([]);
     }
-  }, [ROLES_API, TOKEN]);
+  }, [ROLES_API, TOKEN, ORG_ID]);
 
-  // ===== Lifecycle =====
   useEffect(() => {
     if (TOKEN) {
       fetchStaff();
@@ -224,7 +216,6 @@ export default function AdminStaffManagement() {
     if (!popupOpen && TOKEN) fetchStaff();
   }, [popupOpen, TOKEN, fetchStaff]);
 
-  // ===== Handlers =====
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -255,7 +246,6 @@ export default function AdminStaffManagement() {
     }
   };
 
-  // ===== Filtering =====
   const filteredStaff =
     activeTab === "All Staff"
       ? staffList
@@ -268,9 +258,9 @@ export default function AdminStaffManagement() {
               !s.staffRoleType?.toLowerCase().includes("waiter")
         );
 
-  // ===== JSX =====
   return (
     <div className="user-management">
+      {/* Header and Add Button */}
       <div className="user-header">
         <h2>
           <UserCog size={26} /> Staff Management
@@ -287,6 +277,7 @@ export default function AdminStaffManagement() {
         </button>
       </div>
 
+      {/* Tabs */}
       <div className="tab-navigation">
         {["All Staff", "Chef", "Waiters", "Other"].map((tab) => (
           <div
@@ -300,65 +291,61 @@ export default function AdminStaffManagement() {
       </div>
 
       {/* Table */}
-      <table>
-        <thead>
-          <tr>
-            <th>SL.NO</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Role</th>
-            <th>Shift</th>
-            <th>Salary</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredStaff.length > 0 ? (
-            filteredStaff.map((staff, index) => (
-              <tr key={staff.id}>
-                <td>{index + 1}</td>
-                <td>{staff.firstName} {staff.lastName}</td>
-                <td>{staff.email}</td>
-                <td>{staff.phoneNumber}</td>
-                <td>{staff.staffRoleType}</td>
-                <td>{staff.shiftTiming}</td>
-                <td>{staff.salary}</td>
-                <td>{staff.contractStartDate}</td>
-                <td>{staff.contractEndDate}</td>
-                <td>
-                  <span className={`status ${staff.status?.toLowerCase()}`}>
-                    {staff.status || "Inactive"}
-                  </span>
-                </td>
-                <td>
-                  <button
-                    className="action-btn edit"
-                    onClick={() => handleEdit(staff)}
-                  >
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    className="action-btn delete"
-                    onClick={() => handleRemove(staff.id)}
-                  >
-                    <Trash2 size={16} />
-                  </button>
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>SL.NO</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Role</th>
+              <th>Shift</th>
+              <th>Salary</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredStaff.length > 0 ? (
+              filteredStaff.map((staff, index) => (
+                <tr key={staff.id}>
+                  <td>{index + 1}</td>
+                  <td>{staff.firstName} {staff.lastName}</td>
+                  <td>{staff.email}</td>
+                  <td>{staff.phoneNumber}</td>
+                  <td>{staff.staffRoleType}</td>
+                  <td>{staff.shiftTiming}</td>
+                  <td>{staff.salary}</td>
+                  <td>{staff.contractStartDate}</td>
+                  <td>{staff.contractEndDate}</td>
+                  <td>
+                    <span className={`status ${staff.status?.toLowerCase()}`}>
+                      {staff.status || "Inactive"}
+                    </span>
+                  </td>
+                  <td>
+                    <button className="action-btn edit" onClick={() => handleEdit(staff)}>
+                      <Edit size={16} />
+                    </button>
+                    <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={11} style={{ textAlign: "center", padding: "20px" }}>
+                  No staff found in {activeTab}.
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={11} style={{ textAlign: "center", padding: "20px" }}>
-                No staff found in {activeTab}.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Mobile Cards */}
       <div className="mobile-user-cards">
@@ -387,109 +374,57 @@ export default function AdminStaffManagement() {
         )}
       </div>
 
-
       {/* Popup Form */}
       {popupOpen && (
         <div className="popup">
           <div className="popup-content">
             <h3>{editId ? "Edit Staff" : "Add Staff"}</h3>
             <form>
-              {[
-                { label: "First Name", name: "firstName", type: "text" },
-                { label: "Last Name", name: "lastName", type: "text" },
-                { label: "Email", name: "email", type: "email" },
-                { label: "Phone", name: "phoneNumber", type: "text" },
-              ].map((field) => (
-                <div className="form-group" key={field.name}>
-                  <label>{field.label}</label>
-                  <input
-                    type={field.type}
-                    name={field.name}
-                    value={form[field.name]}
-                    onChange={handleChange}
-                    placeholder={field.label}
-                  />
+              {["firstName","lastName","email","phoneNumber"].map((name) => (
+                <div className="form-group" key={name}>
+                  <label>{name.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</label>
+                  <input type={name==="email"?"email":"text"} name={name} value={form[name]} onChange={handleChange} placeholder={name} />
                 </div>
               ))}
 
               <div className="form-group">
                 <label>Role</label>
-                <select
-                  name="staffRoleType"
-                  value={form.staffRoleType}
-                  onChange={handleChange}
-                >
+                <select name="staffRoleType" value={form.staffRoleType} onChange={handleChange}>
                   <option value="">Select Role</option>
-                  {roles.map((role) => (
-                    <option key={role.id} value={role.staffRoleName}>
-                      {role.staffRoleName}
-                    </option>
-                  ))}
+                  {roles.map((role) => <option key={role.id} value={role.staffRoleName}>{role.staffRoleName}</option>)}
                 </select>
               </div>
 
               <div className="form-group">
                 <label>Shift Timing</label>
-                <input
-                  type="text"
-                  name="shiftTiming"
-                  value={form.shiftTiming}
-                  onChange={handleChange}
-                  placeholder="Shift Timing"
-                />
+                <input type="text" name="shiftTiming" value={form.shiftTiming} onChange={handleChange} placeholder="Shift Timing" />
               </div>
 
               <div className="form-group">
                 <label>Salary</label>
-                <input
-                  type="number"
-                  name="salary"
-                  value={form.salary}
-                  onChange={handleChange}
-                  placeholder="Salary"
-                />
+                <input type="number" name="salary" value={form.salary} onChange={handleChange} placeholder="Salary" />
               </div>
 
               <div className="form-group">
                 <label>Contract Start</label>
-                <input
-                  type="date"
-                  name="contractStartDate"
-                  value={form.contractStartDate}
-                  onChange={handleChange}
-                />
+                <input type="date" name="contractStartDate" value={form.contractStartDate} onChange={handleChange} />
               </div>
 
               <div className="form-group">
                 <label>Contract End</label>
-                <input
-                  type="date"
-                  name="contractEndDate"
-                  value={form.contractEndDate}
-                  onChange={handleChange}
-                />
+                <input type="date" name="contractEndDate" value={form.contractEndDate} onChange={handleChange} />
               </div>
 
               {!editId && (
                 <div className="form-group">
                   <label>Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    placeholder="Password"
-                  />
+                  <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="Password" />
                 </div>
               )}
 
               <div className="form-buttons">
-                <button type="button" onClick={() => setPopupOpen(false)}>
-                  Cancel
-                </button>
-                <button type="button" onClick={handleAddOrUpdate}>
-                  {editId ? "Update" : "Add"}
-                </button>
+                <button type="button" onClick={() => setPopupOpen(false)}>Cancel</button>
+                <button type="button" onClick={handleAddOrUpdate}>{editId ? "Update" : "Add"}</button>
               </div>
             </form>
           </div>

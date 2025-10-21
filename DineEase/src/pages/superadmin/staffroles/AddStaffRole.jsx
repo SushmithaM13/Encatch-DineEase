@@ -20,8 +20,8 @@ export default function RoleManagement() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://localhost:8082/dine-ease/api/v1/staff-role/all", {
-        headers: {
+const ORG_ID = localStorage.getItem("organizationId");
+const res = await fetch(`http://localhost:8082/dine-ease/api/v1/staff-role/all?organizationId=${ORG_ID}`, {        headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
@@ -61,9 +61,11 @@ export default function RoleManagement() {
 
     setLoading(true);
 
-    const url = editingId
-      ? `http://localhost:8082/dine-ease/api/v1/staff-role/update/${editingId}`
-      : `http://localhost:8082/dine-ease/api/v1/staff-role/add`;
+    const ORG_ID = localStorage.getItem("organizationId");
+const url = editingId
+  ? `http://localhost:8082/dine-ease/api/v1/staff-role/update/${editingId}?organizationId=${ORG_ID}`
+  : `http://localhost:8082/dine-ease/api/v1/staff-role/add?organizationId=${ORG_ID}`;
+
     const method = editingId ? "PUT" : "POST";
 
     try {

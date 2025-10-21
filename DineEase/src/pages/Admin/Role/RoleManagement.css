@@ -1,178 +1,394 @@
-/* --- Container --- */
+/* ===== Container ===== */
 .admin-role-management-page {
-  padding: 20px;
-  color: #000;
-  background: #fff;
-  font-family: Arial, sans-serif;
-  max-width: 900px;
-  margin: 0 auto;
+  padding: 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* --- Header --- */
+/* ===== Header ===== */
 .admin-role-management-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .admin-page-title {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* --- Buttons --- */
-.admin-add-btn {
+.admin-title-icon {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 8px;
+  border-radius: 12px;
+}
+
+/* ===== Header Buttons ===== */
+.admin-header-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 6px;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 12px;
   border: none;
-  background-color: #000;
-  color: #fff;
   cursor: pointer;
-  font-weight: 500;
-  transition: 0.2s;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.admin-add-btn:hover {
-  background-color: #fff;
-  color: #000;
-  border: 1px solid #000;
+.admin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* --- Search Bar --- */
+.admin-view-btn {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  backdrop-filter: blur(10px);
+}
+
+.admin-add-btn {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: #ffffff;
+}
+
+/* ===== Search Bar ===== */
 .admin-search-bar {
-  width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
-.admin-search-bar input {
+.admin-search-input {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #000;
-  border-radius: 6px;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 12px;
   font-size: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  outline: none;
 }
 
-/* --- Table --- */
+.admin-search-input:focus {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Table ===== */
+.admin-table-wrapper {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
 .admin-roles-table {
   width: 100%;
-  margin-top: 10px;
   border-collapse: collapse;
 }
 
-.admin-roles-table th,
-.admin-roles-table td {
-  border: 1px solid #000;
-  padding: 10px;
-  text-align: left;
-}
-
 .admin-roles-table th {
-  background: #000;
-  color: #fff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.admin-roles-table tr:nth-child(even) {
-  background: #f9f9f9;
+.admin-roles-table td {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
 }
 
-.admin-roles-table tr:hover {
-  background: #eaeaea;
+.admin-roles-table tbody tr:nth-child(even) {
+  background: #ffffff;
 }
 
-/* --- Table Actions --- */
+.admin-roles-table tbody tr:nth-child(odd) {
+  background: #f9fafb;
+}
+
+.admin-roles-table tbody tr:hover {
+  background: #f3f4f6;
+}
+
+.admin-role-name {
+  font-weight: 600;
+}
+
+.admin-center-text {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+}
+
+/* ===== Action Icons ===== */
 .admin-action-icons {
   display: flex;
-  gap: 8px;
+  gap: 12px;
 }
 
 .admin-icon-btn {
   border: none;
-  background: none;
   cursor: pointer;
-  padding: 4px;
-  transition: 0.2s;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-icon-btn:hover {
+  transform: scale(1.1);
 }
 
 .admin-icon-btn.admin-edit {
-  color: #fbbf24;
+  color: #f59e0b;
+  background: #fef3c7;
 }
 
 .admin-icon-btn.admin-edit:hover {
-  color: #b45309;
+  background: #fde68a;
 }
 
 .admin-icon-btn.admin-delete {
   color: #ef4444;
+  background: #fee2e2;
 }
 
 .admin-icon-btn.admin-delete:hover {
-  color: #b91c1c;
+  background: #fecaca;
 }
 
-/* --- Modal --- */
+/* ===== Loader ===== */
+.admin-loader {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== Modal ===== */
 .admin-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .admin-modal {
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  width: 400px;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 20px;
+  width: 450px;
   max-width: 90%;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
 }
-.admin-header-buttons {
-  display: flex;
-  gap: 10px; /* space between buttons */
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
+
 .admin-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e5e7eb;
 }
 
-.admin-modal-header h3 {
+.admin-modal-title {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .admin-close-btn {
   border: none;
-  background: none;
+  background: #f3f4f6;
   cursor: pointer;
-  color: #000;
+  color: #6b7280;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
 }
 
-.admin-modal-body input {
+.admin-close-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.admin-modal-body {
+  margin-bottom: 24px;
+}
+
+.admin-input-group {
+  margin-bottom: 20px;
+}
+
+.admin-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.admin-input {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 12px;
-  border: 1px solid #000;
-  border-radius: 6px;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
   font-size: 1rem;
+  transition: all 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.admin-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .admin-modal-footer {
   display: flex;
   justify-content: flex-end;
+}
+
+/* ===== Toast Notifications ===== */
+.admin-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+  z-index: 2000;
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.admin-toast-success {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+}
+
+.admin-toast-error {
+  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .admin-role-management-page {
+    padding: 20px;
+  }
+
+  .admin-page-title {
+    font-size: 1.5rem;
+  }
+
+  .admin-role-management-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-header-buttons {
+    justify-content: stretch;
+  }
+
+  .admin-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .admin-roles-table {
+    font-size: 0.9rem;
+  }
+
+  .admin-roles-table th,
+  .admin-roles-table td {
+    padding: 10px;
+  }
+
+  .admin-modal {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .admin-toast {
+    right: 10px;
+    left: 10px;
+    top: 10px;
+  }
 }

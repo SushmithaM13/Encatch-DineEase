@@ -15,6 +15,8 @@ import Items from "./pages/superadmin/items/FoodItems";
 import SuperAdminHome from "./pages/superadmin/dashboard/SuperAdminHome";
 import TableManagement from "./pages/superadmin/tablemanagemnet/TableManagement";
 import AddStaffRole  from './pages/superadmin/staffroles/AddStaffRole'; 
+import SuperAdminProfile from "./pages/superadmin/profile/SuperAdminProfile";
+import SuperAdminSettings from "./pages/superadmin/settings/SuperAdminSettings";
 
 // ===== Admin Pages =====
 import AdminDashboard from "./pages/Admin/Dashboard/AdminDashboard";
@@ -57,6 +59,8 @@ function App() {
         <Route path="food-items" element={<Items />} />
         <Route path="staffrole" element={<AddStaffRole />} />
         <Route path="table" element={<TableManagement />} />
+         <Route path="profile" element={<SuperAdminProfile />} />
+         <Route path="settings" element={<SuperAdminSettings />} />
         
       </Route>
         {/* ===== Admin Dashboard Routes ===== */}
