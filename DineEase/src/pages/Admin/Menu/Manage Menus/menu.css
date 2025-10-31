@@ -5,6 +5,8 @@
 .admin-menu-page {
   padding: 20px;
   font-family: "Inter", sans-serif;
+  color: #222;
+  background: #fafafa;
 }
 
 /* ============================= */
@@ -18,7 +20,6 @@
   font-size: 1.6rem;
   font-weight: 700;
   margin-bottom: 20px;
-  color: #222;
 }
 
 /* ============================= */
@@ -44,7 +45,7 @@
 
 .admin-search-input:focus {
   border-color: black;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.15);
   outline: none;
 }
 
@@ -77,11 +78,11 @@
 }
 
 .admin-switch {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  position: relative;
 }
 
 .admin-switch input {
@@ -118,6 +119,7 @@
 input:checked + .admin-slider.admin-veg {
   background: #16a34a;
 }
+
 input:checked + .admin-slider.admin-veg::before {
   transform: translateX(24px);
 }
@@ -125,6 +127,7 @@ input:checked + .admin-slider.admin-veg::before {
 input:checked + .admin-slider.admin-nonveg {
   background: #dc2626;
 }
+
 input:checked + .admin-slider.admin-nonveg::before {
   transform: translateX(24px);
 }
@@ -260,6 +263,7 @@ input:checked + .admin-slider.admin-nonveg::before {
   flex-direction: column;
   z-index: 10;
   min-width: 120px;
+  overflow: hidden;
 }
 
 .admin-menu-dropdown button {
@@ -270,61 +274,146 @@ input:checked + .admin-slider.admin-nonveg::before {
   text-align: left;
   cursor: pointer;
   font-size: 14px;
+  transition: 0.2s;
 }
 
 .admin-menu-dropdown button:hover {
   background: #333;
 }
 
+.admin-menu-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.admin-add-attributes-btn {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-add-attributes-btn:hover {
+  background-color: #eaeaea;
+}
+
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  width: 210px;
+}
+
+.dropdown-menu button {
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.dropdown-menu button:hover {
+  background-color: #f2f2f2;
+}
+
+.admin-modal.small {
+  max-width: 400px;
+}
+
+
 /* ============================= */
 /* Modal */
 /* ============================= */
 .admin-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 50;
+  align-items: center;
+  z-index: 1000;
+  padding: 40px 20px;
 }
 
 .admin-modal {
-  background: white;
-  padding: 20px;
+  background: #fff;
   border-radius: 12px;
-  width: 400px;
-  max-height: 90vh;
+  width: 100%;
+  max-width: 600px;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  max-height: 90vh;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.2s ease-in-out;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
+/* ===== Scrollbar ===== */
+.admin-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-modal::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.admin-modal::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* ===== Modal Header ===== */
 .admin-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.admin-modal-header h3 {
-  font-size: 18px;
-  font-weight: 600;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 10;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #ddd;
 }
 
 .admin-modal-header button {
-  background: black;
-  color: white;
+  background: #000;
+  color: #fff;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   padding: 4px 6px;
 }
 
-/* Inputs */
+/* ===== Modal Body ===== */
+.admin-modal-body {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ===== Inputs & Selects ===== */
 .admin-modal input,
 .admin-modal textarea,
 .admin-modal select {
@@ -333,6 +422,7 @@ input:checked + .admin-slider.admin-nonveg::before {
   border-radius: 6px;
   border: 1px solid #ccc;
   font-size: 14px;
+  margin-bottom: 10px;
 }
 
 .admin-modal textarea {
@@ -340,7 +430,9 @@ input:checked + .admin-slider.admin-nonveg::before {
   resize: vertical;
 }
 
+/* ===== Buttons ===== */
 .admin-save-btn {
+  margin-top: 10px;
   padding: 10px;
   background: black;
   color: white;
@@ -353,6 +445,18 @@ input:checked + .admin-slider.admin-nonveg::before {
 
 .admin-save-btn:hover {
   background: #333;
+}
+
+/* ===== Animation ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ============================= */
@@ -372,9 +476,6 @@ input:checked + .admin-slider.admin-nonveg::before {
   .admin-menu-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .admin-modal {
-    width: 90%;
-  }
 }
 
 @media (max-width: 768px) {
@@ -385,7 +486,6 @@ input:checked + .admin-slider.admin-nonveg::before {
 
   .admin-search-input {
     width: 100%;
-    max-width: none;
   }
 
   .admin-add-btn {

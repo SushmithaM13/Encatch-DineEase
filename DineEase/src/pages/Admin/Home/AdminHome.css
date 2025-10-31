@@ -1,5 +1,5 @@
 /* ============================
-   AdminHome.css - Prefixed Version
+   AdminHome.css - Mobile Optimized
 ============================ */
 
 /* ---------------- General Dashboard ---------------- */
@@ -93,6 +93,7 @@
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+  overflow-x: auto;
 }
 
 .admin-analytics-header {
@@ -100,12 +101,14 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
+  flex-wrap: wrap;
 }
 
 .admin-analytics-controls {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .admin-analytics-select {
@@ -174,6 +177,7 @@
 /* ---------------- Staff Section ---------------- */
 .admin-staff-section {
   margin-top: 30px;
+  overflow-x: auto;
 }
 
 .admin-staff-table {
@@ -317,7 +321,7 @@
   color: #777;
 }
 
-/* ---------------- Responsive ---------------- */
+/* ---------------- Responsive Improvements ---------------- */
 @media (max-width: 1024px) {
   .admin-stats-cards,
   .admin-menu-grid,
@@ -339,10 +343,12 @@
 
   .admin-welcome {
     font-size: 1.3rem;
+    text-align: center;
   }
 
   .admin-restaurant {
     font-size: 0.9rem;
+    text-align: center;
   }
 
   .admin-menu-img {
@@ -354,6 +360,21 @@
     font-size: 0.8rem;
     padding: 6px;
   }
+
+  .admin-revenue-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .admin-analytics-section {
+    padding: 12px;
+    margin-top: 25px;
+    overflow-x: auto;
+  }
+
+  .admin-analytics-section .recharts-wrapper {
+    min-width: 400px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -363,25 +384,12 @@
 
   .admin-welcome {
     font-size: 1.2rem;
-    font-weight: 700;
-    text-align: center;
     margin-bottom: 4px;
   }
 
   .admin-restaurant {
     font-size: 0.85rem;
-    text-align: center;
     margin-bottom: 15px;
-    color: #666;
-  }
-
-  .admin-stats-cards {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .admin-card {
-    padding: 15px;
   }
 
   .admin-card h4 {
@@ -392,32 +400,27 @@
     font-size: 12px;
   }
 
-  .admin-analytics-section {
-    padding: 12px;
-    margin-top: 25px;
+  .admin-menu-card.admin-small-card {
+    font-size: 0.8rem;
+    padding: 10px;
   }
 
-  .admin-analytics-section h3 {
-    font-size: 1rem;
-    text-align: center;
-    margin-bottom: 12px;
+  .admin-menu-img {
+    height: 90px;
   }
 
-  .admin-analytics-section > div[style] {
-    overflow-x: auto;
-  }
-
-  .admin-analytics-section .recharts-wrapper {
-    min-width: 450px;
-  }
-
-  .admin-revenue-grid {
+  .admin-table-grid {
     grid-template-columns: 1fr;
     gap: 10px;
   }
 
-  .admin-revenue-card {
+  .admin-table-box {
     padding: 12px;
+    font-size: 0.85rem;
+  }
+
+  .admin-table-box span {
+    font-size: 11px;
   }
 
   .admin-staff-table {
@@ -432,31 +435,8 @@
     padding: 6px 8px;
   }
 
-  .admin-menu-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .admin-menu-card.admin-small-card {
-    font-size: 0.8rem;
-    padding: 10px;
-  }
-
-  .admin-menu-img {
-    height: 90px;
-  }
-
-  .admin-table-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .admin-table-box {
-    padding: 12px;
-    font-size: 0.85rem;
-  }
-
-  .admin-table-box span {
-    font-size: 11px;
+  .admin-analytics-controls {
+    flex-direction: column;
+    gap: 6px;
   }
 }

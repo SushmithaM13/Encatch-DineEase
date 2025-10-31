@@ -10,6 +10,8 @@ import {
   FaCog,
   FaSignOutAlt,
   FaIdBadge,
+  FaTable,
+  
 } from "react-icons/fa";
 
 const SuperAdminDashboard = () => {
@@ -95,9 +97,20 @@ const SuperAdminDashboard = () => {
     }
   };
 
+document.querySelectorAll('.sidebar ul li a').forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+      document.querySelector('.sidebar').classList.remove('mobile-open');
+      document.querySelector('.sidebar-overlay').classList.remove('active');
+    }
+  });
+});
+
+    
   return (
     <div className={`dashboard ${sidebarOpen ? "expanded" : "collapsed"}`}>
       {/* Mobile Overlay */}
+      
       <div
         className={`sidebar-overlay ${mobileMenuOpen ? "active" : ""}`}
         onClick={handleMobileMenuClose}
@@ -110,6 +123,7 @@ const SuperAdminDashboard = () => {
         } ${mobileMenuOpen ? "mobile-open" : ""}`}
       >
         <div className="sidebar-header">
+          <FaUtensils size={22} />
           <h2 className="logo">{sidebarOpen ? "DINE _ EASE" : "DE"}</h2>
           <button className="toggle-btn" onClick={handleDesktopSidebarToggle}>
             {/* <FaBars /> */}
@@ -142,7 +156,7 @@ const SuperAdminDashboard = () => {
           </li>
           <li>
             <NavLink to="/superAdminDashboard/table">
-              <FaUtensils />
+              <FaTable />
               {sidebarOpen && <span>Table Management</span>}
             </NavLink>
           </li>
@@ -166,6 +180,10 @@ const SuperAdminDashboard = () => {
             <FaBars size={22} />
           </button>
 
+           <div className="dashboard-header">
+    <h1>Super Admin Dashboard</h1>
+  </div>
+
           {/* Profile Dropdown */}
           <div className="profile-info" ref={dropdownRef}>
             <div
@@ -176,20 +194,19 @@ const SuperAdminDashboard = () => {
               <span className="profile-name">SuperAdmin</span>
             </div>
 
-            {dropdownOpen && (
-              <div className="profile-dropdown">
-                <button>
-                  <FaIdBadge /> Profile
-                </button>
-                <button>
-                  <FaCog /> Settings
-                </button>
-                {/* Attach logout handler here */}
-                <button className="logout-btn" onClick={handleLogout}>
-                  <FaSignOutAlt /> Logout
-                </button>
-              </div>
-            )}
+           {dropdownOpen && (
+  <div className="profile-dropdown">
+    <button onClick={() => navigate("/superAdminDashboard/profile")}>
+      <FaIdBadge /> Profile
+    </button>
+    <button onClick={() => navigate("/superAdminDashboard/settings")}>
+      <FaCog /> Settings
+    </button>
+    <button className="logout-btn" onClick={handleLogout}>
+      <FaSignOutAlt /> Logout
+    </button>
+  </div>
+)}
           </div>
         </div>
 

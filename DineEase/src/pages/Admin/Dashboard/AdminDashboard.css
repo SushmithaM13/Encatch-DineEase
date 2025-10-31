@@ -1,62 +1,76 @@
-/* ============================= */
-/* 📊 Admin Dashboard Layout CSS */
-/* ============================= */
-
-/* Layout container */
+/* ================================ */
+/* 🌟 General Layout & Reset */
+/* ================================ */
 .admin-layout-container {
   display: flex;
   height: 100vh;
+  background: #f9fafb;
+  overflow: hidden;
+  font-family: "Inter", Arial, sans-serif;
 }
 
-/* Sidebar */
+/* ================================ */
+/* 📱 Sidebar Styles */
+/* ================================ */
 .admin-sidebar {
-  background: black;
-  color: white;
-  min-height: 100vh;
+  width: 250px;
+  background-color: black;
+  color: #ddd;
   display: flex;
   flex-direction: column;
-  padding: 20px 10px;
-  transition: width 0.3s ease, left 0.3s ease;
-  overflow: hidden;
-  z-index: 200;
-  width: 250px; /* desktop default */
-}
-
-.admin-sidebar.admin-open {
-  width: 250px;
+  transition: width 0.3s ease, transform 0.3s ease;
+  position: relative;
+  z-index: 20;
 }
 
 .admin-sidebar.admin-collapsed {
   width: 70px;
 }
 
-/* Sidebar header */
 .admin-sidebar-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .admin-sidebar-title {
   display: flex;
   align-items: center;
-  font-size: 22px;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  transition: opacity 0.3s ease;
+  font-weight: 600;
+  font-size: 20px;
 }
-
-.admin-sidebar.admin-collapsed .admin-sidebar-title {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Hamburger button */
-.admin-hamburger {
+/* Black 3-line (hamburger) button before Welcome */
+.admin-hamburger-toggle {
+  display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 12px;
+}
+
+.admin-hamburger-toggle span {
+  width: 22px;
+  height: 2.5px;
+  background-color: #000; /* black lines */
+  border-radius: 2px;
+  transition: 0.3s;
+}
+
+/* Optional hover effect */
+.admin-hamburger-toggle:hover span {
+  background-color: #333;
+}
+
+
+/* Hamburger toggle */
+.admin-hamburger {
+  display: flex;
+  flex-direction: column;
   gap: 4px;
   background: none;
   border: none;
@@ -64,320 +78,273 @@
 }
 
 .admin-hamburger span {
-  display: block;
-  height: 3px;
-  width: 22px;
+  width: 20px;
+  height: 2px;
+  background-color: white;
   border-radius: 2px;
 }
 
-/* Desktop hamburger (white) */
-.admin-desktop-only span {
-  background: white;
-}
-
 .admin-desktop-only {
-  display: flex;
-}
-@media (max-width: 768px) {
-  .admin-desktop-only {
-    display: none;
-  }
-}
-
-/* Mobile hamburger (black) */
-.admin-mobile-only {
   display: none;
 }
-.admin-mobile-only span {
-  background: black;
-}
-@media (max-width: 768px) {
-  .admin-mobile-only {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px;
-  }
+
+.admin-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  overflow-y: auto;
+  flex-grow: 1;
 }
 
-/* Sidebar nav links */
-.admin-sidebar-nav a {
+/* Sidebar links */
+.admin-sidebar-link {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 15px;
-  margin-bottom: 10px;
-  border-radius: 6px;
-  font-weight: 500;
-  transition: background 0.3s ease, color 0.3s ease;
-  color: #fff;
+  padding: 12px 20px;
+  gap: 10px;
   text-decoration: none;
-  white-space: nowrap;
+  color: #ddd;
+  font-size: 19px; /* ⬅️ increased from 15px */
+  font-weight: 500; /* ⬅️ makes text look bolder and cleaner */
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s, padding-left 0.3s;
+  border-left: 3px solid transparent;
 }
 
-.admin-sidebar-nav a svg {
-  width: 20px;
-  height: 20px;
+.admin-submenu-link {
+  color: #ccc;
+  text-decoration: none;
+  padding: 8px 0;
+  font-size: 15px; /* was 14px */
+  transition: color 0.3s, transform 0.2s;
+}
+
+
+.admin-sidebar-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  padding-left: 25px;
+}
+
+.admin-sidebar-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-left: 3px solid #f5c518;
+}
+
+/* Sidebar overlay for mobile */
+.admin-sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+/* ================================ */
+/* 👥 Staff Management Dropdown */
+/* ================================ */
+.admin-sidebar-dropdown {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-sidebar-dropdown > .admin-sidebar-link {
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  color: #ddd;
+}
+
+.admin-sidebar-dropdown > .admin-sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* Staff submenu */
+.admin-submenu {
+  display: flex;
+  flex-direction: column;
+  margin-left: 25px;
+  margin-top: 5px;
+  padding-left: 10px;
+  border-left: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-submenu-link {
+  color: #ccc;
+  text-decoration: none;
+  padding: 8px 0;
+  font-size: 14px;
+  transition: color 0.3s, transform 0.2s;
+}
+
+.admin-submenu-link:hover {
+  color: #fff;
+  transform: translateX(6px);
+}
+
+/* ================================ */
+/* 📂 Menu Management Dropdown */
+/* ================================ */
+.admin-sidebar-link svg {
   flex-shrink: 0;
 }
 
-.admin-sidebar-nav a:hover {
-  background-color: #f5f5f5;
-  color: #000;
+.admin-sidebar-link span svg {
+  transition: transform 0.3s ease;
 }
 
-.admin-sidebar-nav a.active {
-  background-color: #e0e0e0;
-  color: #000;
-  font-weight: 600;
+.admin-sidebar-link.active svg {
+  transform: rotate(180deg);
 }
 
-.admin-sidebar.admin-collapsed .admin-sidebar-nav a svg {
-  width: 24px;
-  height: 24px;
-  margin: 0 auto;
-}
-
-/* ============================= */
-/* 🔝 Top Header (Dashboard) */
-/* ============================= */
-.admin-dashboard-header {
-  background: white;
-  padding: 15px 20px;
-  font-size: 16px;
-  font-weight: 600;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+/* ================================ */
+/* 🧭 Main Dashboard Area */
+/* ================================ */
+.admin-main-content {
+  flex-grow: 1;
   display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ================================ */
+/* 🔝 Header */
+/* ================================ */
+.admin-dashboard-header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  background: white;
+  color: black;
+  padding: 10px 20px;
+  height: 60px;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 15;
 }
 
 .admin-header-left {
-  font-weight: 600;
+  font-weight: 500;
   font-size: 16px;
-  flex: 1;
 }
 
-.admin-header-center {
-  flex: 1;
-  text-align: center;
-  font-weight: 700;
-  font-size: 18px;
-  color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-}
-
-.admin-header-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  flex: 1;
-  justify-content: flex-end;
-}
-
-/* Search bar */
-.admin-search-container {
-  position: relative;
-}
-
-.admin-search-bar {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: all 0.2s ease;
-}
-
-.admin-search-bar:focus {
-  border-color: #16a34a;
-  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
-  outline: none;
-}
-
-.admin-search-results {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 250px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  margin-top: 5px;
-  z-index: 10;
-  max-height: 200px;
-  overflow-y: auto;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.admin-search-item {
-  padding: 8px 12px;
-  cursor: pointer;
-}
-.admin-search-item:hover {
-  background: #f5f5f5;
-}
-
-/* Profile Dropdown */
-.admin-profile-dropdown {
-  position: relative;
-}
-
-.admin-profile-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: black;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.admin-dropdown-menu {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  display: flex;
-  flex-direction: column;
-  min-width: 140px;
-  z-index: 100;
-}
-
-.admin-dropdown-item {
-  background: none;
-  border: none;
-  padding: 10px;
-  text-align: left;
-  cursor: pointer;
-  font-size: 14px;
-}
-.admin-dropdown-item:hover {
-  background: #f3f4f6;
-}
-
-/* Restaurant name */
 .admin-restaurant-display {
   display: flex;
   align-items: center;
   gap: 6px;
-}
-.admin-restaurant-display span {
-  font-weight: 700;
-  font-size: 18px;
-  color: black;
+  font-size: 15px;
+  color: #333;
 }
 
-/* ============================= */
-/* 📄 Main Content Area */
-/* ============================= */
-.admin-main-content {
+.admin-header-right {
+  position: relative;
   display: flex;
-  flex-direction: column;
-  flex: 1;
+  align-items: center;
 }
+
+/* Profile circle */
+.admin-profile-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #1a1d21;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.admin-profile-pic {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Profile dropdown */
+.admin-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 50px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  min-width: 180px;
+  z-index: 30;
+}
+
+.admin-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  background: none;
+  border: none;
+  width: 100%;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: left;
+  color: #333;
+  transition: background 0.3s;
+}
+
+.admin-dropdown-item:hover {
+  background: #f3f4f6;
+}
+
+/* ================================ */
+/* 📋 Main Content (Outlet area) */
+/* ================================ */
 .admin-dashboard-content {
-  flex: 1;
-  padding: 30px;
-  background: #f9fafb;
+  flex-grow: 1;
   overflow-y: auto;
+  background: #f9fafb;
+  padding: 20px;
 }
 
-/* ============================= */
-/* 📱 Mobile Responsive Styles */
-/* ============================= */
+/* ================================ */
+/* 📱 Responsive Design */
+/* ================================ */
 @media (max-width: 768px) {
-  .admin-layout-container {
-    flex-direction: column;
-  }
-
   .admin-sidebar {
     position: fixed;
-    top: 0;
-    left: -250px;
-    height: 100%;
-    width: 250px;
-    background: black;
-    transition: left 0.3s ease;
-    z-index: 200;
-  }
-  .admin-sidebar.admin-open {
     left: 0;
+    top: 0;
+    height: 100vh;
+    transform: translateX(-100%);
   }
-  .admin-sidebar.admin-collapsed {
+
+  .admin-sidebar.admin-open {
+    transform: translateX(0);
+  }
+
+  .admin-hamburger.admin-desktop-only {
     display: none;
   }
 
-  .admin-sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    z-index: 180;
+  .admin-hamburger.admin-mobile-only {
+    display: flex;
   }
 
   .admin-main-content {
-    margin-left: 0;
     width: 100%;
   }
 
   .admin-dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 12px 16px;
+    padding: 10px 15px;
   }
 
-  .admin-header-left {
-    font-size: 14px;
-    font-weight: 600;
-    width: 100%;
-    text-align: left;
+  .admin-dashboard-content {
+    padding: 15px;
   }
-
-  .admin-header-center {
-    width: 100%;
-    justify-content: flex-start;
-    font-size: 15px;
-  }
-
-  .admin-restaurant-display span {
-    font-size: 15px;
-  }
-
-  .admin-header-right {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .admin-search-bar {
-    width: 100%;
-    max-width: 220px;
-    font-size: 13px;
-  }
-
-  .admin-profile-circle {
-    width: 34px;
-    height: 34px;
-    font-size: 14px;
-  }
-}
-.admin-dropdown-menu {
-  right: 0;
-  background: black;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  z-index: 10;
-  min-width: 120px;
 }

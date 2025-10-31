@@ -20,21 +20,71 @@ const DashboardHome = () => {
   });
   const [showPopup, setShowPopup] = useState(false);
   const [editData, setEditData] = useState({});
+  const [role, setRole] = useState("");
 
   const navigate = useNavigate();
+  const API_BASE = "http://localhost:8082/dine-ease/api/v1";
 
+  // ✅ Reusable function to fetch staff stats
+  const fetchStaffStats = async (orgId, token) => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/staff/all?organizationId=${orgId}&pageNumber=0&pageSize=10&sortBy=asc`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+
+      const staffData = Array.isArray(data)
+        ? data
+        : Array.isArray(data.content)
+        ? data.content
+        : [];
+
+      const total = staffData.length;
+      const active = staffData.filter(
+        (s) => s.staffStatus?.toLowerCase() === "active"
+      ).length;
+      const inactive = staffData.filter(
+        (s) => s.staffStatus?.toLowerCase() === "inactive"
+      ).length;
+      const pending = staffData.filter(
+        (s) => s.staffStatus?.toLowerCase() === "pending"
+      ).length;
+
+      setStats({
+        totalStaff: total,
+        activeStaff: active,
+        inactiveStaff: inactive,
+        pendingStaff: pending,
+      });
+    } catch (error) {
+      console.error("Error fetching staff stats:", error);
+    }
+  };
+
+  // ✅ Fetch organization + staff stats
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
+    const userRole = localStorage.getItem("role");
+    setRole(userRole);
 
-    if (!token || role !== "SUPER_ADMIN") {
+    if (!token) {
       console.warn("Unauthorized access - redirecting to login");
       navigate("/");
       return;
     }
 
-    // ✅ Fetch staff data
-    fetch("http://localhost:8082/dine-ease/api/v1/staff/all", {
+    // ✅ Allow both SUPER_ADMIN and ADMIN to view dashboard
+    if (userRole !== "SUPER_ADMIN" && userRole !== "ADMIN") {
+      console.warn("Access denied - redirecting to login");
+      navigate("/");
+      return;
+    }
+
+    // ✅ Step 1: Fetch Organization Details
+    fetch(`${API_BASE}/admin/organization/get`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -43,73 +93,51 @@ const DashboardHome = () => {
       },
     })
       .then((res) => res.json())
-      .then((data) => {
-        const staffData = Array.isArray(data)
-          ? data
-          : Array.isArray(data.content)
-            ? data.content
-            : [];
-        const total = staffData.length;
-        const active = staffData.filter(
-          (s) => s.staffStatus?.toLowerCase() === "active"
-        ).length;
-        const inactive = staffData.filter(
-          (s) => s.staffStatus?.toLowerCase() === "inactive"
-        ).length;
-        const pending = staffData.filter(
-          (s) => s.staffStatus?.toLowerCase() === "pending"
-        ).length;
-
-        setStats({
-          totalStaff: total,
-          activeStaff: active,
-          inactiveStaff: inactive,
-          pendingStaff: pending,
-        });
-      })
-      .catch((err) => console.error("Error fetching staff stats:", err));
-
-    // ✅ Fetch hotel details
-    fetch("http://localhost:8082/dine-ease/api/v1/admin/organization/get", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setHotel(data);
-        setEditData(data);
+      .then((orgData) => {
+        setHotel(orgData);
+        setEditData(orgData);
         setLoading(false);
 
-        // ✅ Store organizationId (hotel.id) in localStorage for staff usage
-        if (data?.id) {
-          localStorage.setItem("organizationId", data.id);
-          console.log("✅ Organization ID stored:", data.id);
+        if (orgData?.id) {
+          localStorage.setItem("organizationId", orgData.id);
+          console.log("Organization ID stored:", orgData.id);
+
+          // ✅ Step 2: Fetch Staff Stats for both roles
+          fetchStaffStats(orgData.id, token);
         } else {
-          console.warn("⚠ No organization ID found in hotel data");
+          console.warn("No organization ID found in response");
         }
       })
       .catch((err) => {
-        console.error("Error fetching hotels:", err);
+        console.error("Error fetching organization:", err);
         setLoading(false);
-});
+      });
   }, [navigate]);
 
-  // ✅ Handle form input change
+  // ✅ Real-time update listener (if staff are added by admin or superadmin)
+  useEffect(() => {
+    const handleStaffUpdate = () => {
+      const orgId = localStorage.getItem("organizationId");
+      const token = localStorage.getItem("token");
+      if (orgId && token) fetchStaffStats(orgId, token);
+    };
+
+    window.addEventListener("staffUpdated", handleStaffUpdate);
+    return () => window.removeEventListener("staffUpdated", handleStaffUpdate);
+  }, []);
+
+  // ✅ Handle input changes in edit popup
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Handle Update API call
+  // ✅ Handle organization update
   const handleUpdate = (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:8082/dine-ease/api/v1/admin/organization/update", {
+    fetch(`${API_BASE}/admin/organization/update`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -133,7 +161,13 @@ const DashboardHome = () => {
     <>
       {/* Dashboard Header */}
       <div className="dashboard-header">
-        <h1>Super Admin Dashboard</h1>
+        <h1>
+          {role === "SUPER_ADMIN"
+            ? ""
+            : "Admin Dashboard"}
+        </h1>
+
+        {/* ✅ Show staff stats for both Super Admin and Admin */}
         <div className="stats">
           <div className="stat-card">
             <div className="icon-container">
@@ -166,11 +200,11 @@ const DashboardHome = () => {
         </div>
       </div>
 
-      {/* Hotel Details Section */}
+      {/* ✅ Organization Details Section */}
       <section className="hotels-section">
         <h2>
-          Hotel Details{" "}
-          {!loading && hotel && (
+          Organization Details{" "}
+          {!loading && hotel && role === "SUPER_ADMIN" && (
             <button
               className="update-btn"
               onClick={() => setShowPopup(true)}
@@ -182,7 +216,7 @@ const DashboardHome = () => {
         </h2>
 
         {loading ? (
-          <p>Loading hotel...</p>
+          <p>Loading organization...</p>
         ) : hotel ? (
           <div className="hotel-card">
             <table className="hotel-table">
@@ -227,12 +261,12 @@ const DashboardHome = () => {
             </table>
           </div>
         ) : (
-          <p>No hotel data available.</p>
+          <p>No organization data available.</p>
         )}
       </section>
 
-      {/* ✅ Popup Form */}
-      {showPopup && (
+      {/* ✅ Edit Popup (Super Admin Only) */}
+      {showPopup && role === "SUPER_ADMIN" && (
         <div className="popup-overlay">
           <div className="popup-content">
             <h3>Edit Organization Details</h3>
