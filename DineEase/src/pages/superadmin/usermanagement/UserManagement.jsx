@@ -168,7 +168,34 @@ export default function AdminStaffManagement() {
         throw new Error(errText || "Failed to save staff");
       }
 
+
+// ✅ Parse backend response for instant UI update
+      const newStaff = await res.json();
+
+      // ✅ Add new staff to frontend immediately
+      setStaffList((prev) => [
+        ...prev,
+        {
+          id: newStaff.id,
+          staffId: newStaff.id,
+          firstName: newStaff.firstName,
+          lastName: newStaff.lastName,
+          email: newStaff.email,
+          phoneNumber: newStaff.phoneNumber || newStaff.phone || "",
+          staffRoleType: newStaff.staffRoleName || form.staffRoleType,
+          shiftTiming: newStaff.shiftTiming,
+          salary: newStaff.salary,
+          contractStartDate: formatDate(newStaff.contractStartDate),
+          contractEndDate: formatDate(newStaff.contractEndDate),
+          status: newStaff.staffStatus || "Pending",
+        },
+      ]);
+
+
+
+
       await fetchStaff();
+      
       setForm(initialForm);
       setEditId(null);
       setPopupOpen(false);

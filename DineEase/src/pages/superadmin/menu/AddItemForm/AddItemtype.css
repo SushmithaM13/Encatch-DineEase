@@ -1,0 +1,130 @@
+.itemtype-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 25px;
+  background-color: #f8f9fb;
+  font-family: "Poppins", sans-serif;
+  min-height: 100vh;
+}
+
+.itemtype-heading {
+  font-size: 26px;
+  font-weight: 600;
+  color: #222;
+  text-align: center;
+}
+
+.itemtype-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.itemtype-form input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 220px;
+}
+
+.itemtype-form button {
+  padding: 10px 18px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.itemtype-form button:hover {
+  background-color: #0056b3;
+}
+
+.cancel-btn {
+  background-color: #ff6b6b !important;
+}
+
+.itemtype-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.itemtype-table th,
+.itemtype-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+.itemtype-table th {
+  background-color: #007bff;
+  color: white;
+}
+
+.edit-btn,
+.delete-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.edit-btn:hover {
+  color: #007bff;
+}
+.delete-btn:hover {
+  color: #ff4d4d;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.pagination button {
+  padding: 8px 14px;
+  border: 1px solid #007bff;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.pagination .active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Mobile View */
+@media (max-width: 768px) {
+  .web-view {
+    display: none;
+  }
+  .mobile-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .itemtype-card {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-view {
+    display: none;
+  }
+}

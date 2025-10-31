@@ -11,19 +11,34 @@ import SuperAdminRegistration from './components/signup/SuperAdminRegistration';
 // ===== Super Admin Pages =====
 import SuperAdminDashboard from './pages/superadmin/dashboard/superAdminDashboard';
 import UserManagement from "./pages/superadmin/usermanagement/UserManagement";
-import Items from "./pages/superadmin/items/FoodItems";
 import SuperAdminHome from "./pages/superadmin/dashboard/SuperAdminHome";
 import TableManagement from "./pages/superadmin/tablemanagemnet/TableManagement";
-import AddStaffRole  from './pages/superadmin/staffroles/AddStaffRole'; 
+import AddStaffRole from './pages/superadmin/staffroles/AddStaffRole';
 import SuperAdminProfile from "./pages/superadmin/profile/SuperAdminProfile";
 import SuperAdminSettings from "./pages/superadmin/settings/SuperAdminSettings";
+
+
+import MenuList from "./pages/superadmin/menu/MenuList/MenuList";
+import CategoryForm from "./pages/superadmin/menu/CategoryForm/CategoryForm";
+import AddItemtype from "./pages/superadmin/menu/AddItemForm/AddItemtype";
+import Foodtype from "./pages/superadmin/menu/Foodtype/Foodtype";
+import Cuisinetype from "./pages/superadmin/menu/cuisinetype/cuisinetype";
+import VariantForm from "./pages/superadmin/menu/VariantForm/VariantForm";
+import AddonForm from "./pages/superadmin/menu/AddonForm/AddonForm";
+import CustomizationGroupForm from "./pages/superadmin/menu/CustomizationGroupForm/CustomizationGroupForm";
+
+
+
+// ===== New Menu Dashboard (Tabbed) =====
+import MenuDashboard from "./pages/superadmin/menu/MenuDashboard/MenuDashboard";
+
 
 // ===== Admin Pages =====
 import AdminDashboard from "./pages/Admin/Dashboard/AdminDashboard";
 import AdminHome from "./pages/Admin/Home/AdminHome";
 import AdminProfile from "./pages/Admin/Profile/AdminProfile";
 import AdminMenu from "./pages/Admin/Menu/AdminMenu";
-import AdminTableManagement from "./pages/Admin/Table/AdminTableManagement"; 
+import AdminTableManagement from "./pages/Admin/Table/AdminTableManagement";
 import RoleManagement from "./pages/Admin/Role/RoleManagement";
 import AdminStaffManagement from "./pages/Admin/Staff/AdminStaffManagement";
 import AdminSettings from "./pages/Admin/Settings/AdminSettings";
@@ -40,32 +55,41 @@ import WaiterProfile from "./pages/Waiter/Profile/WaiterProfile";
 import Footer from './components/footer/Footer';
 
 function App() {
-  
+
   return (
     <>
-    <Routes>
-      <Route path='/' element={<Login/>}/>
-      <Route path='/forgotPassword' element={<ForgotPassword/>}/>
-      <Route path='/resetPassword' element={<ResetPassword/>}/>
-      <Route path='/SuperAdminRegistration' element={<SuperAdminRegistration/>}/>
+      <Routes>
+        <Route path='/' element={<Login />} />
+        <Route path='/forgotPassword' element={<ForgotPassword />} />
+        <Route path='/resetPassword' element={<ResetPassword />} />
+        <Route path='/SuperAdminRegistration' element={<SuperAdminRegistration />} />
 
 
-      
-      {/* Private Routes */}
-      <Route path='superAdminDashboard/*' element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}><SuperAdminDashboard/></ProtectedRoute>}>
 
-        <Route index element={<SuperAdminHome />} />
-        <Route path="staff" element={<UserManagement />} />
-        <Route path="food-items" element={<Items />} />
-        <Route path="staffrole" element={<AddStaffRole />} />
-        <Route path="table" element={<TableManagement />} />
-         <Route path="profile" element={<SuperAdminProfile />} />
-         <Route path="settings" element={<SuperAdminSettings />} />
-        
-      </Route>
+        {/* Private Routes */}
+        <Route path='superAdminDashboard/*' element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}><SuperAdminDashboard /></ProtectedRoute>}>
+
+          <Route index element={<SuperAdminHome />} />
+          <Route path="staff" element={<UserManagement />} />
+          <Route path="menu" element={<MenuDashboard />} />
+          <Route path="staffrole" element={<AddStaffRole />} />
+          <Route path="table" element={<TableManagement />} />
+          <Route path="profile" element={<SuperAdminProfile />} />
+          <Route path="settings" element={<SuperAdminSettings />} />
+
+          <Route path="menu" element={<MenuList />} />
+          <Route path="menu/category" element={<CategoryForm />} />
+          <Route path="menu/item" element={<AddItemtype />} />
+          <Route path="menu/food" element={<Foodtype />} />
+          <Route path="menu/cuisine" element={<Cuisinetype />} />
+          <Route path="menu/variant" element={<VariantForm />} />
+          <Route path="menu/addon" element={<AddonForm />} />
+          <Route path="menu/customization" element={<CustomizationGroupForm />} />
+
+        </Route>
         {/* ===== Admin Dashboard Routes ===== */}
-        <Route 
-          path="/AdminDashboard" 
+        <Route
+          path="/AdminDashboard"
           element={
             <ProtectedRoute allowedRoles={["ADMIN"]}>
               <AdminDashboard />
@@ -74,7 +98,7 @@ function App() {
         >
           <Route index element={<AdminHome />} />
           <Route path="home" element={<AdminHome />} />
-          <Route path="dashboard" element={<AdminHome />} />  
+          <Route path="dashboard" element={<AdminHome />} />
           <Route path="profile" element={<AdminProfile />} />
           <Route path="menu" element={<AdminMenu />} />
           <Route path="table" element={<AdminTableManagement />} />
@@ -85,15 +109,15 @@ function App() {
         </Route>
 
         {/* ===== Waiter Dashboard Routes ===== */}
-        <Route 
-          path="/WaiterDashboard" 
+        <Route
+          path="/WaiterDashboard"
           element={
             <ProtectedRoute allowedRoles={["WAITER"]}>
               <WaiterDashboard />
             </ProtectedRoute>
           }
         >
-          <Route index element={<WaiterHome />} /> 
+          <Route index element={<WaiterHome />} />
           <Route path="home" element={<WaiterHome />} />
           <Route path="reservations" element={<WaiterReservation />} />
           <Route path="settings" element={<WaiterSettings />} />
@@ -102,8 +126,8 @@ function App() {
 
         {/* ===== Catch-all 404 ===== */}
         <Route path="*" element={<h2 className="text-center mt-10">404 - Page Not Found</h2>} />
-    </Routes>
-    <Footer/>
+      </Routes>
+      <Footer />
     </>
   );
 

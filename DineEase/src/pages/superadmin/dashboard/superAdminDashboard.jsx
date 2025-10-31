@@ -11,6 +11,12 @@ import {
   FaSignOutAlt,
   FaIdBadge,
   FaTable,
+  FaFolder,
+  FaPlusCircle,
+  FaTags,
+  FaPuzzlePiece,
+  FaMagic,
+  
   
 } from "react-icons/fa";
 
@@ -19,8 +25,20 @@ const SuperAdminDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
+  // ✅ Menu dropdown options (from MenuDashboard)
+  const menuOptions = [
+    { path: "/superAdminDashboard/Menu/category", label: "Add Category", icon: <FaFolder /> },
+    { path: "/superAdminDashboard/Menu/item", label: "Add Item", icon: <FaPlusCircle /> },
+    { path: "/superAdminDashboard/Menu/food", label: "Food type", icon: <FaUtensils  /> },
+     { path: "/superAdminDashboard/Menu/cuisine", label: "Cuisine type", icon: <FaBars  /> },
+    { path: "/superAdminDashboard/Menu/variant", label: "Add Variant", icon: <FaTags /> },
+    { path: "/superAdminDashboard/Menu/addon", label: "Add Addon", icon: <FaPuzzlePiece /> },
+    { path: "/superAdminDashboard/Menu/customization", label: "Customization Group", icon: <FaMagic /> },
+  ];
 
   // Load hotels from localStorage
   useEffect(() => {
@@ -38,7 +56,7 @@ const SuperAdminDashboard = () => {
   const handleMobileMenuClose = () => setMobileMenuOpen(false);
   const handleDesktopSidebarToggle = () => setSidebarOpen((prev) => !prev);
 
-  // Close dropdown when clicking outside
+  // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -46,8 +64,7 @@ const SuperAdminDashboard = () => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Prevent back button from going to login when logged in
@@ -74,7 +91,6 @@ const SuperAdminDashboard = () => {
     if (!token) return;
 
     try {
-      // Replace with your logout API endpoint
       const response = await fetch(
         "http://localhost:8082/dine-ease/api/v1/users/logout",
         {
@@ -88,7 +104,6 @@ const SuperAdminDashboard = () => {
 
       if (!response.ok) throw new Error("Logout failed");
 
-      // Clear localStorage and redirect to login
       localStorage.removeItem("token");
       localStorage.removeItem("role");
       navigate("/", { replace: true });
@@ -97,20 +112,22 @@ const SuperAdminDashboard = () => {
     }
   };
 
-document.querySelectorAll('.sidebar ul li a').forEach(link => {
-  link.addEventListener('click', () => {
-    if (window.innerWidth <= 768) {
-      document.querySelector('.sidebar').classList.remove('mobile-open');
-      document.querySelector('.sidebar-overlay').classList.remove('active');
-    }
-  });
-});
+  // ✅ Close sidebar in mobile view when a link is clicked
+  useEffect(() => {
+    const links = document.querySelectorAll(".sidebar ul li a");
+    links.forEach((link) => {
+      link.addEventListener("click", () => {
+        if (window.innerWidth <= 768) {
+          document.querySelector(".sidebar").classList.remove("mobile-open");
+          document.querySelector(".sidebar-overlay").classList.remove("active");
+        }
+      });
+    });
+  }, []);
 
-    
   return (
     <div className={`dashboard ${sidebarOpen ? "expanded" : "collapsed"}`}>
       {/* Mobile Overlay */}
-      
       <div
         className={`sidebar-overlay ${mobileMenuOpen ? "active" : ""}`}
         onClick={handleMobileMenuClose}
@@ -125,10 +142,9 @@ document.querySelectorAll('.sidebar ul li a').forEach(link => {
         <div className="sidebar-header">
           <FaUtensils size={22} />
           <h2 className="logo">{sidebarOpen ? "DINE _ EASE" : "DE"}</h2>
-          <button className="toggle-btn" onClick={handleDesktopSidebarToggle}>
-            {/* <FaBars /> */}
-          </button>
+          <button className="toggle-btn" onClick={handleDesktopSidebarToggle}></button>
         </div>
+
         <ul>
           <li>
             <NavLink to="/superAdminDashboard">
@@ -136,24 +152,46 @@ document.querySelectorAll('.sidebar ul li a').forEach(link => {
               {sidebarOpen && <span>Dashboard</span>}
             </NavLink>
           </li>
+
           <li>
             <NavLink to="/superAdminDashboard/staff">
               <FaUsers />
               {sidebarOpen && <span>Staff</span>}
             </NavLink>
           </li>
+
           <li>
             <NavLink to="/superAdminDashboard/staffrole">
               <FaUsers />
               {sidebarOpen && <span>Staff-role</span>}
             </NavLink>
           </li>
-          <li>
-            <NavLink to="/superAdminDashboard/food-items">
+
+          {/* ✅ Menu Dashboard with hover dropdown */}
+          <li
+            className="menu-dropdown"
+            onMouseEnter={() => setMenuDropdownOpen(true)}
+            onMouseLeave={() => setMenuDropdownOpen(false)}
+          >
+            <NavLink to="/superAdminDashboard/Menu">
               <FaUtensils />
-              {sidebarOpen && <span>Food Items</span>}
+              {sidebarOpen && <span>Menu Dashboard</span>}
             </NavLink>
+
+            {menuDropdownOpen && sidebarOpen && (
+              <ul className="submenu">
+                {menuOptions.map((option) => (
+                  <li key={option.path}>
+                    <NavLink to={option.path}>
+                      {option.icon}
+                      <span>{option.label}</span>
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            )}
           </li>
+
           <li>
             <NavLink to="/superAdminDashboard/table">
               <FaTable />
@@ -180,9 +218,9 @@ document.querySelectorAll('.sidebar ul li a').forEach(link => {
             <FaBars size={22} />
           </button>
 
-           <div className="dashboard-header">
-    <h1>Super Admin Dashboard</h1>
-  </div>
+          <div className="dashboard-header">
+            <h1>Super Admin Dashboard</h1>
+          </div>
 
           {/* Profile Dropdown */}
           <div className="profile-info" ref={dropdownRef}>
@@ -194,28 +232,24 @@ document.querySelectorAll('.sidebar ul li a').forEach(link => {
               <span className="profile-name">SuperAdmin</span>
             </div>
 
-           {dropdownOpen && (
-  <div className="profile-dropdown">
-    <button onClick={() => navigate("/superAdminDashboard/profile")}>
-      <FaIdBadge /> Profile
-    </button>
-    <button onClick={() => navigate("/superAdminDashboard/settings")}>
-      <FaCog /> Settings
-    </button>
-    <button className="logout-btn" onClick={handleLogout}>
-      <FaSignOutAlt /> Logout
-    </button>
-  </div>
-)}
+            {dropdownOpen && (
+              <div className="profile-dropdown">
+                <button onClick={() => navigate("/superAdminDashboard/profile")}>
+                  <FaIdBadge /> Profile
+                </button>
+                <button onClick={() => navigate("/superAdminDashboard/settings")}>
+                  <FaCog /> Settings
+                </button>
+                <button className="logout-btn" onClick={handleLogout}>
+                  <FaSignOutAlt /> Logout
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Outlet for child routes */}
-        <Outlet
-          context={{
-            hotels,
-          }}
-        />
+        <Outlet context={{ hotels }} />
       </main>
     </div>
   );

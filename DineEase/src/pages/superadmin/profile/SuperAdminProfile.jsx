@@ -38,7 +38,7 @@ export default function SuperAdminProfile() {
     };
 
     fetchProfile();
-  }, []);
+  }, [TOKEN]);
 
   // ✅ Handle input changes
   const handleChange = (e) => {
