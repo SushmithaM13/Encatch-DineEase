@@ -128,7 +128,7 @@ export default function AdminMenuCategory() {
             {cat.name}
           </td>
           <td>{parentName}</td>
-          <td>
+          {/* <td>
             {cat.imageUrl ? (
               <img
                 src={
@@ -150,7 +150,7 @@ export default function AdminMenuCategory() {
               <div className="no-img">No Image</div>
             )}
 
-          </td>
+          </td> */}
 
           <td>{cat.description || "—"}</td>
           <td>

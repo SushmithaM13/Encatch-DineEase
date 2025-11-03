@@ -133,6 +133,18 @@
   color: #721c24;
 }
 
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.filter-dropdown {
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
 /* ===== Action Buttons ===== */
 .admin-action-buttons {
   display: flex;

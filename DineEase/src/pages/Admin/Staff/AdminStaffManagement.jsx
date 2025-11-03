@@ -85,7 +85,9 @@ export default function AdminStaffManagement() {
     setLoading(true);
     try {
       const res = await fetch(
-        `${API_BASE}/all?organizationId=${organizationId}&page=${pageNumber}&size=${pageSize}`,
+        `${API_BASE}/all?organizationId=${organizationId}&pageNumber=${pageNumber}&pageSize=${pageSize}`
+
+,
         {
           headers: { Authorization: `Bearer ${TOKEN}` },
         }
