@@ -35,6 +35,12 @@ export default function AdminStaffManagement() {
   const [popupOpen, setPopupOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("All Staff");
 
+  // ✅ Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, _setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [_loading, setLoading] = useState(false);
+
   const [previousActiveIds, setPreviousActiveIds] = useState(() => {
     const stored = localStorage.getItem("activeStaffIds");
     return stored ? JSON.parse(stored) : [];
@@ -59,16 +65,20 @@ export default function AdminStaffManagement() {
     }
   };
 
-  // ===== Fetch All Staff =====
-  const fetchStaff = useCallback(async () => {
+  // ===== Fetch All Staff with Pagination =====
+  const fetchStaff = useCallback(async (page = 0, size = pageSize) => {
     if (!TOKEN || !ORG_ID) return;
+    setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/all?organizationId=${ORG_ID}&page=0&size=50`, {
-        headers: {
-          Authorization: `Bearer ${TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const res = await fetch(
+        `${API_BASE}/all?organizationId=${ORG_ID}&page=${page}&size=${size}`,
+        {
+          headers: {
+            Authorization: `Bearer ${TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
       const text = await res.text();
@@ -96,6 +106,7 @@ export default function AdminStaffManagement() {
       }));
 
       setStaffList(mappedStaff.sort((a, b) => a.staffId - b.staffId));
+      setTotalPages(data.totalPages || 1);
 
       const newlyActivated = mappedStaff.filter(
         (s) =>
@@ -117,8 +128,43 @@ export default function AdminStaffManagement() {
     } catch (err) {
       console.error("Error fetching staff:", err);
       setStaffList([]);
+    } finally {
+      setLoading(false);
     }
-  }, [API_BASE, TOKEN, ORG_ID, previousActiveIds]);
+  }, [API_BASE, TOKEN, ORG_ID, pageSize, previousActiveIds]);
+
+  // ===== Pagination useEffect =====
+  useEffect(() => {
+    fetchStaff(currentPage, pageSize);
+  }, [fetchStaff, currentPage, pageSize]);
+
+  // ===== Fetch Roles =====
+  const fetchRoles = useCallback(async () => {
+    if (!TOKEN || !ORG_ID) return;
+    try {
+      const res = await fetch(`${ROLES_API}?organizationId=${ORG_ID}`, {
+        headers: { Authorization: `Bearer ${TOKEN}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch roles");
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : [];
+      setRoles(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Error fetching roles:", err);
+      setRoles([]);
+    }
+  }, [ROLES_API, TOKEN, ORG_ID]);
+
+  useEffect(() => {
+    if (TOKEN) {
+      fetchStaff(currentPage, pageSize);
+      fetchRoles();
+    }
+  }, [TOKEN, fetchStaff, fetchRoles, currentPage, pageSize]);
+
+  useEffect(() => {
+    if (!popupOpen && TOKEN) fetchStaff(currentPage, pageSize);
+  }, [popupOpen, TOKEN, fetchStaff, currentPage, pageSize]);
 
   // ===== Add / Update Staff =====
   const handleAddOrUpdate = async () => {
@@ -168,11 +214,7 @@ export default function AdminStaffManagement() {
         throw new Error(errText || "Failed to save staff");
       }
 
-
-// ✅ Parse backend response for instant UI update
       const newStaff = await res.json();
-
-      // ✅ Add new staff to frontend immediately
       setStaffList((prev) => [
         ...prev,
         {
@@ -191,18 +233,12 @@ export default function AdminStaffManagement() {
         },
       ]);
 
-
-
-
-      await fetchStaff();
-      
+      await fetchStaff(currentPage, pageSize);
       setForm(initialForm);
       setEditId(null);
       setPopupOpen(false);
 
-      // ✅ Dispatch event so dashboards/components can refresh automatically
       window.dispatchEvent(new Event("staffUpdated"));
-
       toast.success(
         method === "POST"
           ? "✅ Staff added successfully!"
@@ -214,34 +250,6 @@ export default function AdminStaffManagement() {
       toast.error("Error saving staff: " + err.message);
     }
   };
-
-  // ===== Fetch Roles =====
-  const fetchRoles = useCallback(async () => {
-    if (!TOKEN || !ORG_ID) return;
-    try {
-      const res = await fetch(`${ROLES_API}?organizationId=${ORG_ID}`, {
-        headers: { Authorization: `Bearer ${TOKEN}` },
-      });
-      if (!res.ok) throw new Error("Failed to fetch roles");
-      const text = await res.text();
-      const data = text ? JSON.parse(text) : [];
-      setRoles(Array.isArray(data) ? data : []);
-    } catch (err) {
-      console.error("Error fetching roles:", err);
-      setRoles([]);
-    }
-  }, [ROLES_API, TOKEN, ORG_ID]);
-
-  useEffect(() => {
-    if (TOKEN) {
-      fetchStaff();
-      fetchRoles();
-    }
-  }, [TOKEN, fetchStaff, fetchRoles]);
-
-  useEffect(() => {
-    if (!popupOpen && TOKEN) fetchStaff();
-  }, [popupOpen, TOKEN, fetchStaff]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -265,7 +273,7 @@ export default function AdminStaffManagement() {
         headers: { Authorization: `Bearer ${TOKEN}` },
       });
       if (!res.ok) throw new Error(await res.text());
-      await fetchStaff();
+      await fetchStaff(currentPage, pageSize);
       toast.info("Staff deleted successfully.", { position: "top-center" });
     } catch (err) {
       console.error("Error deleting staff:", err);
@@ -273,6 +281,7 @@ export default function AdminStaffManagement() {
     }
   };
 
+   // ✅ Filter staff by tab
   const filteredStaff =
     activeTab === "All Staff"
       ? staffList
@@ -284,6 +293,29 @@ export default function AdminStaffManagement() {
             : !s.staffRoleType?.toLowerCase().includes("chef") &&
               !s.staffRoleType?.toLowerCase().includes("waiter")
         );
+
+  // ✅ PAGINATION (local, frontend-based)
+  const startIndex = currentPage * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedStaff = filteredStaff.slice(startIndex, endIndex);
+  //const totalLocalPages = Math.ceil(filteredStaff.length / pageSize);
+  //const [currentPage, setCurrentPage] = useState(1);
+
+const handleNext = () => {
+  if (currentPage < totalPages) {
+    setCurrentPage(currentPage + 1);
+  }
+};
+
+const handlePrevious = () => {
+  if (currentPage > 1) {
+    setCurrentPage(currentPage - 1);
+  }
+};
+
+  useEffect(() => {
+    setCurrentPage(0); // reset to first page on tab change
+  }, [activeTab]);
 
   return (
     <div className="user-management">
@@ -336,70 +368,116 @@ export default function AdminStaffManagement() {
             </tr>
           </thead>
           <tbody>
-            {filteredStaff.length > 0 ? (
-              filteredStaff.map((staff, index) => (
-                <tr key={staff.id}>
-                  <td>{index + 1}</td>
-                  <td>{staff.firstName} {staff.lastName}</td>
-                  <td>{staff.email}</td>
-                  <td>{staff.phoneNumber}</td>
-                  <td>{staff.staffRoleType}</td>
-                  <td>{staff.shiftTiming}</td>
-                  <td>{staff.salary}</td>
-                  <td>{staff.contractStartDate}</td>
-                  <td>{staff.contractEndDate}</td>
-                  <td>
-                    <span className={`status ${staff.status?.toLowerCase()}`}>
-                      {staff.status || "Inactive"}
-                    </span>
-                  </td>
-                  <td>
-                    <button className="action-btn edit" onClick={() => handleEdit(staff)}>
-                      <Edit size={16} />
-                    </button>
-                    <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={11} style={{ textAlign: "center", padding: "20px" }}>
-                  No staff found in {activeTab}.
-                </td>
-              </tr>
-            )}
-          </tbody>
+  {paginatedStaff.length > 0 ? (
+    paginatedStaff.map((staff, index) => (
+      <tr key={staff.id}>
+        <td>{index + 1 + currentPage * pageSize}</td>
+        <td>{staff.firstName} {staff.lastName}</td>
+        <td>{staff.email}</td>
+        <td>{staff.phoneNumber}</td>
+        <td>{staff.staffRoleType}</td>
+        <td>{staff.shiftTiming}</td>
+        <td>{staff.salary}</td>
+        <td>{staff.contractStartDate}</td>
+        <td>{staff.contractEndDate}</td>
+        <td>
+          <span className={`status ${staff.status?.toLowerCase()}`}>
+            {staff.status || "Inactive"}
+          </span>
+        </td>
+        <td>
+          <button className="action-btn edit" onClick={() => handleEdit(staff)}>
+            <Edit size={16} />
+          </button>
+          <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
+            <Trash2 size={16} />
+          </button>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td colSpan={11} style={{ textAlign: "center", padding: "20px" }}>
+        No staff found in {activeTab}.
+      </td>
+    </tr>
+  )}
+</tbody>
+
         </table>
       </div>
 
-      {/* Mobile Cards */}
       <div className="mobile-user-cards">
-        {filteredStaff.length > 0 ? (
-          filteredStaff.map((staff) => (
-            <div key={staff.id} className="user-card-mobile">
-              <div className="user-row user-name-cell">
-                <span className="cell-label">Name</span>
-                <span className="cell-value">{staff.firstName} {staff.lastName}</span>
-              </div>
-              <div className="user-row"><span className="cell-label">Email</span><span className="cell-value">{staff.email}</span></div>
-              <div className="user-row"><span className="cell-label">Phone</span><span className="cell-value">{staff.phone}</span></div>
-              <div className="user-row"><span className="cell-label">Role</span><span className="cell-value">{staff.staffRoleType}</span></div>
-              <div className="user-row"><span className="cell-label">Shift</span><span className="cell-value">{staff.shiftTiming}</span></div>
-              <div className="user-row"><span className="cell-label">Status</span><span className={`status ${staff.status?.toLowerCase()}`}>{staff.status || "Inactive"}</span></div>
-              <div className="user-row actions-cell">
-                <div className="user-actions">
-                  <button className="action-btn edit" onClick={() => handleEdit(staff)}><Edit size={16} /></button>
-                  <button className="action-btn delete" onClick={() => handleRemove(staff.id)}><Trash2 size={16} /></button>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="no-users-mobile">No staff available in {activeTab}.</div>
-        )}
+  {paginatedStaff.length > 0 ? (
+    paginatedStaff.map((staff) => (
+      <div key={staff.id} className="user-card-mobile">
+        <div className="user-row user-name-cell">
+          <span className="cell-label">Name</span>
+          <span className="cell-value">{staff.firstName} {staff.lastName}</span>
+        </div>
+        <div className="user-row">
+          <span className="cell-label">Email</span>
+          <span className="cell-value">{staff.email}</span>
+        </div>
+        <div className="user-row">
+          <span className="cell-label">Phone</span>
+          <span className="cell-value">{staff.phoneNumber}</span>
+        </div>
+        <div className="user-row">
+          <span className="cell-label">Role</span>
+          <span className="cell-value">{staff.staffRoleType}</span>
+        </div>
+        <div className="user-row">
+          <span className="cell-label">Shift</span>
+          <span className="cell-value">{staff.shiftTiming}</span>
+        </div>
+        <div className="user-row">
+          <span className="cell-label">Status</span>
+          <span className={`status ${staff.status?.toLowerCase()}`}>
+            {staff.status || "Inactive"}
+          </span>
+        </div>
+        <div className="user-row actions-cell">
+          <div className="user-actions">
+            <button className="action-btn edit" onClick={() => handleEdit(staff)}>
+              <Edit size={16} />
+            </button>
+            <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
+              <Trash2 size={16} />
+            </button>
+          </div>
+        </div>
       </div>
+    ))
+  ) : (
+    <div className="no-users-mobile">No staff available in {activeTab}.</div>
+  )}
+</div>
+
+
+      {/* ✅ Pagination controls */}
+   <div className="pagination-container">
+  <button
+    onClick={handlePrevious}
+    disabled={currentPage === 1}
+    className="pagination-btn"
+  >
+    ⬅ Previous
+  </button>
+
+  <span className="pagination-info">
+    Page {currentPage} of {totalPages}
+  </span>
+
+  <button
+    onClick={handleNext}
+    disabled={currentPage === totalPages}
+    className="pagination-btn"
+  >
+    Next ➡
+  </button>
+</div>
+
 
       {/* Popup Form */}
       {popupOpen && (
