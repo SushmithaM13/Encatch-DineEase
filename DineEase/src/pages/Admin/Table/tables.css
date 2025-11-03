@@ -1,23 +1,27 @@
 /* ============================= */
-/* 🍽️ Table Management Styles   */
+/* 🍽️ Admin Table Management Styles */
 /* ============================= */
 
-.tables-page {
+.admin-tables-page {
   padding: 20px;
   font-family: Arial, sans-serif;
 }
 
 /* Page Title */
-.page-title {
+.admin-page-title {
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 20px;
   text-align: center;
   color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 /* Add Table Section */
-.add-table-section {
+.admin-add-table-section {
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -25,7 +29,11 @@
   margin-bottom: 20px;
 }
 
-.add-table-section button {
+.admin-right-align {
+  justify-content: flex-end;
+}
+
+.admin-add-table-section button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,12 +49,42 @@
   transition: 0.2s;
 }
 
-.add-table-section button:hover {
+.qr-section {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.qr-image {
+  width: 120px;
+  height: 120px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #007bff;
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.download-btn:hover {
+  background: #0056b3;
+}
+
+.admin-add-table-section button:hover {
   background: #333;
 }
 
 /* Stats Section */
-.stats {
+.admin-stats {
   display: flex;
   justify-content: center;
   gap: 20px;
@@ -54,7 +92,7 @@
   font-size: 15px;
   font-weight: 500;
 }
-.stats p {
+.admin-stats p {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -64,36 +102,15 @@
   font-weight: 500;
 }
 
-/* Specific Status Colors */
-.stat-total {
-  background: #f3f4f6; /* light gray for total */
-  color: #111;
-}
-
-.stat-available {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.stat-booked {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.stat-cleaning {
-  background: #fef9c3;
-  color: #92400e;
-}
-
 /* Table Grid */
-.tables-grid {
+.admin-tables-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
 }
 
 /* Table Card */
-.table-card {
+.admin-table-card {
   background: white;
   border-radius: 12px;
   padding: 16px;
@@ -102,37 +119,37 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.table-card:hover {
+.admin-table-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 6px 14px rgba(0,0,0,0.15);
 }
 
 /* Status Highlight Borders */
-.table-card.available { border: 2px solid #16a34a; }
-.table-card.booked { border: 2px solid #dc2626; }
-.table-card.cleaning { border: 2px solid #ca8a04; }
+.admin-table-card.available { border: 2px solid #16a34a; }
+.admin-table-card.booked { border: 2px solid #dc2626; }
+.admin-table-card.cleaning { border: 2px solid #ca8a04; }
 
 /* Table Title */
-.table-card h3 {
+.admin-table-card h3 {
   font-size: 18px;
   margin-bottom: 6px;
   color: #111;
 }
 
-.table-card p {
+.admin-table-card p {
   font-size: 14px;
   color: #555;
   margin-bottom: 12px;
 }
 
 /* Status Buttons inside card */
-.actions {
+.admin-actions {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.actions button {
+.admin-actions button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -145,48 +162,34 @@
   font-weight: 500;
   transition: background 0.2s;
 }
-.popup-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #111;
-  transition: 0.2s;
-}
-
-.popup-close:hover {
-  color: #ff0000;
-}
 
 /* Unique Button Colors */
-.actions button:nth-child(1) { background: #dcfce7; color: #166534; }
-.actions button:nth-child(1):hover { background: #bbf7d0; }
+.admin-actions button:nth-child(1) { background: #dcfce7; color: #166534; }
+.admin-actions button:nth-child(1):hover { background: #bbf7d0; }
 
-.actions button:nth-child(2) { background: #fee2e2; color: #991b1b; }
-.actions button:nth-child(2):hover { background: #fecaca; }
+.admin-actions button:nth-child(2) { background: #fee2e2; color: #991b1b; }
+.admin-actions button:nth-child(2):hover { background: #fecaca; }
 
-.actions button:nth-child(3) { background: #fef9c3; color: #92400e; }
-.actions button:nth-child(3):hover { background: #fde68a; }
+.admin-actions button:nth-child(3) { background: #fef9c3; color: #92400e; }
+.admin-actions button:nth-child(3):hover { background: #fde68a; }
 
 /* Table Card Header Dropdown */
-.table-card-header {
+.admin-table-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.dots-btn {
+.admin-dots-btn {
   background: transparent;
   border: none;
   cursor: pointer;
   padding: 4px;
 }
 
-.dropdown-container { position: relative; }
+.admin-dropdown-container { position: relative; }
 
-.dropdown-menu {
+.admin-dropdown-menu {
   position: absolute;
   right: 0;
   top: 28px;
@@ -200,7 +203,7 @@
   min-width: 100px;
 }
 
-.dropdown-menu button {
+.admin-dropdown-menu button {
   background: none;
   border: none;
   padding: 8px 12px;
@@ -208,11 +211,11 @@
   cursor: pointer;
 }
 
-.dropdown-menu button:hover { background: #f2f2f2; }
+.admin-dropdown-menu button:hover { background: #f2f2f2; }
 
 /* Popup Modal */
 /* Overlay covers full screen */
-.popup-overlay {
+.admin-popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -220,19 +223,19 @@
   height: 100%;
   background: rgba(0, 0, 0, 0.6);
   display: flex;
-  justify-content: center;  /* horizontal center */
-  align-items: center;      /* vertical center */
+  justify-content: center;
+  align-items: center;
   z-index: 1000;
 }
 
 /* Popup card */
-.popup {
-  position: relative;       /* needed for close button */
+.admin-popup {
+  position: relative;
   background: white;
   padding: 25px 20px;
   border-radius: 12px;
   width: 100%;
-  max-width: 400px;         /* controls popup size */
+  max-width: 400px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
@@ -240,7 +243,7 @@
 }
 
 /* Close button top-right */
-.popup-close {
+.admin-popup-close {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -251,19 +254,18 @@
   transition: 0.2s;
 }
 
-.popup-close:hover {
+.admin-popup-close:hover {
   color: black;
 }
 
-
-.popup h3 {
+.admin-popup h3 {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 10px;
   text-align: center;
 }
 
-.popup label {
+.admin-popup label {
   display: flex;
   flex-direction: column;
   font-size: 14px;
@@ -271,8 +273,8 @@
   gap: 4px;
 }
 
-.popup input, 
-.popup select {
+.admin-popup input, 
+.admin-popup textarea {
   padding: 8px 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
@@ -280,14 +282,14 @@
   width: 100%;
 }
 
-.popup-actions {
+.admin-popup-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 10px;
 }
 
-.popup-actions button {
+.admin-popup-actions button {
   padding: 8px 14px;
   border-radius: 6px;
   border: none;
@@ -297,37 +299,37 @@
   transition: 0.2s;
 }
 
-.popup-actions button:first-child {
+.admin-popup-actions button:first-child {
   background: black;
   color: white;
 }
 
-.popup-actions button:first-child:hover {
+.admin-popup-actions button:first-child:hover {
   background: #333;
 }
 
-.popup-actions button:last-child {
+.admin-popup-actions button:last-child {
   background: #f3f3f3;
   color: #111;
 }
 
-.popup-actions button:last-child:hover {
+.admin-popup-actions button:last-child:hover {
   background: #ddd;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .tables-grid {
+  .admin-tables-grid {
     grid-template-columns: 1fr;
   }
 
-  .popup {
+  .admin-popup {
     width: 90%;
   }
 }
 
 @media (max-width: 480px) {
-  .popup {
+  .admin-popup {
     width: 95%;
   }
 }

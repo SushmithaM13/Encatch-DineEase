@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Inventory.module.css";
 
-export default function Inventory() {
+export default function ChefInventory() {
   const [inventory, setInventory] = useState([]);
 
   useEffect(() => {
@@ -43,16 +43,16 @@ export default function Inventory() {
   };
 
   return (
-    <div className="inventory-container">
-      <div className="inventory-header">
+    <div className="chef-inventory-container">
+      <div className="chef-inventory-header">
         <h2>Inventory Status</h2>
-        <button className="btn btn-outline" onClick={handleRequest}>
+        <button className="chef-add-btn" onClick={handleRequest}>
           ➕ Request Items
         </button>
       </div>
 
-      <div className="table-wrapper">
-        <table className="inventory-table">
+      <div className="chef-table-wrapper">
+        <table className="chef-inventory-table">
           <thead>
             <tr>
               <th>Ingredient</th>
@@ -70,12 +70,12 @@ export default function Inventory() {
                 <td>{item.stock}</td>
                 <td>
                   <span
-                    className={`badge ${
+                    className={`chef-status ${
                       item.status === "Adequate"
-                        ? "badge-success"
+                        ? "chef-status-adequate"
                         : item.status === "Low"
-                        ? "badge-warning"
-                        : "badge-error"
+                        ? "chef-status-low"
+                        : "chef-status-out"
                     }`}
                   >
                     {item.status}
@@ -83,10 +83,10 @@ export default function Inventory() {
                 </td>
                 <td>
                   <button
-                    className="btn btn-sm btn-outline"
+                    className="chef-action-btn chef-notify"
                     onClick={() => handleNotify(item.ingredient)}
                   >
-                    🔔 Notify
+                    🔔
                   </button>
                 </td>
               </tr>

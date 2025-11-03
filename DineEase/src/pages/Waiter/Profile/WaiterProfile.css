@@ -1,11 +1,11 @@
 /* ===== Profile Page Layout ===== */
-.admin-profile-page {
+.waiter-profile-page {
   padding: 20px;
   font-family: Arial, sans-serif;
   color: #333;
 }
 
-.admin-profile-heading {
+.waiter-profile-heading {
   display: flex;
   align-items: center;
   font-size: 24px;
@@ -13,26 +13,26 @@
   margin-bottom: 20px;
 }
 
-.admin-user-icon {
+.waiter-user-icon {
   margin-right: 8px;
   color: black;
 }
 
-.admin-profile-container {
+.waiter-profile-container {
   display: flex;
   justify-content: space-between;
   gap: 20px;
 }
 
 /* ===== Left Side (Details) ===== */
-.admin-profile-details {
+.waiter-profile-details {
   flex: 2;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.admin-profile-details section {
+.waiter-profile-details section {
   border: 1px solid #ddd;
   padding: 15px;
   border-radius: 8px;
@@ -40,21 +40,21 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.admin-profile-details h3 {
+.waiter-profile-details h3 {
   margin-bottom: 10px;
   color: #444;
   font-size: 18px;
 }
 
-.admin-profile-details label {
+.waiter-profile-details label {
   display: block;
   margin-bottom: 12px;
   font-size: 14px;
   font-weight: 500;
 }
 
-.admin-profile-details input,
-.admin-profile-details textarea {
+.waiter-profile-details input,
+.waiter-profile-details textarea {
   margin-left: 10px;
   padding: 6px 10px;
   border: 1px solid #ccc;
@@ -63,36 +63,46 @@
   font-size: 14px;
 }
 
-.admin-profile-details textarea {
+.waiter-profile-details textarea {
   width: 100%;
   resize: vertical;
   min-height: 60px;
 }
 
 /* ===== Password Section ===== */
-.admin-password-box {
+.waiter-password-box {
   margin-top: 10px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.admin-password-box h4 {
+.waiter-password-box h4 {
   margin-bottom: 5px;
   font-size: 15px;
   font-weight: 600;
 }
 
-.admin-password-box input {
+.waiter-password-box input {
   width: 100%;
 }
 
+/* ===== Password Success Message ===== */
+.waiter-password-success {
+  color: green;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
 /* ===== Buttons ===== */
-.admin-action-buttons {
+.waiter-action-buttons {
   margin-top: 15px;
 }
 
-.admin-action-buttons button {
+.waiter-action-buttons button,
+.waiter-save-password-btn,
+.waiter-cancel-otp-btn,
+.waiter-send-otp-btn {
   margin-right: 10px;
   padding: 8px 14px;
   border: none;
@@ -105,31 +115,35 @@
   transition: background 0.2s ease;
 }
 
-.admin-action-buttons button:hover {
+.waiter-action-buttons button:hover,
+.waiter-save-password-btn:hover,
+.waiter-send-otp-btn:hover {
   background: #454545;
 }
 
-.admin-action-buttons button:nth-child(2) {
+.waiter-cancel-btn,
+.waiter-cancel-otp-btn {
   background: #9e9e9e;
 }
 
-.admin-action-buttons button:nth-child(2):hover {
+.waiter-cancel-btn:hover,
+.waiter-cancel-otp-btn:hover {
   background: #757575;
 }
 
 /* ===== Right Side (Profile Picture) ===== */
-.admin-profile-picture {
+.waiter-profile-picture {
   flex: 1;
   display: flex;
   align-items: flex-start;
   justify-content: center;
 }
 
-.admin-image-wrapper {
+.waiter-image-wrapper {
   position: relative;
 }
 
-.admin-circle-img {
+.waiter-circle-img {
   width: 120px;
   height: 120px;
   border-radius: 50%;
@@ -144,42 +158,17 @@
   border: 2px solid #ddd;
 }
 
-.admin-circle-img.placeholder {
+.waiter-circle-img.placeholder {
   background: #e5e7eb;
   color: #555;
 }
 
-/* ===== Remove Photo Button ===== */
-.admin-remove-photo {
-  margin-top: 10px;
-  padding: 6px 12px;
-  background-color: #ef4444; /* red */
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px; /* space between icon and text */
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.admin-remove-photo:hover {
-  background-color: #dc2626; /* darker red */
-}
-
-.admin-remove-photo svg {
-  flex-shrink: 0;
-}
-
-/* ===== Edit Icon / 3 Dots Menu ===== */
-.admin-menu-container {
+/* ===== 3 Dots Menu ===== */
+.waiter-menu-container {
   position: absolute;
   top: 6px;
   right: 6px;
-  background: rgba(0, 0, 0, 0.5); /* dark circle */
+  background: rgba(0, 0, 0, 0.5);
   border-radius: 50%;
   padding: 4px;
   display: flex;
@@ -187,7 +176,7 @@
   justify-content: center;
 }
 
-.admin-menu-button {
+.waiter-menu-button {
   background: none;
   border: none;
   color: #fff;
@@ -197,11 +186,11 @@
   justify-content: center;
 }
 
-.admin-menu-button:hover {
+.waiter-menu-button:hover {
   color: #ddd;
 }
 
-.admin-dropdown-menu {
+.waiter-dropdown-menu {
   position: absolute;
   top: 30px;
   right: 0;
@@ -213,7 +202,7 @@
   z-index: 10;
 }
 
-.admin-dropdown-item {
+.waiter-dropdown-item {
   width: 100%;
   padding: 8px 12px;
   font-size: 14px;
@@ -226,6 +215,6 @@
   cursor: pointer;
 }
 
-.admin-dropdown-item:hover {
+.waiter-dropdown-item:hover {
   background: #f3f4f6;
 }

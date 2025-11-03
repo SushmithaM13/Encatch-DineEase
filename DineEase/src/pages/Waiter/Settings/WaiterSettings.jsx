@@ -1,35 +1,35 @@
 import { useState } from "react";
-import "./AdminSettings.css";
+import "./WaiterSettings.css";
 
-export default function AdminSettings() {
+export default function WaiterSettings() {
   const [activeTab, setActiveTab] = useState("profile");
 
   return (
-    <div className="admin-settings-page">
-      <h2 className="admin-settings-heading">Admin Settings</h2>
+    <div className="waiter-settings-page">
+      <h2 className="waiter-settings-heading">Waiter Settings</h2>
 
       {/* Tabs */}
-      <div className="admin-settings-tabs">
+      <div className="waiter-settings-tabs">
         <button
-          className={activeTab === "profile" ? "admin-active" : ""}
+          className={activeTab === "profile" ? "waiter-active" : ""}
           onClick={() => setActiveTab("profile")}
         >
           Profile
         </button>
         <button
-          className={activeTab === "security" ? "admin-active" : ""}
+          className={activeTab === "security" ? "waiter-active" : ""}
           onClick={() => setActiveTab("security")}
         >
           Security
         </button>
         <button
-          className={activeTab === "notifications" ? "admin-active" : ""}
+          className={activeTab === "notifications" ? "waiter-active" : ""}
           onClick={() => setActiveTab("notifications")}
         >
           Notifications
         </button>
         <button
-          className={activeTab === "theme" ? "admin-active" : ""}
+          className={activeTab === "theme" ? "waiter-active" : ""}
           onClick={() => setActiveTab("theme")}
         >
           Theme
@@ -37,17 +37,17 @@ export default function AdminSettings() {
       </div>
 
       {/* Tab Content */}
-      <div className="admin-settings-content">
+      <div className="waiter-settings-content">
         {activeTab === "profile" && (
-          <div className="admin-tab-content">
+          <div className="waiter-tab-content">
             <h3>Profile</h3>
             <label>
               Name:
-              <input type="text" placeholder="Admin Name" />
+              <input type="text" placeholder="Waiter Name" />
             </label>
             <label>
               Email:
-              <input type="email" placeholder="admin@example.com" />
+              <input type="email" placeholder="waiter@example.com" />
             </label>
             <label>
               Contact:
@@ -57,12 +57,12 @@ export default function AdminSettings() {
               Change Password:
               <input type="password" placeholder="New Password" />
             </label>
-            <button className="admin-save-btn">Save Profile</button>
+            <button className="waiter-save-btn">Save Profile</button>
           </div>
         )}
 
         {activeTab === "security" && (
-          <div className="admin-tab-content">
+          <div className="waiter-tab-content">
             <h3>Security</h3>
             <label>
               Two-Factor Authentication:
@@ -73,13 +73,13 @@ export default function AdminSettings() {
             </label>
             <label>
               Logout from other devices:
-              <button className="admin-logout-btn">Logout All</button>
+              <button className="waiter-logout-btn">Logout All</button>
             </label>
           </div>
         )}
 
         {activeTab === "notifications" && (
-          <div className="admin-tab-content">
+          <div className="waiter-tab-content">
             <h3>Notifications</h3>
             <label>
               New Orders
@@ -97,7 +97,7 @@ export default function AdminSettings() {
         )}
 
         {activeTab === "theme" && (
-          <div className="admin-tab-content">
+          <div className="waiter-tab-content">
             <h3>Theme</h3>
             <label>
               Dark Mode

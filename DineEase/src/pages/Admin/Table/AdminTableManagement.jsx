@@ -1,219 +1,265 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, Brush, Plus, Sofa, MoreVertical, X } from "lucide-react";
+import {
+  Sofa,
+  Plus,
+  Download,
+  X,
+  User,
+} from "lucide-react";
 import "./tables.css";
 
 export default function AdminTableManagement() {
   const [tables, setTables] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
-  const [editTableId, setEditTableId] = useState(null);
-  const [newTable, setNewTable] = useState({
-    capacity: 4,
-    waiterId: "",
-    waiterName: "",
-    status: "available",
-  });
+  const [showAddPopup, setShowAddPopup] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(null);
 
+  const [newTable, setNewTable] = useState({
+    organizationId: "",
+    tableNumber: "",
+    tableStatus: "AVAILABLE",
+    capacity: 1,
+    section: "",
+    locationDescription: "",
+    waiterEmail: "",
+    qrCodeUrl: "",
+  });
+
+  // Load tables from localStorage
   useEffect(() => {
     const stored = JSON.parse(localStorage.getItem("tables") || "[]");
     setTables(stored);
   }, []);
 
-  const saveTables = (newTables) => {
-    setTables(newTables);
-    localStorage.setItem("tables", JSON.stringify(newTables));
+  // Save to localStorage helper
+  const saveTables = (data) => {
+    setTables(data);
+    localStorage.setItem("tables", JSON.stringify(data));
   };
 
-  const handleOpenPopup = (table = null) => {
-    if (table) {
-      setNewTable({
-        capacity: table.capacity,
-        waiterId: table.waiterId,
-        waiterName: table.waiterName,
-        status: table.status,
-      });
-      setEditTableId(table.id);
-    } else {
-      setNewTable({
-        capacity: 4,
-        waiterId: "",
-        waiterName: "",
-        status: "available",
-      });
-      setEditTableId(null);
+  // Add a new table
+  const handleAddTable = () => {
+    const { organizationId, tableNumber } = newTable;
+    if (!organizationId.trim() || !tableNumber.trim()) {
+      alert("Please enter Organization ID and Table Number");
+      return;
     }
-    setShowPopup(true);
-    setDropdownOpen(null);
-  };
 
-  const handleSaveTable = () => {
-    if (editTableId) {
-      const updated = tables.map((t) =>
-        t.id === editTableId ? { ...t, ...newTable } : t
-      );
-      saveTables(updated);
-    } else {
-      const tableToAdd = {
-        id: tables.length + 1,
-        ...newTable,
-      };
-      saveTables([...tables, tableToAdd]);
-    }
-    setShowPopup(false);
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=Org-${organizationId}-Table-${encodeURIComponent(
+      tableNumber
+    )}`;
+
+    const tableData = {
+      id: Date.now(),
+      ...newTable,
+      qrCodeUrl: qrUrl,
+    };
+
+    const updated = [...tables, tableData];
+    saveTables(updated);
+
+    // Reset
+    setNewTable({
+      organizationId: "",
+      tableNumber: "",
+      tableStatus: "AVAILABLE",
+      capacity: 1,
+      section: "",
+      locationDescription: "",
+      waiterEmail: "",
+      qrCodeUrl: "",
+    });
+    setShowAddPopup(false);
   };
 
   const handleDeleteTable = (id) => {
     const updated = tables.filter((t) => t.id !== id);
     saveTables(updated);
-    setDropdownOpen(null);
   };
 
-  const handleChangeStatus = (id, newStatus) => {
-    const updated = tables.map((t) =>
-      t.id === id ? { ...t, status: newStatus } : t
-    );
-    saveTables(updated);
-  };
+  const handleDownloadQr = async (url, tableNumber) => {
+  if (!url) {
+    alert("QR not generated for this table yet.");
+    return;
+  }
+
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = `${tableNumber}-QR.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Clean up
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (error) {
+    console.error("Download failed:", error);
+    alert("Failed to download QR code.");
+  }
+};
+
 
   return (
-    <div className="tables-page">
-      <h2 className="page-title"><Sofa size={22} /> Table Management</h2>
+    <div className="admin-tables-page">
+      <h2 className="admin-page-title">
+        <Sofa size={22} /> Table Management
+      </h2>
 
-      {/* Add Table Button aligned to right */}
-      <div className="add-table-section right-align">
-        <button onClick={() => handleOpenPopup()}>
+      <div className="admin-add-table-section admin-right-align">
+        <button onClick={() => setShowAddPopup(true)}>
           <Plus size={16} /> Add Table
         </button>
       </div>
 
-      {/* Stats */}
-<div className="stats">
-  <p className="stat-total">Total: {tables.length}</p>
-  <p className="stat-available">
-    Available: {tables.filter((t) => t.status === "available").length}
-  </p>
-  <p className="stat-booked">
-    Booked: {tables.filter((t) => t.status === "booked").length}
-  </p>
-  <p className="stat-cleaning">
-    Cleaning: {tables.filter((t) => t.status === "cleaning").length}
-  </p>
-</div>
+      <div className="admin-stats">
+        <p>Total: {tables.length}</p>
+        <p>Available: {tables.filter((t) => t.tableStatus === "AVAILABLE").length}</p>
+        <p>Booked: {tables.filter((t) => t.tableStatus === "BOOKED").length}</p>
+        <p>Cleaning: {tables.filter((t) => t.tableStatus === "CLEANING").length}</p>
+      </div>
 
-
-      {/* Table Grid */}
-      <div className="tables-grid">
+      <div className="admin-tables-grid">
         {tables.map((table) => (
-          <div key={table.id} className={`table-card ${table.status}`}>
-            <div className="table-card-header">
-              <h3>Table {table.id}</h3>
-              <div className="dropdown-container">
-                <button
-                  className="dots-btn"
-                  onClick={() =>
-                    setDropdownOpen(dropdownOpen === table.id ? null : table.id)
-                  }
-                >
-                  <MoreVertical size={18} />
-                </button>
-                {dropdownOpen === table.id && (
-                  <div className="dropdown-menu">
-                    <button onClick={() => handleOpenPopup(table)}>Edit</button>
-                    <button onClick={() => handleDeleteTable(table.id)}>Delete</button>
-                  </div>
-                )}
-              </div>
+          <div key={table.id} className={`admin-table-card ${table.tableStatus.toLowerCase()}`}>
+            <div className="admin-table-card-header">
+              <h3>{table.tableNumber}</h3>
+              <button
+                className="admin-dots-btn"
+                onClick={() =>
+                  setDropdownOpen(dropdownOpen === table.id ? null : table.id)
+                }
+              >
+                ⋮
+              </button>
+              {dropdownOpen === table.id && (
+                <div className="admin-dropdown-menu">
+                  <button onClick={() => handleDeleteTable(table.id)}>Delete</button>
+                  <button onClick={() => handleDownloadQr(table.qrCodeUrl, table.tableNumber)}>
+                    <Download size={14} /> Download QR
+                  </button>
+                </div>
+              )}
             </div>
 
-            <p>
-              {table.status === "booked"
-                ? `🚨 Table ${table.id} (${table.capacity}-seater) booked! Waiter ${table.waiterName || "—"} (${table.waiterId || "N/A"}) be ready to serve.`
-                : `Status: ${table.status}`}
-            </p>
+            <p>Status: {table.tableStatus}</p>
             <p>Capacity: {table.capacity}</p>
-            <p>Waiter: {table.waiterName || "—"} ({table.waiterId || "N/A"})</p>
+            <p>Section: {table.section || "—"}</p>
+            <p>Location: {table.locationDescription || "—"}</p>
+            <p>
+              Waiter:{" "}
+              {table.waiterEmail ? (
+                <>
+                  <User size={14} /> {table.waiterEmail}
+                </>
+              ) : (
+                "—"
+              )}
+            </p>
 
-            <div className="actions">
-              <button onClick={() => handleChangeStatus(table.id, "available")}>
-                <CheckCircle size={16} /> Available
-              </button>
-              <button onClick={() => handleChangeStatus(table.id, "booked")}>
-                <XCircle size={16} /> Booked
-              </button>
-              <button onClick={() => handleChangeStatus(table.id, "cleaning")}>
-                <Brush size={16} /> Cleaning
-              </button>
-            </div>
+            {table.qrCodeUrl && (
+              <div className="qr-section">
+                <img src={table.qrCodeUrl} alt="QR Code" className="qr-image" />
+              </div>
+            )}
           </div>
         ))}
       </div>
 
-      {/* Popup Modal */}
-      {showPopup && (
-        <div className="popup-overlay">
-          <div className="popup">
-            {/* Close button top-right */}
-            <button className="popup-close" onClick={() => setShowPopup(false)}>
+      {/* Add Table Popup */}
+      {showAddPopup && (
+        <div className="admin-popup-overlay">
+          <div className="admin-popup">
+            <button className="admin-popup-close" onClick={() => setShowAddPopup(false)}>
               <X size={18} />
             </button>
+            <h3>Add New Table</h3>
 
-            <h3>{editTableId ? "Edit Table" : "Add New Table"}</h3>
+            <label>
+              Organization ID:
+              <input
+                type="text"
+                value={newTable.organizationId}
+                onChange={(e) =>
+                  setNewTable({ ...newTable, organizationId: e.target.value })
+                }
+              />
+            </label>
+
+            <label>
+              Table Number:
+              <input
+                type="text"
+                value={newTable.tableNumber}
+                onChange={(e) =>
+                  setNewTable({ ...newTable, tableNumber: e.target.value })
+                }
+              />
+            </label>
+
+            <label>
+              Table Status:
+              <select
+                value={newTable.tableStatus}
+                onChange={(e) =>
+                  setNewTable({ ...newTable, tableStatus: e.target.value })
+                }
+              >
+                <option value="AVAILABLE">AVAILABLE</option>
+                <option value="BOOKED">BOOKED</option>
+                <option value="CLEANING">CLEANING</option>
+              </select>
+            </label>
 
             <label>
               Capacity:
-              <select
+              <input
+                type="number"
+                min="1"
                 value={newTable.capacity}
                 onChange={(e) =>
                   setNewTable({ ...newTable, capacity: Number(e.target.value) })
                 }
-              >
-                <option value="2">2-seater</option>
-                <option value="4">4-seater</option>
-                <option value="6">6-seater</option>
-                <option value="8">8-seater</option>
-                <option value="10">10-seater</option>
-                <option value="12">12-seater</option>
-              </select>
+              />
             </label>
 
             <label>
-              Waiter ID:
+              Section:
               <input
                 type="text"
-                value={newTable.waiterId}
+                value={newTable.section}
                 onChange={(e) =>
-                  setNewTable({ ...newTable, waiterId: e.target.value })
+                  setNewTable({ ...newTable, section: e.target.value })
                 }
               />
             </label>
 
             <label>
-              Waiter Name:
-              <input
-                type="text"
-                value={newTable.waiterName}
+              Location Description:
+              <textarea
+                value={newTable.locationDescription}
                 onChange={(e) =>
-                  setNewTable({ ...newTable, waiterName: e.target.value })
+                  setNewTable({ ...newTable, locationDescription: e.target.value })
                 }
               />
             </label>
 
             <label>
-              Status:
-              <select
-                value={newTable.status}
+              Waiter Email:
+              <input
+                type="email"
+                value={newTable.waiterEmail}
                 onChange={(e) =>
-                  setNewTable({ ...newTable, status: e.target.value })
+                  setNewTable({ ...newTable, waiterEmail: e.target.value })
                 }
-              >
-                <option value="available">Available</option>
-                <option value="booked">Booked</option>
-                <option value="cleaning">Cleaning</option>
-              </select>
+              />
             </label>
 
-            <div className="popup-actions">
-              <button onClick={handleSaveTable}>Save</button>
+            <div className="admin-popup-actions">
+              <button onClick={handleAddTable}>Save & Generate QR</button>
             </div>
           </div>
         </div>

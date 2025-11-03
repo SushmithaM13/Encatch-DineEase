@@ -29,16 +29,12 @@ export default function AdminMenu() {
     reviews: [],
   });
 
-  /* =====================
-     Load menus safely
-  ===================== */
+  // Load menus safely
   const loadMenus = () => {
     try {
       const stored = localStorage.getItem("menuItems");
       if (!stored) return [];
-
       const parsed = JSON.parse(stored);
-
       if (Array.isArray(parsed)) {
         return parsed.map((menu) => ({
           dishName: menu.dishName ?? "",
@@ -51,7 +47,6 @@ export default function AdminMenu() {
           reviews: Array.isArray(menu.reviews) ? menu.reviews : [],
         }));
       }
-
       return [];
     } catch {
       return [];
@@ -62,9 +57,7 @@ export default function AdminMenu() {
     setMenus(loadMenus());
   }, []);
 
-  /* =====================
-     Delete menu
-  ===================== */
+  // Delete menu
   const handleDelete = (index) => {
     const updated = [...menus];
     updated.splice(index, 1);
@@ -73,26 +66,20 @@ export default function AdminMenu() {
     setMenuOpenIndex(null);
   };
 
-  /* =====================
-     Save menu
-  ===================== */
+  // Save or update menu
   const handleSave = () => {
     if (!newMenu.dishName || !newMenu.cost || !newMenu.imageUrl) {
       alert("Please fill all fields and upload an image.");
       return;
     }
-
     const updated = [...menus];
-
     if (editingIndex !== null) {
       updated[editingIndex] = { ...newMenu };
     } else {
       updated.push({ ...newMenu });
     }
-
     setMenus(updated);
     localStorage.setItem("menuItems", JSON.stringify(updated));
-
     setNewMenu({
       dishName: "",
       cost: "",
@@ -107,9 +94,7 @@ export default function AdminMenu() {
     setShowModal(false);
   };
 
-  /* =====================
-     Edit menu
-  ===================== */
+  // Edit menu
   const handleEdit = (index) => {
     setNewMenu({ ...menus[index] });
     setEditingIndex(index);
@@ -117,9 +102,7 @@ export default function AdminMenu() {
     setMenuOpenIndex(null);
   };
 
-  /* =====================
-     Image Upload
-  ===================== */
+  // Image Upload
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -131,56 +114,43 @@ export default function AdminMenu() {
     }
   };
 
-  /* =====================
-     Stars Renderer
-  ===================== */
-  const renderStars = (rating) => {
-    return (
-      <div className="review-stars">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <span key={star} className={star <= rating ? "star filled" : "star"}>
-            ★
-          </span>
-        ))}
-      </div>
-    );
-  };
+  // Stars Renderer
+  const renderStars = (rating) => (
+    <div className="admin-review-stars">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span key={star} className={star <= rating ? "admin-star filled" : "admin-star"}>
+          ★
+        </span>
+      ))}
+    </div>
+  );
 
-  /* =====================
-     Filter menus
-  ===================== */
+  // Filter menus
   const filteredMenus = menus.filter((menu) => {
-    const matchesSearch = menu.dishName
-      .toLowerCase()
-      .includes(search.toLowerCase());
-
+    const matchesSearch = menu.dishName.toLowerCase().includes(search.toLowerCase());
     const matchesFilter =
       (!vegFilter && !nonVegFilter) ||
       (vegFilter && menu.type === "veg") ||
       (nonVegFilter && menu.type === "nonveg");
-
     return matchesSearch && matchesFilter;
   });
 
-  /* =====================
-     Render
-  ===================== */
   return (
     <div className="admin-menu-page">
-      <h2 className="page-title">
+      <h2 className="admin-page-title">
         <Newspaper size={22} style={{ marginRight: "8px" }} /> Menu Management
       </h2>
 
-      <div className="menu-header">
+      <div className="admin-menu-header">
         <input
           type="text"
           placeholder="Search food..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="search-input"
+          className="admin-search-input"
         />
         <button
-          className="add-btn"
+          className="admin-add-btn"
           onClick={() => {
             setNewMenu({
               dishName: "",
@@ -201,69 +171,63 @@ export default function AdminMenu() {
       </div>
 
       {/* Filters */}
-      <div className="filter-switches">
-        <label className="switch">
+      <div className="admin-filter-switches">
+        <label className="admin-switch">
           <input
             type="checkbox"
             checked={vegFilter}
             onChange={() => setVegFilter(!vegFilter)}
           />
-          <span className="slider veg"></span>
-          <span className="switch-label">Veg</span>
+          <span className="admin-slider admin-veg"></span>
+          <span className="admin-switch-label">Veg</span>
         </label>
 
-        <label className="switch">
+        <label className="admin-switch">
           <input
             type="checkbox"
             checked={nonVegFilter}
             onChange={() => setNonVegFilter(!nonVegFilter)}
           />
-          <span className="slider nonveg"></span>
-          <span className="switch-label">Non-Veg</span>
+          <span className="admin-slider admin-nonveg"></span>
+          <span className="admin-switch-label">Non-Veg</span>
         </label>
       </div>
 
       {filteredMenus.length === 0 ? (
-        <p className="empty-message">No menus found.</p>
+        <p className="admin-empty-message">No menus found.</p>
       ) : (
-        <div className="menu-grid">
+        <div className="admin-menu-grid">
           {filteredMenus.map((menu, index) => (
-            <div key={index} className="menu-card">
+            <div key={index} className="admin-menu-card">
               {menu.imageUrl && (
-                <img
-                  src={menu.imageUrl}
-                  alt={menu.dishName}
-                  className="menu-img"
-                />
+                <img src={menu.imageUrl} alt={menu.dishName} className="admin-menu-img" />
               )}
-              <h3 className="menu-name">{menu.dishName}</h3>
-              <p className="menu-cost">₹ {menu.cost}</p>
-              <p className="menu-desc">{menu.description}</p>
-              <p className={`menu-type ${menu.type}`}>
+              <h3 className="admin-menu-name">{menu.dishName}</h3>
+              <p className="admin-menu-cost">₹ {menu.cost}</p>
+              <p className="admin-menu-desc">{menu.description}</p>
+              <p className={`admin-menu-type ${menu.type}`}>
                 {menu.type === "veg" ? "Veg" : "Non-Veg"}
               </p>
-              <p className="category">
+              <p className="admin-category">
                 {menu.category} → {menu.subCategory || "General"}
               </p>
 
-              {/* Display ALL reviews */}
-              <div className="reviews">
+              <div className="admin-reviews">
                 {menu.reviews.length > 0 ? (
                   menu.reviews.map((review, i) => (
-                    <div key={i} className="review-block">
+                    <div key={i} className="admin-review-block">
                       {renderStars(review.rating)}
-                      <p className="review-comment">"{review.comment}"</p>
+                      <p className="admin-review-comment">"{review.comment}"</p>
                     </div>
                   ))
                 ) : (
-                  <p className="review-comment">No reviews yet</p>
+                  <p className="admin-review-comment">No reviews yet</p>
                 )}
               </div>
 
-              {/* Dropdown menu */}
-              <div className="menu-wrapper">
+              <div className="admin-menu-wrapper">
                 <button
-                  className="menu-btn"
+                  className="admin-menu-btn"
                   onClick={() =>
                     setMenuOpenIndex(menuOpenIndex === index ? null : index)
                   }
@@ -272,7 +236,7 @@ export default function AdminMenu() {
                 </button>
 
                 {menuOpenIndex === index && (
-                  <div className="menu-dropdown">
+                  <div className="admin-menu-dropdown">
                     <button onClick={() => handleEdit(index)}>
                       <Edit3 size={16} /> Edit
                     </button>
@@ -289,9 +253,9 @@ export default function AdminMenu() {
 
       {/* Modal */}
       {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <div className="admin-modal-header">
               <h3>{editingIndex !== null ? "Edit Menu" : "Add New Menu"}</h3>
               <button
                 onClick={() => {
@@ -307,17 +271,13 @@ export default function AdminMenu() {
               type="text"
               placeholder="Dish Name"
               value={newMenu.dishName}
-              onChange={(e) =>
-                setNewMenu({ ...newMenu, dishName: e.target.value })
-              }
+              onChange={(e) => setNewMenu({ ...newMenu, dishName: e.target.value })}
             />
             <input
               type="text"
               placeholder="Cost"
               value={newMenu.cost}
-              onChange={(e) =>
-                setNewMenu({ ...newMenu, cost: e.target.value })
-              }
+              onChange={(e) => setNewMenu({ ...newMenu, cost: e.target.value })}
             />
             <textarea
               placeholder="Description"
@@ -328,18 +288,11 @@ export default function AdminMenu() {
             />
             <select
               value={newMenu.type}
-              onChange={(e) =>
-                setNewMenu({
-                  ...newMenu,
-                  type: e.target.value,
-                })
-              }
+              onChange={(e) => setNewMenu({ ...newMenu, type: e.target.value })}
             >
               <option value="veg">Veg</option>
               <option value="nonveg">Non-Veg</option>
             </select>
-
-            {/* Category */}
             <select
               value={newMenu.category}
               onChange={(e) =>
@@ -352,8 +305,6 @@ export default function AdminMenu() {
               <option value="Starter">Starter</option>
               <option value="Main Course">Main Course</option>
             </select>
-
-            {/* SubCategory */}
             <input
               type="text"
               placeholder="Subcategory (e.g., Plain Rice, Cold Drink)"
@@ -365,10 +316,10 @@ export default function AdminMenu() {
 
             <input type="file" accept="image/*" onChange={handleImageUpload} />
             {newMenu.imageUrl && (
-              <img src={newMenu.imageUrl} alt="Preview" className="menu-img" />
+              <img src={newMenu.imageUrl} alt="Preview" className="admin-menu-img" />
             )}
 
-            <button className="save-btn" onClick={handleSave}>
+            <button className="admin-save-btn" onClick={handleSave}>
               {editingIndex !== null ? "Update Menu" : "Save Menu"}
             </button>
           </div>

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Pencil, Trash2, MoreVertical, User } from "lucide-react";
-import "./AdminProfile.css";
+import "./WaiterProfile.css";
 
-export default function AdminProfile() {
+export default function WaiterProfile() {
   const API_URL = "http://localhost:8082/dine-ease/api/v1/staff/profile";
-  const TOKEN = localStorage.getItem("token"); // ✅ Get token from login
+  const TOKEN = localStorage.getItem("token");
 
   const [profile, setProfile] = useState({
     id: "",
@@ -13,17 +13,12 @@ export default function AdminProfile() {
     fullName: "",
     firstName: "",
     lastName: "",
-    staffRoleName: "",
+    staffRoleName: "Waiter",
     phoneNumber: "",
-    password: "",
-    shiftTiming: "",
-    staffStatus: "",
-    salary: "",
-    contractStartDate: "",
-    contractEndDate: "",
     email: "",
     profileImage: "",
-    accountCreatedAt: "",
+    contractStartDate: "",
+    contractEndDate: "",
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -38,7 +33,7 @@ export default function AdminProfile() {
     confirm: "",
   });
 
-  // ===== Fetch Profile (with token) =====
+  // ===== Fetch Waiter Profile =====
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -46,26 +41,26 @@ export default function AdminProfile() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${TOKEN}`, // ✅ Include token
+            Authorization: `Bearer ${TOKEN}`,
           },
-          credentials: "include", // ✅ If your backend uses cookies
+          credentials: "include",
         });
 
         if (!res.ok) {
-          console.error(`Profile fetch failed: ${res.status} ${res.statusText}`);
+          console.error(`Waiter profile fetch failed: ${res.status} ${res.statusText}`);
           return;
         }
 
-        const text = await res.text(); // Avoid crash if empty
+        const text = await res.text();
         if (!text) {
-          console.warn("Empty profile response");
+          console.warn("Empty waiter profile response");
           return;
         }
 
         const data = JSON.parse(text);
         setProfile(data);
       } catch (err) {
-        console.error("Error fetching profile:", err.message);
+        console.error("Error fetching waiter profile:", err.message);
       }
     };
 
@@ -73,7 +68,7 @@ export default function AdminProfile() {
     else console.warn("⚠️ No token found — please log in first.");
   }, [TOKEN]);
 
-  // ===== Save (Update) Profile =====
+  // ===== Save Profile =====
   const handleSave = async () => {
     try {
       const res = await fetch(API_URL, {
@@ -91,12 +86,12 @@ export default function AdminProfile() {
       } else {
         alert(`Failed to update profile (${res.status})`);
       }
-    } catch (error) {
-      console.error("Update error:", error);
+    } catch (err) {
+      console.error("Profile update error:", err);
     }
   };
 
-  // ===== Handle Image Upload =====
+  // ===== Handle Profile Picture Upload =====
   const handleImageChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
       const reader = new FileReader();
@@ -173,7 +168,7 @@ export default function AdminProfile() {
         setOtpSent(false);
         setPasswordForm({ current: "", newPass: "", confirm: "" });
         setOtp("");
-        alert("Password updated successfully!");
+        alert("✅ Password updated successfully!");
       } else {
         alert("Failed to update password!");
       }
@@ -183,14 +178,14 @@ export default function AdminProfile() {
   };
 
   return (
-    <div className="admin-profile-page">
-      <h2 className="admin-profile-heading">
-        <User size={28} className="admin-user-icon" /> Admin Profile
+    <div className="waiter-profile-page">
+      <h2 className="waiter-profile-heading">
+        <User size={28} className="waiter-user-icon" /> Waiter Profile
       </h2>
 
-      <div className="admin-profile-container">
-        {/* Left Side */}
-        <div className="admin-profile-details">
+      <div className="waiter-profile-container">
+        {/* ===== Left Side ===== */}
+        <div className="waiter-profile-details">
           <section>
             <h3>Basic Info</h3>
             <label>
@@ -221,18 +216,24 @@ export default function AdminProfile() {
             </label>
             <label>
               Role:
-              <input type="text" value={profile.staffRoleName || ""} disabled />
+              <input type="text" value={profile.staffRoleName || "Waiter"} disabled />
             </label>
           </section>
 
           <section>
             <h3>Organization Info</h3>
+
             <label>
               Organization ID:
-              <input type="text" value={profile.organizationId || ""} disabled />
+              <input
+                type="text"
+                value={profile.organizationId || ""}
+                disabled
+              />
             </label>
+
             <label>
-              Organization:
+              Organization Name:
               <input
                 type="text"
                 value={profile.organizationName || ""}
@@ -242,6 +243,7 @@ export default function AdminProfile() {
                 }
               />
             </label>
+
             <label>
               Contract Start:
               <input
@@ -249,13 +251,11 @@ export default function AdminProfile() {
                 value={profile.contractStartDate?.substring(0, 10) || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
-                  setProfile({
-                    ...profile,
-                    contractStartDate: e.target.value,
-                  })
+                  setProfile({ ...profile, contractStartDate: e.target.value })
                 }
               />
             </label>
+
             <label>
               Contract End:
               <input
@@ -263,19 +263,17 @@ export default function AdminProfile() {
                 value={profile.contractEndDate?.substring(0, 10) || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
-                  setProfile({
-                    ...profile,
-                    contractEndDate: e.target.value,
-                  })
+                  setProfile({ ...profile, contractEndDate: e.target.value })
                 }
               />
             </label>
           </section>
 
-          {/* Password Change */}
+
+          {/* ===== Password Change ===== */}
           <section>
             <h3>Account Settings</h3>
-            <div className="admin-password-box">
+            <div className="waiter-password-box">
               <h4>Change Password</h4>
               <input
                 type="password"
@@ -291,10 +289,7 @@ export default function AdminProfile() {
                 placeholder="Confirm Password"
                 value={passwordForm.confirm}
                 onChange={(e) =>
-                  setPasswordForm({
-                    ...passwordForm,
-                    confirm: e.target.value,
-                  })
+                  setPasswordForm({ ...passwordForm, confirm: e.target.value })
                 }
                 disabled={!isEditing}
               />
@@ -316,14 +311,12 @@ export default function AdminProfile() {
                 ))}
 
               {passwordSuccess && (
-                <p style={{ color: "green" }}>
-                  ✅ Password changed successfully!
-                </p>
+                <p style={{ color: "green" }}>✅ Password changed successfully!</p>
               )}
             </div>
           </section>
 
-          <div className="admin-action-buttons">
+          <div className="waiter-action-buttons">
             {isEditing ? (
               <>
                 <button onClick={handleSave}>Save Changes</button>
@@ -335,32 +328,32 @@ export default function AdminProfile() {
           </div>
         </div>
 
-        {/* Right Side */}
-        <div className="admin-profile-picture">
-          <div className="admin-image-wrapper">
+        {/* ===== Right Side (Profile Image) ===== */}
+        <div className="waiter-profile-picture">
+          <div className="waiter-image-wrapper">
             {profile.profileImage ? (
               <img
                 src={profile.profileImage}
                 alt="Profile"
-                className="admin-circle-img"
+                className="waiter-circle-img"
               />
             ) : (
-              <div className="admin-circle-img placeholder">
-                {profile.fullName ? profile.fullName[0].toUpperCase() : "A"}
+              <div className="waiter-circle-img placeholder">
+                {profile.fullName ? profile.fullName[0].toUpperCase() : "W"}
               </div>
             )}
 
-            <div className="admin-menu-container">
+            <div className="waiter-menu-container">
               <button
-                className="admin-menu-button"
+                className="waiter-menu-button"
                 onClick={() => setShowMenu((prev) => !prev)}
               >
                 <MoreVertical size={20} />
               </button>
 
               {showMenu && (
-                <div className="admin-dropdown-menu">
-                  <label className="admin-dropdown-item">
+                <div className="waiter-dropdown-menu">
+                  <label className="waiter-dropdown-item">
                     <Pencil size={16} /> Edit Photo
                     <input
                       type="file"
@@ -371,7 +364,7 @@ export default function AdminProfile() {
                   </label>
                   {profile.profileImage && (
                     <button
-                      className="admin-dropdown-item"
+                      className="waiter-dropdown-item"
                       onClick={handleRemoveImage}
                     >
                       <Trash2 size={16} /> Remove Photo

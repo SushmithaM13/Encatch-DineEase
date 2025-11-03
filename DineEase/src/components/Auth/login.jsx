@@ -41,7 +41,7 @@ const Login = () => {
           localStorage.setItem("waiterName", data.name);
         }
 
-        // Remember email
+        // Remember email if checkbox is ticked
         if (remember) {
           localStorage.setItem("rememberEmail", username);
         } else {
@@ -50,7 +50,7 @@ const Login = () => {
 
         toast.success("Login successful! Redirecting...");
 
-        // Redirect based on role
+        // Redirect based on role after 1.5s
         setTimeout(() => {
           switch (data.role) {
             case "SUPER_ADMIN":
@@ -61,16 +61,17 @@ const Login = () => {
               break;
             case "WAITER":
               navigate("/WaiterDashboard");
+              console.log("Logged in as Waiter");
               break;
-  //           case "CHEF":
-  // navigate("/chefDashboard"); 
-  //             break;
+            case "CHEF":
+              navigate("/chefDashboard");
+              break;
             default:
               navigate("/");
           }
         }, 1500);
       } else {
-        // Handle login errors
+        // Handle backend error messages
         let errorMsg = "Invalid credentials. Please try again.";
         if (data.message?.toLowerCase().includes("not found")) {
           errorMsg = "User not found. Please register first.";

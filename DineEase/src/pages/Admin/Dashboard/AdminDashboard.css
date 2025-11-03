@@ -3,14 +3,14 @@
 /* ============================= */
 
 /* Layout container */
-.layout-container {
+.admin-layout-container {
   display: flex;
   height: 100vh;
 }
 
 /* Sidebar */
-.sidebar {
-  background: linear-gradient(black, black);
+.admin-sidebar {
+  background: black;
   color: white;
   min-height: 100vh;
   display: flex;
@@ -19,26 +19,26 @@
   transition: width 0.3s ease, left 0.3s ease;
   overflow: hidden;
   z-index: 200;
-  width: 250px; /* ✅ desktop default full */
+  width: 250px; /* desktop default */
 }
 
-.sidebar.open {
+.admin-sidebar.admin-open {
   width: 250px;
 }
 
-.sidebar.collapsed {
+.admin-sidebar.admin-collapsed {
   width: 70px;
 }
 
 /* Sidebar header */
-.sidebar-header {
+.admin-sidebar-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
 }
 
-.sidebar-title {
+.admin-sidebar-title {
   display: flex;
   align-items: center;
   font-size: 22px;
@@ -48,13 +48,13 @@
   transition: opacity 0.3s ease;
 }
 
-.sidebar.collapsed .sidebar-title {
+.admin-sidebar.admin-collapsed .admin-sidebar-title {
   opacity: 0;
   pointer-events: none;
 }
 
-/* Hamburger button base */
-.hamburger {
+/* Hamburger button */
+.admin-hamburger {
   flex-direction: column;
   justify-content: center;
   gap: 4px;
@@ -63,42 +63,45 @@
   cursor: pointer;
 }
 
-.hamburger span {
+.admin-hamburger span {
   display: block;
   height: 3px;
   width: 22px;
-  background: white;
   border-radius: 2px;
 }
 
-/* Desktop hamburger */
-.desktop-only {
+/* Desktop hamburger (white) */
+.admin-desktop-only span {
+  background: white;
+}
+
+.admin-desktop-only {
   display: flex;
 }
 @media (max-width: 768px) {
-  .desktop-only {
+  .admin-desktop-only {
     display: none;
   }
 }
 
-/* Mobile hamburger */
-.mobile-only {
+/* Mobile hamburger (black) */
+.admin-mobile-only {
   display: none;
 }
+.admin-mobile-only span {
+  background: black;
+}
 @media (max-width: 768px) {
-  .mobile-only {
+  .admin-mobile-only {
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 4px;
   }
-  .mobile-only span {
-    background: black;
-  }
 }
 
-/* Nav links */
-.sidebar nav a {
+/* Sidebar nav links */
+.admin-sidebar-nav a {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -112,25 +115,24 @@
   white-space: nowrap;
 }
 
-.sidebar nav a svg {
+.admin-sidebar-nav a svg {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
 }
 
-.sidebar nav a:hover {
+.admin-sidebar-nav a:hover {
   background-color: #f5f5f5;
   color: #000;
 }
 
-.sidebar nav a.active {
+.admin-sidebar-nav a.active {
   background-color: #e0e0e0;
   color: #000;
   font-weight: 600;
 }
 
-/* Adjust icons on collapsed sidebar */
-.sidebar.collapsed nav a svg {
+.admin-sidebar.admin-collapsed .admin-sidebar-nav a svg {
   width: 24px;
   height: 24px;
   margin: 0 auto;
@@ -139,7 +141,7 @@
 /* ============================= */
 /* 🔝 Top Header (Dashboard) */
 /* ============================= */
-.dashboard-header {
+.admin-dashboard-header {
   background: white;
   padding: 15px 20px;
   font-size: 16px;
@@ -149,13 +151,13 @@
   align-items: center;
 }
 
-.header-left {
+.admin-header-left {
   font-weight: 600;
   font-size: 16px;
   flex: 1;
 }
 
-.header-center {
+.admin-header-center {
   flex: 1;
   text-align: center;
   font-weight: 700;
@@ -164,12 +166,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 6px; /* space between icon and name */
+  gap: 6px;
 }
 
-
-
-.header-right {
+.admin-header-right {
   display: flex;
   align-items: center;
   gap: 15px;
@@ -178,11 +178,11 @@
 }
 
 /* Search bar */
-.search-container {
+.admin-search-container {
   position: relative;
 }
 
-.search-bar {
+.admin-search-bar {
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -190,13 +190,13 @@
   transition: all 0.2s ease;
 }
 
-.search-bar:focus {
+.admin-search-bar:focus {
   border-color: #16a34a;
   box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
   outline: none;
 }
 
-.search-results {
+.admin-search-results {
   position: absolute;
   top: 100%;
   left: 0;
@@ -211,21 +211,20 @@
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.search-item {
+.admin-search-item {
   padding: 8px 12px;
   cursor: pointer;
 }
-
-.search-item:hover {
+.admin-search-item:hover {
   background: #f5f5f5;
 }
 
 /* Profile Dropdown */
-.profile-dropdown {
+.admin-profile-dropdown {
   position: relative;
 }
 
-.profile-circle {
+.admin-profile-circle {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -239,7 +238,7 @@
   cursor: pointer;
 }
 
-.dropdown-menu {
+.admin-dropdown-menu {
   position: absolute;
   top: 50px;
   right: 0;
@@ -253,7 +252,7 @@
   z-index: 100;
 }
 
-.dropdown-menu button {
+.admin-dropdown-item {
   background: none;
   border: none;
   padding: 10px;
@@ -261,39 +260,31 @@
   cursor: pointer;
   font-size: 14px;
 }
-.restaurant-display {
-  display: flex;
-  align-items: center;
-  gap: 6px; /* space between icon and name */
+.admin-dropdown-item:hover {
+  background: #f3f4f6;
 }
 
-.restaurant-display span {
-  display: inline-block;
-  vertical-align: middle;
-  color: black;
-  font-weight: 700;
+/* Restaurant name */
+.admin-restaurant-display {
+  display: flex;
+  align-items: center;
   gap: 6px;
 }
-.restaurant-name {
+.admin-restaurant-display span {
   font-weight: 700;
   font-size: 18px;
   color: black;
 }
 
-.dropdown-menu button:hover {
-  background: #f3f4f6;
-}
-
 /* ============================= */
 /* 📄 Main Content Area */
 /* ============================= */
-.main-content {
+.admin-main-content {
   display: flex;
   flex-direction: column;
   flex: 1;
 }
-
-.dashboard-content {
+.admin-dashboard-content {
   flex: 1;
   padding: 30px;
   background: #f9fafb;
@@ -301,14 +292,14 @@
 }
 
 /* ============================= */
-/* 📱 Mobile Responsive Sidebar */
+/* 📱 Mobile Responsive Styles */
 /* ============================= */
 @media (max-width: 768px) {
-  .layout-container {
+  .admin-layout-container {
     flex-direction: column;
   }
 
-  .sidebar {
+  .admin-sidebar {
     position: fixed;
     top: 0;
     left: -250px;
@@ -318,31 +309,75 @@
     transition: left 0.3s ease;
     z-index: 200;
   }
-
-  .sidebar.open {
+  .admin-sidebar.admin-open {
     left: 0;
   }
+  .admin-sidebar.admin-collapsed {
+    display: none;
+  }
 
-  .sidebar-overlay {
+  .admin-sidebar-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.5);
-    z-index: 150;
+    z-index: 180;
   }
 
-  .sidebar.collapsed {
-    display: none;
-  }
-
-  .main-content {
+  .admin-main-content {
     margin-left: 0;
     width: 100%;
   }
 
-  .dashboard-header {
+  .admin-dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .admin-header-left {
+    font-size: 14px;
+    font-weight: 600;
+    width: 100%;
+    text-align: left;
+  }
+
+  .admin-header-center {
+    width: 100%;
+    justify-content: flex-start;
+    font-size: 15px;
+  }
+
+  .admin-restaurant-display span {
+    font-size: 15px;
+  }
+
+  .admin-header-right {
+    width: 100%;
     justify-content: space-between;
   }
+
+  .admin-search-bar {
+    width: 100%;
+    max-width: 220px;
+    font-size: 13px;
+  }
+
+  .admin-profile-circle {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+}
+.admin-dropdown-menu {
+  right: 0;
+  background: black;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  min-width: 120px;
 }
