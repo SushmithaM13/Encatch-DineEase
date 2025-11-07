@@ -223,4 +223,3 @@ const url = editingId
     </div>
   );
 }
-

@@ -1,5 +1,15 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit, Trash2, UserCog, X, Eye, EyeOff } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  UserCog,
+  X,
+  Eye,
+  EyeOff,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./staff.css";
@@ -7,470 +17,584 @@ import "./staff.css";
 export default function AdminStaffManagement() {
   const API_BASE = "http://localhost:8082/dine-ease/api/v1/staff";
   const ROLES_API = "http://localhost:8082/dine-ease/api/v1/staff-role/all";
+  const PROFILE_API = "http://localhost:8082/dine-ease/api/v1/staff/profile";
   const TOKEN = localStorage.getItem("token");
-  const ORGANIZATION_ID = localStorage.getItem("organizationId");
-
-  if (!TOKEN) console.warn("⚠️ No token found! Please login first.");
-  if (!ORGANIZATION_ID)
-    console.warn("⚠️ No organizationId found! Please login as Admin.");
 
   const initialForm = {
     firstName: "",
     lastName: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
     staffRoleType: "",
     shiftTiming: "",
-    salary: 0,
+    salary: "",
     contractStartDate: "",
     contractEndDate: "",
     password: "",
   };
 
+  const [organizationId, setOrganizationId] = useState("");
   const [staffList, setStaffList] = useState([]);
   const [roles, setRoles] = useState([]);
   const [form, setForm] = useState(initialForm);
   const [editId, setEditId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("All Staff");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [roleFilter, setRoleFilter] = useState("All");
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmMessage, setConfirmMessage] = useState("");
 
-  const [previousActiveIds, setPreviousActiveIds] = useState(() => {
-    const stored = localStorage.getItem("activeStaffIds");
-    return stored ? JSON.parse(stored) : [];
-  });
 
-  // ✅ Save active staff list in localStorage
+  // Fetch organizationId
   useEffect(() => {
-    localStorage.setItem("activeStaffIds", JSON.stringify(previousActiveIds));
-  }, [previousActiveIds]);
-
-  // ✅ Format date for display
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "-";
-    const date = new Date(dateStr);
-    const options = { day: "2-digit", month: "short", year: "numeric" };
-    return date.toLocaleDateString("en-GB", options).replace(/ /g, "-");
-  };
-
-  // ✅ Fetch all staff
-  const fetchStaff = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/all`, {
-        headers: {
-          Authorization: `Bearer ${TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!res.ok) throw new Error("Failed to fetch staff");
-      const data = await res.json();
-
-      const staffData = Array.isArray(data)
-        ? data
-        : Array.isArray(data.content)
-        ? data.content
-        : [];
-
-      const mappedStaff = staffData
-        .map((s) => ({
-          id: s.id,
-          staffId: s.id,
-          firstName: s.firstName,
-          lastName: s.lastName,
-          email: s.email,
-          phone: s.phoneNumber,
-          staffRoleType: s.staffRoleName,
-          shiftTiming: s.shiftTiming,
-          salary: s.salary,
-          contractStartDate: s.contractStartDate,
-          contractEndDate: s.contractEndDate,
-          status: s.staffStatus,
-          organizationId: s.organizationId,
-        }))
-        .filter((s) => s.staffRoleType?.toUpperCase() !== "ADMIN")
-        .sort((a, b) => a.staffId - b.staffId);
-
-      setStaffList(mappedStaff);
-      localStorage.setItem("staffList", JSON.stringify(mappedStaff));
-
-      // ✅ Toast newly activated staff
-      const newlyActivated = mappedStaff.filter(
-        (s) =>
-          s.status?.toLowerCase() === "active" &&
-          !previousActiveIds.includes(s.id)
-      );
-
-      if (newlyActivated.length > 0) {
-        newlyActivated.forEach((s) => {
-          toast.success(
-            `Staff ${s.firstName} ${s.lastName} successfully activated!`,
-            { position: "top-center" }
-          );
+    const fetchProfile = async () => {
+      if (!TOKEN)
+        return toast.error("Token missing! Please login.", {
+          position: "top-center",
         });
-
-        setPreviousActiveIds((prev) => [
-          ...prev,
-          ...newlyActivated.map((s) => s.id),
-        ]);
-      }
-    } catch (err) {
-      console.error("Error fetching staff:", err);
-      setStaffList([]);
-      localStorage.removeItem("staffList");
-    }
-  };
-
-  // ✅ Add or update staff (with organizationId)
-  const handleAddOrUpdate = async () => {
-    if (!form.firstName || !form.lastName || !form.email || !form.phone) {
-      alert("Please fill all required fields.");
-      return;
-    }
-
-    if (!ORGANIZATION_ID) {
-      alert("Organization ID not found! Please log in as Admin again.");
-      return;
-    }
-
-    const payload = {
-      ...form,
-      salary: Number(form.salary),
-      organizationId: ORGANIZATION_ID, // ✅ attach organizationId
-    };
-
-    try {
-      let url = `${API_BASE}/add`;
-      let method = "POST";
-
-      if (editId) {
-        url = `${API_BASE}/update-staff/${editId}`;
-        method = "PUT";
-      }
-
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${TOKEN}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Failed to save staff");
-      }
-
-      await res.json();
-      await fetchStaff();
-
-      setForm(initialForm);
-      setEditId(null);
-      setModalOpen(false);
-
-      if (method === "POST") {
-        toast.success(
-          "✅ Staff added successfully (linked to organization)!",
-          { position: "top-center" }
-        );
-      } else {
-        toast.info("✏️ Staff updated successfully!", {
+      try {
+        const res = await fetch(PROFILE_API, {
+          headers: { Authorization: `Bearer ${TOKEN}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch profile");
+        const data = await res.json();
+        if (!data.organizationId) throw new Error("Organization ID not found");
+        setOrganizationId(data.organizationId);
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to fetch organization ID", {
           position: "top-center",
         });
       }
+    };
+    fetchProfile();
+  }, [TOKEN]);
+
+  const formatDate = (arr) => {
+    if (!arr || !Array.isArray(arr) || arr.length < 3) return "";
+    const [y, m, d] = arr;
+    return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  };
+
+  // Fetch staff
+  const fetchStaff = async (pageNumber = 0, pageSize = 10) => {
+    if (!organizationId || !TOKEN) return;
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${API_BASE}/all?organizationId=${organizationId}&page=${pageNumber}&size=${pageSize}`,
+        {
+          headers: { Authorization: `Bearer ${TOKEN}` },
+        }
+      );
+      if (!res.ok) throw new Error(`Failed to fetch staff: ${res.status}`);
+      const data = await res.json();
+
+      const staffData = Array.isArray(data.content) ? data.content : [];
+      const filteredStaff = staffData.filter(
+        (s) => (s.staffRoleName || "").trim().toUpperCase() !== "ADMIN"
+      );
+
+      const mappedStaff = filteredStaff.map((s) => ({
+        id: s.id,
+        firstName: s.firstName || "",
+        lastName: s.lastName || "",
+        email: s.email || "",
+        phoneNumber: s.phoneNumber || "",
+        staffRoleType: (s.staffRoleName || "").trim(),
+        shiftTiming: s.shiftTiming || "",
+        salary: s.salary || 0,
+        contractStartDate: Array.isArray(s.contractStartDate)
+          ? formatDate(s.contractStartDate)
+          : s.contractStartDate || "",
+        contractEndDate: Array.isArray(s.contractEndDate)
+          ? formatDate(s.contractEndDate)
+          : s.contractEndDate || "",
+        status: s.staffStatus || "ACTIVE",
+      }));
+
+      setStaffList(mappedStaff);
+      setPage(data.number || 0);
+      setTotalPages(data.totalPages || 1);
     } catch (err) {
-      console.error("Error saving staff:", err);
-      alert("Error saving staff: " + err.message);
+      console.error(err);
+      toast.error("Failed to load staff", { position: "top-center" });
+      setStaffList([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // ✅ Fetch staff and roles on load
   useEffect(() => {
-    if (TOKEN) fetchStaff();
-  }, [TOKEN]);
+    if (organizationId) fetchStaff();
+  }, [organizationId]);
 
+  // Fetch roles
   useEffect(() => {
-    if (!TOKEN) return;
+    if (!organizationId || !TOKEN) return;
     const fetchRoles = async () => {
       try {
-        const res = await fetch(ROLES_API, {
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (!res.ok) throw new Error("Failed to fetch roles");
+        const res = await fetch(
+          `${ROLES_API}?organizationId=${organizationId}`,
+          {
+            headers: { Authorization: `Bearer ${TOKEN}` },
+          }
+        );
+        if (!res.ok) throw new Error(`Failed to fetch roles: ${res.status}`);
         const data = await res.json();
-        setRoles(data);
+        const filteredRoles = (data || []).filter(
+          (r) => (r.staffRoleName || "").trim().toUpperCase() !== "ADMIN"
+        );
+        setRoles(filteredRoles);
       } catch (err) {
-        console.error("Error fetching roles:", err);
+        console.error(err);
         setRoles([]);
       }
     };
     fetchRoles();
-  }, [TOKEN]);
+  }, [organizationId, TOKEN]);
 
-  // ✅ Input change handler
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+  // Add or update staff
+  const handleAddOrUpdate = async () => {
+  if (!organizationId || !TOKEN) return;
+
+  const requiredFields = [
+    "firstName",
+    "lastName",
+    "email",
+    "phoneNumber",
+    "staffRoleType",
+    "shiftTiming",
+    "salary",
+    "contractStartDate",
+    "contractEndDate",
+  ];
+  for (const field of requiredFields) {
+    if (!form[field]) {
+      toast.error(`Please fill ${field.replace(/([A-Z])/g, " $1")}`, {
+        position: "top-center",
+      });
+      return;
+    }
+  }
+
+  if (!editId && !form.password) {
+    toast.error("Password is required for new staff", {
+      position: "top-center",
+    });
+    return;
+  }
+
+  // ✅ If editing, ask for confirmation first
+  if (editId) {
+    setConfirmMessage("Are you sure you want to update this staff?");
+    setConfirmAction(() => async () => {
+      await saveStaff(); // call helper
+      setConfirmAction(null);
+    });
+  } else {
+    await saveStaff(); // directly save for add
+  }
+};
+const saveStaff = async () => {
+  const today = new Date();
+  const selectedStart = new Date(form.contractStartDate);
+
+  // ✅ Normalize times to midnight to avoid timezone issues
+  today.setHours(0, 0, 0, 0);
+  selectedStart.setHours(0, 0, 0, 0);
+
+  // 🚫 Validation check
+  if (selectedStart < today) {
+    toast.error("Contract start date must be today or in the future.", {
+      position: "top-center",
+    });
+    return;
+  }
+
+  const payload = {
+    organizationId,
+    firstName: form.firstName,
+    lastName: form.lastName,
+    email: form.email,
+    phone: form.phoneNumber,
+    staffRoleType: form.staffRoleType,
+    shiftTiming: form.shiftTiming,
+    contractStartDate: form.contractStartDate,
+    contractEndDate: form.contractEndDate,
+    salary: Number(form.salary),
   };
 
-  // ✅ Edit staff
-  const handleEdit = (staff) => {
-    setForm({ ...initialForm, ...staff });
-    setEditId(staff.id);
-    setModalOpen(true);
-  };
+  if (!editId) payload.password = form.password;
 
-  // ✅ Remove staff
-  const handleRemove = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this staff?")) return;
+  try {
+    const url = editId
+      ? `${API_BASE}/update-staff/${editId}`
+      : `${API_BASE}/add`;
+    const method = editId ? "PUT" : "POST";
 
+    const res = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${TOKEN}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(`Failed to save staff: ${res.status} - ${errorText}`);
+    }
+
+    if (editId) {
+      toast.success("Staff updated successfully!", { position: "top-center" });
+    } else {
+      toast.info("Activation email sent!", { position: "top-center" });
+      setTimeout(() => {
+        toast.success("Staff added & activated!", { position: "top-center" });
+      }, 3000);
+    }
+
+    await fetchStaff(page);
+    setForm(initialForm);
+    setEditId(null);
+    setModalOpen(false);
+  } catch (err) {
+    console.error("Error while saving staff:", err);
+    toast.error(err.message || "Failed to save staff", {
+      position: "top-center",
+    });
+  }
+};
+
+const handleRemove = (id) => {
+  setConfirmMessage("Are you sure you want to delete this staff?");
+  setConfirmAction(() => async () => {
     try {
       const res = await fetch(`${API_BASE}/delete/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${TOKEN}` },
       });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || "Failed to delete staff");
-      }
-
-      await fetchStaff();
-      toast.error("Staff removed successfully.", { position: "top-center" });
+      if (!res.ok) throw new Error(`Failed to delete staff: ${res.status}`);
+      await fetchStaff(page);
+      toast.success("Staff deleted successfully!", { position: "top-center" });
     } catch (err) {
-      console.error("Error deleting staff:", err);
-      alert("Error deleting staff: " + err.message);
+      console.error(err);
+      toast.error("Failed to delete staff", { position: "top-center" });
+    } finally {
+      setConfirmAction(null);
     }
-  };
+  });
+};
+const handleEdit = (staff) => {
+  setForm({
+    firstName: staff.firstName || "",
+    lastName: staff.lastName || "",
+    email: staff.email || "",
+    phoneNumber: staff.phoneNumber || "",
+    staffRoleType: staff.staffRoleType || "",
+    shiftTiming: staff.shiftTiming || "",
+    salary: staff.salary || "",
+    contractStartDate: staff.contractStartDate || "",
+    contractEndDate: staff.contractEndDate || "",
+    password: "", // keep empty on edit
+  });
+  setEditId(staff.id);
+  setModalOpen(true);
+};
 
-  // ✅ Filter by tabs
-  const filteredStaff =
-    activeTab === "All Staff"
-      ? staffList
-      : staffList.filter((s) => {
-          const role = s.staffRoleType?.toLowerCase() || "";
-          if (activeTab.toLowerCase() === "chef") return role.includes("chef");
-          if (activeTab.toLowerCase() === "waiters")
-            return role.includes("waiter");
-          if (activeTab.toLowerCase() === "accountant")
-            return role.includes("accountant");
-          return (
-            !role.includes("chef") &&
-            !role.includes("waiter") &&
-            !role.includes("accountant")
-          );
-        });
+
+
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
+  const filteredStaff = staffList.filter((s) => {
+    const role = (s.staffRoleType || "").trim().toLowerCase();
+    if (roleFilter === "All") return true;
+    if (roleFilter === "Waiter") return role.includes("waiter");
+    if (roleFilter === "Chef") return role.includes("chef");
+    if (roleFilter === "Accountant") return role.includes("accountant");
+    if (roleFilter === "Others")
+      return (
+        !role.includes("waiter") &&
+        !role.includes("chef") &&
+        !role.includes("accountant")
+      );
+    return true;
+  });
 
   return (
-    <div className="admin-staff-page">
-      <h2 className="admin-page-title">
-        <UserCog size={22} /> Staff Management
-      </h2>
+  <div className="admin-staff-add-page">
+    <h2 className="admin-staff-add-title">
+      <UserCog size={22} /> Staff Management
+    </h2>
 
-      {/* ===== Tabs + Add Button ===== */}
-      <div className="admin-tabs-add-container">
-        <div className="admin-staff-tabs">
-          {["All Staff", "Chef", "Waiters", "Accountant", "Other"].map((tab) => (
-            <button
-              key={tab}
-              className={`admin-tab-btn ${activeTab === tab ? "active" : ""}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+    {!organizationId && (
+      <p className="admin-staff-add-warning">⚠️ Loading organization ID...</p>
+    )}
 
+    {/* ===== Tabs + Add Staff Button Container ===== */}
+    <div className="admin-staff-add-tabs-container">
+      <div className="admin-staff-add-tabs">
+        {/* Add any tabs if required */}
+      </div>
+      <div className="admin-staff-add-btn-container">
         <button
-          className="admin-add-btn"
+          className="admin-staff-add-btn"
           onClick={() => {
             setForm(initialForm);
             setEditId(null);
             setModalOpen(true);
           }}
+          disabled={!organizationId}
         >
           <Plus size={16} /> Add Staff
         </button>
       </div>
+    </div>
 
-      {/* ===== Staff Table ===== */}
-      <table className="admin-staff-table">
-        <thead>
+    {/* ===== Confirm Modal ===== */}
+    {confirmAction && (
+      <div className="admin-staff-add-confirm-overlay">
+        <div className="admin-staff-add-confirm-modal">
+          <p className="admin-staff-add-confirm-message">{confirmMessage}</p>
+          <div className="admin-staff-add-confirm-buttons">
+            <button
+              className="admin-staff-add-confirm-yes"
+              onClick={() => {
+                confirmAction();
+                setConfirmAction(null);
+              }}
+            >
+              Yes
+            </button>
+            <button
+              className="admin-staff-add-confirm-no"
+              onClick={() => setConfirmAction(null)}
+            >
+              No
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* ===== Role Filters ===== */}
+    <div className="admin-staff-add-role-filters">
+      {["All", "Waiter", "Chef", "Accountant", "Others"].map((role) => (
+        <button
+          key={role}
+          className={`admin-staff-add-filter-btn ${
+            roleFilter === role ? "active" : ""
+          }`}
+          onClick={() => setRoleFilter(role)}
+        >
+          {role}
+        </button>
+      ))}
+    </div>
+
+    {/* ===== Staff Table ===== */}
+    <table className="admin-staff-add-table">
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Role</th>
+          <th>Shift</th>
+          <th>Salary</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {loading ? (
           <tr>
-            <th>Sl. No.</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Role</th>
-            <th>Shift</th>
-            <th>Salary</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <td colSpan="11" className="admin-staff-add-loading">
+              Loading staff...
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {filteredStaff.length > 0 ? (
-            filteredStaff.map((staff, index) => (
-              <tr key={staff.id || index}>
-                <td>{index + 1}</td>
-                <td>
-                  {staff.firstName} {staff.lastName}
-                </td>
-                <td>{staff.email}</td>
-                <td>{staff.phone}</td>
-                <td>{staff.staffRoleType}</td>
-                <td>{staff.shiftTiming}</td>
-                <td>{staff.salary}</td>
-                <td>{formatDate(staff.contractStartDate)}</td>
-                <td>{formatDate(staff.contractEndDate)}</td>
-                <td>
-                  <span
-                    className={`admin-status ${staff.status?.toLowerCase() || ""}`}
-                  >
-                    {staff.status || "Inactive"}
-                  </span>
-                </td>
-                <td className="admin-action-icons">
-                  <button
-                    className="admin-icon-btn admin-edit"
-                    onClick={() => handleEdit(staff)}
-                    title="Edit"
-                  >
-                    <Edit size={16} />
-                  </button>
-                  <button
-                    className="admin-icon-btn admin-delete"
-                    onClick={() => handleRemove(staff.id)}
-                    title="Remove"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={11} style={{ textAlign: "center", padding: "20px" }}>
-                No staff in {activeTab}.
+        ) : filteredStaff.length > 0 ? (
+          filteredStaff.map((s, i) => (
+            <tr key={s.id}>
+              <td>{i + 1}</td>
+              <td>{s.firstName + " " + s.lastName}</td>
+              <td>{s.email}</td>
+              <td>{s.phoneNumber}</td>
+              <td>{s.staffRoleType}</td>
+              <td>{s.shiftTiming}</td>
+              <td>{s.salary}</td>
+              <td>{s.contractStartDate}</td>
+              <td>{s.contractEndDate}</td>
+              <td>{s.status}</td>
+              <td className="admin-staff-add-actions">
+                <button
+                  className="admin-staff-add-edit"
+                  onClick={() => handleEdit(s)}
+                >
+                  <Edit size={16} />
+                </button>
+                <button
+                  className="admin-staff-add-delete"
+                  onClick={() => handleRemove(s.id)}
+                >
+                  <Trash2 size={16} />
+                </button>
               </td>
             </tr>
-          )}
-        </tbody>
-      </table>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="11" className="admin-staff-add-empty">
+              No staff found.
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
 
-      {/* ===== Add/Edit Modal ===== */}
-      {modalOpen && (
-        <div className="admin-modal-overlay">
-          <div className="admin-modal">
-            <div className="admin-modal-header">
-              <h3>{editId ? "Edit Staff" : "Add Staff"}</h3>
+    {/* ===== Pagination ===== */}
+    <div className="admin-staff-add-pagination">
+      <button
+        onClick={() => fetchStaff(page - 1)}
+        disabled={page <= 0}
+        className="admin-staff-add-prev"
+      >
+        <ChevronLeft /> Previous
+      </button>
+      <span className="admin-staff-add-page-info">
+        Page {page + 1} of {totalPages}
+      </span>
+      <button
+        onClick={() => fetchStaff(page + 1)}
+        disabled={page + 1 >= totalPages}
+        className="admin-staff-add-next"
+      >
+        Next <ChevronRight />
+      </button>
+    </div>
+
+    {/* ===== Modal ===== */}
+    {modalOpen && (
+      <div className="admin-staff-add-modal-overlay">
+        <div className="admin-staff-add-modal">
+          <div className="admin-staff-add-modal-header">
+            <h3>{editId ? "Edit Staff" : "Add Staff"}</h3>
+            <button
+              className="admin-staff-add-close-btn"
+              onClick={() => setModalOpen(false)}
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <div className="admin-staff-add-modal-body">
+            <input
+              type="text"
+              name="firstName"
+              placeholder="First Name"
+              value={form.firstName}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="lastName"
+              placeholder="Last Name"
+              value={form.lastName}
+              onChange={handleChange}
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={handleChange}
+            />
+            <input
+              type="text"
+              name="phoneNumber"
+              placeholder="Phone"
+              value={form.phoneNumber}
+              onChange={handleChange}
+            />
+            <select
+              name="staffRoleType"
+              value={form.staffRoleType}
+              onChange={handleChange}
+            >
+              <option value="">Select Role</option>
+              {roles.map((r) => (
+                <option key={r.id} value={r.staffRoleName}>
+                  {r.staffRoleName}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              name="shiftTiming"
+              placeholder="Shift Timing"
+              value={form.shiftTiming}
+              onChange={handleChange}
+            />
+            <input
+              type="number"
+              name="salary"
+              placeholder="Salary"
+              value={form.salary}
+              onChange={handleChange}
+            />
+            <input
+              type="date"
+              name="contractStartDate"
+              value={form.contractStartDate}
+              onChange={handleChange}
+            />
+            <input
+              type="date"
+              name="contractEndDate"
+              value={form.contractEndDate}
+              onChange={handleChange}
+            />
+
+            <div className="admin-staff-add-password-field">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                value={form.password}
+                onChange={handleChange}
+              />
               <button
-                className="admin-close-btn"
-                onClick={() => setModalOpen(false)}
+                type="button"
+                className="admin-staff-add-eye-btn"
+                onClick={() => setShowPassword(!showPassword)}
               >
-                <X size={18} />
-              </button>
-            </div>
-            <div className="admin-modal-body">
-              <input
-                type="text"
-                name="firstName"
-                placeholder="First Name"
-                value={form.firstName}
-                onChange={handleChange}
-              />
-              <input
-                type="text"
-                name="lastName"
-                placeholder="Last Name"
-                value={form.lastName}
-                onChange={handleChange}
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={handleChange}
-              />
-              <input
-                type="text"
-                name="phone"
-                placeholder="Phone"
-                value={form.phone}
-                onChange={handleChange}
-              />
-              <select
-                name="staffRoleType"
-                value={form.staffRoleType}
-                onChange={handleChange}
-              >
-                <option value="">Select Role</option>
-                {roles.map((role, index) => (
-                  <option key={role.id || index} value={role.staffRoleName}>
-                    {role.staffRoleName}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="text"
-                name="shiftTiming"
-                placeholder="Shift Timing"
-                value={form.shiftTiming}
-                onChange={handleChange}
-              />
-              <input
-                type="number"
-                name="salary"
-                placeholder="Salary"
-                value={form.salary}
-                onChange={handleChange}
-              />
-              <input
-                type="date"
-                name="contractStartDate"
-                value={form.contractStartDate}
-                onChange={handleChange}
-              />
-              <input
-                type="date"
-                name="contractEndDate"
-                value={form.contractEndDate}
-                onChange={handleChange}
-              />
-              <div className="admin-password-field">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  placeholder="Password"
-                  value={form.password}
-                  onChange={handleChange}
-                />
-                <button
-                  type="button"
-                  className="admin-eye-btn"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-            <div className="admin-modal-footer">
-              <button className="admin-add-btn" onClick={handleAddOrUpdate}>
-                <Plus size={16} /> {editId ? "Update Staff" : "Add Staff"}
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
-        </div>
-      )}
 
-      <ToastContainer />
-    </div>
-  );
+          <div className="admin-staff-add-modal-footer">
+            <button
+              className="admin-staff-add-btn"
+              onClick={handleAddOrUpdate}
+            >
+              <Plus size={16} /> {editId ? "Update" : "Add"}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+
+    <ToastContainer />
+  </div>
+);
 }

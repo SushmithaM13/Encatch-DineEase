@@ -4,7 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./Usermanagement.css";
 
-export default function AdminStaffManagement() {
+export default function SuperAdminStaffManagement() {
   const API_BASE = "http://localhost:8082/dine-ease/api/v1/staff";
   const ROLES_API = "http://localhost:8082/dine-ease/api/v1/staff-role/all";
   const TOKEN = localStorage.getItem("token");
@@ -298,8 +298,7 @@ export default function AdminStaffManagement() {
   const startIndex = currentPage * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedStaff = filteredStaff.slice(startIndex, endIndex);
-  //const totalLocalPages = Math.ceil(filteredStaff.length / pageSize);
-  //const [currentPage, setCurrentPage] = useState(1);
+  
 
 const handleNext = () => {
   if (currentPage < totalPages) {
@@ -322,7 +321,7 @@ const handlePrevious = () => {
       {/* Header and Add Button */}
       <div className="user-header">
         <h2>
-          <UserCog size={26} /> Staff Management
+          <UserCog size={20} /> Staff Management
         </h2>
         <button
           className="add-btn"
@@ -338,7 +337,7 @@ const handlePrevious = () => {
 
       {/* Tabs */}
       <div className="tab-navigation">
-        {["All Staff", "Chef", "Waiters", "Other"].map((tab) => (
+        {["All Staff", "Admin", "Waiters", "Chef", "Other"].map((tab) => (
           <div
             key={tab}
             className={`tab ${activeTab === tab ? "active" : ""}`}
@@ -478,64 +477,171 @@ const handlePrevious = () => {
   </button>
 </div>
 
-
-      {/* Popup Form */}
-      {popupOpen && (
-        <div className="popup">
-          <div className="popup-content">
-            <h3>{editId ? "Edit Staff" : "Add Staff"}</h3>
-            <form>
-              {["firstName","lastName","email","phoneNumber"].map((name) => (
-                <div className="form-group" key={name}>
-                  <label>{name.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</label>
-                  <input type={name==="email"?"email":"text"} name={name} value={form[name]} onChange={handleChange} placeholder={name} />
-                </div>
-              ))}
-
-              <div className="form-group">
-                <label>Role</label>
-                <select name="staffRoleType" value={form.staffRoleType} onChange={handleChange}>
-                  <option value="">Select Role</option>
-                  {roles.map((role) => <option key={role.id} value={role.staffRoleName}>{role.staffRoleName}</option>)}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label>Shift Timing</label>
-                <input type="text" name="shiftTiming" value={form.shiftTiming} onChange={handleChange} placeholder="Shift Timing" />
-              </div>
-
-              <div className="form-group">
-                <label>Salary</label>
-                <input type="number" name="salary" value={form.salary} onChange={handleChange} placeholder="Salary" />
-              </div>
-
-              <div className="form-group">
-                <label>Contract Start</label>
-                <input type="date" name="contractStartDate" value={form.contractStartDate} onChange={handleChange} />
-              </div>
-
-              <div className="form-group">
-                <label>Contract End</label>
-                <input type="date" name="contractEndDate" value={form.contractEndDate} onChange={handleChange} />
-              </div>
-
-              {!editId && (
-                <div className="form-group">
-                  <label>Password</label>
-                  <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="Password" />
-                </div>
-              )}
-
-              <div className="form-buttons">
-                <button type="button" onClick={() => setPopupOpen(false)}>Cancel</button>
-                <button type="button" onClick={handleAddOrUpdate}>{editId ? "Update" : "Add"}</button>
-              </div>
-            </form>
+{popupOpen && (
+  <div className="popup">
+    <div className="popup-content">
+      <h3>{editId ? "Edit Staff" : "Add Staff"}</h3>
+      <form>
+        {/* Existing Basic Fields */}
+        {["firstName", "lastName", "email", "phoneNumber"].map((name) => (
+          <div className="form-group" key={name}>
+            <label>
+              {name
+                .replace(/([A-Z])/g, " $1")
+                .replace(/^./, (str) => str.toUpperCase())}
+            </label>
+            <input
+              type={name === "email" ? "email" : "text"}
+              name={name}
+              value={form[name]}
+              onChange={handleChange}
+              placeholder={name}
+            />
           </div>
-        </div>
-      )}
+        ))}
 
+        {/* Role */}
+        <div className="form-group">
+          <label>Role</label>
+          <select
+            name="staffRoleType"
+            value={form.staffRoleType}
+            onChange={handleChange}
+          >
+            <option value="">Select Role</option>
+            {roles.map((role) => (
+              <option key={role.id} value={role.staffRoleName}>
+                {role.staffRoleName}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Added New Inputs (extra fields) */}
+        <div className="form-group">
+          <label>Address</label>
+          <input
+            type="text"
+            name="address"
+            value={form.address || ""}
+            onChange={handleChange}
+            placeholder="Enter address"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>City</label>
+          <input
+            type="text"
+            name="city"
+            value={form.city || ""}
+            onChange={handleChange}
+            placeholder="Enter city"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>State</label>
+          <input
+            type="text"
+            name="state"
+            value={form.state || ""}
+            onChange={handleChange}
+            placeholder="Enter state"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Emergency Contact</label>
+          <input
+            type="text"
+            name="emergencyContact"
+            value={form.emergencyContact || ""}
+            onChange={handleChange}
+            placeholder="Emergency contact number"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>ID Proof</label>
+          <input
+            type="text"
+            name="idProof"
+            value={form.idProof || ""}
+            onChange={handleChange}
+            placeholder="Aadhar / PAN / Passport"
+          />
+        </div>
+
+        {/* Existing Fields */}
+        <div className="form-group">
+          <label>Shift Timing</label>
+          <input
+            type="text"
+            name="shiftTiming"
+            value={form.shiftTiming}
+            onChange={handleChange}
+            placeholder="Shift Timing"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Salary</label>
+          <input
+            type="number"
+            name="salary"
+            value={form.salary}
+            onChange={handleChange}
+            placeholder="Salary"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Contract Start</label>
+          <input
+            type="date"
+            name="contractStartDate"
+            value={form.contractStartDate}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Contract End</label>
+          <input
+            type="date"
+            name="contractEndDate"
+            value={form.contractEndDate}
+            onChange={handleChange}
+          />
+        </div>
+
+        {!editId && (
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              placeholder="Password"
+            />
+          </div>
+        )}
+
+        {/* Footer Buttons */}
+        <div className="form-buttons">
+          <button type="button" onClick={() => setPopupOpen(false)}>
+            Cancel
+          </button>
+          <button type="button" onClick={handleAddOrUpdate}>
+            {editId ? "Update" : "Add"}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
       <ToastContainer />
     </div>
   );
