@@ -4,7 +4,7 @@ import "./AdminProfile.css";
 
 export default function AdminProfile() {
   const API_URL = "http://localhost:8082/dine-ease/api/v1/staff/profile";
-  const TOKEN = localStorage.getItem("token"); // ✅ Get token from login
+  const TOKEN = localStorage.getItem("token"); // Get token from login
 
   const [profile, setProfile] = useState({
     id: "",
@@ -46,9 +46,9 @@ export default function AdminProfile() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${TOKEN}`, // ✅ Include token
+            Authorization: `Bearer ${TOKEN}`, //  Include token
           },
-          credentials: "include", // ✅ If your backend uses cookies
+          credentials: "include", //  If your backend uses cookies
         });
 
         if (!res.ok) {
@@ -63,7 +63,20 @@ export default function AdminProfile() {
         }
 
         const data = JSON.parse(text);
-        setProfile(data);
+        console.log(" PROFILE RESPONSE FROM BACKEND:", data);
+        setProfile({
+        id: data.id || "",
+        fullName: data.fullName || "",
+        phoneNumber: data.phoneNumber || "",
+        email: data.email || "",
+        staffRoleName: data.staffRoleName || data.roleName || data.staffRole?.name || "",
+        organizationId: data.organizationId || data.organization?.id || "",
+        organizationName: data.organizationName || data.organization?.name || "",
+        contractStartDate: data.contractStartDate || "",
+        contractEndDate: data.contractEndDate || "",
+        profileImage: data.profileImage || "",
+      });
+
       } catch (err) {
         console.error("Error fetching profile:", err.message);
       }
@@ -86,7 +99,7 @@ export default function AdminProfile() {
       });
 
       if (res.ok) {
-        alert("✅ Profile updated successfully!");
+        alert("Profile updated successfully!");
         setIsEditing(false);
       } else {
         alert(`Failed to update profile (${res.status})`);

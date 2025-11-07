@@ -89,7 +89,7 @@ export default function AdminMenu() {
     };
 
     fetchProfile();
-  }, []);
+  }, [PROFILE_API]);
 
   // ---------------- FETCH DROPDOWNS -----------------
   useEffect(() => {
@@ -144,7 +144,7 @@ export default function AdminMenu() {
     };
 
     fetchMenus();
-  }, [organizationId]);
+  }, [MENU_API, organizationId]);
 
   // ---------------- IMAGE UPLOAD -----------------
   const handleImageUpload = (e) => {

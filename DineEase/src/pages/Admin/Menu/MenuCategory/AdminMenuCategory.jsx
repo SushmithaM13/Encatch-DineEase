@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   PlusSquare,
   Edit3,
@@ -51,43 +51,33 @@ export default function AdminMenuCategory() {
       }
     };
     fetchProfile();
-  }, []);
+  }, [TOKEN]);
 
   // ✅ Fetch paginated categories
-  const fetchCategories = async () => {
-    if (!organizationId) return;
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `${CATEGORY_API}/${organizationId}?page=${page}&size=5&sortBy=id&sortDir=asc`,
-        { headers: { Authorization: `Bearer ${TOKEN}` } }
-      );
-      if (!res.ok) throw new Error("Failed to fetch categories");
-      const data = await res.json();
+ const fetchCategories = useCallback(async () => {
+  if (!organizationId) return;
+  setLoading(true);
+  try {
+    const res = await fetch(
+      `${CATEGORY_API}/${organizationId}?page=${page}&size=5&sortBy=id&sortDir=asc`,
+      { headers: { Authorization: `Bearer ${TOKEN}` } }
+    );
+    const data = await res.json();
+    setCategories(data.content || []);
+    setTotalPages(data.totalPages || 0);
+    setTotalElements(data.totalElements || 0);
+  } catch (err) {
+    console.error(err);
+    toast.error("Error loading categories");
+  } finally {
+    setLoading(false);
+  }
+}, [organizationId, page, TOKEN]);
 
-      // ✅ Set backend pagination data
-      setCategories(data.content || []);
-      setTotalPages(data.totalPages || 0);
-      setTotalElements(data.totalElements || 0);
-    } catch (err) {
-      console.error(err);
-      toast.error("Error loading categories");
-    } finally {
-      setLoading(false);
-    }
-  };
+useEffect(() => {
+  fetchCategories();
+}, [fetchCategories]);
 
-  useEffect(() => {
-    if (!organizationId) return;
-    let ignore = false;
-    const load = async () => {
-      if (!ignore) await fetchCategories();
-    };
-    load();
-    return () => {
-      ignore = true;
-    };
-  }, [organizationId, page]);
 
 
   const toggleExpand = (id) => {
