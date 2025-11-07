@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./Inventory.module.css";
+import styles from "./Inventory.module.css";
 
 export default function ChefInventory() {
   const [inventory, setInventory] = useState([]);
@@ -43,16 +43,16 @@ export default function ChefInventory() {
   };
 
   return (
-    <div className="chef-inventory-container">
-      <div className="chef-inventory-header">
+    <div className={styles["chef-inventory-container"]}>
+      <div className={styles["chef-inventory-header"]}>
         <h2>Inventory Status</h2>
-        <button className="chef-add-btn" onClick={handleRequest}>
+        <button className={styles["chef-add-btn"]} onClick={handleRequest}>
           ➕ Request Items
         </button>
       </div>
 
-      <div className="chef-table-wrapper">
-        <table className="chef-inventory-table">
+      <div className={styles["chef-table-wrapper"]}>
+        <table className={styles["chef-inventory-table"]}>
           <thead>
             <tr>
               <th>Ingredient</th>
@@ -70,12 +70,12 @@ export default function ChefInventory() {
                 <td>{item.stock}</td>
                 <td>
                   <span
-                    className={`chef-status ${
+                    className={`${styles["chef-status"]} ${
                       item.status === "Adequate"
-                        ? "chef-status-adequate"
+                        ? styles["chef-status-adequate"]
                         : item.status === "Low"
-                        ? "chef-status-low"
-                        : "chef-status-out"
+                        ? styles["chef-status-low"]
+                        : styles["chef-status-out"]
                     }`}
                   >
                     {item.status}
@@ -83,7 +83,7 @@ export default function ChefInventory() {
                 </td>
                 <td>
                   <button
-                    className="chef-action-btn chef-notify"
+                    className={`${styles["chef-action-btn"]} ${styles["chef-notify"]}`}
                     onClick={() => handleNotify(item.ingredient)}
                   >
                     🔔

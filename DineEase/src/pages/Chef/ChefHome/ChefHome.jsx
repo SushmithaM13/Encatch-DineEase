@@ -9,20 +9,68 @@ import {
   LogOut,
   Settings,
   User,
-  Search,
+  Bell,
+  Clock,
+  AlertTriangle,
+  FlameKindling,
+  CheckCircle2,
   Menu,
   Home,
 } from "lucide-react";
 import "./ChefHome.css";
 
+
 export default function ChefHome() {
   const [chefName, setChefName] = useState("shaikyakuvali123");
-  const [restaurantName, setRestaurantName] = useState("DineEase Restaurant");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [restaurantName] = useState("DineEase Restaurant");
+  // start collapsed on small screens, expanded on larger
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [profilePic, setProfilePic] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [profilePic] = useState(null);
+  // Load saved notification read states from localStorage
+  const loadSavedReadStates = () => {
+    const saved = localStorage.getItem("notificationReadStates");
+    return saved ? JSON.parse(saved) : {};
+  };
+
+  // Initial notifications with read states from localStorage
+
+  const [notifications, setNotifications] = useState([
+    {
+      id: 45,
+      label: "Order #45 — 3 items",
+      details: "2× Pasta Carbonara, 1× Caesar Salad",
+      status: "New",
+      timeAgo: "2m",
+      unread: true,
+      priority: "high",
+      table: "Table 12",
+    },
+    {
+      id: 46,
+      label: "Order #46 — 1 item",
+      details: "1× Grilled Salmon",
+      status: "Preparing",
+      timeAgo: "7m",
+      unread: true,
+      priority: "normal",
+      table: "Table 8",
+    },
+    {
+      id: 47,
+      label: "Order #47 — 2 items",
+      details: "1× Mushroom Risotto, 1× Tiramisu",
+      status: "Ready",
+      timeAgo: "12m",
+      unread: false,
+      priority: "normal",
+      table: "Table 15",
+    },
+  ].map(notif => ({
+    ...notif,
+    unread: loadSavedReadStates()[notif.id] ?? notif.unread
+  })));
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -33,6 +81,53 @@ export default function ChefHome() {
   }, []);
 
   // Dropdown close outside click
+  // Save notification read states to localStorage whenever they change
+  useEffect(() => {
+    const readStates = notifications.reduce((acc, n) => ({
+      ...acc,
+      [n.id]: n.unread
+    }), {});
+    localStorage.setItem("notificationReadStates", JSON.stringify(readStates));
+  }, [notifications]);
+
+  // Mock WebSocket for new orders demo
+  useEffect(() => {
+    const mockOrders = [
+      {
+        id: 48,
+        label: "Order #48 — 4 items",
+        details: "2× Steak (Medium), 2× Chocolate Cake",
+        status: "New",
+        priority: "high",
+        table: "Table 3",
+      },
+      {
+        id: 49,
+        label: "Order #49 — 2 items",
+        details: "1× Seafood Pasta, 1× Crème Brûlée",
+        status: "New",
+        priority: "normal",
+        table: "Table 7",
+      }
+    ];
+
+    let orderIndex = 0;
+    const interval = setInterval(() => {
+      if (orderIndex < mockOrders.length) {
+        const newOrder = {
+          ...mockOrders[orderIndex],
+          timeAgo: "just now",
+          unread: true
+        };
+        setNotifications(prev => [newOrder, ...prev]);
+        orderIndex++;
+      }
+    }, 15000); // New order every 15 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -41,26 +136,14 @@ export default function ChefHome() {
         !dropdownRef.current.contains(event.target)
       ) {
         setDropdownOpen(false);
+        setNotifOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Search simulation
-  useEffect(() => {
-    if (!searchQuery.trim()) return setSearchResults([]);
-    const dummyResults = [
-      { type: "Order", label: "Order #45 - 3 items" },
-      { type: "Menu", label: "Pasta Alfredo" },
-      { type: "Inventory", label: "Tomatoes (Low Stock)" },
-    ];
-    setSearchResults(
-      dummyResults.filter((r) =>
-        r.label.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
-  }, [searchQuery]);
+  
 
   const handleLogout = () => {
     localStorage.clear();
@@ -141,14 +224,16 @@ export default function ChefHome() {
             {sidebarOpen && <span>Inventory</span>}
           </NavLink>
 
-          <div className="nav-footer">
-            <button className="logout-btn" onClick={handleLogout}>
-              <LogOut size={20} />
-              {sidebarOpen && <span>Logout</span>}
-            </button>
-          </div>
+          
         </nav>
       </aside>
+
+      {/* overlay/backdrop for mobile sidebar */}
+      <div
+        className={`sidebar-backdrop ${sidebarOpen ? "show" : ""}`}
+        onClick={() => setSidebarOpen(false)}
+        aria-hidden={!sidebarOpen}
+      />
 
       {/* ===== Main Area ===== */}
       <main className="chef-main">
@@ -164,24 +249,96 @@ export default function ChefHome() {
               <span>{restaurantName}</span>
             </div>
           </div>
-
           <div className="header-right" ref={dropdownRef}>
-            {/* Search */}
-            <div className="search-box">
-              <Search size={16} className="search-icon" />
-              <input
-                type="text"
-                placeholder="Search orders, menu..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchResults.length > 0 && (
-                <div className="search-results">
-                  {searchResults.map((res, i) => (
-                    <div key={i} className="search-item">
-                      <strong>{res.type}:</strong> {res.label}
-                    </div>
-                  ))}
+            {/* Notification bell (click to open list / navigate to OrdersQueue) */}
+            <div className="notification-wrapper">
+              <button
+                className="notif-btn"
+                onClick={() => {
+                  setNotifOpen(!notifOpen);
+                }}
+                aria-label="Notifications"
+                title="Notifications"
+              >
+                <Bell size={18} />
+                {notifications.length > 0 && (
+                  <span className="notif-badge">{notifications.length}</span>
+                )}
+              </button>
+
+              {notifOpen && (
+                <div className="notif-dropdown">
+                  <div className="notif-actions">
+                    <button
+                      className="mark-all-btn"
+                      onClick={() => {
+                        setNotifications((prev) => prev.map((p) => ({ ...p, unread: false })));
+                      }}
+                    >
+                      Mark all read
+                    </button>
+                    <button
+                      className="clear-btn"
+                      onClick={() => setNotifications([])}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                  <div className="notif-list">
+                    {notifications.length === 0 && (
+                      <div className="notif-empty">No notifications</div>
+                    )}
+                    {notifications.map((n) => (
+                      <div
+                        key={n.id}
+                        className={`notif-item ${n.unread ? "unread" : ""}`}
+                      >
+                        <div
+                          className="notif-main"
+                            onClick={() => {
+                            // navigate to OrdersQueue when clicking a notification (use absolute path)
+                            setNotifications((prev) => prev.map((p) => (p.id === n.id ? { ...p, unread: false } : p)));
+                            navigate("/chefDashboard/OrdersQueue");
+                            setNotifOpen(false);
+                          }}
+                        >
+                          <div className="notif-header">
+                            <div className="notif-title">
+                              {n.label}
+                              {n.priority === "high" && (
+                                <AlertTriangle size={14} className="priority-icon" />
+                              )}
+                            </div>
+                            <div className="notif-table">{n.table}</div>
+                          </div>
+                          <div className="notif-details">{n.details}</div>
+                          <div className="notif-meta">
+                            <span className={`notif-status ${n.status.toLowerCase()}`}>
+                              {n.status === "New" && <AlertTriangle size={14} />}
+                              {n.status === "Preparing" && <FlameKindling size={14} />}
+                              {n.status === "Ready" && <CheckCircle2 size={14} />}
+                              {n.status}
+                            </span>
+                            <span className="notif-time">
+                              <Clock size={14} />
+                              {n.timeAgo} ago
+                            </span>
+                          </div>
+                        </div>
+                        <div className="notif-controls">
+                          {n.unread && <span className="unread-dot" />}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="notif-footer">
+                    <button
+                      className="view-all-btn"
+                      onClick={() => navigate("/chefDashboard/OrdersQueue")}
+                    >
+                      View all orders
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -200,10 +357,10 @@ export default function ChefHome() {
 
             {dropdownOpen && (
               <div className="dropdown-menu">
-                <button onClick={() => navigate("profile")}>
+                <button onClick={() => navigate("/chefDashboard/profile")}> 
                   <User size={16} /> Profile
                 </button>
-                <button onClick={() => navigate("settings")}>
+                <button onClick={() => navigate("/chefDashboard/settings")}>
                   <Settings size={16} /> Settings
                 </button>
                 <button onClick={handleLogout}>
@@ -215,7 +372,7 @@ export default function ChefHome() {
         </header>
 
         {/* Outlet */}
-        <section className="page-container">
+        <section className="page-container container">
           <Outlet />
         </section>
       </main>

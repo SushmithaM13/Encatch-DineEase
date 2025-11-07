@@ -1,30 +1,42 @@
 
 .footer {
-  background-color: #111;
+  background-color: #0b1220; /* slightly softer than pure black */
   color: #fff;
-  padding: 40px 20px;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .footer-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 30px;
+  gap: 24px;
+  align-items: start;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .footer-section h2,
 .footer-section h3 {
   color: #facc15; /* yellow accent */
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .footer-logo {
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
 }
 
 .footer-about {
-  color: #bbb;
+  color: #c9d1d9;
   line-height: 1.6;
+  margin: 0;
 }
 
 .footer-section ul {
@@ -37,20 +49,24 @@
 }
 
 .footer-section a {
-  color: #bbb;
+  color: #c9d1d9;
   text-decoration: none;
-  transition: color 0.3s;
+  transition: color 0.18s ease, transform 0.12s ease;
 }
 
-.footer-section a:hover {
+.footer-section a:hover,
+.footer-section a:focus {
   color: #facc15;
+  transform: translateX(4px);
+  outline: none;
 }
 
 .footer-contact li {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #bbb;
+  color: #c9d1d9;
+  font-size: 0.95rem;
 }
 
 .footer-socials {
@@ -60,24 +76,38 @@
 
 .footer-socials a {
   background: #facc15;
-  color: #111;
+  color: #0b1220;
   padding: 10px;
   border-radius: 50%;
   display: inline-flex;
-  transition: background 0.3s;
+  transition: transform 0.12s ease, background 0.18s ease;
 }
 
-.footer-socials a:hover {
+.footer-socials a:hover,
+.footer-socials a:focus {
   background: #eab308;
+  transform: translateY(-3px);
+  outline: none;
 }
 
 .footer-bottom {
   text-align: center;
-  margin-top: 30px;
-  border-top: 1px solid #333;
-  padding-top: 15px;
-  color: #888;
-  font-size: 14px;
+  margin-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 12px;
+  color: #9aa3ad;
+  font-size: 13px;
+}
+
+/* Make sure footer content fits on small screens and doesn't collapse */
+.footer * {
+  box-sizing: border-box;
+}
+
+/* small focus-visible helper for accessibility */
+.footer a:focus-visible {
+  outline: 3px solid rgba(250,204,21,0.18);
+  border-radius: 6px;
 }
 /* Responsive */
 @media (max-width: 600px) { 

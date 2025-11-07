@@ -1,216 +1,248 @@
+:root {
+  --green: #27ae60;
+  --orange: #f39c12;
+  --red: #e74c3c;
+  --light-green: #a8e6cf;
+  --bg-light: #f9fafb;
+  --text-dark: #2d3436;
+  --gray: #64748b;
+  --shadow: rgba(0, 0, 0, 0.08);
+}
+
 .chef-home-container {
-  background-color: #f9fafb;
   padding: 2rem;
   font-family: "Inter", sans-serif;
-  min-height: 100vh;
 }
 
-/* Welcome Section */
+/* ✅ Welcome Section */
 .welcome-section {
-  background-color: white;
-  border-radius: 12px;
-  padding: 2rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  margin-bottom: 2rem;
-}
-
-.welcome-text {
-  max-width: 60%;
+  justify-content: space-between;
+  gap: 2rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px var(--shadow);
 }
 
 .welcome-text h1 {
-  color: #166534;
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-dark);
 }
 
 .welcome-text p {
-  color: #4b5563;
-  margin-bottom: 1.2rem;
-  line-height: 1.5;
+  font-size: 1rem;
+  margin-top: 8px;
+  color: var(--gray);
+  line-height: 1.6;
 }
 
-.welcome-image img {
-  width: 140px;
-}
-
-/* Buttons */
+/* ✅ Buttons */
 .button-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-bottom: 1rem;
+  gap: 10px;
+  margin-top: 1rem;
 }
 
 .btn {
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 0.9rem;
   cursor: pointer;
-  font-size: 0.95rem;
+  border: none;
+  transition: 0.2s ease;
+  font-weight: 600;
 }
 
+.btn-icon {
+  font-size: 1rem;
+}
+
+/* Filled button */
 .btn-green {
-  background-color: #166534;
+  background: var(--green);
   color: white;
-  border: none;
 }
 
 .btn-green:hover {
-  background-color: #14532d;
+  opacity: 0.85;
 }
 
+/* Outline buttons */
 .btn-outline-green {
-  border: 1px solid #166534;
-  color: #166534;
+  border: 2px solid var(--green);
+  color: var(--green);
   background: transparent;
 }
 
 .btn-outline-green:hover {
-  background-color: #dcfce7;
+  background: var(--green);
+  color: white;
 }
 
 .btn-outline-orange {
-  border: 1px solid #f97316;
-  color: #f97316;
-  background: transparent;
+  border: 2px solid var(--orange);
+  color: var(--orange);
 }
 
 .btn-outline-orange:hover {
-  background-color: #fff7ed;
+  background: var(--orange);
+  color: white;
 }
 
 .btn-outline-red {
-  border: 1px solid #dc2626;
-  color: #dc2626;
-  background: transparent;
+  border: 2px solid var(--red);
+  color: var(--red);
 }
 
 .btn-outline-red:hover {
-  background-color: #fef2f2;
+  background: var(--red);
+  color: white;
 }
 
-/* Badges */
+/* ✅ Badges */
 .badges {
   display: flex;
+  gap: 10px;
+  margin-top: 1rem;
   flex-wrap: wrap;
-  gap: 0.5rem;
 }
 
 .badge {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  padding: 8px 12px;
+  gap: 6px;
+  border-radius: 20px;
   font-size: 0.85rem;
-  border-radius: 9999px;
-  padding: 0.3rem 0.8rem;
-  font-weight: 500;
-}
-
-.badge.orange {
-  background-color: #fff7ed;
-  color: #ea580c;
-}
-
-.badge.red {
-  background-color: #fef2f2;
-  color: #dc2626;
-}
-
-.badge.green {
-  background-color: #f0fdf4;
-  color: #166534;
-}
-
-/* Cards Section */
-.info-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.card {
-  background-color: white;
-  border-radius: 10px;
-  padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.card h3 {
-  margin-bottom: 0.3rem;
+  color: white;
   font-weight: 600;
 }
 
-.card p {
-  font-size: 0.9rem;
-  color: #6b7280;
+.badge.orange { background: var(--orange); }
+.badge.red { background: var(--red); }
+.badge.green { background: var(--green); }
+
+/* ✅ Welcome Image */
+.welcome-image img {
+  width: 260px;
+  filter: drop-shadow(0 4px 8px var(--shadow));
 }
 
-.card.green h3 {
-  color: #166534;
+/* ✅ Info Cards */
+.info-cards {
+  margin-top: 2rem;
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-.card.orange h3 {
-  color: #ea580c;
+.card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px var(--shadow);
+  text-align: center;
+  cursor: pointer;
+  transition: 0.25s ease;
 }
 
-.card.green-light h3 {
-  color: #22c55e;
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px var(--shadow);
 }
 
-.card.red h3 {
-  color: #dc2626;
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
 }
 
-/* Tips & Shortcuts Section */
+.card.green { border-left: 6px solid var(--green); }
+.card.orange { border-left: 6px solid var(--orange); }
+.card.red { border-left: 6px solid var(--red); }
+.card.green-light { border-left: 6px solid var(--light-green); }
+
+/* ✅ Bottom Section */
 .bottom-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.2rem;
+  margin-top: 2rem;
 }
 
-.tips-card,
+.tips-card, 
 .shortcuts-card {
-  background-color: white;
-  border-radius: 10px;
-  padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  background: white;
+  padding: 1.6rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px var(--shadow);
 }
 
 .tips-card h3,
 .shortcuts-card h3 {
-  color: #166534;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 0.8rem;
 }
 
 .tips-card ul {
-  list-style: disc;
-  padding-left: 1.25rem;
-  color: #4b5563;
+  padding-left: 18px;
+  color: var(--gray);
+  font-size: 0.95rem;
 }
 
 .text-red {
-  color: #dc2626;
-  font-weight: 500;
+  color: var(--red);
 }
 
+/* ✅ Shortcut Buttons */
 .shortcut-buttons {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .btn-outline {
-  border: 1px solid #d1d5db;
-  background-color: white;
-  color: #374151;
+  border: 2px solid var(--gray);
+  color: var(--text-dark);
+  background: transparent;
+  width: 100%;
 }
 
 .btn-outline:hover {
-  background-color: #f3f4f6;
+  background: var(--text-dark);
+  color: white;
+}
+
+/* ✅ Responsive */
+@media (max-width: 900px) {
+  .welcome-section {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .welcome-image img {
+    width: 200px;
+  }
+
+  .button-group {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .chef-home-container {
+    padding: 1rem;
+  }
+
+  .welcome-text h1 {
+    font-size: 1.6rem;
+  }
 }

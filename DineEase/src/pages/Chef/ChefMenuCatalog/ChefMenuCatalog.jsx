@@ -68,7 +68,7 @@ export default function ChefMenuCatalog() {
   };
 
   return (
-    <div className="menu-catalog">
+    <div className="menu-catalog container">
       <div className="menu-header">
         <h2>Menu Catalog</h2>
         <button className="btn btn-outline" onClick={handleReportOut}>

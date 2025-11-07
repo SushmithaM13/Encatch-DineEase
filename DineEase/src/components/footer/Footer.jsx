@@ -6,11 +6,11 @@ import "./Footer.css";
 const Footer = () => {
     return (
         <footer className="footer">
-            <div className="footer-count">
+        <div className="footer-container">
 
                 <div className="footer-section">
                     <h2 className="footer-logo">🍴 DINEEASE</h2>
-                    <p className="FOOTER-ABOUT">
+                <p className="footer-about">
                          Serving delicious food made with love and fresh ingredients.  
                          Your satisfaction is our top priority.
                     </p>

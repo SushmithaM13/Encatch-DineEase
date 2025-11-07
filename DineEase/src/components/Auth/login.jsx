@@ -16,6 +16,30 @@ const Login = () => {
     if (remembered) setUsername(remembered);
   }, []);
 
+  // If already logged in (token present), redirect directly to the correct dashboard
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    if (token && role) {
+      switch (role) {
+        case "SUPER_ADMIN":
+          navigate("/superAdminDashboard", { replace: true });
+          break;
+        case "ADMIN":
+          navigate("/AdminDashboard", { replace: true });
+          break;
+        case "WAITER":
+          navigate("/WaiterDashboard", { replace: true });
+          break;
+        case "CHEF":
+          navigate("/chefDashboard", { replace: true });
+          break;
+        default:
+          break;
+      }
+    }
+  }, [navigate]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -144,3 +168,4 @@ const Login = () => {
 };
 
 export default Login;
+

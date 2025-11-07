@@ -30,7 +30,7 @@ export default function ChefDashboard() {
   ]);
 
   return (
-    <div className="chef-dashboard">
+    <div className="chef-dashboard container">
       <h2 className="section-title">Kitchen Overview</h2>
 
       <div className="stats-grid">
