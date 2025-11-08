@@ -1,440 +1,225 @@
 import { useEffect, useState } from "react";
-import { Users, Newspaper, Sofa, IndianRupee } from "lucide-react";
+import { Users, Newspaper, Sofa } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-} from "recharts";
+import { toast } from "react-toastify";
 import "./AdminHome.css";
 
 export default function AdminHome() {
   const [adminName, setAdminName] = useState("");
   const [restaurant, setRestaurant] = useState("");
+  const [organizationId, setOrganizationId] = useState(null);
   const [staff, setStaff] = useState([]);
   const [menu, setMenu] = useState([]);
   const [tables, setTables] = useState([]);
-  const [revenue, setRevenue] = useState(0);
-
-  const [revenueFilter, setRevenueFilter] = useState("Weekly");
-  const [tableFilter, setTableFilter] = useState("Weekly");
-
-  const [customRevenueStart, setCustomRevenueStart] = useState(null);
-  const [customRevenueEnd, setCustomRevenueEnd] = useState(null);
-
-  const [customTableStart, setCustomTableStart] = useState(null);
-  const [customTableEnd, setCustomTableEnd] = useState(null);
 
   const navigate = useNavigate();
+  const TOKEN = localStorage.getItem("token");
+  const PROFILE_API = "http://localhost:8082/dine-ease/api/v1/staff/profile";
 
-  // ===== Load localStorage data =====
+  // ===== Fetch Admin Profile =====
   useEffect(() => {
-    const name = localStorage.getItem("loggedInAdmin") || "Admin";
-    const rest = localStorage.getItem("restaurantName") || "My Restaurant";
-    const savedStaff = JSON.parse(localStorage.getItem("staffList") || "[]");
-    const savedMenu = JSON.parse(localStorage.getItem("menuItems") || "[]");
-    const savedTables = JSON.parse(localStorage.getItem("tables") || "[]");
-    const savedRevenue = parseFloat(localStorage.getItem("todaysRevenue") || "0");
+    const fetchProfile = async () => {
+      if (!TOKEN)
+        return toast.error("Token missing! Please login.", {
+          position: "top-center",
+        });
 
-    setAdminName(name);
-    setRestaurant(rest);
-    setStaff(savedStaff);
-    setMenu(savedMenu);
-    setTables(savedTables);
-    setRevenue(savedRevenue);
-  }, []);
+      try {
+        const res = await fetch(PROFILE_API, {
+          headers: { Authorization: `Bearer ${TOKEN}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch profile");
+        const data = await res.json();
 
-  const occupiedTables = tables.filter((t) => t.status === "booked").length;
+        setOrganizationId(data.organizationId);
+        setAdminName(data.firstName || "Admin");
+        setRestaurant(data.organizationName || "My Restaurant");
+      } catch {
+        toast.error("Failed to fetch organization ID", {
+          position: "top-center",
+        });
+      }
+    };
+    fetchProfile();
+  }, [TOKEN]);
 
-  // ===== Dummy Revenue Data =====
-  const revenueDataWeekly = [
-    { day: "Mon", revenue: 2000 },
-    { day: "Tue", revenue: 3000 },
-    { day: "Wed", revenue: 2500 },
-    { day: "Thu", revenue: 4000 },
-    { day: "Fri", revenue: 3500 },
-    { day: "Sat", revenue: 5000 },
-    { day: "Sun", revenue: 4500 },
-  ];
+  // ===== Fetch Dashboard Data =====
+  useEffect(() => {
+    if (!organizationId) return;
 
-  const revenueDataMonthly = [
-    { month: "Jan", revenue: 12000 },
-    { month: "Feb", revenue: 15000 },
-    { month: "Mar", revenue: 13000 },
-    { month: "Apr", revenue: 16000 },
-    { month: "May", revenue: 14000 },
-    { month: "Jun", revenue: 17000 },
-    { month: "Jul", revenue: 15500 },
-    { month: "Aug", revenue: 16500 },
-    { month: "Sep", revenue: 14500 },
-    { month: "Oct", revenue: 17500 },
-    { month: "Nov", revenue: 16000 },
-    { month: "Dec", revenue: 18000 },
-  ];
+    const fetchDashboardData = async () => {
+      try {
+        // Staff
+        const staffRes = await fetch(
+          `http://localhost:8082/dine-ease/api/v1/staff/all?organizationId=${organizationId}&pageNumber=0&pageSize=10`,
+          { headers: { Authorization: `Bearer ${TOKEN}` } }
+        );
+        const staffData = await staffRes.json();
+        const allStaff = staffData.content || staffData || [];
+        const nonAdminStaff = allStaff.filter(
+          (s) => s.staffRoleName?.toUpperCase() !== "ADMIN"
+        );
+        setStaff(nonAdminStaff);
 
-  const revenueDataYearly = [
-    { year: "2021", revenue: 150000 },
-    { year: "2022", revenue: 180000 },
-    { year: "2023", revenue: 200000 },
-  ];
 
-  const getRevenueData = () => {
-    switch (revenueFilter) {
-      case "Weekly":
-        return revenueDataWeekly;
-      case "Monthly":
-        return revenueDataMonthly;
-      case "Yearly":
-        return revenueDataYearly;
-      case "Custom":
-        if (!customRevenueStart || !customRevenueEnd) return [];
-        return revenueDataWeekly.filter((_, i) => i % 2 === 0); // dummy
-      default:
-        return revenueDataWeekly;
-    }
-  };
+        // Menu
+        const menuRes = await fetch(
+          `http://localhost:8082/dine-ease/api/v1/menu/organization/${organizationId}?page=0&size=20`,
+          { headers: { Authorization: `Bearer ${TOKEN}` } }
+        );
+        const menuData = await menuRes.json();
+        setMenu(menuData.content || menuData || []);
 
-  // ===== Dummy Table Data =====
-  const tableDataWeekly = [
-    { day: "Mon", booked: 8, available: 12 },
-    { day: "Tue", booked: 10, available: 10 },
-    { day: "Wed", booked: 6, available: 14 },
-    { day: "Thu", booked: 12, available: 8 },
-    { day: "Fri", booked: 14, available: 6 },
-    { day: "Sat", booked: 15, available: 5 },
-    { day: "Sun", booked: 13, available: 7 },
-  ];
+        // Tables
+        const tableRes = await fetch(
+          `http://localhost:8082/dine-ease/api/v1/restaurant-tables/all/${organizationId}`,
+          { headers: { Authorization: `Bearer ${TOKEN}` } }
+        );
+        const tableData = await tableRes.json();
+        setTables(tableData.content || tableData || []);
+      } catch (err) {
+        console.error("Dashboard Fetch Error:", err);
+        toast.error("Failed to load dashboard data", {
+          position: "top-center",
+        });
+      }
+    };
+    fetchDashboardData();
+  }, [organizationId, TOKEN]);
 
-  const tableDataMonthly = [
-    { month: "Jan", booked: 50, available: 30 },
-    { month: "Feb", booked: 60, available: 40 },
-    { month: "Mar", booked: 55, available: 35 },
-    { month: "Apr", booked: 70, available: 30 },
-    { month: "May", booked: 65, available: 25 },
-    { month: "Jun", booked: 72, available: 28 },
-    { month: "Jul", booked: 68, available: 32 },
-    { month: "Aug", booked: 75, available: 25 },
-    { month: "Sep", booked: 63, available: 37 },
-    { month: "Oct", booked: 77, available: 23 },
-    { month: "Nov", booked: 69, available: 31 },
-    { month: "Dec", booked: 80, available: 20 },
-  ];
-
-  const tableDataYearly = [
-    { year: "2021", booked: 600, available: 200 },
-    { year: "2022", booked: 650, available: 250 },
-    { year: "2023", booked: 700, available: 300 },
-  ];
-
-  const getTableData = () => {
-    switch (tableFilter) {
-      case "Weekly":
-        return tableDataWeekly;
-      case "Monthly":
-        return tableDataMonthly;
-      case "Yearly":
-        return tableDataYearly;
-      case "Custom":
-        if (!customTableStart || !customTableEnd) return [];
-        return tableDataWeekly.filter((_, i) => i % 2 === 0); // dummy
-      default:
-        return tableDataWeekly;
-    }
-  };
+  const occupiedTables = tables.filter((t) => t.tableStatus === "BOOKED").length;
 
   return (
-    <div className="admin-dashboard-page">
-      {/* Welcome */}
-      <h2 className="admin-welcome">Welcome, {adminName}</h2>
-      <h3 className="admin-restaurant">{restaurant}</h3>
+    <div className="admin-home-dashboard-page">
+      <h2 className="admin-home-welcome">Welcome, {adminName}</h2>
+      <h3 className="admin-home-restaurant">{restaurant}</h3>
 
-      {/* Stats Cards */}
-      <div className="admin-stats-cards">
-        <div className="admin-card bounce-card" onClick={() => navigate("/AdminDashboard/staff")}>
-          <Users size={28} className="admin-card-icon" />
+      {/* ===== Stats Cards ===== */}
+      <div className="admin-home-stats-cards">
+        <div
+          className="admin-home-card bounce-card"
+          onClick={() => navigate("/AdminDashboard/staff")}
+        >
+          <Users size={28} className="admin-home-card-icon" />
           <h4>{staff.length}</h4>
           <p>Staff Members</p>
         </div>
-        <div className="admin-card bounce-card" onClick={() => navigate("/AdminDashboard/menu")}>
-          <Newspaper size={28} className="admin-card-icon" />
+
+        <div
+          className="admin-home-card bounce-card"
+          onClick={() => navigate("/AdminDashboard/menu")}
+        >
+          <Newspaper size={28} className="admin-home-card-icon" />
           <h4>{menu.length}</h4>
           <p>Menu Items</p>
         </div>
-        <div className="admin-card bounce-card" onClick={() => navigate("/AdminDashboard/table")}>
-          <Sofa size={28} className="admin-card-icon" />
-          <h4>{occupiedTables}/{tables.length}</h4>
+
+        <div
+          className="admin-home-card bounce-card"
+          onClick={() => navigate("/AdminDashboard/table")}
+        >
+          <Sofa size={28} className="admin-home-card-icon" />
+          <h4>
+            {occupiedTables}/{tables.length}
+          </h4>
           <p>Tables Occupied</p>
         </div>
-        <div className="admin-card bounce-card" onClick={() => navigate("/AdminDashboard/revenue")}>
-          <IndianRupee size={28} className="admin-card-icon" />
-          <h4>₹{revenue.toLocaleString()}</h4>
-          <p>Today's Revenue</p>
+      </div>
+
+      {/* ===== Staff Preview ===== */}
+      <div className="admin-home-preview-section">
+        <div className="admin-home-section-header">
+          <span>Staff Members</span>
+          <button onClick={() => navigate("/AdminDashboard/staff")}>
+            More →
+          </button>
+        </div>
+        <div className="admin-home-preview-list">
+          {staff.slice(0, 5).map((s, i) => (
+            <div key={i} className="admin-home-preview-card staff-card">
+              <Users size={20} color="#0056d2" />
+              <div>
+                <strong>
+                  {s.firstName} {s.lastName}
+                </strong>
+                <p className="role">{s.staffRoleName || "N/A"}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Analytics Section */}
-      <div className="admin-analytics-section">
-        {/* Revenue Analysis */}
-        <div className="admin-analytics-header">
-          <h3>Revenue Analysis</h3>
-          <div className="admin-analytics-controls">
-            <select
-              value={revenueFilter}
-              onChange={(e) => setRevenueFilter(e.target.value)}
-              className="admin-analytics-select"
-            >
-              <option value="Weekly">Weekly</option>
-              <option value="Monthly">Monthly</option>
-              <option value="Yearly">Yearly</option>
-              <option value="Custom">Custom</option>
-            </select>
-            {revenueFilter === "Custom" && (
-              <>
-                <DatePicker
-                  selected={customRevenueStart}
-                  onChange={(date) => setCustomRevenueStart(date)}
-                  selectsStart
-                  startDate={customRevenueStart}
-                  endDate={customRevenueEnd}
-                  placeholderText="Start Date"
-                  dateFormat="dd/MM/yyyy"
-                />
-                <DatePicker
-                  selected={customRevenueEnd}
-                  onChange={(date) => setCustomRevenueEnd(date)}
-                  selectsEnd
-                  startDate={customRevenueStart}
-                  endDate={customRevenueEnd}
-                  placeholderText="End Date"
-                  dateFormat="dd/MM/yyyy"
-                  minDate={customRevenueStart || undefined}
-                />
-              </>
-            )}
-          </div>
+      {/* ===== Menu Preview ===== */}
+      <div className="admin-home-preview-section">
+        <div className="admin-home-section-header">
+          <span>Menu Items</span>
+          <button onClick={() => navigate("/AdminDashboard/menu")}>
+            More →
+          </button>
         </div>
 
-        <div className="admin-chart-container">
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={getRevenueData()}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey={
-                  revenueFilter === "Weekly"
-                    ? "day"
-                    : revenueFilter === "Monthly"
-                    ? "month"
-                    : "year"
-                }
-              />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="revenue" stroke="#4caf50" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Table Occupancy */}
-        <div className="admin-analytics-header">
-          <h3>Table Occupancy</h3>
-          <div className="admin-analytics-controls">
-            <select
-              value={tableFilter}
-              onChange={(e) => setTableFilter(e.target.value)}
-              className="admin-analytics-select"
-            >
-              <option value="Weekly">Weekly</option>
-              <option value="Monthly">Monthly</option>
-              <option value="Yearly">Yearly</option>
-              <option value="Custom">Custom</option>
-            </select>
-            {tableFilter === "Custom" && (
-              <>
-                <DatePicker
-                  selected={customTableStart}
-                  onChange={(date) => setCustomTableStart(date)}
-                  selectsStart
-                  startDate={customTableStart}
-                  endDate={customTableEnd}
-                  placeholderText="Start Date"
-                  dateFormat="dd/MM/yyyy"
+        <div className="admin-home-preview-list menu-list">
+          {menu.slice(0, 5).map((item, i) => (
+            <div className="admin-home-menu-card" key={i}>
+              <div className="admin-home-image-container">
+                <img
+                  src={
+                    item.imageData
+                      ? `data:image/jpeg;base64,${item.imageData}`
+                      : "/placeholder-food.jpg"
+                  }
+                  alt={item.itemName}
+                  className="admin-home-menu-image"
                 />
-                <DatePicker
-                  selected={customTableEnd}
-                  onChange={(date) => setCustomTableEnd(date)}
-                  selectsEnd
-                  startDate={customTableStart}
-                  endDate={customTableEnd}
-                  placeholderText="End Date"
-                  dateFormat="dd/MM/yyyy"
-                  minDate={customTableStart || undefined}
-                />
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className="admin-chart-container">
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={getTableData()}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey={
-                  tableFilter === "Weekly"
-                    ? "day"
-                    : tableFilter === "Monthly"
-                    ? "month"
-                    : "year"
-                }
-              />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="booked" fill="#f44336" />
-              <Bar dataKey="available" fill="#4caf50" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Staff Section */}
-      <div className="admin-staff-section">
-        <div className="admin-section-header">Staff Management</div>
-        <table className="admin-staff-table">
-          <thead>
-            <tr>
-              <th>Staff Member</th>
-              <th>Role</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {staff.length > 0 ? (
-              staff.slice(0, 3).map((s, i) => (
-                <tr key={i}>
-                  <td>{s.firstName}</td>
-                  <td>{s.role}</td>
-                  <td>
-                    <span className={`admin-status ${s.status.toLowerCase()}`}>{s.status}</span>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={3} style={{ textAlign: "center" }}>
-                  No staff added yet
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-
-        {staff.length > 3 && (
-          <div className="admin-staff-more-card" onClick={() => navigate("/AdminDashboard/staff")}>
-            <h4>More →</h4>
-          </div>
-        )}
-      </div>
-
-      {/* Menu Section */}
-      <div className="admin-menu-section">
-        <div className="admin-section-header">Menu Items</div>
-        <div className="admin-menu-grid">
-          {menu.length === 0 ? (
-            <p>No menu items yet</p>
-          ) : (
-            <>
-              {menu.slice(0, 4).map((item, i) => (
-                <div key={i} className="admin-menu-card admin-small-card">
-                  {item.imageUrl && (
-                    <img src={item.imageUrl} alt={item.dishName} className="admin-menu-img" />
-                  )}
-                  <h4>{item.dishName}</h4>
-                  <p>₹ {item.cost}</p>
-                  <div className={`admin-veg-nonveg-circle ${item.type}`}></div>
-                </div>
-              ))}
-              {menu.length > 4 && (
                 <div
-                  className="admin-menu-card admin-small-card admin-more-card"
-                  onClick={() => navigate("/AdminDashboard/Menu")}
+                  className={`badge ${item.itemType?.toUpperCase() === "VEG" ? "veg" : "non-veg"
+                    }`}
                 >
-                  <h4>More →</h4>
+                  {item.itemType || "N/A"}
                 </div>
-              )}
-            </>
-          )}
+              </div>
+
+              <div className="admin-home-details">
+                <h3>{item.itemName}</h3>
+                <p className="admin-home-desc">
+                  {item.description || "No description available"}
+                </p>
+                <p className="admin-home-category">
+                  {item.categoryName || "Uncategorized"}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Table Section */}
-      <div className="admin-table-section">
-        <div className="admin-section-header">Table Management</div>
-        <div className="admin-table-grid">
-          {tables.length > 0 ? (
-            <>
-              {tables.slice(0, 4).map((t) => (
-                <div key={t.id} className={`admin-table-box ${t.status}`}>
-                  T{t.id} <span>({t.status})</span>
-                </div>
-              ))}
-              {tables.length > 4 && (
-                <div
-                  className="admin-table-box admin-more-card"
-                  onClick={() => navigate("/AdminDashboard/table")}
-                >
-                  <h4>More →</h4>
-                </div>
-              )}
-            </>
-          ) : (
-            <p>No tables defined yet</p>
-          )}
-        </div>
-      </div>
 
-      {/* Revenue Management Section */}
-      <div className="admin-revenue-section">
-        <div className="admin-section-header">Revenue Management</div>
-        <div className="admin-revenue-grid">
-          <div className="admin-revenue-card admin-small-card">
-            <h4>₹{(revenue || 0).toLocaleString()}</h4>
-            <p>Daily Revenue</p>
-          </div>
-          <div className="admin-revenue-card admin-small-card">
-            <h4>
-              ₹{revenueDataWeekly.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()}
-            </h4>
-            <p>Weekly Revenue</p>
-          </div>
-          <div className="admin-revenue-card admin-small-card">
-            <h4>
-              ₹{revenueDataMonthly.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()}
-            </h4>
-            <p>Monthly Revenue</p>
-          </div>
-          <div className="admin-revenue-card admin-small-card">
-            <h4>
-              ₹{revenueDataYearly.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()}
-            </h4>
-            <p>Yearly Revenue</p>
-          </div>
-          <div
-            className="admin-revenue-card admin-small-card admin-more-card"
-            onClick={() => navigate("/AdminDashboard/revenue")}
-          >
-            <h4>More →</h4>
-          </div>
+      {/* ===== Tables Preview ===== */}
+      <div className="admin-home-preview-section">
+        <div className="admin-home-section-header">
+          <span>Restaurant Tables</span>
+          <button onClick={() => navigate("/AdminDashboard/table")}>
+            More →
+          </button>
+        </div>
+        <div className="admin-home-preview-list">
+          {tables.slice(0, 5).map((t, i) => (
+            <div key={i} className="admin-home-preview-card table-card">
+              <Sofa size={20} color="#f59e0b" />
+              <div>
+                <strong>Table {t.tableNumber}</strong>
+                <p>Capacity: {t.capacity || "N/A"}</p>
+                <span
+                  className={`status-tag ${t.tableStatus?.toLowerCase() === "booked"
+                      ? "booked"
+                      : "available"
+                    }`}
+                >
+                  {t.tableStatus}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

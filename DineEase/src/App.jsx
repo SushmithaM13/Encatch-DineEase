@@ -20,7 +20,7 @@ import AddStaffRole from "./pages/superadmin/staffroles/AddStaffRole";
 import AdminDashboard from "./pages/Admin/Dashboard/AdminDashboard";
 import AdminHome from "./pages/Admin/Home/AdminHome";
 import AdminProfile from "./pages/Admin/Profile/AdminProfile";
-import AdminTableManagement from "./pages/Admin/table/AdminTableManagement";
+import AdminTableManagement from "./pages/Admin/Table/AdminTableManagement";
 import RoleManagement from "./pages/Admin/Role/RoleManagement";
 import AdminStaffManagement from "./pages/Admin/Staff/AdminStaffManagement";
 import AdminSettings from "./pages/Admin/Settings/AdminSettings";
@@ -28,6 +28,7 @@ import AdminRevenueManagement from "./pages/Admin/Revenue/AdminRevenueManagement
 
 // ===== Admin Menu Management Pages =====
 import AdminMenu from "./pages/Admin/Menu/Manage Menus/AdminMenu";
+import AdminMenuDetail from "./pages/Admin/Menu/Manage Menus/AdminMenuDetail";
 import AdminMenuCategory from "./pages/Admin/Menu/MenuCategory/AdminMenuCategory";
 import AdminFoodType from "./pages/Admin/Menu/FoodType/AdminFoodType";
 import AdminItemType from "./pages/Admin/Menu/ItemType/AdminItemType";
@@ -84,6 +85,7 @@ function App() {
           <Route path="dashboard" element={<AdminHome />} />
           <Route path="profile" element={<AdminProfile />} />
           <Route path="menu" element={<AdminMenu />} />
+          <Route path="menu/:id" element={<AdminMenuDetail />} />
           <Route path="menu-category" element={<AdminMenuCategory />} />
           <Route path="cuisine-type" element={<AdminCusineType />} />
           <Route path="food-type" element={<AdminFoodType />} />

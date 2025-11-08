@@ -1,17 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import {
-  Newspaper,
-  Edit3,
-  Trash2,
-  PlusSquare,
-  X,
-  Plus,
-  Minus,
-} from "lucide-react";
-import { toast } from "react-toastify";
-import "./menu.css";
+import { useNavigate } from "react-router-dom";
+import { Newspaper, PlusSquare, X, Plus, Minus } from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "./AdminMenu.css";
 
 export default function AdminMenu() {
+  const navigate = useNavigate();
   const API_BASE = "http://localhost:8082/dine-ease/api/v1";
   const PROFILE_API = `${API_BASE}/staff/profile`;
   const MENU_API = `${API_BASE}/menu`;
@@ -20,7 +16,6 @@ export default function AdminMenu() {
   const [menus, setMenus] = useState([]);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
 
@@ -29,6 +24,8 @@ export default function AdminMenu() {
   const [itemTypes, setItemTypes] = useState([]);
   const [foodTypes, setFoodTypes] = useState([]);
   const [cuisines, setCuisines] = useState([]);
+  const [addons, setAddons] = useState([]);
+  const [customizeGroups, setCustomizeGroups] = useState([]);
 
   const [newMenu, setNewMenu] = useState({
     organizationId: "",
@@ -47,23 +44,17 @@ export default function AdminMenu() {
     preparationTime: 1,
     allergenInfo: "",
     variants: [],
-    addons: [],
-    customizationGroupIds: [],
+    selectedAddons: [],
+    customizationGroupNames: [],
   });
 
-  // ---------------- FETCH PROFILE -----------------
+  // ---------- FETCH PROFILE ----------
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const cachedProfile = JSON.parse(localStorage.getItem("profile") || "{}");
-        if (cachedProfile?.organizationId) {
-          setOrganizationId(cachedProfile.organizationId);
-          return;
-        }
-
         const token = localStorage.getItem("token");
         if (!token) {
-          toast.error("Unauthorized: Please log in again!");
+          toast.error("Unauthorized: Please log in!");
           return;
         }
 
@@ -71,82 +62,90 @@ export default function AdminMenu() {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (res.status === 403) {
-          toast.error("Session expired. Please log in again.");
-          localStorage.removeItem("token");
-          return;
-        }
-
         if (!res.ok) throw new Error("Failed to fetch profile");
-
         const data = await res.json();
-        setOrganizationId(data.organizationId);
-        localStorage.setItem("profile", JSON.stringify(data));
+        setOrganizationId(data.organizationId || data.organization?.id || "");
       } catch (err) {
         console.error("Profile fetch error:", err);
-        toast.error("Failed to fetch profile!");
+        toast.error("Failed to load profile");
       }
     };
 
     fetchProfile();
   }, []);
 
-  // ---------------- FETCH DROPDOWNS -----------------
+  // ---------- FETCH DROPDOWNS & MENUS ----------
   useEffect(() => {
-    if (!organizationId) return;
-
-    const fetchDropdowns = async () => {
+    const fetchAll = async () => {
       try {
         const token = localStorage.getItem("token");
+        const headers = { Authorization: `Bearer ${token}` };
 
-        const [catRes, itemRes, foodRes, cuisineRes] = await Promise.all([
-          fetch(`${API_BASE}/menu/category/all?organizationId=${organizationId}`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_BASE}/menu/item-type/all?organizationId=${organizationId}`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_BASE}/menu/food-type/all?organizationId=${organizationId}`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${API_BASE}/menu/cuisine-type/all?organizationId=${organizationId}`, { headers: { Authorization: `Bearer ${token}` } }),
+        const [
+          categoryRes,
+          itemTypesRes,
+          foodTypesRes,
+          cuisinesRes,
+          addonsRes,
+          groupsRes,
+        ] = await Promise.all([
+          fetch(`${API_BASE}/menu-category/${organizationId}?page=0&size=10&sortBy=id&sortDir=desc`, { headers }),
+          fetch(`${API_BASE}/menu/item-types?organizationId=${organizationId}&active=true`, { headers }),
+          fetch(`${API_BASE}/menu/food-types?organizationId=${organizationId}`, { headers }),
+          fetch(`${API_BASE}/menu/cuisine-types?organizationId=${organizationId}&active=true`, { headers }),
+          fetch(`${API_BASE}/menu/addons/${organizationId}`, { headers }),
+          fetch(`${API_BASE}/menu/customization-group/organization/${organizationId}/active`, { headers }),
         ]);
 
-        setCategories(await catRes.json());
-        setItemTypes(await itemRes.json());
-        setFoodTypes(await foodRes.json());
-        setCuisines(await cuisineRes.json());
+        const [categoryJson, itemTypesJson, foodTypesJson, cuisinesJson, addonsJson, groupsJson] =
+          await Promise.all([
+            categoryRes.json(),
+            itemTypesRes.json(),
+            foodTypesRes.json(),
+            cuisinesRes.json(),
+            addonsRes.json(),
+            groupsRes.json(),
+          ]);
+
+        setCategories(categoryJson.content || []);
+        setItemTypes(itemTypesJson.content || itemTypesJson || []);
+        setFoodTypes(foodTypesJson.content || foodTypesJson || []);
+        setCuisines(Array.isArray(cuisinesJson) ? cuisinesJson : cuisinesJson.content || []);
+        setAddons(addonsJson.content || addonsJson || []);
+        setCustomizeGroups(groupsJson.content || groupsJson || []);
       } catch (err) {
-        console.error("Error fetching dropdowns:", err);
+        console.error("Dropdown fetch error:", err);
+        toast.error("Failed to load dropdown data");
       }
     };
 
-    fetchDropdowns();
+    if (organizationId) {
+      fetchAll();
+      fetchMenus();
+    }
   }, [organizationId]);
 
-  // ---------------- FETCH MENUS -----------------
-  useEffect(() => {
+  // ---------- FETCH MENUS ----------
+  const fetchMenus = async () => {
     if (!organizationId) return;
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${MENU_API}/organization/${organizationId}?page=0&size=50`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch menus");
+      const data = await res.json();
+      setMenus(Array.isArray(data) ? data : data.content || []);
+    } catch (err) {
+      console.error("Menus fetch error:", err);
+      toast.error("Failed to load menus");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const fetchMenus = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(`${MENU_API}/all?organizationId=${organizationId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!res.ok) throw new Error("Failed to fetch menus");
-
-        const data = await res.json();
-        setMenus(Array.isArray(data) ? data : data?.content || []);
-      } catch (err) {
-        console.error("Fetch menu error:", err);
-        toast.error("Error fetching menus");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMenus();
-  }, [organizationId]);
-
-  // ---------------- IMAGE UPLOAD -----------------
+  // ---------- IMAGE PREVIEW ----------
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -156,104 +155,13 @@ export default function AdminMenu() {
     }
   };
 
-  // ---------------- SAVE MENU -----------------
-  const handleSave = async () => {
-    if (!newMenu.itemName) {
-      toast.error("Item name is required!");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("organizationId", organizationId);
-    formData.append("categoryId", newMenu.categoryId || 0);
-    formData.append("itemName", newMenu.itemName);
-    formData.append("description", newMenu.description);
-    if (imageFile) formData.append("image", imageFile);
-    formData.append("itemTypeId", newMenu.itemTypeId || 0);
-    formData.append("foodTypeId", newMenu.foodTypeId || 0);
-    formData.append("cuisineTypeId", newMenu.cuisineTypeId || 0);
-    formData.append("spiceLevel", newMenu.spiceLevel);
-    formData.append("isAvailable", newMenu.isAvailable);
-    formData.append("isRecommended", newMenu.isRecommended);
-    formData.append("isBestseller", newMenu.isBestseller);
-    formData.append("chefSpecial", newMenu.chefSpecial);
-    formData.append("preparationTime", newMenu.preparationTime);
-    formData.append("allergenInfo", newMenu.allergenInfo || "");
-    formData.append("variants", JSON.stringify(newMenu.variants));
-    formData.append("addons", JSON.stringify(newMenu.addons));
-    formData.append(
-      "customizationGroupIds",
-      JSON.stringify(newMenu.customizationGroupIds)
-    );
-
-    try {
-      const token = localStorage.getItem("token");
-      const url = editingItem
-        ? `${MENU_API}/update/${editingItem.id}`
-        : `${MENU_API}/add`;
-
-      const res = await fetch(url, {
-        method: editingItem ? "PUT" : "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Save failed");
-
-      toast.success(editingItem ? "Menu updated!" : "Menu added!");
-      resetForm();
-      fetchUpdatedMenus();
-    } catch (err) {
-      console.error(err);
-      toast.error("Error saving menu");
-    }
-  };
-
-  const fetchUpdatedMenus = async () => {
-    const token = localStorage.getItem("token");
-    const res = await fetch(`${MENU_API}/all?organizationId=${organizationId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    setMenus(Array.isArray(data) ? data : data?.content || []);
-  };
-
-  // ---------------- DELETE MENU -----------------
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this menu item?")) return;
-
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${MENU_API}/delete/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) throw new Error("Delete failed");
-
-      toast.success("Menu deleted!");
-      setMenus(menus.filter((m) => m.id !== id));
-    } catch (err) {
-      console.error(err);
-      toast.error("Error deleting menu");
-    }
-  };
-
-  // ---------------- VARIANTS -----------------
+  // ---------- VARIANTS ----------
   const addVariant = () =>
     setNewMenu({
       ...newMenu,
       variants: [
         ...newMenu.variants,
-        {
-          variantName: "",
-          quantityValue: 1,
-          quantityUnit: "piece",
-          price: 0,
-          discountPrice: 0,
-          isDefault: false,
-          isAvailable: true,
-        },
+        { variantName: "", variantType: "", quantityValue: "", quantityUnit: "", price: "", discountPrice: "", displayOrder: "", isDefault: false, isAvailable: true },
       ],
     });
 
@@ -263,9 +171,118 @@ export default function AdminMenu() {
     setNewMenu({ ...newMenu, variants: updated });
   };
 
+  // ---------- ADDONS & CUSTOMIZATION ----------
+  const toggleAddonSelection = (addon) => {
+    const exists = newMenu.selectedAddons.find((a) => a.id === addon.id);
+    if (exists) {
+      setNewMenu({
+        ...newMenu,
+        selectedAddons: newMenu.selectedAddons.filter((a) => a.id !== addon.id),
+      });
+    } else {
+      setNewMenu({
+        ...newMenu,
+        selectedAddons: [...newMenu.selectedAddons, addon],
+      });
+    }
+  };
+
+  const toggleCustomizationGroup = (group) => {
+    const exists = newMenu.customizationGroupNames.includes(group.name);
+    if (exists) {
+      setNewMenu({
+        ...newMenu,
+        customizationGroupNames: newMenu.customizationGroupNames.filter((n) => n !== group.name),
+      });
+    } else {
+      setNewMenu({
+        ...newMenu,
+        customizationGroupNames: [...newMenu.customizationGroupNames, group.name],
+      });
+    }
+  };
+
+  // ---------- SAVE MENU (ONLY ADD) ----------
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (!newMenu.itemName) return toast.error("Item name is required!");
+
+    try {
+      const token = localStorage.getItem("token");
+      const form = new FormData();
+
+      form.append("organizationId", organizationId);
+      form.append("itemName", newMenu.itemName);
+      form.append("description", newMenu.description || "");
+      if (imageFile) form.append("image", imageFile);
+
+      // Append category, item type, food type, cuisine type
+      const category = categories.find((c) => c.name === newMenu.categoryId);
+      if (!category) return toast.error("Please select a valid Category!");
+      form.append("categoryName", category.name);
+
+      const itemType = itemTypes.find((it) => it.id.toString() === newMenu.itemTypeId.toString());
+      if (!itemType) return toast.error("Please select a valid Item Type!");
+      form.append("itemTypeName", itemType.name || itemType.itemTypeName);
+
+      const foodType = foodTypes.find((f) => f.id.toString() === newMenu.foodTypeId.toString());
+      if (!foodType) return toast.error("Please select a valid Food Type!");
+      form.append("foodTypeName", foodType.name || foodType.foodTypeName);
+
+      const cuisine = cuisines.find((c) => c.id.toString() === newMenu.cuisineTypeId.toString());
+      if (!cuisine) return toast.error("Please select a valid Cuisine Type!");
+      form.append("cuisineTypeName", cuisine.name || cuisine.cuisineTypeName);
+
+      form.append("spiceLevel", newMenu.spiceLevel.toString());
+      form.append("isAvailable", newMenu.isAvailable.toString());
+      form.append("isRecommended", newMenu.isRecommended.toString());
+      form.append("isBestseller", newMenu.isBestseller.toString());
+      form.append("chefSpecial", newMenu.chefSpecial.toString());
+      form.append("preparationTime", newMenu.preparationTime.toString());
+      form.append("allergenInfo", newMenu.allergenInfo || "");
+
+      // Variants
+      newMenu.variants.forEach((v, i) => {
+        form.append(`variants[${i}].variantName`, v.variantName || "");
+        form.append(`variants[${i}].variantType`, v.variantType || "");
+        form.append(`variants[${i}].price`, v.price?.toString() || "0");
+        form.append(`variants[${i}].discountPrice`, v.discountPrice?.toString() || "0");
+        form.append(`variants[${i}].isDefault`, v.isDefault.toString());
+        form.append(`variants[${i}].isAvailable`, v.isAvailable.toString());
+      });
+
+      // Addons
+      newMenu.selectedAddons.forEach((a, i) => {
+        form.append(`availableAddons[${i}].name`, a.name || a.addOnName);
+        form.append(`availableAddons[${i}].price`, a.price?.toString() || "0");
+      });
+
+      // Customization groups
+      newMenu.customizationGroupNames.forEach((g, i) => {
+        form.append(`customizationGroups[${i}].name`, g);
+        form.append(`customizationGroups[${i}].isRequired`, "false");
+        form.append(`customizationGroups[${i}].selectionType`, "SINGLE");
+        form.append(`customizationGroups[${i}].maxSelections`, "1");
+      });
+
+      const res = await fetch(`${MENU_API}/add`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+      toast.success("Menu added!");
+      resetForm();
+      fetchMenus();
+    } catch (err) {
+      console.error("Save error:", err);
+      toast.error("Error saving menu: " + err.message);
+    }
+  };
+
   const resetForm = () => {
     setShowModal(false);
-    setEditingItem(null);
     setImageFile(null);
     setNewMenu({
       organizationId,
@@ -284,36 +301,35 @@ export default function AdminMenu() {
       preparationTime: 1,
       allergenInfo: "",
       variants: [],
-      addons: [],
-      customizationGroupIds: [],
+      selectedAddons: [],
+      customizationGroupNames: [],
     });
   };
 
-  // ---------------- UI -----------------
+  // ---------- UI ----------
+  
   return (
     <div className="admin-menu-page">
-      <h2 className="admin-page-title">
-        <Newspaper size={22} style={{ marginRight: "8px" }} /> Menu Management
+      <ToastContainer />
+      <h2 className="admin-menu-title">
+        <Newspaper size={20} /> Menu Management
       </h2>
 
-      <div className="admin-menu-header">
+      <div className="admin-menu-controls">
         <input
-          type="text"
-          placeholder="Search item..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="admin-search-input"
+          placeholder="Search item..."
+          className="admin-menu-search"
         />
-
-        <button
-          className="admin-add-btn"
-          onClick={() => {
-            setEditingItem(null);
-            setShowModal(true);
-          }}
-        >
-          <PlusSquare size={18} /> Add Menu
-        </button>
+        <div>
+          <button
+            className="admin-menu-add-btn"
+            onClick={() => setShowModal(true)}
+          >
+            <PlusSquare size={16} /> Add Menu
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -328,177 +344,379 @@ export default function AdminMenu() {
                 m.itemName?.toLowerCase().includes(search.toLowerCase())
               )
               .map((menu) => (
-                <div key={menu.id} className="admin-menu-card">
-                  {menu.image && (
+                <div
+                  key={menu.id}
+                  className="admin-menu-card"
+                  onClick={() => navigate(`/AdminDashboard/menu/${menu.id}`)}
+                >
+                  {menu.imageData ? (
                     <img
-                      src={menu.image}
+                      src={`data:image/jpeg;base64,${menu.imageData}`}
                       alt={menu.itemName}
                       className="admin-menu-img"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/no-image.png";
+                      }}
                     />
+                  ) : menu.imageUrl ? (
+                    <img
+                      src={menu.imageUrl.replace(
+                        "C:\\dine-ease-backend\\dine-ease\\uploads\\",
+                        "http://localhost:8082/dine-ease/uploads/"
+                      )}
+                      alt={menu.itemName}
+                      className="admin-menu-img"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/no-image.png";
+                      }}
+                    />
+                  ) : (
+                    <div className="no-img">No Image</div>
                   )}
+
                   <h3 className="admin-menu-name">{menu.itemName}</h3>
                   <p className="admin-menu-desc">{menu.description}</p>
-                  <div className="admin-menu-wrapper">
-                    <button
-                      onClick={() => {
-                        setEditingItem(menu);
-                        setNewMenu(menu);
-                        setShowModal(true);
-                      }}
-                    >
-                      <Edit3 size={16} /> Edit
-                    </button>
-                    <button onClick={() => handleDelete(menu.id)}>
-                      <Trash2 size={16} /> Delete
-                    </button>
-                  </div>
                 </div>
               ))
           )}
         </div>
       )}
-
-      {/* ================= MODAL ================= */}
+      {/* modal */}
       {showModal && (
         <div className="admin-modal-overlay">
-          <div className="admin-modal large">
+          <div className="admin-modal">
             <div className="admin-modal-header">
-              <h3>{editingItem ? "Edit Menu" : "Add New Menu"}</h3>
-              <button onClick={resetForm}>
-                <X size={20} />
-              </button>
+              <h3>Add New Menu</h3>
+              <button onClick={resetForm}><X size={18} /></button>
             </div>
 
-            <div className="admin-modal-body">
+            <form className="admin-modal-body" onSubmit={handleSave}>
+              <label>Item Name *</label>
               <input
                 type="text"
-                placeholder="Item Name *"
                 value={newMenu.itemName}
-                onChange={(e) =>
-                  setNewMenu({ ...newMenu, itemName: e.target.value })
-                }
+                onChange={(e) => setNewMenu({ ...newMenu, itemName: e.target.value })}
+                required
               />
 
+              <label>Description</label>
               <textarea
-                placeholder="Description"
                 value={newMenu.description}
-                onChange={(e) =>
-                  setNewMenu({ ...newMenu, description: e.target.value })
-                }
-              ></textarea>
+                onChange={(e) => setNewMenu({ ...newMenu, description: e.target.value })}
+              />
+              <div>
+                <label>Category</label>
+                <select
+                  value={newMenu.categoryId}
+                  onChange={(e) => setNewMenu({ ...newMenu, categoryId: e.target.value })}
+                >
+                  <option value="">Select category</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
 
-              {/* DROPDOWNS */}
-              <select
-                value={newMenu.categoryId}
-                onChange={(e) =>
-                  setNewMenu({ ...newMenu, categoryId: e.target.value })
-                }
-              >
-                <option value="">Select Category</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.categoryName}
-                  </option>
-                ))}
-              </select>
+              </div>
 
-              <select
-                value={newMenu.itemTypeId}
-                onChange={(e) =>
-                  setNewMenu({ ...newMenu, itemTypeId: e.target.value })
-                }
-              >
-                <option value="">Select Item Type</option>
-                {itemTypes.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.itemTypeName}
-                  </option>
-                ))}
-              </select>
+              <div className="admin-grid-2">
+                <div>
+                  <label>Item Type</label>
+                  <select
+                    value={newMenu.itemTypeId}
+                    onChange={(e) => setNewMenu({ ...newMenu, itemTypeId: e.target.value })}
+                  >
+                    <option value="">Select item type</option>
+                    {itemTypes.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
 
-              <select
-                value={newMenu.foodTypeId}
-                onChange={(e) =>
-                  setNewMenu({ ...newMenu, foodTypeId: e.target.value })
-                }
-              >
-                <option value="">Select Food Type</option>
-                {foodTypes.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.foodTypeName}
-                  </option>
-                ))}
-              </select>
+                    ))}
+                  </select>
+                </div>
 
-              <select
-                value={newMenu.cuisineTypeId}
-                onChange={(e) =>
-                  setNewMenu({ ...newMenu, cuisineTypeId: e.target.value })
-                }
-              >
-                <option value="">Select Cuisine</option>
-                {cuisines.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.cuisineTypeName}
-                  </option>
-                ))}
-              </select>
+                <div>
+                  <label>Food Type</label>
+                  <select
+                    value={newMenu.foodTypeId}
+                    onChange={(e) => setNewMenu({ ...newMenu, foodTypeId: e.target.value })}
+                  >
+                    <option value="">Select food type</option>
+                    {foodTypes.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.foodTypeName || f.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <label>Upload Image:</label>
-              <input type="file" accept="image/*" onChange={handleImageUpload} />
-              {newMenu.image && (
-                <img
-                  src={newMenu.image}
-                  alt="Preview"
-                  style={{
-                    width: "100px",
-                    marginTop: "5px",
-                    borderRadius: "8px",
-                  }}
-                />
-              )}
+                <div>
+                  <label>Cuisine</label>
+                  <select
+                    value={newMenu.cuisineTypeId}
+                    onChange={(e) => setNewMenu({ ...newMenu, cuisineTypeId: e.target.value })}
+                  >
+                    <option value="">Select cuisine</option>
+                    {cuisines.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <h4 style={{ marginTop: "15px" }}>Variants</h4>
-              {newMenu.variants.map((v, i) => (
-                <div key={i} className="variant-row">
+                <div>
+                  <label>Spice Level</label>
                   <input
-                    type="text"
-                    placeholder="Variant Name"
+                    type="number"
+                    min={1}
+                    max={5}
+                    value={newMenu.spiceLevel}
+                    onChange={(e) => setNewMenu({ ...newMenu, spiceLevel: Number(e.target.value) })}
+                  />
+                </div>
+              </div>
+
+              <label>Upload Image</label>
+              <input type="file" accept="image/*" onChange={handleImageUpload} />
+              {newMenu.image && <img src={newMenu.image} alt="preview" className="admin-menu-preview" />}
+
+              <h4>Variants</h4>
+              {newMenu.variants.map((v, i) => (
+                <div key={i} className="admin-menu-variant-row">
+                  <input
                     value={v.variantName}
+                    placeholder="Variant Name (e.g., Half Plate / Full Plate)"
                     onChange={(e) => {
                       const updated = [...newMenu.variants];
                       updated[i].variantName = e.target.value;
                       setNewMenu({ ...newMenu, variants: updated });
                     }}
                   />
-                  <input
-                    type="number"
-                    placeholder="Price"
-                    value={v.price}
+                  <select
+                    value={v.variantType}
                     onChange={(e) => {
                       const updated = [...newMenu.variants];
-                      updated[i].price = e.target.value;
+                      updated[i].variantType = e.target.value;
+                      setNewMenu({ ...newMenu, variants: updated });
+                    }}
+                  >
+                    <option value="">Select Variant Type</option>
+                    <option value="SIZE">Size</option>
+                    <option value="PORTION">Portion</option>
+                    <option value="FLAVOR">Flavor</option>
+                    <option value="QUANTITY">Quantity</option>
+                  </select>
+
+
+
+
+                  <input
+                    type="number"
+                    value={v.quantityValue}
+                    placeholder="Quantity Value (e.g., 250 / 500)"
+                    onChange={(e) => {
+                      const updated = [...newMenu.variants];
+                      updated[i].quantityValue = Number(e.target.value);
                       setNewMenu({ ...newMenu, variants: updated });
                     }}
                   />
-                  <button onClick={() => removeVariant(i)}>
-                    <Minus size={16} />
+
+                  <input
+                    value={v.quantityUnit}
+                    placeholder="Quantity Unit (e.g., g / ml / pcs / plate)"
+                    onChange={(e) => {
+                      const updated = [...newMenu.variants];
+                      updated[i].quantityUnit = e.target.value;
+                      setNewMenu({ ...newMenu, variants: updated });
+                    }}
+                  />
+
+                  <input
+                    type="number"
+                    value={v.price}
+                    placeholder="Price (e.g., 199)"
+                    onChange={(e) => {
+                      const updated = [...newMenu.variants];
+                      updated[i].price = (e.target.value);
+                      setNewMenu({ ...newMenu, variants: updated });
+                    }}
+                  />
+
+                  <input
+                    type="number"
+                    value={v.discountPrice}
+                    placeholder="Discount Price (optional, e.g., 179)"
+                    onChange={(e) => {
+                      const updated = [...newMenu.variants];
+                      updated[i].discountPrice = Number(e.target.value);
+                      setNewMenu({ ...newMenu, variants: updated });
+                    }}
+                  />
+
+                  <input
+                    type="number"
+                    value={v.displayOrder}
+                    placeholder="Display Order (e.g., 1, 2, 3)"
+                    onChange={(e) => {
+                      const updated = [...newMenu.variants];
+                      updated[i].displayOrder = Number(e.target.value);
+                      setNewMenu({ ...newMenu, variants: updated });
+                    }}
+                  />
+
+                  <label>
+                    Default{" "}
+                    <input
+                      type="checkbox"
+                      checked={v.isDefault}
+                      onChange={(e) => {
+                        const updated = [...newMenu.variants];
+                        updated[i].isDefault = e.target.checked;
+                        setNewMenu({ ...newMenu, variants: updated });
+                      }}
+                    />
+                  </label>
+
+                  <label>
+                    Available{" "}
+                    <input
+                      type="checkbox"
+                      checked={v.isAvailable}
+                      onChange={(e) => {
+                        const updated = [...newMenu.variants];
+                        updated[i].isAvailable = e.target.checked;
+                        setNewMenu({ ...newMenu, variants: updated });
+                      }}
+                    />
+                  </label>
+
+                  <button type="button" onClick={() => removeVariant(i)}>
+                    <Minus size={14} />
                   </button>
                 </div>
               ))}
-              <button onClick={addVariant} className="add-variant-btn">
-                <Plus size={14} /> Add Variant
+
+              <button
+                type="button"
+                className="admin-menu-add-variant-btn"
+                onClick={addVariant}
+              >
+                <Plus size={12} /> Add Variant
               </button>
 
-              <div style={{ marginTop: "15px" }}>
-                <button className="admin-save-btn" onClick={handleSave}>
-                  {editingItem ? "Update Menu" : "Save Menu"}
+
+
+              <div className="admin-menu-grid-2">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={newMenu.isAvailable}
+                    onChange={(e) => setNewMenu({ ...newMenu, isAvailable: e.target.checked })}
+                  />{" "}
+                  Available
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={newMenu.isRecommended}
+                    onChange={(e) => setNewMenu({ ...newMenu, isRecommended: e.target.checked })}
+                  />{" "}
+                  Recommended
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={newMenu.isBestseller}
+                    onChange={(e) => setNewMenu({ ...newMenu, isBestseller: e.target.checked })}
+                  />{" "}
+                  Bestseller
+                </label>
+
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={newMenu.chefSpecial}
+                    onChange={(e) => setNewMenu({ ...newMenu, chefSpecial: e.target.checked })}
+                  />{" "}
+                  Chef’s Special
+                </label>
+              </div>
+
+              <label>Preparation Time (minutes)</label>
+              <input
+                type="number"
+                min=""
+                value={newMenu.preparationTime}
+                onChange={(e) =>
+                  setNewMenu({ ...newMenu, preparationTime: (e.target.value) })
+                }
+              />
+
+              <label>Allergen Info</label>
+              <input
+                type="text"
+                value={newMenu.allergenInfo}
+                onChange={(e) => setNewMenu({ ...newMenu, allergenInfo: e.target.value })}
+              />
+
+
+              <h4>Addons (select)</h4>
+              <div className="admin-menu-checkbox-grid">
+                {addons.map((a) => (
+                  <label key={a.addOnId || a.id} className="admin-menu-checkbox-item">
+                    <input
+                      type="checkbox"
+                      checked={!!newMenu.selectedAddons.find((s) => s.addOnId === a.addOnId)}
+                      onChange={() => toggleAddonSelection(a)}
+                    />
+                    {a.addOnName || a.name}
+                  </label>
+                ))}
+                {addons.length === 0 && <p className="admin-menu-muted">No addons available</p>}
+              </div>
+
+              <h4>Customization Groups (select)</h4>
+              <div className="admin-menu-checkbox-grid">
+                {customizeGroups.map((g) => (
+                  <label key={g.id} className="admin-menu-checkbox-item">
+                    <input
+                      type="checkbox"
+                      checked={newMenu.customizationGroupNames.includes(g.name)}
+                      onChange={() => toggleCustomizationGroup(g)}
+                    />
+                    {g.name}
+                  </label>
+                ))}
+                {customizeGroups.length === 0 && <p className="admin-mneu-muted">No customization groups</p>}
+              </div>
+        
+
+
+
+              <div className="admin-menu-modal-actions">
+                <button type="submit" className="admin-menu-save-btn">
+                  Save Menu
+                </button>
+                <button
+                  type="button"
+                  className="admin-menu-cancel-btn"
+                  onClick={resetForm}
+                >
+                  Cancel
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}
     </div>
   );
 }
+

@@ -31,7 +31,7 @@ body {
 }
 
 .admin-add-table-section button {
-  background: black;
+  background: #2563eb; 
   border: none;
   color: white;
   padding: 10px 18px;
@@ -45,7 +45,7 @@ body {
 }
 
 .admin-add-table-section button:hover {
-  background: #222;
+  background: #1d4ed8;
   transform: translateY(-2px);
 }
 
@@ -79,15 +79,103 @@ body {
   background: #ffffff;
   border-radius: 20px;
   padding: 20px;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 6px 14px rgba(206, 7, 7, 0.07);
   transition: 0.3s ease;
-  border-top: 4px solid #030303;
+  border-top: 4px solid #1d4ed8;
 }
 
 .admin-table-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 18px rgba(0, 0, 0, 0.1);
 }
+/* ===== Dynamic Status Borders ===== */
+.admin-table-card.status-available {
+  border-top: 4px solid #16a34a; /* green */
+  box-shadow: 0 6px 14px rgba(22, 163, 74, 0.15);
+}
+
+.admin-table-card.status-booked {
+  border-top: 4px solid #dc2626; /* red */
+  box-shadow: 0 6px 14px rgba(220, 38, 38, 0.15);
+}
+
+.admin-table-card.status-cleaning {
+  border-top: 4px solid #facc15; /* yellow */
+  box-shadow: 0 6px 14px rgba(250, 204, 21, 0.15);
+}
+.admin-table-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+/* ===== Success Popup Overlay ===== */
+.admin-success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* ===== Popup Box ===== */
+.admin-success-box {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  width: 340px;
+  text-align: center;
+  padding: 24px;
+  animation: fadeInScale 0.3s ease-in-out;
+}
+
+/* Title */
+.admin-success-box h2 {
+  color: #16a34a; /* green */
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Message text */
+.admin-success-box p {
+  color: #374151;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+/* OK Button */
+.admin-success-box button {
+  background: #1d4ed8;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.admin-success-box button:hover {
+  background: #153ea8;
+}
+
+/* ===== Animation ===== */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
 
 /* ========== CARD HEADER ========== */
 .admin-table-card-header {
@@ -393,7 +481,7 @@ body {
 }
 /* Add Table / Popup Buttons */
 .admin-popup button {
-  background: #111; /* Black color */
+  background: #2563eb; 
   color: #fff;
   padding: 10px 16px;
   border: none;
@@ -405,7 +493,7 @@ body {
 }
 
 .admin-popup button:hover {
-  background: #333; /* Darker black on hover */
+  background: #1d4ed8; 
 }
 
 
@@ -422,19 +510,20 @@ body {
 
 .admin-popup-close,
 .admin-qr-popup-close {
-  background: none;
+    background: none !important;
+  color: #9ca3af !important;
   border: none;
-  color: #9ca3af;
+  cursor: pointer;
+  font-size: 18px;
   position: absolute;
   top: 12px;
   right: 12px;
-  cursor: pointer;
-  transition: 0.2s;
+  transition: color 0.2s ease-in-out;
 }
 
 .admin-popup-close:hover,
 .admin-qr-popup-close:hover {
-  color: #ef4444;
+  color: #ef4444 !important;
 }
 
 .admin-popup h3 {

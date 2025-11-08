@@ -1,47 +1,168 @@
-/* ================================ */
-/* 🌟 General Layout & Reset */
-/* ================================ */
+/* ---------------- Root Variables ---------------- */
+:root {
+  --primary: #4f46e5;
+  --primary-light: #eef2ff;
+  --primary-dark: #3730a3;
+  --bg-white: #ffffff;
+  --bg-light: #f9fafb;
+  --text-dark: #111827;
+  --text-light: #6b7280;
+  --border: #e5e7eb;
+  --radius: 10px;
+  --shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* ---------------- Layout ---------------- */
 .admin-layout-container {
   display: flex;
   height: 100vh;
-  background: #f9fafb;
+  background: var(--bg-light);
   overflow: hidden;
-  font-family: "Inter", Arial, sans-serif;
 }
 
-/* ================================ */
-/* 📱 Sidebar Styles */
-/* ================================ */
+/* ---------------- Sidebar ---------------- */
 .admin-sidebar {
   width: 250px;
-  background-color: black;
-  color: #ddd;
+  background: var(--bg-white);
   display: flex;
   flex-direction: column;
-  transition: width 0.3s ease, transform 0.3s ease;
-  position: relative;
-  z-index: 20;
+  border-right: 1px solid var(--border);
+  transition: all 0.3s ease;
+  z-index: 200;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
 }
 
 .admin-sidebar.admin-collapsed {
-  width: 70px;
+  width: 80px;
 }
 
+/* Sidebar Header */
 .admin-sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 18px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border);
 }
 
 .admin-sidebar-title {
   display: flex;
   align-items: center;
-  font-weight: 600;
-  font-size: 20px;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--primary);
+  gap: 8px;
 }
-/* Black 3-line (hamburger) button before Welcome */
+
+/* Hamburger (for desktop collapse) */
+.admin-hamburger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.admin-hamburger span {
+  width: 18px;
+  height: 2px;
+  background: var(--text-dark);
+  border-radius: 2px;
+}
+
+/* Sidebar Links */
+.admin-sidebar-nav {
+  flex: 1;
+  padding-top: 12px;
+  overflow-y: auto;
+}
+
+.admin-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  margin: 4px 10px;
+  border-radius: 8px;
+  color: var(--text-light);
+  font-weight: 500;
+  font-size: 15px;
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+/* Hover and active state */
+.admin-sidebar-link:hover,
+.admin-sidebar-link.active {
+  background: var(--primary-light);
+  border-left: 3px solid var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Make the icon blue on hover/active */
+.admin-sidebar-link:hover svg,
+.admin-sidebar-link.active svg {
+  color: var(--primary);
+}
+/* Dropdown (Staff, Menu etc.) */
+.admin-sidebar-dropdown {
+  width: 100%;
+}
+
+.admin-sidebar-link button {
+  background: none;
+  border: none;
+}
+
+/* Submenu */
+.admin-submenu {
+  display: flex;
+  flex-direction: column;
+  padding-left: 36px;
+  margin-top: 4px;
+}
+
+.admin-submenu-link {
+  padding: 8px 0;
+  text-decoration: none;
+  color: var(--text-light);
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.admin-submenu-link:hover {
+  color: var(--primary);
+  transform: translateX(5px);
+}
+
+/* Sidebar Overlay for Mobile */
+.admin-sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  display: none;
+}
+
+/* ---------------- Header ---------------- */
+.admin-dashboard-header {
+  height: 65px;
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 150;
+}
+
+/* Left Group (Hamburger Mobile) */
 .admin-hamburger-toggle {
   display: flex;
   flex-direction: column;
@@ -50,277 +171,135 @@
   background: none;
   border: none;
   cursor: pointer;
-  margin-right: 12px;
 }
 
 .admin-hamburger-toggle span {
   width: 22px;
-  height: 2.5px;
-  background-color: #000; /* black lines */
-  border-radius: 2px;
-  transition: 0.3s;
-}
-
-/* Optional hover effect */
-.admin-hamburger-toggle:hover span {
-  background-color: #333;
-}
-
-
-/* Hamburger toggle */
-.admin-hamburger {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.admin-hamburger span {
-  width: 20px;
   height: 2px;
-  background-color: white;
+  background: var(--text-dark);
   border-radius: 2px;
 }
 
-.admin-desktop-only {
-  display: none;
-}
-
-.admin-sidebar-nav {
+/* Center Restaurant Name */
+.admin-header-center {
+  flex: 1;
   display: flex;
-  flex-direction: column;
-  padding: 10px 0;
-  overflow-y: auto;
-  flex-grow: 1;
-}
-
-/* Sidebar links */
-.admin-sidebar-link {
-  display: flex;
-  align-items: center;
-  padding: 12px 20px;
-  gap: 10px;
-  text-decoration: none;
-  color: #ddd;
-  font-size: 19px; /* ⬅️ increased from 15px */
-  font-weight: 500; /* ⬅️ makes text look bolder and cleaner */
-  cursor: pointer;
-  transition: background 0.3s, color 0.3s, padding-left 0.3s;
-  border-left: 3px solid transparent;
-}
-
-.admin-submenu-link {
-  color: #ccc;
-  text-decoration: none;
-  padding: 8px 0;
-  font-size: 15px; /* was 14px */
-  transition: color 0.3s, transform 0.2s;
-}
-
-
-.admin-sidebar-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-  padding-left: 25px;
-}
-
-.admin-sidebar-link.active {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-  border-left: 3px solid #f5c518;
-}
-
-/* Sidebar overlay for mobile */
-.admin-sidebar-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 10;
-}
-
-/* ================================ */
-/* 👥 Staff Management Dropdown */
-/* ================================ */
-.admin-sidebar-dropdown {
-  display: flex;
-  flex-direction: column;
-}
-
-.admin-sidebar-dropdown > .admin-sidebar-link {
-  background: transparent;
-  border: none;
-  width: 100%;
-  text-align: left;
-  color: #ddd;
-}
-
-.admin-sidebar-dropdown > .admin-sidebar-link:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-
-/* Staff submenu */
-.admin-submenu {
-  display: flex;
-  flex-direction: column;
-  margin-left: 25px;
-  margin-top: 5px;
-  padding-left: 10px;
-  border-left: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.admin-submenu-link {
-  color: #ccc;
-  text-decoration: none;
-  padding: 8px 0;
-  font-size: 14px;
-  transition: color 0.3s, transform 0.2s;
-}
-
-.admin-submenu-link:hover {
-  color: #fff;
-  transform: translateX(6px);
-}
-
-/* ================================ */
-/* 📂 Menu Management Dropdown */
-/* ================================ */
-.admin-sidebar-link svg {
-  flex-shrink: 0;
-}
-
-.admin-sidebar-link span svg {
-  transition: transform 0.3s ease;
-}
-
-.admin-sidebar-link.active svg {
-  transform: rotate(180deg);
-}
-
-/* ================================ */
-/* 🧭 Main Dashboard Area */
-/* ================================ */
-.admin-main-content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* ================================ */
-/* 🔝 Header */
-/* ================================ */
-.admin-dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: white;
-  color: black;
-  padding: 10px 20px;
-  height: 60px;
-  border-bottom: 1px solid #e5e7eb;
-  position: sticky;
-  top: 0;
-  z-index: 15;
-}
-
-.admin-header-left {
-  font-weight: 500;
-  font-size: 16px;
+  justify-content: center;
 }
 
 .admin-restaurant-display {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  font-weight: 600;
   font-size: 15px;
-  color: #333;
+  color: var(--primary);
 }
 
+
+/* Profile Section */
 .admin-header-right {
   position: relative;
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 
-/* Profile circle */
 .admin-profile-circle {
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  background-color: #1a1d21;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  font-weight: bold;
+  background: var(--bg-white);
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  font-weight: 600;
   font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.admin-profile-circle:hover {
+  transform: scale(1.05);
+  background: var(--primary-light);
 }
 
 .admin-profile-pic {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+  border-radius: 50%;
 }
 
-/* Profile dropdown */
+/* Dropdown Menu */
 .admin-dropdown-menu {
   position: absolute;
+  top: 52px;
   right: 0;
-  top: 50px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  background: var(--bg-white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
   min-width: 180px;
-  z-index: 30;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
 .admin-dropdown-item {
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  text-align: left;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 15px;
-  background: none;
-  border: none;
-  width: 100%;
+  color: var(--text-dark);
   font-size: 14px;
   cursor: pointer;
-  text-align: left;
-  color: #333;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
 }
 
 .admin-dropdown-item:hover {
-  background: #f3f4f6;
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
-/* ================================ */
-/* 📋 Main Content (Outlet area) */
-/* ================================ */
+/* ---------------- Main Content ---------------- */
+.admin-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-light);
+}
+
 .admin-dashboard-content {
-  flex-grow: 1;
+  flex: 1;
+  padding: 24px;
   overflow-y: auto;
-  background: #f9fafb;
-  padding: 20px;
 }
 
-/* ================================ */
-/* 📱 Responsive Design */
-/* ================================ */
+/* ---------------- Animation ---------------- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------------- Responsive ---------------- */
 @media (max-width: 768px) {
   .admin-sidebar {
     position: fixed;
-    left: 0;
     top: 0;
-    height: 100vh;
+    left: 0;
+    height: 100%;
     transform: translateX(-100%);
   }
 
@@ -328,23 +307,11 @@
     transform: translateX(0);
   }
 
-  .admin-hamburger.admin-desktop-only {
-    display: none;
-  }
-
-  .admin-hamburger.admin-mobile-only {
-    display: flex;
-  }
-
-  .admin-main-content {
-    width: 100%;
-  }
-
-  .admin-dashboard-header {
-    padding: 10px 15px;
+  .admin-sidebar-overlay {
+    display: block;
   }
 
   .admin-dashboard-content {
-    padding: 15px;
+    padding: 16px;
   }
 }
