@@ -29,6 +29,7 @@
 .admin-role-add-header {
   display: flex;
   justify-content: space-between;
+<<<<<<< HEAD
   align-items: center;
   margin-bottom: 20px;
   flex-wrap: wrap;
@@ -67,6 +68,85 @@
 }
 .admin-role-add-btn:hover {
   background: #1e40af;
+=======
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.admin-role-add-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Warning Text --- */
+.admin-role-add-warning {
+  color: red;
+  margin-top: 10px;
+}
+
+/* ============================= */
+/* 🌟 Buttons - Global BW Theme  */
+/* ============================= */
+
+.admin-role-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 1px solid #000;
+  background-color: #000;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: 0.25s ease;
+}
+
+.admin-role-add-btn:hover {
+  background-color: #fff;
+  color: #000;
+  border-color: #000;
+}
+
+/* ============================= */
+/* 🌟 Search Bar                */
+/* ============================= */
+
+.admin-role-add-search {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.admin-role-add-search input {
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  outline: none;
+}
+
+.admin-search-input:focus {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Table ===== */
+.admin-table-wrapper {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+>>>>>>> 42596c85a2edb425264b971a9dd9cad3c0c6d4b3
 }
 
 /* ============================= */
@@ -161,6 +241,12 @@
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .admin-role-add-modal {
@@ -265,5 +351,86 @@
   }
   .admin-role-add-btn {
     width: 100%;
+  }
+}
+
+/* ===== Toast Notifications ===== */
+.admin-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+  z-index: 2000;
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.admin-toast-success {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+}
+
+.admin-toast-error {
+  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .admin-role-management-page {
+    padding: 20px;
+  }
+
+  .admin-page-title {
+    font-size: 1.5rem;
+  }
+
+  .admin-role-management-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-header-buttons {
+    justify-content: stretch;
+  }
+
+  .admin-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .admin-roles-table {
+    font-size: 0.9rem;
+  }
+
+  .admin-roles-table th,
+  .admin-roles-table td {
+    padding: 10px;
+  }
+
+  .admin-modal {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .admin-toast {
+    right: 10px;
+    left: 10px;
+    top: 10px;
   }
 }

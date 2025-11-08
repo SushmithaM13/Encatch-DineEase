@@ -1,0 +1,54 @@
+.settings-container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+.settings-section {
+  background: #fff;
+  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.settings-section h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.settings-section input,
+.settings-section select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.settings-section button {
+  padding: 8px 15px;
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.settings-section button:hover {
+  background-color: #0056b3;
+}
+
+.preview-box {
+  padding: 15px;
+  border: 2px solid;
+  border-radius: 10px;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .settings-container {
+    padding: 10px;
+  }
+}

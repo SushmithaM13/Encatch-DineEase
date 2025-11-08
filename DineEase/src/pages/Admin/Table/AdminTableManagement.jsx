@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, } from "react";
 import {
   Sofa,
   Plus,
@@ -39,6 +38,10 @@ export default function AdminTableManagement() {
   const [loading, setLoading] = useState(false);
   const [assignments, setAssignments] = useState([]);
   const [staffMap, setStaffMap] = useState({});
+
+const [_assignedWaiters, setAssignedWaiters] = useState([]);
+
+
   const [showAddPopup, setShowAddPopup] = useState(false);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showWaiterPopup, setShowWaiterPopup] = useState(false);
@@ -83,32 +86,33 @@ export default function AdminTableManagement() {
       }
     };
     fetchProfile();
-  }, [TOKEN]);
+  }, [TOKEN, PROFILE_API]);
 
   // ---------------- FETCH TABLES ----------------
-  const fetchTables = async () => {
-    if (!organizationId || !TOKEN) return;
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `${TABLE_GET_ALL_API}/${organizationId}?page=0&size=50&sortBy=id&sortDir=desc`,
-        { headers: { Authorization: `Bearer ${TOKEN}` } }
-      );
-      if (!res.ok) throw new Error("Failed to fetch tables");
-      const data = await res.json();
-      const tablesList = data.content || data || [];
-      setTables(tablesList);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to fetch tables", { position: "top-center" });
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchTables = useCallback(async () => {
+  if (!organizationId || !TOKEN) return;
+  setLoading(true);
+  try {
+    const res = await fetch(
+      `${TABLE_GET_ALL_API}/${organizationId}?page=0&size=50&sortBy=id&sortDir=desc`,
+      { headers: { Authorization: `Bearer ${TOKEN}` } }
+    );
+    if (!res.ok) throw new Error("Failed to fetch tables");
+    const data = await res.json();
+    const tablesList = data.content || data || [];
+    setTables(tablesList);
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to fetch tables", { position: "top-center" });
+  } finally {
+    setLoading(false);
+  }
+}, [organizationId, TOKEN, TABLE_GET_ALL_API]); // ✅ Added dependency array
 
-  useEffect(() => {
-    fetchTables();
-  }, [organizationId, TOKEN]);
+useEffect(() => {
+  fetchTables();
+}, [fetchTables]); // ✅ clean, no need to repeat dependencies here
+
 
   // ---------------- FETCH WAITERS ----------------
   useEffect(() => {
@@ -128,7 +132,7 @@ export default function AdminTableManagement() {
       }
     };
     fetchWaiters();
-  }, [organizationId, TOKEN]);
+  }, [organizationId, TOKEN, WAITER_API]);
 
   useEffect(() => {
     const fetchQrStatus = async () => {
@@ -164,46 +168,56 @@ export default function AdminTableManagement() {
     };
 
     if (tables.length > 0 && organizationId) fetchQrStatus();
-  }, [tables, organizationId, TOKEN]);
+  }, [tables, organizationId, TOKEN, QR_GET_API]);
+
+
+
+
   // ---------------- FETCH STAFF MAP ----------------
-  const fetchStaff = async () => {
-    if (!organizationId || !TOKEN) return;
-    try {
-      const res = await fetch(`${API_BASE}/staff/all?organizationId=${organizationId}`, {
-        headers: { Authorization: `Bearer ${TOKEN}` },
-      });
-      const data = await res.json();
-      const map = {};
-      (data.content || []).forEach(s => {
-        map[s.email] = s.firstName + " " + s.lastName;
-      });
-      setStaffMap(map);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-  useEffect(() => { fetchStaff(); }, [organizationId, TOKEN]);
+ const fetchStaff = useCallback(async () => {
+  if (!organizationId || !TOKEN) return;
+  try {
+    const res = await fetch(`${API_BASE}/staff/all?organizationId=${organizationId}`, {
+      headers: { Authorization: `Bearer ${TOKEN}` },
+    });
+    const data = await res.json();
+    const map = {};
+    (data.content || []).forEach((s) => {
+      map[s.email] = s.firstName + " " + s.lastName;
+    });
+    setStaffMap(map);
+  } catch (err) {
+    console.error(err);
+  }
+}, [organizationId, TOKEN, API_BASE]); // ✅ dependencies
+
+useEffect(() => {
+  fetchStaff();
+}, [fetchStaff]); // ✅ warning gone
+
 
   // ---------------- FETCH WAITER ASSIGNMENTS ----------------
-  const fetchWaiterAssignments = async () => {
-    if (!organizationId || !TOKEN) return;
-    try {
-      const res = await fetch(
-        `${API_BASE}/waiter-table-assignments/all?organizationId=${organizationId}&page=0&size=50&sortBy=id&sortDir=desc`,
-        { headers: { Authorization: `Bearer ${TOKEN}` } }
-      );
+ const fetchWaiterAssignments = useCallback(async () => {
+  if (!organizationId || !TOKEN) return;
+  try {
+    const res = await fetch(
+      `${API_BASE}/waiter-table-assignments/all?organizationId=${organizationId}&page=0&size=50&sortBy=id&sortDir=desc`,
+      { headers: { Authorization: `Bearer ${TOKEN}` } }
+    );
 
-      if (!res.ok) throw new Error("Failed to fetch waiter assignments");
-      const data = await res.json();
-      setAssignments(data.content || data || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    if (!res.ok) throw new Error("Failed to fetch waiter assignments");
+    const data = await res.json();
+    setAssignments(data.content || data || []);
+  } catch (err) {
+    console.error(err);
+  }
+}, [organizationId, TOKEN, API_BASE]); // ✅ THIS LINE IS REQUIRED
+
   useEffect(() => {
     fetchTables();
     fetchWaiterAssignments();
-  }, [organizationId, TOKEN]);
+  }, [organizationId, TOKEN, API_BASE, fetchTables, fetchWaiterAssignments]);
+
 
   // ---------------- TABLE ACTIONS ----------------
   const handleAddTable = async () => {
@@ -548,19 +562,19 @@ export default function AdminTableManagement() {
               <p>{assignments.filter(a => a.tableNumber === table.tableNumber).map(a => staffMap[a.waiterEmail] || a.waiterEmail).join(", ") || "—"}</p>
 
               <button
-                onClick={() => {
-                  const assignedWaiters = assignments
-                    .filter((a) => a.tableNumber === table.tableNumber)
-                    .map((a) => a.waiterEmail);
+  onClick={() => {
+    const assigned = Array.isArray(assignments)
+      ? assignments
+          .filter((a) => a.tableNumber === table.tableNumber)
+          .map((a) => a.waiterEmail)
+      : [];
 
+    setAssignedWaiters(assigned); // ✅ using it here
+    setWaiterData({ waiterEmail: "", tableNumber: table.tableNumber });
+    setShowWaiterPopup(true);
+  }}
+>
 
-                  setWaiterData({
-                    waiterEmail: assignedWaiters[0] || "",
-                    tableNumber: table.tableNumber
-                  });
-                  setShowWaiterPopup(true);
-                }}
-              >
                 {Array.isArray(assignments) &&
                   assignments.filter((a) => a.tableNumber === table.tableNumber).length > 0
                   ? "Update Waiters"

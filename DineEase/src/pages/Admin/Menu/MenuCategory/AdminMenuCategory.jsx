@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   PlusSquare,
   Edit3,
@@ -51,20 +51,30 @@ export default function AdminMenuCategory() {
       }
     };
     fetchProfile();
-  }, []);
+  }, [TOKEN]);
 
   // ✅ Fetch paginated categories
-  const fetchCategories = async () => {
-    if (!organizationId) return;
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `${CATEGORY_API}/${organizationId}?page=${page}&size=5&sortBy=id&sortDir=asc`,
-        { headers: { Authorization: `Bearer ${TOKEN}` } }
-      );
-      if (!res.ok) throw new Error("Failed to fetch categories");
-      const data = await res.json();
+ const fetchCategories = useCallback(async () => {
+  if (!organizationId) return;
+  setLoading(true);
+  try {
+    const res = await fetch(
+      `${CATEGORY_API}/${organizationId}?page=${page}&size=5&sortBy=id&sortDir=asc`,
+      { headers: { Authorization: `Bearer ${TOKEN}` } }
+    );
+    const data = await res.json();
+    setCategories(data.content || []);
+    setTotalPages(data.totalPages || 0);
+    setTotalElements(data.totalElements || 0);
+  } catch (err) {
+    console.error(err);
+    toast.error("Error loading categories");
+  } finally {
+    setLoading(false);
+  }
+}, [organizationId, page, TOKEN]);
 
+<<<<<<< HEAD
       setCategories(data.content || []);
       setTotalPages(data.totalPages || 0);
       setTotalElements(data.totalElements || 0);
@@ -80,6 +90,12 @@ export default function AdminMenuCategory() {
     if (!organizationId) return;
     fetchCategories();
   }, [organizationId, page]);
+=======
+useEffect(() => {
+  fetchCategories();
+}, [fetchCategories]);
+
+>>>>>>> 42596c85a2edb425264b971a9dd9cad3c0c6d4b3
 
   const toggleExpand = (id) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));

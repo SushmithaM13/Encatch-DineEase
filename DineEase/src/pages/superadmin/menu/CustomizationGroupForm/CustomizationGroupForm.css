@@ -1,0 +1,82 @@
+.menu-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.menu-card h3 {
+  font-size: 1.4rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.menu-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.menu-card input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  width: 100%;
+}
+
+.menu-card input:focus {
+  border-color: #ff8800;
+}
+
+.option-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.secondary-btn,
+.primary-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.secondary-btn {
+  background: #eee;
+  color: #333;
+}
+
+.primary-btn {
+  background: #ff8800;
+  color: white;
+}
+
+.secondary-btn:hover {
+  background: #ddd;
+}
+
+.primary-btn:hover {
+  background: #ff6600;
+}
+
+@media (max-width: 768px) {
+  .option-row {
+    flex-direction: column;
+  }
+  .menu-card {
+    width: 95%;
+    padding: 15px;
+  }
+}
+@media (max-width: 480px) {
+  .menu-card h3 {
+    font-size: 1.2rem;
+  }
+}

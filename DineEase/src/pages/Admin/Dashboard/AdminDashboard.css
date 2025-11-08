@@ -314,4 +314,22 @@
   .admin-dashboard-content {
     padding: 16px;
   }
+
+  .admin-dashboard-content {
+    padding: 20px 16px;
+  }
+
+  .admin-toast {
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+    top: 80px;
+  }
+
+  .admin-dropdown-menu {
+    position: fixed;
+    right: 16px;
+    top: auto;
+    transform: translateY(70px);
+  }
 }

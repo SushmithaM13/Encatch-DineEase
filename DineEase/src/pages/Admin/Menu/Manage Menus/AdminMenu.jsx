@@ -72,7 +72,7 @@ export default function AdminMenu() {
     };
 
     fetchProfile();
-  }, []);
+  }, [PROFILE_API]);
 
   // ---------- FETCH DROPDOWNS & MENUS ----------
   useEffect(() => {

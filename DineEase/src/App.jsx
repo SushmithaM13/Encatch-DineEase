@@ -11,10 +11,24 @@ import SuperAdminRegistration from "./components/signup/SuperAdminRegistration";
 // ===== Super Admin Pages =====
 import SuperAdminDashboard from "./pages/superadmin/dashboard/superAdminDashboard";
 import UserManagement from "./pages/superadmin/usermanagement/UserManagement";
-import Items from "./pages/superadmin/items/FoodItems";
 import SuperAdminHome from "./pages/superadmin/dashboard/SuperAdminHome";
+import Analytics from "./pages/superadmin/Analytics/Analytics";
 import TableManagement from "./pages/superadmin/tablemanagemnet/TableManagement";
-import AddStaffRole from "./pages/superadmin/staffroles/AddStaffRole";
+import AddStaffRole from './pages/superadmin/staffroles/AddStaffRole';
+import SuperAdminProfile from "./pages/superadmin/profile/SuperAdminProfile";
+import SuperAdminSettings from "./pages/superadmin/settings/SuperAdminSettings";
+
+// ===== New Menu Dashboard (Tabbed) =====
+import MenuDashboard from "./pages/superadmin/menu/MenuDashboard/MenuDashboard";
+
+import MenuList from "./pages/superadmin/menu/MenuList/MenuList";
+import CategoryForm from "./pages/superadmin/menu/CategoryForm/CategoryForm";
+import AddItemtype from "./pages/superadmin/menu/AddItemForm/AddItemtype";
+import Foodtype from "./pages/superadmin/menu/Foodtype/Foodtype";
+import Cuisinetype from "./pages/superadmin/menu/cuisinetype/cuisinetype";
+import VariantForm from "./pages/superadmin/menu/VariantForm/VariantForm";
+import AddonForm from "./pages/superadmin/menu/AddonForm/AddonForm";
+import CustomizationGroupForm from "./pages/superadmin/menu/CustomizationGroupForm/CustomizationGroupForm";
 
 // ===== Admin Pages =====
 import AdminDashboard from "./pages/Admin/Dashboard/AdminDashboard";
@@ -46,31 +60,40 @@ import WaiterProfile from "./pages/Waiter/Profile/WaiterProfile";
 import Footer from "./components/footer/Footer";
 
 function App() {
+
   return (
     <>
       <Routes>
-        {/* ===== Auth Routes ===== */}
-        <Route path="/" element={<Login />} />
-        <Route path="/forgotPassword" element={<ForgotPassword />} />
-        <Route path="/resetPassword" element={<ResetPassword />} />
-        <Route path="/SuperAdminRegistration" element={<SuperAdminRegistration />} />
+        <Route path='/' element={<Login />} />
+        <Route path='/forgotPassword' element={<ForgotPassword />} />
+        <Route path='/resetPassword' element={<ResetPassword />} />
+        <Route path='/SuperAdminRegistration' element={<SuperAdminRegistration />} />
 
-        {/* ===== Super Admin Routes ===== */}
-        <Route
-          path="superAdminDashboard/*"
-          element={
-            <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
-              <SuperAdminDashboard />
-            </ProtectedRoute>
-          }
-        >
+        {/* Private Routes */}
+        <Route path='superAdminDashboard/*' element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}><SuperAdminDashboard /></ProtectedRoute>}>
+
           <Route index element={<SuperAdminHome />} />
+<Route path="analytics" element={<Analytics />} />
+  {/* <Route path="reports" element={<Reports />} />
+  <Route path="settings" element={<Settings />} /> */}
+
           <Route path="staff" element={<UserManagement />} />
-          <Route path="food-items" element={<Items />} />
+          <Route path="menu" element={<MenuDashboard />} />
           <Route path="staffrole" element={<AddStaffRole />} />
           <Route path="table" element={<TableManagement />} />
-        </Route>
+          <Route path="profile" element={<SuperAdminProfile />} />
+          <Route path="settings" element={<SuperAdminSettings />} />
 
+          <Route path="menu" element={<MenuList />} />
+          <Route path="menu/category" element={<CategoryForm />} />
+          <Route path="menu/item" element={<AddItemtype />} />
+          <Route path="menu/food" element={<Foodtype />} />
+          <Route path="menu/cuisine" element={<Cuisinetype />} />
+          <Route path="menu/variant" element={<VariantForm />} />
+          <Route path="menu/addon" element={<AddonForm />} />
+          <Route path="menu/customization" element={<CustomizationGroupForm />} />
+
+        </Route>
         {/* ===== Admin Dashboard Routes ===== */}
         <Route
           path="/AdminDashboard"
@@ -115,11 +138,8 @@ function App() {
           <Route path="profile" element={<WaiterProfile />} />
         </Route>
 
-        {/* ===== 404 Page ===== */}
-        <Route
-          path="*"
-          element={<h2 className="text-center mt-10">404 - Page Not Found</h2>}
-        />
+        {/* ===== Catch-all 404 ===== */}
+        <Route path="*" element={<h2 className="text-center mt-10">404 - Page Not Found</h2>} />
       </Routes>
       <Footer />
     </>
