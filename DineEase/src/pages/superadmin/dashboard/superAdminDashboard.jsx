@@ -6,7 +6,6 @@ import {
   FaUsers,
   FaBars,
   FaHome,
-  FaUserCircle,
   FaUtensils,
   FaCog,
   FaSignOutAlt,
@@ -17,7 +16,6 @@ import {
   FaTags,
   FaPuzzlePiece,
   FaMagic,
-  FaBell,
   FaSearch,
   FaChevronRight,
   FaChartBar,
@@ -57,10 +55,7 @@ const SuperAdminDashboard = () => {
     { path: "/superAdminDashboard/Menu/customization", label: "Customization Group", icon: <FaMagic /> },
   ];
 
-  // ✅ Load user and organization data
   useEffect(() => {
-    // const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
-    // setHotels(storedHotels);
 
 try {
     const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
@@ -70,27 +65,24 @@ try {
     setHotels([]);
   }
 
+   try {
+  const storedUserRaw = localStorage.getItem("user");
+  const storedUser = storedUserRaw && storedUserRaw !== "undefined"
+    ? JSON.parse(storedUserRaw)
+    : {};
 
-    // const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-    // if (storedUser?.name) setUserName(storedUser.name);
-    // else setUserName("User");
+  // ✅ Check for name from localStorage (saved by Profile page)
+  const profileFullName = localStorage.getItem("superAdminFullName");
 
-
-     try {
-    const storedUserRaw = localStorage.getItem("user");
-    const storedUser = storedUserRaw && storedUserRaw !== "undefined"
-      ? JSON.parse(storedUserRaw)
-      : {};
-
-    setUserName(storedUser?.name || "User");
-  } catch (e) {
-    console.error("Invalid user data in localStorage:", e);
-    setUserName("User");
-  }
+  setUserName(profileFullName || storedUser?.name || "User");
+} catch (e) {
+  console.error("Invalid user data in localStorage:", e);
+  setUserName("User");
+}
 
 
-  //    
-  
+
+  // Load organization info
    try {
     const storedOrgRaw = localStorage.getItem("organization");
     const storedOrg =
@@ -131,7 +123,7 @@ try {
 
   const handleMobileMenuClose = () => setMobileMenuOpen(false);
 
-  // ✅ Close dropdown if clicked outside
+  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -142,7 +134,7 @@ try {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ Prevent back navigation for logged-in SuperAdmin
+  // Prevent back navigation for logged-in SuperAdmin
   useEffect(() => {
     const handlePopState = () => {
       const token = localStorage.getItem("token");
@@ -156,7 +148,7 @@ try {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  // ✅ Logout
+  //  Logout
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -178,7 +170,7 @@ try {
     }
   };
 
-  // ✅ Search functionality
+  //  Search functionality
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (searchQuery.trim() !== "") {

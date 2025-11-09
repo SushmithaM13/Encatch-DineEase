@@ -37,7 +37,7 @@ export default function SuperAdminStaffManagement() {
 
   // ✅ Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, _setPageSize] = useState(10);
+  const [pageSize, _setPageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [_loading, setLoading] = useState(false);
 
@@ -186,7 +186,6 @@ export default function SuperAdminStaffManagement() {
       staffRoleType: form.staffRoleType,
       shiftTiming: form.shiftTiming,
       salary: Number(form.salary),
-      // contractStartDate: form.contractStartDate || null,
       contractEndDate: form.contractEndDate || null,
       staffStatus: form.status || "Pending",
       organizationId: ORG_ID,
@@ -311,7 +310,7 @@ export default function SuperAdminStaffManagement() {
                 : staffList;
 
   // ✅ PAGINATION (local, frontend-based)
-  const startIndex = currentPage * pageSize;
+  const startIndex = (currentPage ) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedStaff = filteredStaff.slice(startIndex, endIndex);
 

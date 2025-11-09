@@ -235,10 +235,6 @@ const DashboardHome = () => {
                 <span className="org-value">{hotel.organizationName || "N/A"}</span>
               </div>
               <div className="org-item">
-                <span className="org-label">Full Name</span>
-                <span className="org-value">{hotel.FullName || "N/A"}</span>
-              </div>
-              <div className="org-item">
                 <span className="org-label">Business Type</span>
                 <span className="org-value">{hotel.businessType || "N/A"}</span>
               </div>
