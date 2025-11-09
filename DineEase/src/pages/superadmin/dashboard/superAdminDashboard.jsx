@@ -35,6 +35,7 @@ const SuperAdminDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [organizationName, setOrganizationName] = useState("");
+  const [organizationFullName, setOrganizationFullName] = useState("");
 
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -58,32 +59,70 @@ const SuperAdminDashboard = () => {
 
   // ✅ Load user and organization data
   useEffect(() => {
+    // const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
+    // setHotels(storedHotels);
+
+try {
     const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
     setHotels(storedHotels);
+  } catch (e) {
+    console.error("Invalid hotels data in localStorage:", e);
+    setHotels([]);
+  }
 
-    const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-    if (storedUser?.name) setUserName(storedUser.name);
-    else setUserName("User");
 
+    // const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+    // if (storedUser?.name) setUserName(storedUser.name);
+    // else setUserName("User");
+
+
+     try {
+    const storedUserRaw = localStorage.getItem("user");
+    const storedUser = storedUserRaw && storedUserRaw !== "undefined"
+      ? JSON.parse(storedUserRaw)
+      : {};
+
+    setUserName(storedUser?.name || "User");
+  } catch (e) {
+    console.error("Invalid user data in localStorage:", e);
+    setUserName("User");
+  }
+
+
+  //    
+  
+   try {
+    const storedOrgRaw = localStorage.getItem("organization");
     const storedOrg =
-      localStorage.getItem("organizationName") ||
-      JSON.parse(localStorage.getItem("user") || "{}").organizationName ||
-      JSON.parse(localStorage.getItem("user") || "{}").organization ||
-      JSON.parse(localStorage.getItem("registrationData") || "{}").organizationName ||
-      JSON.parse(localStorage.getItem("registrationData") || "{}").organization ||
-      "Organization Name";
+      storedOrgRaw && storedOrgRaw !== "undefined"
+        ? JSON.parse(storedOrgRaw)
+        : null;
 
-    setOrganizationName(storedOrg);
+    if (storedOrg) {
+      setOrganizationName(storedOrg.name || "");
+      setOrganizationFullName(storedOrg.fullName || "");
+    }
+  } catch (e) {
+    console.error("Invalid organization data in localStorage:", e);
+    setOrganizationName("");
+    setOrganizationFullName("");
+    localStorage.removeItem("organization"); // remove bad data
+  }
 
-    //  Auto-update if localStorage changes
-    const handleStorageChange = (event) => {
-      if (event.key === "organizationName") {
-        setOrganizationName(event.newValue || "Organization Name");
-      }
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
+  const orgName = localStorage.getItem("organizationName");
+  const fullName = localStorage.getItem("organizationFullName");
+
+  if (orgName) setOrganizationName(orgName);
+  if (fullName) setOrganizationFullName(fullName);
+
+  const handleStorageChange = (e) => {
+    if (e.key === "organizationName") setOrganizationName(e.newValue || "");
+    if (e.key === "organizationFullName") setOrganizationFullName(e.newValue || "");
+  };
+
+  window.addEventListener("storage", handleStorageChange);
+  return () => window.removeEventListener("storage", handleStorageChange);
+}, []);
 
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? "hidden" : "unset";
@@ -165,9 +204,8 @@ const SuperAdminDashboard = () => {
 
       {/* Sidebar */}
       <aside
-        className={`sidebar ${sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed"} ${
-          mobileMenuOpen ? "mobile-open" : ""
-        }`}
+        className={`sidebar ${sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed"} ${mobileMenuOpen ? "mobile-open" : ""
+          }`}
       >
         <div className="sidebar-header">
           <div
@@ -321,7 +359,8 @@ const SuperAdminDashboard = () => {
 
           {/* 🏢 Organization Name (center) */}
           <div className="organization-center">
-            <h2 className="organization-title">{organizationName || "Organization Name"}</h2>
+            <h2 className="organization-title">
+              {organizationName || "Organization Name"}</h2>
           </div>
 
           {/* 🔔 Notification + Profile (right) */}
@@ -331,7 +370,7 @@ const SuperAdminDashboard = () => {
 
             <div className="profile-info">
               <div className="hello-bubble" onClick={() => setDropdownOpen((prev) => !prev)}>
-                <span>Hello, {userName}</span>
+                <span>Hello, {organizationFullName || userName}</span>
                 <img
                   src="https://via.placeholder.com/40"
                   alt="profile"

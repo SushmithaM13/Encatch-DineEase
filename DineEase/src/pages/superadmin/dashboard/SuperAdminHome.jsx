@@ -41,8 +41,8 @@ const DashboardHome = () => {
       const staffData = Array.isArray(data)
         ? data
         : Array.isArray(data.content)
-        ? data.content
-        : [];
+          ? data.content
+          : [];
 
       const total = staffData.length;
       const active = staffData.filter(
@@ -96,7 +96,12 @@ const DashboardHome = () => {
         setHotel(orgData);
         setEditData(orgData);
         setLoading(false);
-
+        if (orgData?.organizationName) {
+          localStorage.setItem("organizationName", orgData.organizationName);
+        }
+        if (orgData?.FullName) {
+          localStorage.setItem("organizationFullName", orgData.FullName);
+        }
         if (orgData?.id) {
           localStorage.setItem("organizationId", orgData.id);
           fetchStaffStats(orgData.id, token);
@@ -153,13 +158,10 @@ const DashboardHome = () => {
       {/* Welcome Header */}
       <div className="welcome-header">
         <div>
-          <h1 className="welcome-title">Dashboard</h1>
-          <p className="welcome-subtitle">Welcome to Dine Ease ! ! ! ..</p>
+          {/* <h1 className="welcome-title">Dashboard</h1> */}
+          <h2 className="welcome-subtitle">Welcome to Dine Ease ! ! ! ..</h2>
         </div>
-        <div className="date-filter">
-          <span className="filter-label">Filter Periode</span>
-          <span className="filter-value">4 June 2020 - 4 July 2020</span>
-        </div>
+
       </div>
 
       {/* Stats Cards */}
@@ -289,7 +291,7 @@ const DashboardHome = () => {
                     required
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label>Business Type</label>
                   <input
