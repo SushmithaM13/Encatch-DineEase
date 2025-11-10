@@ -278,8 +278,8 @@ export default function AdminAddon() {
         {addons.length === 0 ? (
           <p className="admin-addons-empty">No add-ons found.</p>
         ) : (
-          addons.map((addon) => (
-            <div key={addon.id} className="admin-addons-card">
+          addons.map((addon, index) => (
+            <div key={addon.id || index} className="admin-addons-card">
               {addon.addOnImageData ? (
                 <img
                   src={`data:image/jpeg;base64,${addon.addOnImageData}`}

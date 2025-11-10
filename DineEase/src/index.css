@@ -1,0 +1,25 @@
+/* === Reset Scrollbar to Default Gray === */
+
+/* For Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* light gray track */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1; /* medium gray handle */
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0; /* darker on hover */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
