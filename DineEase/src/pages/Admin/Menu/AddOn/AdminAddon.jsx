@@ -326,4 +326,5 @@ export default function AdminAddon() {
       <ToastContainer position="top-center" />
     </div>
   );
+  
 }
