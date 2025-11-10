@@ -16,29 +16,24 @@ import "./tables.css";
 export default function AdminTableManagement() {
   const API_BASE = "http://localhost:8082/dine-ease/api/v1";
   const TOKEN = localStorage.getItem("token");
-
   const PROFILE_API = `${API_BASE}/staff/profile`;
   const WAITER_API = `${API_BASE}/staff/all`;
   const TABLE_GET_ALL_API = `${API_BASE}/restaurant-tables/all`;
   const TABLE_ADD_API = `${API_BASE}/restaurant-tables/add`;
   const TABLE_UPDATE_API = `${API_BASE}/restaurant-tables/update`;
-  const TABLE_DELETE_API = `${API_BASE}/restaurant-tables/delete`;
+  const TABLE_DELETE_API = `${API_BASE}/restaurant-tables`;
   const ASSIGN_WAITER_API = `${API_BASE}/waiter-table-assignments/assign`;
   const WAITER_UPDATE_API = `${API_BASE}/waiter-table-assignments/update`;
   const WAITER_REMOVE_API = `${API_BASE}/waiter-table-assignments/remove`;
   const QR_GENERATE_API = `${API_BASE}/qr-code/generate-qr-code`;
   const QR_GET_API = `${API_BASE}/qr-code/get-qr-code-image`;
   const QR_DELETE_API = `${API_BASE}/qr-code/delete-qr-code`;
-
   const [organizationId, setOrganizationId] = useState("");
   const [tables, setTables] = useState([]);
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [selectedTable, setSelectedTable] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
   const [waiters, setWaiters] = useState([]);
   const [loading, setLoading] = useState(false);
   const [assignments, setAssignments] = useState([]);
@@ -51,17 +46,16 @@ const [_assignedWaiters, setAssignedWaiters] = useState([]);
   const [showEditPopup, setShowEditPopup] = useState(false);
   const [showWaiterPopup, setShowWaiterPopup] = useState(false);
   const [showQrPopup, setShowQrPopup] = useState(false);
-
   const [qrLoading, setQrLoading] = useState({});
   const [qrData, setQrData] = useState(null);
   const [qrStatus, setQrStatus] = useState({});
   const [selectedTableForDelete, setSelectedTableForDelete] = useState(null);
-
-
   const [showRemoveWaiterPopup, setShowRemoveWaiterPopup] = useState({ visible: false, tableNumber: null, waiters: [] });
   const [selectedWaitersToRemove, setSelectedWaitersToRemove] = useState([]);
-
   const [editTable, setEditTable] = useState(null);
+  const [showTableDeletePopup, setShowTableDeletePopup] = useState(false);
+  const [showQRDeletePopup, setShowQRDeletePopup] = useState(false);
+
   const [newTable, setNewTable] = useState({
     tableNumber: "",
     tableStatus: "AVAILABLE",
@@ -74,10 +68,6 @@ const [_assignedWaiters, setAssignedWaiters] = useState([]);
     waiterEmail: "",
     tableNumber: "",
   });
-
-
-
-
   // ---------------- FETCH ORGANIZATION ----------------
   useEffect(() => {
     const fetchProfile = async () => {
@@ -296,73 +286,31 @@ useEffect(() => {
       toast.error("Failed to update table: " + err.message, { position: "top-center" });
     }
   };
+ const handleDeleteTable = async () => {
+  if (!selectedTable?.id || !organizationId) {
+    toast.error("Missing table or organization info");
+    return;
+  }
 
+  try {
+    const url = `${TABLE_DELETE_API}/${selectedTable.id}?organizationId=${organizationId}`;
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${TOKEN}` },
+    });
 
-  const handleDeleteTable = async () => {
-    if (!selectedTable || !organizationId) return;
-
-    setIsDeleting(true);
-
-    try {
-      const { id: tableId, number: tableNumber } = selectedTable;
-
-      // 1️⃣ Delete the table
-      const res = await fetch(`${TABLE_DELETE_API}/${tableId}/${organizationId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${TOKEN}` },
-      });
-
-      if (res.status === 403) {
-        toast.error("Access forbidden! You may not have permission to delete this table.", {
-          position: "top-center",
-        });
-        return;
-      }
-
-      if (!res.ok) throw new Error("Failed to delete table");
-
-      // 2️⃣ Delete QR
-      await fetch(
-        `${QR_DELETE_API}/${organizationId}/${tableNumber}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${TOKEN}` },
-        }
-      );
-
-      // 3️⃣ Clean waiter assignments
-      const assignedWaiters = assignments
-        .filter((a) => a.tableNumber === tableNumber)
-        .map((a) => a.waiterEmail);
-
-      for (const email of assignedWaiters) {
-        await fetch(
-          `${WAITER_REMOVE_API}?organizationId=${organizationId}&email=${encodeURIComponent(email)}`,
-          {
-            method: "DELETE",
-            headers: { Authorization: `Bearer ${TOKEN}` },
-          }
-        );
-      }
-
-      toast.success(`✅ Table ${tableNumber} deleted successfully!`, {
-        position: "top-center",
-      });
-
-      // Refresh UI
-      fetchTables();
-      fetchWaiterAssignments();
-      setQrStatus((prev) => ({ ...prev, [tableNumber]: false }));
-
-      setShowDeletePopup(false);
-      setSelectedTable(null);
-    } catch (err) {
-      console.error("Table delete failed:", err);
-      toast.error("Failed to delete table: " + err.message, { position: "top-center" });
-    } finally {
-      setIsDeleting(false);
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.message || "Failed to delete table");
     }
-  };
+
+    setTables((prev) => prev.filter((t) => t.id !== selectedTable.id));
+    toast.success(`✅ Table ${selectedTable.tablenumber} deleted successfully!`);
+  } catch (err) {
+    console.error("Error deleting table:", err);
+    toast.error(err.message);
+  }
+};
 
 
 
@@ -411,7 +359,6 @@ useEffect(() => {
       setQrLoading((prev) => ({ ...prev, [tableNumber]: false }));
     }
   };
-
   const handleDeleteQr = async (tableNumber) => {
     if (!organizationId || !tableNumber) {
       return toast.error("Missing Organization ID or Table Number", {
@@ -453,9 +400,6 @@ useEffect(() => {
       toast.error("Failed to delete QR: " + err.message, { position: "top-center" });
     }
   };
-
-
-
   // ---------------- WAITER ACTIONS ----------------
   const handleAssignWaiter = async (waiterEmail, tableNumber, update = false) => {
     if (!waiterEmail || !tableNumber) {
@@ -496,8 +440,6 @@ useEffect(() => {
       toast.error(err.message, { position: "top-center" });
     }
   };
-
-
   const handleRemoveSelectedWaiters = async () => {
     if (!selectedWaitersToRemove.length)
       return toast.error("Select at least one waiter", { position: "top-center" });
@@ -518,13 +460,11 @@ useEffect(() => {
             headers: { Authorization: `Bearer ${TOKEN}` },
           }
         );
-
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));
           throw new Error(errData.message || `Failed to remove waiter: ${email}`);
         }
       }
-
       toast.success("Selected waiter(s) removed successfully!", {
         position: "top-center",
       });
@@ -538,13 +478,8 @@ useEffect(() => {
       });
     }
   };
-
-
-
-
   // ---------------- UI ----------------
   if (loading) return <p style={{ textAlign: "center" }}>Loading...</p>;
-
   return (
     <div className="admin-tables-page">
       <h2 className="admin-page-title"><Sofa size={22} /> Table Management</h2>
@@ -552,44 +487,47 @@ useEffect(() => {
       <div className="admin-add-table-section admin-right-align">
         <button onClick={() => setShowAddPopup(true)}><Plus size={16} /> Add Table</button>
       </div>
-
       <div className="admin-stats">
         <p>Total: {tables.length}</p>
         <p>Available: {tables.filter((t) => t.tableStatus === "AVAILABLE").length}</p>
         <p>Booked: {tables.filter((t) => t.tableStatus === "BOOKED").length}</p>
         <p>Cleaning: {tables.filter((t) => t.tableStatus === "CLEANING").length}</p>
       </div>
-
       <div className="admin-tables-grid">
         {tables.map((table) => (
-          <div key={table.id || table.tableNumber} className="admin-table-card">
+          <div
+            key={table.id || table.tableNumber}
+            className={`admin-table-card ${table.tableStatus?.toLowerCase() === "available"
+              ? "status-available"
+              : table.tableStatus?.toLowerCase() === "booked"
+                ? "status-booked"
+                : table.tableStatus?.toLowerCase() === "cleaning"
+                  ? "status-cleaning"
+                  : ""
+              }`}
+          >
+
             <div className="admin-table-card-header">
               <h3>Table {table.tableNumber}</h3>
               <div className="admin-actions">
                 <button onClick={() => { setEditTable(table); setShowEditPopup(true); }}><Edit size={16} /></button>
                 <button
                   onClick={() => {
-                    setSelectedTable({ id: table.id, number: table.tableNumber });
-                    setShowDeletePopup(true);
+                    setSelectedTable({ id: table.id, tablenumber: table.tableNumber });
+                    setShowTableDeletePopup(true);
                   }}
                   className="text-red-600 hover:text-red-800"
                 >
                   <Trash2 size={16} />
                 </button>
-
-
               </div>
             </div>
-
             <p><strong>Status:</strong> {table.tableStatus || "—"}</p>
             <p><strong>Capacity:</strong> {table.capacity || "—"}</p>
             <p><strong>Section:</strong> {table.section?.trim() || "—"}</p>
             <p><strong>Location:</strong> {table.locationDescription || "—"}</p>
-
-
             <div className="admin-qr-section">
               <h4><QrCode size={16} /> QR Management</h4>
-
               {!qrStatus[table.tableNumber] ? (
                 <button
                   onClick={() => handleGenerateQr(table.tableNumber)}
@@ -606,7 +544,18 @@ useEffect(() => {
                 </button>
               )}
             </div>
-
+            {/* {showTableDeletePopup && (
+              <div className="admin-table-popup-overlay">
+                <div className="admin-table-popup-box">
+                  <h2>Confirm Delete</h2>
+                  <p>Are you sure you want to delete Table {selectedTable.number}?</p>
+                  <div className="admin-table-popup-buttons">
+                    <button onClick={handleDeleteTable} className="admin-table-popup-btn admin-table-delete">Delete</button>
+                    <button onClick={() => setShowTableDeletePopup(false)} className="admin-table-popup-btn admin-table-cancel">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            )} */}
 
             <div className="admin-waiter-section">
               <h4><User size={16} /> Waiter Assignment</h4>
@@ -631,8 +580,6 @@ useEffect(() => {
                   ? "Update Waiters"
                   : "Assign Waiters"}
               </button>
-
-
               {assignments.filter(a => a.tableNumber === table.tableNumber).length > 0 && (
                 <button
                   onClick={() => {
@@ -662,9 +609,7 @@ useEffect(() => {
             >
               <X size={18} />
             </button>
-
             <h3>Remove Waiter(s) from Table {showRemoveWaiterPopup.tableNumber}</h3>
-
             {showRemoveWaiterPopup.waiters?.length > 0 ? (
               <div className="admin-waiter-checkbox-list" style={{ marginTop: "10px" }}>
                 {showRemoveWaiterPopup.waiters.map(email => (
@@ -689,7 +634,6 @@ useEffect(() => {
             ) : (
               <p>No waiters assigned to this table.</p>
             )}
-
             <div className="admin-popup-actions" style={{ marginTop: "12px" }}>
               <button
                 onClick={handleRemoveSelectedWaiters}
@@ -708,9 +652,6 @@ useEffect(() => {
           </div>
         </div>
       )}
-
-
-
       {/* ---------- Add / Edit Table Popups ---------- */}
       {showAddPopup && (
         <div className="admin-popup-overlay">
@@ -728,39 +669,72 @@ useEffect(() => {
             <label>Capacity: <input type="number" min="1" value={newTable.capacity} onChange={(e) => setNewTable({ ...newTable, capacity: Number(e.target.value) })} /></label>
             <label>Section: <input type="text" value={newTable.section} onChange={(e) => setNewTable({ ...newTable, section: e.target.value })} /></label>
             <label>Location: <textarea value={newTable.locationDescription} onChange={(e) => setNewTable({ ...newTable, locationDescription: e.target.value })} /></label>
-            <p><strong>Organization ID:</strong> {organizationId || "—"}</p>
             <button onClick={handleAddTable}>Add Table</button>
           </div>
         </div>
       )}
 
       {showEditPopup && editTable && (
-        <div className="admin-popup-overlay">
-          <div className="admin-popup">
-            <button className="admin-popup-close" onClick={() => setShowEditPopup(false)}><X size={18} /></button>
-            <h3>Edit Table</h3>
-            <label>Table Number: <input type="text" value={editTable.tableNumber} onChange={(e) => setEditTable({ ...editTable, tableNumber: e.target.value })} /></label>
-            <label>Status:
-              <select value={editTable.tableStatus} onChange={(e) => setEditTable({ ...editTable, tableStatus: e.target.value })}>
-                <option value="AVAILABLE">AVAILABLE</option>
-                <option value="BOOKED">BOOKED</option>
-                <option value="CLEANING">CLEANING</option>
-              </select>
-            </label>
-            <label>Capacity: <input type="number" min="1" value={editTable.capacity} onChange={(e) => setEditTable({ ...editTable, capacity: Number(e.target.value) })} /></label>
-            <label>Section: <input type="text" value={editTable.section} onChange={(e) => setEditTable({ ...editTable, section: e.target.value })} /></label>
-            <label>Location: <textarea value={editTable.locationDescription} onChange={(e) => setEditTable({ ...editTable, locationDescription: e.target.value })} /></label>
-            <p><strong>Organization ID:</strong> {organizationId || "—"}</p>
-            <button
-              onClick={() => setShowConfirmPopup(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-            >
-              Save Changes
-            </button>
+  <div className="admin-popup-overlay">
+    <div className="admin-popup">
+      <button className="admin-popup-close" onClick={() => setShowEditPopup(false)}>
+        <X size={18} />
+      </button>
+      <h3>Edit Table</h3>
+      
+      {/* Table Number (disabled) */}
+      <label>
+        Table Number: 
+        <input 
+          type="text" 
+          value={editTable.tableNumber} 
+          disabled  // ✅ Disable editing
+        />
+      </label>
 
-          </div>
-        </div>
-      )}
+      <label>Status:
+        <select value={editTable.tableStatus} onChange={(e) => setEditTable({ ...editTable, tableStatus: e.target.value })}>
+          <option value="AVAILABLE">AVAILABLE</option>
+          <option value="BOOKED">BOOKED</option>
+          <option value="CLEANING">CLEANING</option>
+        </select>
+      </label>
+
+      <label>Capacity: 
+        <input 
+          type="number" 
+          min="1" 
+          value={editTable.capacity} 
+          onChange={(e) => setEditTable({ ...editTable, capacity: Number(e.target.value) })} 
+        />
+      </label>
+
+      <label>Section: 
+        <input 
+          type="text" 
+          value={editTable.section} 
+          onChange={(e) => setEditTable({ ...editTable, section: e.target.value })} 
+        />
+      </label>
+
+      <label>Location: 
+        <textarea 
+          value={editTable.locationDescription} 
+          onChange={(e) => setEditTable({ ...editTable, locationDescription: e.target.value })} 
+        />
+      </label>
+
+
+      <button
+        onClick={() => setShowConfirmPopup(true)}
+        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+      >
+        Save Changes
+      </button>
+    </div>
+  </div>
+)}
+
 
       {/* ---------- Edit Confirmation Popup ---------- */}
       {showConfirmPopup && (
@@ -793,72 +767,46 @@ useEffect(() => {
       )}
 
       {showSuccessPopup && (
-        <div className="admin-table-popup-overlay">
-          <div className="admin-table-popup-box">
-            <h2 className="admin-table-success-title">✅ Table Updated!</h2>
+        <div className="admin-success-overlay">
+          <div className="admin-success-box">
+            <h2>✅ Table Updated!</h2>
             <p>{editTable.tableNumber} updated successfully.</p>
-            <div className="admin-table-popup-buttons">
-              <button
-                className="admin-table-popup-btn admin-table-ok"
-                onClick={() => setShowSuccessPopup(false)}
-              >
-                OK
-              </button>
-            </div>
+            <button onClick={() => setShowSuccessPopup(false)}>OK</button>
           </div>
         </div>
       )}
-
-
-      {showSuccessPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-xl shadow-lg p-6 w-[320px] text-center">
-            <h2 className="text-green-600 text-lg font-semibold mb-3">✅ Table Updated!</h2>
-            <p className="text-gray-700 mb-4">
-              {editTable.tableNumber} updated successfully.
-            </p>
-            <button
-              onClick={() => setShowSuccessPopup(false)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-            >
-              OK
-            </button>
-          </div>
-        </div>
-      )}
-
-
-
 
       {/* ---------- Delete Table Confirmation Popup ---------- */}
+      {showTableDeletePopup && selectedTable && (
+  <div className="delete-popup-overlay">
+    <div className="delete-popup-box">
+      <h2>Delete Table {selectedTable.tablenumber}?</h2>
+      <p>This will also remove its QR and waiter assignments. Are you sure?</p>
 
-      {showDeletePopup && selectedTable && (
-        <div className="delete-popup-overlay">
-          <div className="delete-popup-box">
-            <h2>Delete Table {selectedTable.number}?</h2>
-            <p>This will also remove its QR and waiter assignments. Are you sure?</p>
-
-            <div className="delete-popup-actions">
-              <button
-                onClick={() => setShowDeletePopup(false)}
-                disabled={isDeleting}
-                className="cancel-btn"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteTable}
-                disabled={isDeleting}
-                className="delete-btn"
-              >
-                {isDeleting ? "Deleting..." : "Confirm Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-
+      <div className="delete-popup-actions">
+        <button
+          onClick={() => setShowTableDeletePopup(false)}  // ✅ FIXED
+          disabled={isDeleting}
+          className="cancel-btn"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={async () => {
+            setIsDeleting(true);
+            await handleDeleteTable();
+            setIsDeleting(false);
+            setShowTableDeletePopup(false);  // ✅ CLOSE AFTER DELETE
+          }}
+          disabled={isDeleting}
+          className="delete-btn"
+        >
+          {isDeleting ? "Deleting..." : "Confirm Delete"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* ---------- Assign / Remove Waiter Popups ---------- */}
       {showWaiterPopup && (
@@ -953,7 +901,7 @@ useEffect(() => {
                   <button
                     onClick={() => {
                       setSelectedTableForDelete(qrData.tableNumber);
-                      setShowDeletePopup(true);
+                      setShowQRDeletePopup(true);
                     }}
                     className="admin-qr-btn delete"
                   >
@@ -969,7 +917,7 @@ useEffect(() => {
         </div>
       )}
 
-      {showDeletePopup && (
+      {showQRDeletePopup &&  (
         <div className="admin-qr-delete-overlay">
           <div className="admin-qr-delete-card">
             <h4 className="admin-qr-delete-title">
@@ -984,14 +932,14 @@ useEffect(() => {
                 className="admin-qr-btn delete"
                 onClick={() => {
                   handleDeleteQr(selectedTableForDelete);
-                  setShowDeletePopup(false);
+                  setShowQRDeletePopup(false);
                 }}
               >
                 Yes, Delete
               </button>
               <button
                 className="admin-qr-btn cancel"
-                onClick={() => setShowDeletePopup(false)}
+                onClick={() => setShowQRDeletePopup(false)}
               >
                 Cancel
               </button>
@@ -999,11 +947,6 @@ useEffect(() => {
           </div>
         </div>
       )}
-
-
-
-
-
       <ToastContainer />
     </div>
   );

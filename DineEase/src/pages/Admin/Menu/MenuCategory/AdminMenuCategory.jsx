@@ -79,12 +79,11 @@ useEffect(() => {
 }, [fetchCategories]);
 
 
-
   const toggleExpand = (id) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // ✅ Build parent-child hierarchy (for display only)
+  // ✅ Build parent-child hierarchy
   const buildTree = () => {
     const map = {};
     categories.forEach((cat) => (map[cat.id] = { ...cat, children: [] }));
@@ -111,40 +110,43 @@ useEffect(() => {
         <tr>
           <td style={{ paddingLeft: `${level * 25 + 10}px` }}>
             {hasChildren && (
-              <button onClick={() => toggleExpand(cat.id)} className="expand-btn">
-                {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              <button
+                onClick={() => toggleExpand(cat.id)}
+                className="expand-btn"
+              >
+                {isExpanded ? (
+                  <ChevronDown size={16} />
+                ) : (
+                  <ChevronRight size={16} />
+                )}
               </button>
             )}
             {cat.name}
           </td>
           <td>{parentName}</td>
-          {/* <td>
-            {cat.imageUrl ? (
+
+          <td>
+            {cat.imageData ? (
               <img
-                src={
-                  cat.imageUrl.startsWith("http")
-                    ? cat.imageUrl
-                    : `http://localhost:8082/${cat.imageUrl
-                      .replaceAll("\\", "/") // convert backslashes to forward slashes
-                      .replace(/^.*uploads\//, "uploads/") // keep correct uploads path
-                    }`
-                }
+                src={`data:image/jpeg;base64,${cat.imageData}`}
                 alt={cat.name}
                 className="admin-category-photo"
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = "/no-image.png"; // fallback
+                  e.target.src = "/no-image.png";
                 }}
               />
             ) : (
               <div className="no-img">No Image</div>
             )}
-
-          </td> */}
+          </td>
 
           <td>{cat.description || "—"}</td>
           <td>
-            <span className={`status-badge ${cat.isActive ? "active" : "inactive"}`}>
+            <span
+              className={`status-badge ${cat.isActive ? "active" : "inactive"
+                }`}
+            >
               {cat.isActive ? "Active" : "Inactive"}
             </span>
           </td>
@@ -155,21 +157,30 @@ useEffect(() => {
                 setNewCategory({
                   menuCategoryName: cat.name,
                   description: cat.description,
-                  parentCategoryDropdown: cat.parentCategoryId
-                    ? categories.find((p) => p.id === cat.parentCategoryId)?.name || ""
-                    : "",
+                  parentCategoryDropdown: cat.parentCategoryId || "",
                   displayOrder: cat.displayOrder,
                   isActive: cat.isActive,
                   image: null,
                 });
-                setShowModal(true);
+                setShowModal(true); 
               }}
             >
               <Edit3 size={16} />
             </button>
-            <button onClick={() => handleDelete(cat.id)}>
-              <Trash2 size={16} />
-            </button>
+            {hasChildren ? (
+              <button
+                disabled
+                title="Cannot delete a category that has subcategories"
+                className="admin-category-disabled-delete-btn"
+              >
+                <Trash2 size={16} color="#aaa" />
+              </button>
+            ) : (
+              <button onClick={() => handleDelete(cat.id)}>
+                <Trash2 size={16} />
+              </button>
+            )}
+
           </td>
         </tr>
 
@@ -181,64 +192,114 @@ useEffect(() => {
   };
 
   const handleDelete = async (id) => {
-  if (!window.confirm("Delete this category?")) return;
-  try {
-    const res = await fetch(`${CATEGORY_API}/delete/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${TOKEN}` },
-    });
-    if (!res.ok) throw new Error("Failed to delete category");
-    toast.success("Category deleted!");
-    setPage(0); // ✅ triggers useEffect reload
-  } catch (err) {
-    console.error(err);
-    toast.error("Error deleting category");
-  }
-};
+    const categoryName = categories.find((c) => c.id === id)?.name || "this category";
+
+    // 1️⃣ Confirm delete
+    if (!window.confirm(`Are you sure you want to delete "${categoryName}"?`)) return;
+
+    try {
+      const res = await fetch(
+        `${CATEGORY_API}/delete/${id}?organizationId=${organizationId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${TOKEN}` },
+        }
+      );
+
+      const text = await res.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { message: text };
+      }
+
+      if (!res.ok) {
+        // 🧠 Smart handling for backend constraint errors
+        if (data.message?.includes("violates foreign key constraint")) {
+          toast.error(
+            `Cannot delete "${categoryName}" — it has linked menu items.`
+          );
+        } else {
+          toast.error(data.message || `Failed to delete "${categoryName}".`);
+        }
+        return;
+      }
+
+      toast.success(data.message || "Category deleted successfully!");
+      fetchCategories();
+    } catch (err) {
+      console.error("Delete failed:", err);
+      toast.error("Server error while deleting category");
+    }
+  };
 
 
+
+
+
+
+  // ✅ Updated handleSave
   const handleSave = async () => {
     if (!newCategory.menuCategoryName.trim()) {
       toast.error("Category Name is required");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("organizationId", organizationId);
-    formData.append("menuCategoryName", newCategory.menuCategoryName.trim());
-    formData.append("description", newCategory.description || "");
-    formData.append("displayOrder", newCategory.displayOrder || 0);
-    if (newCategory.image) formData.append("image", newCategory.image);
-    formData.append("isActive", newCategory.isActive);
-
-    const parent = categories.find(
-      (c) => c.name === newCategory.parentCategoryDropdown
-    );
-    formData.append("parentCategoryName", parent ? parent.name : "");
-
     try {
-      const url = editingItem
-        ? `${CATEGORY_API}/update/${editingItem.id}?organizationId=${organizationId}`
-        : `${CATEGORY_API}/create`;
+      let url = "";
+      let options = { headers: { Authorization: `Bearer ${TOKEN}` } };
 
-      const res = await fetch(url, {
-        method: editingItem ? "PUT" : "POST",
-        headers: { Authorization: `Bearer ${TOKEN}` },
-        body: formData,
-      });
+      if (editingItem) {
+        // ✅ For UPDATE — backend expects query params
+        const params = new URLSearchParams({
+          organizationId,
+          menuCategoryName: newCategory.menuCategoryName.trim(),
+          description: newCategory.description || "",
+          image: newCategory.image ? newCategory.image.name : "",
+          displayOrder: newCategory.displayOrder || 0,
+          parentCategoryName:
+            categories.find((c) => c.id === newCategory.parentCategoryDropdown)
+              ?.name || "",
+          isActive: newCategory.isActive,
+        });
 
-      if (!res.ok) throw new Error("Failed to save category");
-      toast.success(editingItem ? "Category updated!" : "Category added!");
+        url = `${CATEGORY_API}/update/${editingItem.id}?${params.toString()}`;
+        options.method = "PUT";
+      } else {
+        // ✅ For CREATE — backend expects FormData
+        const formData = new FormData();
+        formData.append("organizationId", organizationId);
+        formData.append("menuCategoryName", newCategory.menuCategoryName.trim());
+        formData.append("description", newCategory.description || "");
+        formData.append("displayOrder", newCategory.displayOrder || 0);
+        if (newCategory.image) formData.append("image", newCategory.image);
+        formData.append("isActive", newCategory.isActive);
+        if (newCategory.parentCategoryDropdown)
+          formData.append("parentCategoryId", newCategory.parentCategoryDropdown);
+
+        url = `${CATEGORY_API}/create`;
+        options.method = "POST";
+        options.body = formData;
+      }
+
+      const res = await fetch(url, options);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+      toast.success(
+        data.message ||
+        (editingItem ? "Category updated successfully" : "Category created!")
+      );
+
       setShowModal(false);
       setEditingItem(null);
-      setPage(0); 
-
+      fetchCategories();
     } catch (err) {
       console.error(err);
       toast.error("Error saving category");
     }
   };
-
 
   return (
     <div className="admin-menu-category-page">
@@ -254,7 +315,6 @@ useEffect(() => {
       {loading ? (
         <p>Loading categories...</p>
       ) : (
-        
         <div className="admin-table-wrapper">
           <h3 className="admin-item-list-heading">Existing Category Types</h3>
           <table className="admin-category-table">
@@ -271,7 +331,6 @@ useEffect(() => {
             <tbody>{buildTree().map((cat) => renderCategoryRow(cat))}</tbody>
           </table>
 
-          {/* ✅ Pagination */}
           {totalPages > 1 && (
             <div className="pagination">
               <button
@@ -294,13 +353,15 @@ useEffect(() => {
         </div>
       )}
 
-      {/* ✅ Modal */}
       {showModal && (
         <div className="admin-category-modal-overlay">
           <div className="admin-category-modal">
             <div className="admin-category-modal-header">
               <h3>{editingItem ? "Edit Category" : "Add Category"}</h3>
-              <button onClick={() => setShowModal(false)} className="admin-category-close-btn">
+              <button
+                onClick={() => setShowModal(false)}
+                className="admin-category-close-btn"
+              >
                 <X size={20} />
               </button>
             </div>
@@ -311,14 +372,20 @@ useEffect(() => {
                 placeholder="Category / Subcategory Name *"
                 value={newCategory.menuCategoryName}
                 onChange={(e) =>
-                  setNewCategory({ ...newCategory, menuCategoryName: e.target.value })
+                  setNewCategory({
+                    ...newCategory,
+                    menuCategoryName: e.target.value,
+                  })
                 }
               />
               <textarea
                 placeholder="Description"
                 value={newCategory.description}
                 onChange={(e) =>
-                  setNewCategory({ ...newCategory, description: e.target.value })
+                  setNewCategory({
+                    ...newCategory,
+                    description: e.target.value,
+                  })
                 }
               ></textarea>
 
@@ -326,14 +393,17 @@ useEffect(() => {
               <select
                 value={newCategory.parentCategoryDropdown}
                 onChange={(e) =>
-                  setNewCategory({ ...newCategory, parentCategoryDropdown: e.target.value })
+                  setNewCategory({
+                    ...newCategory,
+                    parentCategoryDropdown: e.target.value,
+                  })
                 }
               >
                 <option value="">None (Parent Category)</option>
                 {categories
                   .filter((c) => !c.parentCategoryId)
                   .map((pc) => (
-                    <option key={pc.id} value={pc.name}>
+                    <option key={pc.id} value={pc.id}>
                       {pc.name}
                     </option>
                   ))}
@@ -344,7 +414,10 @@ useEffect(() => {
                 type="file"
                 accept="image/*"
                 onChange={(e) =>
-                  setNewCategory({ ...newCategory, image: e.target.files[0] })
+                  setNewCategory({
+                    ...newCategory,
+                    image: e.target.files[0],
+                  })
                 }
               />
 
@@ -353,7 +426,10 @@ useEffect(() => {
                 placeholder="Display Order"
                 value={newCategory.displayOrder}
                 onChange={(e) =>
-                  setNewCategory({ ...newCategory, displayOrder: e.target.value })
+                  setNewCategory({
+                    ...newCategory,
+                    displayOrder: e.target.value,
+                  })
                 }
               />
 
@@ -362,7 +438,10 @@ useEffect(() => {
                   type="checkbox"
                   checked={newCategory.isActive}
                   onChange={(e) =>
-                    setNewCategory({ ...newCategory, isActive: e.target.checked })
+                    setNewCategory({
+                      ...newCategory,
+                      isActive: e.target.checked,
+                    })
                   }
                 />{" "}
                 Active

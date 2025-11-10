@@ -297,6 +297,16 @@
   margin: 4px 0 10px 0;
   font-size: 14px;
 }
+.admin-category-disabled-delete-btn {
+  background: transparent;
+  border: none;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.admin-category-disabled-delete-btn:hover {
+  opacity: 0.6;
+}
 
 /* ===== Save Button ===== */
 .admin-save-btn {
