@@ -29,7 +29,6 @@
 .admin-role-add-header {
   display: flex;
   justify-content: space-between;
-<<<<<<< HEAD
   align-items: center;
   margin-bottom: 20px;
   flex-wrap: wrap;
@@ -68,85 +67,6 @@
 }
 .admin-role-add-btn:hover {
   background: #1e40af;
-=======
-  margin-bottom: 30px;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.admin-role-add-title {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* --- Warning Text --- */
-.admin-role-add-warning {
-  color: red;
-  margin-top: 10px;
-}
-
-/* ============================= */
-/* 🌟 Buttons - Global BW Theme  */
-/* ============================= */
-
-.admin-role-add-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid #000;
-  background-color: #000;
-  color: #fff;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 14px;
-  transition: 0.25s ease;
-}
-
-.admin-role-add-btn:hover {
-  background-color: #fff;
-  color: #000;
-  border-color: #000;
-}
-
-/* ============================= */
-/* 🌟 Search Bar                */
-/* ============================= */
-
-.admin-role-add-search {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.admin-role-add-search input {
-  width: 100%;
-  padding: 14px 20px;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  outline: none;
-}
-
-.admin-search-input:focus {
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* ===== Table ===== */
-.admin-table-wrapper {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
->>>>>>> 42596c85a2edb425264b971a9dd9cad3c0c6d4b3
 }
 
 /* ============================= */

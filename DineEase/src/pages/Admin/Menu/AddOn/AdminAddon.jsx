@@ -87,8 +87,14 @@ export default function AdminAddon() {
   // ✅ Add or Update Add-On
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!organizationId) {
       toast.error("Organization ID missing");
+      return;
+    }
+
+    if (!editingAddon && !imageFile) {
+      toast.error("Please upload an image for the add-on");
       return;
     }
 
@@ -101,6 +107,8 @@ export default function AdminAddon() {
     data.append("addOnType", formData.addOnType);
     if (imageFile) data.append("addOnImage", imageFile);
 
+    console.log("Submitting addon:", Object.fromEntries(data.entries()));
+
     try {
       const url = editingAddon
         ? `${BASE_URL}/update/details/${editingAddon.id}`
@@ -109,29 +117,22 @@ export default function AdminAddon() {
 
       const res = await fetch(url, {
         method,
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
         body: data,
       });
 
-
       if (res.ok) {
         toast.success(
-          editingAddon
-            ? "Add-on updated successfully!"
-            : "Add-on added successfully!"
+          editingAddon ? "Add-on updated successfully!" : "Add-on added successfully!"
         );
-        setFormData({
-          organizationId,
-          addOnName: "",
-          addOnDescription: "",
-          price: "",
-          isAvailable: true,
-          addOnType: "",
-        });
-        setImageFile(null);
-        setEditingAddon(null);
+        handleCancelEdit();
         fetchAddons(organizationId);
+        setShowModal(false);
       } else {
+        const errText = await res.text();
+        console.error("Backend error:", errText);
         toast.error("Failed to save add-on");
       }
     } catch (err) {
@@ -139,6 +140,7 @@ export default function AdminAddon() {
       toast.error("Error saving add-on");
     }
   };
+
 
   // ✅ Handle Edit
   const handleEdit = (addon) => {
@@ -226,15 +228,21 @@ export default function AdminAddon() {
                 <option value="true">Available</option>
                 <option value="false">Unavailable</option>
               </select>
-              <input
-                type="text"
-                placeholder="Add-On Type"
+              <select
                 className="admin-addons-input"
                 value={formData.addOnType}
                 onChange={(e) =>
                   setFormData({ ...formData, addOnType: e.target.value })
                 }
-              />
+                required
+              >
+                <option value="">Select Add-On Type</option>
+                <option value="TOPPING">Topping</option>
+                <option value="SAUCE">Sauce</option>
+                <option value="EXTRA_CHEESE">Extra Cheese</option>
+                <option value="DRINK">Drink</option>
+              </select>
+
               <input
                 type="file"
                 className="admin-addons-file"
@@ -276,7 +284,7 @@ export default function AdminAddon() {
                 <img
                   src={`data:image/jpeg;base64,${addon.addOnImageData}`}
                   alt={addon.addOnName}
-                  className="admin-addons-image" 
+                  className="admin-addons-image"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = "/no-image.png";

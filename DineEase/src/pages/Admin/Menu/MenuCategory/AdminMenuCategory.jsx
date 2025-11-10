@@ -74,28 +74,10 @@ export default function AdminMenuCategory() {
   }
 }, [organizationId, page, TOKEN]);
 
-<<<<<<< HEAD
-      setCategories(data.content || []);
-      setTotalPages(data.totalPages || 0);
-      setTotalElements(data.totalElements || 0);
-    } catch (err) {
-      console.error(err);
-      toast.error("Error loading categories");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!organizationId) return;
-    fetchCategories();
-  }, [organizationId, page]);
-=======
 useEffect(() => {
   fetchCategories();
 }, [fetchCategories]);
 
->>>>>>> 42596c85a2edb425264b971a9dd9cad3c0c6d4b3
 
   const toggleExpand = (id) => {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
