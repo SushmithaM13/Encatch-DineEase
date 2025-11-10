@@ -30,6 +30,11 @@ export default function SuperAdminProfile() {
         const data = await res.json();
         setProfile(data);
         setFormData(data);
+
+ if (data.fullName) {
+        localStorage.setItem("superAdminFullName", data.fullName);
+      }
+
       } catch (err) {
         toast.error(err.message || "Failed to load profile");
       } finally {
@@ -61,10 +66,11 @@ export default function SuperAdminProfile() {
       if (!res.ok) throw new Error("Failed to update profile");
 
       toast.success("Profile updated successfully!");
-      setProfile(formData);
-      setEditing(false);
+      
+localStorage.setItem("superAdminFullName", formData.fullName || "");
+
     } catch (err) {
-      toast.error(err.message || "Update failed");
+      toast.error(err.message || "Profile Update failed");
     }
   };
 
