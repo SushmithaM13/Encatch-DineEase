@@ -1,9 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-
-//import myImage from "../../../images/food.jpg";
-
-
-
 import "./CategoryForm.css";
 
 export default function CategoryForm() {
@@ -35,7 +30,7 @@ export default function CategoryForm() {
     setLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:8082/dine-ease/api/v1/menu-category/${organizationId}?page=0&size=100&sortBy=id&sortDir=desc`,
+        `http://localhost:8082/dine-ease/api/v1/menu-category/${organizationId}?page=0&size=5&sortBy=id&sortDir=desc`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
@@ -96,11 +91,8 @@ export default function CategoryForm() {
 
     if (imageUrl.trim()) {
       formData.append("imageUrl", imageUrl.trim());
-      console.log("Appending image URL:", imageUrl);
-    } 
-    else if (image) {
+    } else if (image) {
       formData.append("image", image);
-      console.log("Appending image file:", image);
     }
 
     try {
@@ -139,7 +131,7 @@ export default function CategoryForm() {
     }
   };
 
-  //  Delete category
+  // ✅ Delete category
   const handleDeleteCategory = async (id) => {
     if (!window.confirm("Are you sure?")) return;
     try {
@@ -175,7 +167,8 @@ export default function CategoryForm() {
   const handleUpdateCategory = async () => {
     if (!editingCategory) return;
 
-    const { id, menuCategoryName, description, displayOrder, parentCategoryName, isActive } = editingCategory;
+    const { id, menuCategoryName, description, displayOrder, parentCategoryName, isActive } =
+      editingCategory;
     const finalName = menuCategoryName || "";
 
     const apiUrl = `http://localhost:8082/dine-ease/api/v1/menu-category/update/${id}?organizationId=${organizationId}&menuCategoryName=${encodeURIComponent(
@@ -204,45 +197,60 @@ export default function CategoryForm() {
       alert(" Error updating");
     }
   };
-  
- // ✅ Converts file:/// or Windows paths into proper backend URLs
-const getImageSrc = (cat) => {
-  if (!cat || !cat.imageUrl) return null;
 
-  let imagePath = cat.imageUrl.trim();
+  // ✅ Modified for byteData
+  const getImageSrc = (cat) => {
+    if (!cat) return null;
 
-  // If it's already a valid HTTP or HTTPS URL (external)
-  if (/^https?:\/\//i.test(imagePath)) {
-    return imagePath;
-  }
-
-  // If it starts with file:/// (Windows-style absolute path)
-  if (imagePath.startsWith("file:///")) {
-    // Normalize slashes
-    imagePath = imagePath.replace(/\\/g, "/");
-
-    // Find "uploads" folder inside the path
-    const uploadsIndex = imagePath.toLowerCase().indexOf("uploads/");
-    if (uploadsIndex !== -1) {
-      const relativePath = imagePath.substring(uploadsIndex);
-      return `http://localhost:8082/${relativePath}`;
+    // 🔹 Priority 1: if backend sends image as Base64 string (byte data)
+    if (cat.imageData) {
+      return `data:image/jpeg;base64,${cat.imageData}`;
     }
-  }
 
-  // If it's a raw Windows path (E:\React\...)
-  if (imagePath.includes("E:/") || imagePath.includes("e:/")) {
-    imagePath = imagePath.replace(/\\/g, "/");
-    const uploadsIndex = imagePath.toLowerCase().indexOf("uploads/");
-    if (uploadsIndex !== -1) {
-      const relativePath = imagePath.substring(uploadsIndex);
-      return `http://localhost:8082/${relativePath}`;
+    // 🔹 Priority 2: use backend URL path (for older records)
+    if (cat.imageUrl) {
+      let imagePath = cat.imageUrl.trim();
+
+      if (/^https?:\/\//i.test(imagePath)) return imagePath;
+
+      if (imagePath.startsWith("file:///") || imagePath.includes("uploads/")) {
+        imagePath = imagePath.replace(/\\/g, "/");
+        const uploadsIndex = imagePath.toLowerCase().indexOf("uploads/");
+        if (uploadsIndex !== -1) {
+          const relativePath = imagePath.substring(uploadsIndex);
+          return `http://localhost:8082/${relativePath}`;
+        }
+      }
+
+      return `http://localhost:8082/uploads/menu-image/${imagePath}`;
     }
-  }
 
-  // Default fallback (if backend gives only filename)
-  return `http://localhost:8082/uploads/menu-image/${imagePath}`;
-};
+    return null;
+  };
 
+  // ✅ Image component
+  const CategoryImage = ({ cat, className }) => {
+    const [error, setError] = useState(false);
+    const src = getImageSrc(cat);
+
+    if (!src || error)
+      return (
+        <img
+          src="/images/food.jpg"
+          alt="Default food"
+          className={className}
+        />
+      );
+
+    return (
+      <img
+        src={src}
+        alt={cat.name || cat.menuCategoryName}
+        className={className}
+        onError={() => setError(true)}
+      />
+    );
+  };
 
   // ✅ Pagination & filter
   const filtered = categories.filter((c) =>
@@ -253,31 +261,6 @@ const getImageSrc = (cat) => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  // ✅ Image component
- const CategoryImage = ({ cat, className }) => {
-  const [error, setError] = useState(false);
-  const src = getImageSrc(cat);
-
-  if (!src || error)
-    return (
-      <img
-        src="/images/food.jpg" 
-        alt="Default food"
-        className={className}
-      />
-    );
-
-  return (
-    <img
-      src={src}
-      alt={cat.name || cat.menuCategoryName}
-      className={className}
-      onError={() => setError(true)}
-    />
-  );
-};
-
 
   return (
     <div className="category-form-container">
