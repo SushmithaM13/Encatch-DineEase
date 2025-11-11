@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./OrderQueue.css";
 
-export default function OrderQueue() {
-  // Initialize with empty arrays and ensure they always exist
+export default function ChefOrderQueue() {
   const defaultOrders = {
     newOrders: [],
     accepted: [],
@@ -32,8 +31,8 @@ export default function OrderQueue() {
           timer: 15,
         },
       ],
-  accepted: [],
-  preparing: [
+      accepted: [],
+      preparing: [
         {
           table: "Table 3",
           time: "12:25 PM",
@@ -64,15 +63,11 @@ export default function OrderQueue() {
     setOrders(initialData);
   }, []);
 
-  // Timer logic (updates every minute)
   useEffect(() => {
     const interval = setInterval(() => {
       setOrders((prev) => {
         const updateTimer = (arr) =>
-          (arr || []).map((o) => ({
-            ...o,
-            timer: o.timer > 0 ? o.timer - 1 : 1, // Keep minimum of 1 minute
-          }));
+          (arr || []).map((o) => ({ ...o, timer: o.timer > 0 ? o.timer - 1 : 1 }));
         return {
           newOrders: updateTimer(prev.newOrders),
           accepted: updateTimer(prev.accepted),
@@ -85,12 +80,9 @@ export default function OrderQueue() {
   }, []);
 
   const moveOrder = (from, to, index) => {
-    // Ensure arrays exist before accessing
     if (!orders[from] || !orders[to]) return;
-    
     const orderToMove = orders[from][index];
     if (!orderToMove) return;
-
     setOrders((prev) => {
       const updatedFrom = (prev[from] || []).filter((_, i) => i !== index);
       const updatedTo = [...(prev[to] || []), orderToMove];
@@ -98,11 +90,9 @@ export default function OrderQueue() {
     });
   };
 
-  // Accept an order: split its items into separate accepted entries
   const handleAcceptOrder = (index) => {
     const order = orders.newOrders[index];
     if (!order) return;
-    // split items by comma and create individual accepted items
     const itemParts = order.items.split(",").map((s) => s.trim()).filter(Boolean);
     const acceptedItems = itemParts.map((itemText, idx) => ({
       id: `${order.table}-${Date.now()}-${idx}`,
@@ -112,7 +102,7 @@ export default function OrderQueue() {
       item: itemText,
       note: order.note || "",
       urgent: !!order.urgent,
-      timer: order.timer || 15, // Default 15 minutes for new items
+      timer: order.timer || 15,
     }));
 
     setOrders((prev) => {
@@ -121,27 +111,23 @@ export default function OrderQueue() {
     });
   };
 
-  // Reject a new order (remove it)
   const handleRejectNewOrder = (index) => {
-    setOrders((prev) => {
-      const updatedNew = prev.newOrders.filter((_, i) => i !== index);
-      return { ...prev, newOrders: updatedNew };
-    });
+    setOrders((prev) => ({
+      ...prev,
+      newOrders: prev.newOrders.filter((_, i) => i !== index),
+    }));
   };
 
-  // Reject an accepted single item (remove it)
   const handleRejectAccepted = (index) => {
-    setOrders((prev) => {
-      const updatedAccepted = prev.accepted.filter((_, i) => i !== index);
-      return { ...prev, accepted: updatedAccepted };
-    });
+    setOrders((prev) => ({
+      ...prev,
+      accepted: prev.accepted.filter((_, i) => i !== index),
+    }));
   };
 
-  // Start preparation for a single accepted item
   const handleStartPreparationFromAccepted = (index) => {
     const acceptedItem = orders.accepted[index];
     if (!acceptedItem) return;
-    // create a preparing order object from the accepted item
     const prepObj = {
       table: acceptedItem.table,
       time: acceptedItem.time,
@@ -151,148 +137,107 @@ export default function OrderQueue() {
       urgent: acceptedItem.urgent,
       timer: acceptedItem.timer || 10,
     };
-    setOrders((prev) => {
-      const updatedAccepted = prev.accepted.filter((_, i) => i !== index);
-      return { ...prev, accepted: updatedAccepted, preparing: [...prev.preparing, prepObj] };
-    });
+    setOrders((prev) => ({
+      ...prev,
+      accepted: prev.accepted.filter((_, i) => i !== index),
+      preparing: [...prev.preparing, prepObj],
+    }));
   };
 
   return (
-    <div className="order-management container">
-      <div className="header-row">
+    <div className="chef-order-management container">
+      <div className="chef-header-row">
         <h2>Order Management</h2>
-        <button className="refresh-btn" onClick={() => window.location.reload()}>
+        <button className="chef-refresh-btn" onClick={() => window.location.reload()}>
           🔄 Refresh
         </button>
       </div>
 
-      <div className="kanban-board">
+      <div className="chef-kanban-board">
         {/* New Orders */}
-        <div className="kanban-column">
-          <div className="column-header">
+        <div className="chef-kanban-column">
+          <div className="chef-column-header">
             <span>New Orders</span>
-            <span className="order-count">{orders?.newOrders?.length || 0}</span>
+            <span className="chef-order-count">{orders?.newOrders?.length || 0}</span>
           </div>
           {(orders?.newOrders || []).map((o, i) => (
-            <div
-              key={`new-${i}`}
-              className={`order-item ${o.urgent ? "urgent" : ""}`}
-            >
-              <div className="order-table">
+            <div key={`new-${i}`} className={`chef-order-item ${o.urgent ? "chef-urgent" : ""}`}>
+              <div className="chef-order-table">
                 <span>{o.table}</span>
-                <span className="timer">{o.timer} min</span>
+                <span className="chef-timer">{o.timer} min</span>
               </div>
-              <div className="order-time">
-                {o.time} ({o.ago})
-              </div>
-              <div className="order-items">{o.items}</div>
-              {o.note && <div className="order-note">{o.note}</div>}
-              <div className="order-actions">
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => handleAcceptOrder(i)}
-                >
-                  ✅ Accept
-                </button>
-                <button
-                  className="btn btn-reject btn-sm"
-                  onClick={() => handleRejectNewOrder(i)}
-                >
-                  ✖ Reject
-                </button>
+              <div className="chef-order-time">{o.time} ({o.ago})</div>
+              <div className="chef-order-items">{o.items}</div>
+              {o.note && <div className="chef-order-note">{o.note}</div>}
+              <div className="chef-order-actions">
+                <button className="chef-btn chef-btn-primary chef-btn-sm" onClick={() => handleAcceptOrder(i)}>✅ Accept</button>
+                <button className="chef-btn chef-btn-reject chef-btn-sm" onClick={() => handleRejectNewOrder(i)}>✖ Reject</button>
               </div>
             </div>
           ))}
         </div>
 
-  {/* Accepted (single items) */}
-  <div className="kanban-column accepted-column">
-          <div className="column-header">
+        {/* Accepted */}
+        <div className="chef-kanban-column chef-accepted-column">
+          <div className="chef-column-header">
             <span>Accepted</span>
-            <span className="order-count">{orders?.accepted?.length || 0}</span>
+            <span className="chef-order-count">{orders?.accepted?.length || 0}</span>
           </div>
           {(orders?.accepted || []).map((a, ai) => (
-            <div key={a.id || `acc-${ai}`} className={`order-item ${a.urgent ? "urgent" : ""}`}>
-              <div className="order-table">
+            <div key={a.id || `acc-${ai}`} className={`chef-order-item ${a.urgent ? "chef-urgent" : ""}`}>
+              <div className="chef-order-table">
                 <span>{a.table}</span>
-                <span className="timer">{a.timer} min</span>
+                <span className="chef-timer">{a.timer} min</span>
               </div>
-              <div className="order-time">{a.time} ({a.ago})</div>
-              <div className="order-items">{a.item}</div>
-              {a.note && <div className="order-note">{a.note}</div>}
-              <div className="order-actions">
-                <button
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => handleStartPreparationFromAccepted(ai)}
-                >
-                  ▶ Start Prep
-                </button>
-                <button
-                  className="btn btn-reject btn-sm"
-                  onClick={() => handleRejectAccepted(ai)}
-                >
-                  ✖ Reject
-                </button>
+              <div className="chef-order-time">{a.time} ({a.ago})</div>
+              <div className="chef-order-items">{a.item}</div>
+              {a.note && <div className="chef-order-note">{a.note}</div>}
+              <div className="chef-order-actions">
+                <button className="chef-btn chef-btn-secondary chef-btn-sm" onClick={() => handleStartPreparationFromAccepted(ai)}>▶ Start Prep</button>
+                <button className="chef-btn chef-btn-reject chef-btn-sm" onClick={() => handleRejectAccepted(ai)}>✖ Reject</button>
               </div>
             </div>
           ))}
         </div>
 
         {/* Preparing */}
-        <div className="kanban-column">
-          <div className="column-header">
+        <div className="chef-kanban-column">
+          <div className="chef-column-header">
             <span>Preparing</span>
-            <span className="order-count">{orders?.preparing?.length || 0}</span>
+            <span className="chef-order-count">{orders?.preparing?.length || 0}</span>
           </div>
           {(orders?.preparing || []).map((o, i) => (
-            <div
-              key={`prep-${i}`}
-              className={`order-item ${o.urgent ? "urgent" : ""}`}
-            >
-              <div className="order-table">
+            <div key={`prep-${i}`} className={`chef-order-item ${o.urgent ? "chef-urgent" : ""}`}>
+              <div className="chef-order-table">
                 <span>{o.table}</span>
-                <span className="timer">{o.timer} min</span>
+                <span className="chef-timer">{o.timer} min</span>
               </div>
-              <div className="order-time">
-                {o.time} ({o.ago})
-              </div>
-              <div className="order-items">{o.items}</div>
-              {o.note && <div className="order-note">{o.note}</div>}
-              <div className="order-actions">
-                <button
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => moveOrder("preparing", "ready", i)}
-                >
-                  🔔 Mark Ready
-                </button>
+              <div className="chef-order-time">{o.time} ({o.ago})</div>
+              <div className="chef-order-items">{o.items}</div>
+              {o.note && <div className="chef-order-note">{o.note}</div>}
+              <div className="chef-order-actions">
+                <button className="chef-btn chef-btn-secondary chef-btn-sm" onClick={() => moveOrder("preparing", "ready", i)}>🔔 Mark Ready</button>
               </div>
             </div>
           ))}
         </div>
 
         {/* Ready */}
-        <div className="kanban-column">
-          <div className="column-header">
+        <div className="chef-kanban-column">
+          <div className="chef-column-header">
             <span>Ready to Serve</span>
-            <span className="order-count">{orders?.ready?.length || 0}</span>
+            <span className="chef-order-count">{orders?.ready?.length || 0}</span>
           </div>
           {(orders?.ready || []).map((o, i) => (
-            <div key={`ready-${i}`} className="order-item">
-              <div className="order-table">
+            <div key={`ready-${i}`} className="chef-order-item">
+              <div className="chef-order-table">
                 <span>{o.table}</span>
-                <span className="timer">{o.timer} min</span>
+                <span className="chef-timer">{o.timer} min</span>
               </div>
-              <div className="order-time">
-                {o.time} ({o.ago})
-              </div>
-              <div className="order-items">{o.items}</div>
-              <div className="order-actions">
-                <button
-                  className="btn btn-outline btn-sm"
-                  onClick={() => moveOrder("ready", "preparing", i)}
-                >
-                  ↩ Reopen
-                </button>
+              <div className="chef-order-time">{o.time} ({o.ago})</div>
+              <div className="chef-order-items">{o.items}</div>
+              <div className="chef-order-actions">
+                <button className="chef-btn chef-btn-outline chef-btn-sm" onClick={() => moveOrder("ready", "preparing", i)}>↩ Reopen</button>
               </div>
             </div>
           ))}

@@ -68,19 +68,19 @@ export default function ChefMenuCatalog() {
   };
 
   return (
-    <div className="menu-catalog container">
-      <div className="menu-header">
+    <div className="chef-menu-catalog chef-container">
+      <div className="chef-menu-header">
         <h2>Menu Catalog</h2>
-        <button className="btn btn-outline" onClick={handleReportOut}>
+        <button className="chef-btn chef-btn-outline" onClick={handleReportOut}>
           ⚠ Report Out of Stock
         </button>
       </div>
 
-      <div className="filter-chips">
+      <div className="chef-filter-chips">
         {categories.map((cat) => (
           <button
             key={cat}
-            className={`chip ${activeFilter === cat ? "active" : ""}`}
+            className={`chef-chip ${activeFilter === cat ? "chef-active" : ""}`}
             onClick={() => setActiveFilter(cat)}
           >
             {cat}
@@ -88,40 +88,44 @@ export default function ChefMenuCatalog() {
         ))}
       </div>
 
-      <div className="menu-grid">
+      <div className="chef-menu-grid">
         {filteredItems.length === 0 ? (
-          <p className="no-items">No items in this category.</p>
+          <p className="chef-no-items">No items in this category.</p>
         ) : (
           filteredItems.map((item) => (
             <div
               key={item.name}
-              className={`menu-card ${
-                item.status === "Out of Stock" ? "out-of-stock" : ""
+              className={`chef-menu-card ${
+                item.status === "Out of Stock" ? "chef-out-of-stock" : ""
               }`}
             >
               <div
-                className="menu-img"
+                className="chef-menu-img"
                 style={{ backgroundImage: `url(${item.img})` }}
               ></div>
-              <div className="menu-body">
-                <div className="menu-title">
+              <div className="chef-menu-body">
+                <div className="chef-menu-title">
                   <span>{item.name}</span>
-                  <span className="price">${item.price.toFixed(2)}</span>
+                  <span className="chef-price">${item.price.toFixed(2)}</span>
                 </div>
-                <p className="desc">{item.desc}</p>
-                <div className="menu-footer">
+                <p className="chef-desc">{item.desc}</p>
+                <div className="chef-menu-footer">
                   <span
-                    className={`badge ${
-                      item.status === "Out of Stock" ? "badge-error" : "badge-success"
+                    className={`chef-badge ${
+                      item.status === "Out of Stock"
+                        ? "chef-badge-error"
+                        : "chef-badge-success"
                     }`}
                   >
                     {item.status}
                   </span>
                   <button
-                    className="btn btn-sm btn-outline"
+                    className="chef-btn chef-btn-sm chef-btn-outline"
                     onClick={() => toggleStock(item.name)}
                   >
-                    {item.status === "Out of Stock" ? "Mark In Stock" : "Mark Out"}
+                    {item.status === "Out of Stock"
+                      ? "Mark In Stock"
+                      : "Mark Out"}
                   </button>
                 </div>
               </div>

@@ -1,32 +1,57 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import './App.css';
+import React, { useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
+import "./App.css";
+
 
 // ===== Auth Pages =====
-import Login from './components/Auth/login';
-import ForgotPassword from './components/Auth/forgotPassword';
-import ProtectedRoute from './components/Auth/protectedRoute';
-import ResetPassword from './components/Auth/resetPassword';
-import SuperAdminRegistration from './components/signup/SuperAdminRegistration';
+import Login from "./components/Auth/login";
+import ForgotPassword from "./components/Auth/forgotPassword";
+import ProtectedRoute from "./components/Auth/protectedRoute";
+import ResetPassword from "./components/Auth/resetPassword";
+import SuperAdminRegistration from "./components/signup/SuperAdminRegistration";
 
 // ===== Super Admin Pages =====
-import SuperAdminDashboard from './pages/superadmin/dashboard/superAdminDashboard';
+import SuperAdminDashboard from "./pages/superadmin/dashboard/superAdminDashboard";
 import UserManagement from "./pages/superadmin/usermanagement/UserManagement";
-import Items from "./pages/superadmin/items/FoodItems";
+// import Reports from "./pages/superadmin/Reports/Reports";
 import SuperAdminHome from "./pages/superadmin/dashboard/SuperAdminHome";
 import TableManagement from "./pages/superadmin/tablemanagemnet/TableManagement";
 import AddStaffRole from './pages/superadmin/staffroles/AddStaffRole';
+import SuperAdminProfile from "./pages/superadmin/profile/SuperAdminProfile";
+import SuperAdminSettings from "./pages/superadmin/settings/SuperAdminSettings";
+
+// ===== New Menu Dashboard (Tabbed) =====
+import MenuDashboard from "./pages/superadmin/menu/MenuDashboard/MenuDashboard";
+
+import MenuList from "./pages/superadmin/menu/MenuList/MenuList";
+import CategoryForm from "./pages/superadmin/menu/CategoryForm/CategoryForm";
+import AddItemtype from "./pages/superadmin/menu/AddItemForm/AddItemtype";
+import Foodtype from "./pages/superadmin/menu/Foodtype/Foodtype";
+import Cuisinetype from "./pages/superadmin/menu/cuisinetype/cuisinetype";
+import VariantForm from "./pages/superadmin/menu/VariantForm/VariantForm";
+import AddonForm from "./pages/superadmin/menu/AddonForm/AddonForm";
+import CustomizationGroupForm from "./pages/superadmin/menu/CustomizationGroupForm/CustomizationGroupForm";
 
 // ===== Admin Pages =====
 import AdminDashboard from "./pages/Admin/Dashboard/AdminDashboard";
 import AdminHome from "./pages/Admin/Home/AdminHome";
 import AdminProfile from "./pages/Admin/Profile/AdminProfile";
-import AdminMenu from "./pages/Admin/Menu/AdminMenu";
-import AdminTableManagement from "./pages/Admin/Table/AdminTableManagement";
+import AdminTableManagement from "./pages/Admin/table/AdminTableManagement";
 import RoleManagement from "./pages/Admin/Role/RoleManagement";
 import AdminStaffManagement from "./pages/Admin/Staff/AdminStaffManagement";
 import AdminSettings from "./pages/Admin/Settings/AdminSettings";
 import AdminRevenueManagement from "./pages/Admin/Revenue/AdminRevenueManagement";
+
+
+import AdminMenuCategory from "./pages/Admin/Menu/MenuCategory/AdminMenuCategory";
+import AdminFoodType from "./pages/Admin/Menu/FoodType/AdminFoodType";
+import AdminItemType from "./pages/Admin/Menu/ItemType/AdminItemType";
+import AdminCustomizationGroups from "./pages/Admin/Menu/CustomizationGroups/AdminCustomizationGroups";
+import AdminAddon from "./pages/Admin/Menu/AddOn/AdminAddon";
+import AdminCusineType from "./pages/Admin/Menu/CuisineType/AdminCusineType";
+
+// ===== Admin Menu Management Pages =====
+import AdminMenu from "./pages/Admin/Menu/Manage Menus/AdminMenu";
 
 // ===== Waiter Pages =====
 import WaiterDashboard from "./pages/Waiter/WaiterDashboard/WaiterDashboard";
@@ -67,7 +92,7 @@ function App() {
 
         window.history.replaceState({}, document.title, cleanURL);
       }
-    } catch (e) {}
+    } catch (e) { }
   }, []);
 
   return (
@@ -88,7 +113,19 @@ function App() {
         >
           <Route index element={<SuperAdminHome />} />
           <Route path="staff" element={<UserManagement />} />
-          <Route path="food-items" element={<Items />} />
+          {/* <Route path="reports" element={<Reports />} /> */}
+          <Route path="home" element={<SuperAdminHome />} />
+          <Route path="profile" element={<SuperAdminProfile />} />
+          <Route path="settings" element={<SuperAdminSettings />} />
+          <Route path="menu-dashboard" element={<MenuDashboard />} />
+          <Route path="menu-list" element={<MenuList />} />
+          <Route path="category-form" element={<CategoryForm />} />
+          <Route path="add-item-type" element={<AddItemtype />} />
+          <Route path="food-type" element={<Foodtype />} />
+          <Route path="cuisine-type" element={<Cuisinetype />} />
+          <Route path="variant-form" element={<VariantForm />} />
+          <Route path="addon-form" element={<AddonForm />} />
+          <Route path="customization-group-form" element={<CustomizationGroupForm />} />
           <Route path="staffrole" element={<AddStaffRole />} />
           <Route path="table" element={<TableManagement />} />
         </Route>
@@ -106,6 +143,12 @@ function App() {
           <Route path="dashboard" element={<AdminHome />} />
           <Route path="profile" element={<AdminProfile />} />
           <Route path="menu" element={<AdminMenu />} />
+          <Route path="menu-category" element={<AdminMenuCategory />} />
+          <Route path="cuisine-type" element={<AdminCusineType />} />
+          <Route path="food-type" element={<AdminFoodType />} />
+          <Route path="item-type" element={<AdminItemType />} />
+          <Route path="customization-groups" element={<AdminCustomizationGroups />} />
+          <Route path="add-on" element={<AdminAddon />} />
           <Route path="table" element={<AdminTableManagement />} />
           <Route path="roles" element={<RoleManagement />} />
           <Route path="staff" element={<AdminStaffManagement />} />
@@ -113,8 +156,9 @@ function App() {
           <Route path="revenue" element={<AdminRevenueManagement />} />
         </Route>
 
-        {/* WAITER */}
-        <Route path="/WaiterDashboard"
+        {/* ===== Waiter Dashboard Routes ===== */}
+        <Route
+          path="/WaiterDashboard"
           element={
             <ProtectedRoute allowedRoles={["WAITER"]}>
               <WaiterDashboard />
@@ -147,7 +191,6 @@ function App() {
 
         <Route path="*" element={<h2 className="text-center mt-10">404 - Page Not Found</h2>} />
       </Routes>
-
       <Footer />
     </>
   );

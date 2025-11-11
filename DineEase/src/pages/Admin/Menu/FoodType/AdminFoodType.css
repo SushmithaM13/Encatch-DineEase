@@ -1,0 +1,233 @@
+/* ========== GLOBAL CONTAINER ========== */
+.admin-food-container {
+  padding: 30px;
+  color: #222;
+  background: linear-gradient(to bottom right, #fdfbfb, #ebedee);
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+}
+
+.admin-food-title {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #1a1a1a;
+}
+
+/* ========== ADD SECTION ========== */
+.admin-food-add-section {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.admin-food-add-heading {
+  font-size: 18px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.admin-food-add-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-food-input {
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.admin-food-input:focus {
+  border-color: GRAY;
+}
+
+.admin-food-input.small {
+  width: 100px;
+}
+
+.admin-food-add-btn {
+  background: BLACK;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.admin-food-add-btn:hover {
+  background: GRAY;
+}
+
+/* ========== TABLE SECTION ========== */
+.admin-food-list-section {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+}
+
+.admin-food-list-heading {
+  font-size: 18px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.admin-food-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-food-table th,
+.admin-food-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.admin-food-table th {
+  background-color: #f1f5f9;
+  font-weight: 600;
+  color: #374151;
+}
+
+.admin-food-empty {
+  color: #666;
+  font-style: italic;
+}
+
+/* ========== ACTION BUTTONS ========== */
+.admin-food-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-food-edit-btn {
+  background: #10b981;
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.admin-food-edit-btn:hover {
+  background: #059669;
+}
+
+.admin-food-delete-btn {
+  background: #ef4444;
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.admin-food-delete-btn:hover {
+  background: #b91c1c;
+}
+
+/* ========== POPUP OVERLAY ========== */
+.admin-food-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* ========== POPUP BOX ========== */
+.admin-food-popup {
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  width: 350px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  animation: popupScale 0.25s ease;
+}
+
+@keyframes popupScale {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.admin-food-popup-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.admin-food-popup-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  margin-bottom: 12px;
+  outline: none;
+}
+
+.admin-food-popup-input:focus {
+  border-color: GRAY;
+}
+
+.admin-food-popup-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-food-update-btn {
+  background: BLACK;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.admin-food-update-btn:hover {
+  background: GRAY;
+}
+
+.admin-food-cancel-btn {
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.admin-food-cancel-btn:hover {
+  background: #4b5563;
+}

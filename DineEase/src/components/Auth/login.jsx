@@ -10,17 +10,13 @@ const Login = () => {
   const [remember, setRemember] = useState(false);
   const navigate = useNavigate();
 
-  // Load remembered email
-  useEffect(() => {
-    const remembered = localStorage.getItem("rememberEmail");
-    if (remembered) setUsername(remembered);
-  }, []);
-
-  // If already logged in (token present), redirect directly to the correct dashboard
+  // Check if already logged in
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
+
     if (token && role) {
+      // Redirect to dashboard directly if user is already logged in
       switch (role) {
         case "SUPER_ADMIN":
           navigate("/superAdminDashboard", { replace: true });
@@ -31,13 +27,14 @@ const Login = () => {
         case "WAITER":
           navigate("/WaiterDashboard", { replace: true });
           break;
-        case "CHEF":
-          navigate("/chefDashboard", { replace: true });
-          break;
         default:
           break;
       }
     }
+
+    // Pre-fill username if "remember me" was checked
+    const remembered = localStorage.getItem("rememberEmail");
+    if (remembered) setUsername(remembered);
   }, [navigate]);
 
   const handleLogin = async (e) => {
@@ -56,16 +53,14 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Save token and role
+        // Save token & role
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.role);
 
-        // Save waiter name if applicable
         if (data.role === "WAITER" && data.name) {
           localStorage.setItem("waiterName", data.name);
         }
 
-        // Remember email if checkbox is ticked
         if (remember) {
           localStorage.setItem("rememberEmail", username);
         } else {
@@ -74,28 +69,25 @@ const Login = () => {
 
         toast.success("Login successful! Redirecting...");
 
-        // Redirect based on role after 1.5s
         setTimeout(() => {
           switch (data.role) {
             case "SUPER_ADMIN":
-              navigate("/superAdminDashboard");
+              navigate("/superAdminDashboard", { replace: true });
               break;
             case "ADMIN":
-              navigate("/AdminDashboard");
+              navigate("/AdminDashboard", { replace: true });
               break;
             case "WAITER":
-              navigate("/WaiterDashboard");
-              console.log("Logged in as Waiter");
+              navigate("/WaiterDashboard", { replace: true });
               break;
-            case "CHEF":
-              navigate("/chefDashboard");
-              break;
+              case "CHEF":
+              navigate("/ChefDashboard", { replace: true });
+              break
             default:
-              navigate("/");
+              navigate("/", { replace: true });
           }
         }, 1500);
       } else {
-        // Handle backend error messages
         let errorMsg = "Invalid credentials. Please try again.";
         if (data.message?.toLowerCase().includes("not found")) {
           errorMsg = "User not found. Please register first.";
@@ -115,7 +107,6 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-container-left"></div>
-
       <div className="auth-container-right">
         <form onSubmit={handleLogin} className="auth-form">
           <h2 className="login-title">Login</h2>
@@ -167,5 +158,4 @@ const Login = () => {
   );
 };
 
-export default Login;
-
+export default Login;

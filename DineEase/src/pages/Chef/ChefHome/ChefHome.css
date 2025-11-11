@@ -10,21 +10,21 @@
 }
 
 body {
+  margin: 0;
+  font-family: sans-serif;
   background: #f8fafc;
 }
 
 /* ===== LAYOUT ===== */
-
 .chef-layout {
   display: flex;
   min-height: 100vh;
   background: #f9fafb;
-  /* allow page to scroll so global footer can be reached */
-  overflow: visible;
+  overflow-x: hidden;
+  transition: all 0.3s ease;
 }
 
 /* ===== SIDEBAR ===== */
-
 .chef-sidebar {
   width: 240px;
   background: var(--dark);
@@ -32,29 +32,14 @@ body {
   display: flex;
   flex-direction: column;
   padding: 1rem 0;
-  transition: width 0.3s ease, transform 0.25s ease;
   position: fixed;
   height: 100vh;
   z-index: 100;
-  box-sizing: border-box;
-  overflow-y: auto; /* allow sidebar to scroll if content grows */
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 48px; /* keep space for bottom items */
+  overflow-y: auto;
+  transition: width 0.3s ease, transform 0.3s ease;
 }
 
-.chef-layout.collapsed .chef-sidebar {
-  width: 72px;
-}
-
-/* Prevent nav links/content from overflowing horizontally */
-.nav-links {
-  overflow: visible;
-  word-break: break-word;
-}
-
-/* Sidebar Header */
-
-.sidebar-header {
+.chef-sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -62,36 +47,34 @@ body {
   margin-bottom: 1.5rem;
 }
 
-.brand {
+.chef-brand {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: white;
   font-weight: 600;
+  color: #fff;
   font-size: 1.1rem;
 }
 
-.brand-name {
+.chef-brand-name {
   white-space: nowrap;
 }
 
-.menu-toggle {
+.chef-menu-toggle {
   background: none;
   border: none;
-  color: white;
+  color: #fff;
   cursor: pointer;
 }
 
-/* Nav Links */
-
-.nav-links {
+.chef-nav-links {
   display: flex;
   flex-direction: column;
   gap: 5px;
   padding: 0 0.5rem;
 }
 
-.nav-link {
+.chef-nav-link {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -106,42 +89,40 @@ body {
   text-overflow: ellipsis;
 }
 
-.nav-link:hover {
+.chef-nav-link:hover {
   background: rgba(255, 255, 255, 0.12);
   color: white;
 }
 
-.nav-link.active {
+.chef-nav-link.chef-active {
   background: var(--primary);
   color: white;
 }
 
-/* When collapsed */
-.chef-layout.collapsed .nav-link span {
+/* Collapsed Sidebar */
+.chef-layout.chef-collapsed .chef-sidebar {
+  width: 72px;
+}
+
+.chef-layout.chef-collapsed .chef-nav-link span {
   display: none;
 }
 
 /* ===== MAIN AREA ===== */
-
 .chef-main {
   flex: 1;
   margin-left: 240px;
   transition: margin-left 0.3s ease;
   display: flex;
   flex-direction: column;
-}
-
-/* make main area scrollable when content overflows so footer stays reachable */
-.chef-main {
   overflow-y: auto;
 }
 
-.chef-layout.collapsed .chef-main {
+.chef-layout.chef-collapsed .chef-main {
   margin-left: 72px;
 }
 
 /* ===== HEADER ===== */
-
 .chef-header {
   background: white;
   padding: 12px 22px;
@@ -154,13 +135,13 @@ body {
   z-index: 50;
 }
 
-.page-title {
+.chef-page-title {
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--dark);
 }
 
-.restaurant-badge {
+.chef-restaurant-badge {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -171,15 +152,14 @@ body {
   font-size: 0.85rem;
 }
 
-.header-right {
+.chef-header-right {
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
 /* ===== PROFILE & NOTIFICATIONS ===== */
-
-.profile-circle {
+.chef-profile-circle {
   width: 34px;
   height: 34px;
   border-radius: 50%;
@@ -192,255 +172,455 @@ body {
   cursor: pointer;
 }
 
-.profile-circle img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
+/* ===== CONTENT WRAPPER ===== */
+.chef-page-container {
+  padding: 20px;
+  flex: 1;
 }
 
-/* Dropdown Menu */
-
-.dropdown-menu {
-  position: absolute;
-  right: 20px;
-  top: 65px;
-  background: white;
-  box-shadow: 0 5px 15px var(--shadow);
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  width: 180px;
+/* ===== NOTIFICATIONS ===== */
+.chef-notification-wrapper {
+  position: relative;
 }
 
-.dropdown-menu button {
-  width: 100%;
-  padding: 10px 15px;
+.chef-notif-btn {
   background: none;
   border: none;
+  cursor: pointer;
+  position: relative;
   display: flex;
-  gap: 8px;
   align-items: center;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: var(--dark);
+  justify-content: center;
+  padding: 4px;
+  transition: transform 0.2s ease;
 }
 
-.dropdown-menu button:hover {
-  background: #f1f5f9;
+.chef-notif-btn:hover {
+  transform: scale(1.1);
 }
 
-/* ===== Notifications ===== */
-
-.notification-wrapper {
-  position: relative;
-}
-
-.notif-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  position: relative;
-}
-
-.notif-badge {
+.chef-notif-badge {
   position: absolute;
   top: -4px;
   right: -6px;
   background: var(--accent);
   color: white;
   font-size: 0.65rem;
-  padding: 2px 5px;
-  border-radius: 10px;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-/* dropdown */
-.notif-dropdown {
+/* Notification Dropdown */
+.chef-notif-dropdown {
   position: absolute;
   top: 40px;
   right: 0;
-  width: 320px;
+  width: 350px;
+  max-height: 400px;
   background: #fff;
-  box-shadow: 0 4px 15px var(--shadow);
-  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  border-radius: 12px;
+  overflow: hidden;
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  padding: 10px 0;
-  z-index: 100;
+  z-index: 300;
+  animation: fadeIn 0.2s ease;
 }
 
-.notif-actions {
+/* Fade in effect */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Action Buttons (Mark all read / Clear) */
+.chef-notif-actions {
   display: flex;
   justify-content: space-between;
-  padding: 0 10px 8px;
+  padding: 10px 12px;
+  background: #f9fafb;
+  border-bottom: 1px solid var(--border);
 }
 
-.notif-actions button {
-  font-size: 0.75rem;
+.chef-notif-actions button {
+  font-size: 0.8rem;
   border: none;
   background: none;
   cursor: pointer;
   color: var(--primary);
+  font-weight: 500;
+  transition: color 0.2s ease;
 }
 
-.notif-list {
-  max-height: 300px;
+.chef-notif-actions button:hover {
+  color: var(--secondary);
+}
+
+/* Notification List */
+.chef-notif-list {
+  flex: 1;
   overflow-y: auto;
+  max-height: 300px;
 }
 
-.notif-item {
-  padding: 10px 15px;
+.chef-notif-item {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
+  background: #fff;
+  transition: background 0.2s ease;
+  position: relative;
 }
 
-.notif-item.unread {
+.chef-notif-item:hover {
+  background: #f1f5f9;
+}
+
+.chef-notif-item.chef-unread {
   background: #ecfdf5;
 }
 
-.notif-header {
-  font-weight: 600;
-  font-size: 0.9rem;
+/* Notification content */
+.chef-notif-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.notif-details {
-  font-size: 0.8rem;
-  color: var(--gray);
-}
-
-.notif-meta {
+.chef-notif-header {
   display: flex;
   justify-content: space-between;
-  font-size: 0.75rem;
-  margin-top: 5px;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--dark);
+}
+
+.chef-notif-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chef-priority-icon {
+  color: var(--accent);
+}
+
+.chef-notif-table,
+.chef-notif-details {
+  font-size: 0.85rem;
   color: var(--gray);
 }
 
-.unread-dot {
-  width: 8px;
-  height: 8px;
+.chef-notif-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: var(--gray);
+}
+
+.chef-notif-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+}
+
+.chef-notif-status svg {
+  vertical-align: middle;
+}
+
+.chef-notif-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Unread dot */
+.chef-unread-dot {
+  width: 10px;
+  height: 10px;
   background: var(--accent);
   border-radius: 50%;
-  margin-left: auto;
+  position: absolute;
+  top: 12px;
+  right: 16px;
 }
 
-.notif-footer {
-  padding: 6px;
+/* Notification Footer */
+.chef-notif-footer {
+  padding: 10px 12px;
   text-align: center;
+  background: #f9fafb;
 }
 
-.view-all-btn {
+.chef-view-all-btn {
   border: none;
   background: var(--primary);
   color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 500;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-/* ===== CONTENT WRAPPER ===== */
-
-.page-container {
-  padding: 20px;
-  flex: 1;
+.chef-view-all-btn:hover {
+  background: var(--secondary);
 }
 
-/* ===== RESPONSIVE ===== */
+/* Empty state */
+.chef-notif-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--gray);
+  font-size: 0.9rem;
+}
 
+/* Scrollbar for notifications */
+.chef-notif-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chef-notif-list::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+
+.chef-notif-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ===== PROFILE DROPDOWN ===== */
+.chef-dropdown-menu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  width: 180px;
+  overflow: hidden;
+  z-index: 200;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform-origin: top right;
+}
+
+.chef-dropdown-menu button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1e293b;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.chef-dropdown-menu button:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.chef-dropdown-menu button svg {
+  stroke: #64748b;
+  transition: stroke 0.2s ease;
+}
+
+.chef-dropdown-menu button:hover svg {
+  stroke: #1e293b;
+}
+
+/* Optional triangle pointer */
+.chef-dropdown-menu::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: 16px;
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  transform: rotate(45deg);
+  border-left: 1px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
+  z-index: -1;
+}
+
+/* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 768px) {
-  /* On small screens keep main full-width; sidebar overlays instead of pushing content */
-  .chef-main {
-    margin-left: 0;
-  }
-
-  .chef-header {
-    padding: 10px 14px;
-  }
-
-  .restaurant-badge {
-    display: none;
-  }
-}
-
-/* Mobile: make sidebar an overlay (hidden when collapsed) so it doesn't push or overflow content */
-@media (max-width: 768px) {
+  /* Sidebar hidden by default */
   .chef-sidebar {
-    /* start hidden off-canvas */
     transform: translateX(-100%);
     width: 240px;
-    left: 0;
+    position: fixed;
     top: 0;
     bottom: 0;
+    left: 0;
+    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.35);
+    z-index: 200;
   }
 
-  /* when sidebar is open, chef-layout gets `sidebar-open` class (see JSX) */
-  .chef-layout.sidebar-open .chef-sidebar {
+  /* Show sidebar on toggle */
+  .chef-layout.chef-sidebar-open .chef-sidebar {
     transform: translateX(0);
-    box-shadow: 0 8px 24px rgba(2,6,23,0.35);
   }
 
-  /* when collapsed on small screens, keep it hidden */
-  .chef-layout.collapsed .chef-sidebar {
-    transform: translateX(-100%);
+  /* Sidebar backdrop */
+  .chef-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.48);
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 180;
+    transition: opacity 0.3s ease;
   }
 
-  /* main content should not be shifted on mobile; overlay covers content */
+  /* Main content full width */
   .chef-main {
     margin-left: 0 !important;
   }
 
-  /* ensure menu toggle is above the overlay */
-  .menu-toggle {
-    z-index: 210;
+  /* Hide restaurant badge */
+  .chef-restaurant-badge {
+    display: none;
+  }
+
+  /* Notifications dropdown */
+  .chef-notif-dropdown {
+    width: 90vw;
+    max-width: 350px;
+    right: 5vw;
+    top: 45px;
+    max-height: 60vh;
+  }
+
+  /* Profile dropdown adjustments */
+  .chef-dropdown-menu {
+    right: 10px;
+    width: 160px;
   }
 }
 
-/* SIDEBAR BACKDROP (mobile) */
-.sidebar-backdrop {
+/* Smooth transitions */
+.chef-sidebar,
+.chef-sidebar-backdrop,
+.chef-main {
+  transition: all 0.3s ease;
+}
+/* ===== SIDEBAR ===== */
+.chef-sidebar {
+  width: 240px;
+  background: var(--dark);
+  color: var(--light);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0;
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0);
-  pointer-events: none;
-  opacity: 0;
-  transition: background 0.22s ease, opacity 0.22s ease;
-  z-index: 190;
+  height: 100vh;
+  z-index: 100;
+  overflow-y: auto;
+  transition: width 0.3s ease, transform 0.3s ease; /* Smooth transition */
+  transform: translateX(0);
 }
 
-@media (max-width: 768px) {
-  .sidebar-backdrop.show {
-    background: rgba(2,6,23,0.48);
-    opacity: 1;
-    pointer-events: auto;
-  }
+.chef-layout.chef-collapsed .chef-sidebar {
+  width: 72px;
+  transform: translateX(0);
+}
 
-  /* Off-canvas sidebar default (hidden) */
+/* ===== MOBILE RESPONSIVE ===== */
+@media (max-width: 768px) {
   .chef-sidebar {
     transform: translateX(-100%);
-    left: 0;
+    width: 240px;
+    position: fixed;
     top: 0;
     bottom: 0;
-    width: 260px;
+    left: 0;
+    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.35);
+    z-index: 200;
+    transition: transform 0.3s ease-in-out; /* Smooth sliding */
   }
 
-  /* When layout has sidebar-open class, slide it in */
-  .chef-layout.sidebar-open .chef-sidebar {
-    transform: translateX(0);
-    box-shadow: 0 8px 24px rgba(2,6,23,0.35);
+  .chef-layout.chef-sidebar-open .chef-sidebar {
+    transform: translateX(0); /* Slide in */
   }
 
-  /* ensure toggle button sits above overlay */
-  .menu-toggle {
-    z-index: 210;
+  /* Sidebar backdrop */
+  .chef-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.48);
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 180;
+    transition: opacity 0.3s ease;
+  }
+
+  .chef-layout:not(.chef-sidebar-open) .chef-sidebar-backdrop {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Main content full width */
+  .chef-main {
+    margin-left: 0 !important;
+    transition: margin-left 0.3s ease;
+  }
+
+  /* Hide restaurant badge on mobile */
+  .chef-restaurant-badge {
+    display: none;
   }
 }
-
-/* Desktop margin rules: keep main area shifted to make room for sidebar */
-@media (min-width: 769px) {
-  .chef-main {
-    margin-left: 240px;
+/* Mobile Sidebar */
+@media (max-width: 768px) {
+  .chef-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100vh;
+    transform: translateX(-100%);
+    z-index: 300; /* above content */
+    background: var(--dark);
+    transition: transform 0.3s ease;
   }
 
-  .chef-layout.collapsed .chef-main {
-    margin-left: 72px;
+  .chef-layout.chef-sidebar-open .chef-sidebar {
+    transform: translateX(0);
+  }
+
+  /* Backdrop to cover the rest of the page */
+  .chef-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.48);
+    z-index: 250;
+    transition: opacity 0.3s ease;
+  }
+
+  .chef-layout.chef-sidebar-open .chef-sidebar-backdrop {
+    display: block;
+  }
+
+  /* Prevent main content from shifting */
+  .chef-main {
+    margin-left: 0 !important;
   }
 }

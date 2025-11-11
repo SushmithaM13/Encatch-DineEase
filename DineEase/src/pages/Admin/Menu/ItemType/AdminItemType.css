@@ -1,0 +1,172 @@
+.admin-item-container {
+  padding: 24px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+}
+
+.admin-item-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.admin-item-add-section,
+.admin-item-list-section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 24px;
+}
+
+.admin-item-add-heading,
+.admin-item-list-heading {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.admin-item-add-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-item-input {
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 6px;
+  width: 33%;
+}
+
+.admin-item-input.small {
+  width: 20%;
+}
+
+.admin-item-add-btn {
+  background-color: #101110;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.admin-item-add-btn:hover {
+  background-color: gray;
+}
+
+.admin-item-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-item-table th,
+.admin-item-table td {
+  border: 1px solid #e5e7eb;
+  padding: 10px;
+}
+
+.admin-item-table th {
+  background-color: #f3f4f6;
+  text-align: left;
+}
+
+.admin-item-actions {
+  text-align: center;
+}
+
+.admin-item-edit-btn {
+  color: #2563eb;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.admin-item-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.admin-item-popup {
+  background: white;
+  padding: 24px;
+  border-radius: 10px;
+  width: 380px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.admin-item-popup-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.admin-item-popup-input {
+  width: 100%;
+  border: 1px solid #ccc;
+  padding: 8px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.admin-item-popup-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-item-update-btn {
+  background-color: #2563eb;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.admin-item-cancel-btn {
+  background-color: #9ca3af;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.admin-item-delete-btn {
+  color: #dc2626;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+.admin-item-delete-btn:hover {
+  color: #b91c1c;
+}
+
+.admin-item-delete-msg {
+  margin-bottom: 16px;
+  color: #374151;
+  font-size: 15px;
+}
+
+.admin-item-delete-confirm-btn {
+  background-color: #dc2626;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.admin-item-delete-confirm-btn:hover {
+  background-color: #b91c1c;
+}

@@ -1,44 +1,47 @@
-import { Link, Outlet, useNavigate } from "react-router-dom";
+// AdminDashboard.jsx
 import { useEffect, useState, useRef } from "react";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Utensils,
   User,
-  Newspaper,
-  LogOut,
-  Sofa,   
   Users,
+  Newspaper,
+  Sofa,
   Settings,
+  LogOut,
   IndianRupee,
+  ChevronDown,
+  ChevronRight,
+  ChevronUp,
 } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
-  const [adminName, setAdminName] = useState("Admin");
-  const [restaurantName, setRestaurantName] = useState("Restaurant");
+  const [adminName] = useState("");
+  const [restaurantName] = useState("");
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [profilePic, setProfilePic] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [menuExpanded, setMenuExpanded] = useState(false);
+  const [showStaffDropdown, setShowStaffDropdown] = useState(false);
+  const [profilePic] = useState(null);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // Handle responsive sidebar
+  // Responsive sidebar
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
       setSidebarOpen(window.innerWidth > 768);
     };
     window.addEventListener("resize", handleResize);
-    handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Close profile dropdown on outside click
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -53,25 +56,7 @@ export default function AdminDashboard() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Dummy search results for UI demo
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
-    }
-    const dummyResults = [
-      { type: "Staff", label: "John Doe (Chef)" },
-      { type: "Menu", label: "Pasta - ₹250" },
-      { type: "Table", label: "Table 5 (Available)" },
-    ];
-    setSearchResults(
-      dummyResults.filter((res) =>
-        res.label.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
-  }, [searchQuery]);
-
-  // Logout function
+  // Logout
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -82,38 +67,29 @@ export default function AdminDashboard() {
         {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
       );
 
       if (response.ok) {
-        // Clear user info
-        setAdminName("Admin");
-        setRestaurantName("Restaurant");
-        setProfilePic(null);
-        sessionStorage.clear();
         localStorage.removeItem("token");
-
+        sessionStorage.clear();
         toast.success("✅ Successfully logged out!");
-
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
+        setTimeout(() => navigate("/"), 1000);
       } else {
-        const data = await response.json().catch(() => ({}));
-        toast.error("⚠️ Logout failed: " + (data.message || "Try again"));
+        toast.error("⚠️ Logout failed. Try again.");
       }
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("❌ Error during logout. Please try again later.");
+      toast.error("❌ Error during logout.");
     }
   };
 
   return (
     <div className="admin-layout-container">
-      {/* Mobile overlay */}
+      {/* Overlay for mobile */}
       {isMobile && sidebarOpen && (
         <div
           className="admin-sidebar-overlay"
@@ -121,8 +97,10 @@ export default function AdminDashboard() {
         />
       )}
 
-      {/* Sidebar */}
-      <aside className={`admin-sidebar ${sidebarOpen ? "admin-open" : "admin-collapsed"}`}>
+      {/* SIDEBAR */}
+      <aside
+        className={`admin-sidebar ${sidebarOpen ? "admin-open" : "admin-collapsed"}`}
+      >
         <div className="admin-sidebar-header">
           <div className="admin-sidebar-title">
             <Utensils size={22} />
@@ -141,116 +119,191 @@ export default function AdminDashboard() {
         </div>
 
         <nav className="admin-sidebar-nav">
-          {[
-            { to: "dashboard", icon: <LayoutDashboard size={18} />, label: "Dashboard" },
-            { to: "roles", icon: <User size={22} />, label: "Role Management" },
-            { to: "staff", icon: <Users size={22} />, label: "Staff Management" },
-            { to: "menu", icon: <Newspaper size={22} />, label: "Menu Management" },
-            { to: "table", icon: <Sofa size={22} />, label: "Table Management" },
-            { to: "revenue", icon: <IndianRupee size={22} />, label: "Revenue Management" },
-            { to: "settings", icon: <Settings size={22} />, label: "Settings" },
-          ].map((item, i) => (
-            <Link
-              key={i}
-              to={`/AdminDashboard/${item.to}`}
+          <Link
+            to="/AdminDashboard/dashboard"
+            className="admin-sidebar-link"
+            onClick={() => isMobile && setSidebarOpen(false)}
+          >
+            <LayoutDashboard size={20} />
+            {sidebarOpen && <span>Dashboard</span>}
+          </Link>
+
+          {/* === Staff Management with Dropdown === */}
+          <div className="admin-sidebar-dropdown">
+            <button
               className="admin-sidebar-link"
-              onClick={() => isMobile && setSidebarOpen(false)}
+              onClick={() => setShowStaffDropdown(!showStaffDropdown)}
             >
-              {item.icon}
-              {sidebarOpen && <span>{item.label}</span>}
-            </Link>
-          ))}
+              <Users size={20} />
+              {sidebarOpen && (
+                <span style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  Staff
+                  {showStaffDropdown ? (
+                    <ChevronDown size={16} />
+                  ) : (
+                    <ChevronRight size={16} />
+                  )}
+                </span>
+              )}
+            </button>
+
+            {/* Staff Dropdown Items */}
+            {showStaffDropdown && sidebarOpen && (
+              <div className="admin-submenu">
+                <Link
+                  to="/AdminDashboard/roles"
+                  className="admin-submenu-link"
+                  onClick={() => isMobile && setSidebarOpen(false)}
+                >
+                  Manage Roles
+                </Link>
+                <Link
+                  to="/AdminDashboard/staff"
+                  className="admin-submenu-link"
+                  onClick={() => isMobile && setSidebarOpen(false)}
+                >
+                  Manage Staff
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* === Menu Management === */}
+          <div
+            className={`admin-sidebar-link ${menuExpanded ? "active" : ""}`}
+            onClick={() => setMenuExpanded((prev) => !prev)}
+          >
+            <Newspaper size={18} />
+            {sidebarOpen && (
+              <>
+                <span>Menu</span>
+                {menuExpanded ? <ChevronDown size={20} /> : <ChevronRight size={16} />}
+              </>
+            )}
+          </div>
+
+          {menuExpanded && (
+            <div className="admin-submenu">
+              <Link to="/AdminDashboard/menu" className="admin-submenu-link">
+                Manage Menus
+              </Link>
+              <Link to="/AdminDashboard/menu-category" className="admin-submenu-link">
+                Menu Category
+              </Link>
+              <Link to="/AdminDashboard/customization-groups" className="admin-submenu-link">
+                Customization Groups
+              </Link>
+              <Link to="/AdminDashboard/item-type" className="admin-submenu-link">
+                Item Type
+              </Link>
+              <Link to="/AdminDashboard/food-type" className="admin-submenu-link">
+                Food Type
+              </Link>
+              <Link to="/AdminDashboard/cuisine-type" className="admin-submenu-link">
+                Cuisine Type
+              </Link>
+              <Link to="/AdminDashboard/add-on" className="admin-submenu-link">
+                Add-on
+              </Link>
+            </div>
+          )}
+
+          {/* === Table, Revenue, Settings === */}
+          <Link
+            to="/AdminDashboard/table"
+            className="admin-sidebar-link"
+            onClick={() => isMobile && setSidebarOpen(false)}
+          >
+            <Sofa size={20} />
+            {sidebarOpen && <span>Table</span>}
+          </Link>
+
+          <Link
+            to="/AdminDashboard/revenue"
+            className="admin-sidebar-link"
+            onClick={() => isMobile && setSidebarOpen(false)}
+          >
+            <IndianRupee size={20} />
+            {sidebarOpen && <span>Revenue</span>}
+          </Link>
+
+          <Link
+            to="/AdminDashboard/settings"
+            className="admin-sidebar-link"
+            onClick={() => isMobile && setSidebarOpen(false)}
+          >
+            <Settings size={20} />
+            {sidebarOpen && <span>Settings</span>}
+          </Link>
         </nav>
       </aside>
 
-      {/* Main content */}
+      {/* MAIN CONTENT AREA */}
       <div className="admin-main-content">
         <header className="admin-dashboard-header">
-          {isMobile && (
-            <button
-              className="admin-hamburger admin-mobile-only"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
-          )}
+  <div className="admin-header-left-group">
+    <button
+      className="admin-hamburger-toggle"
+      onClick={() => setSidebarOpen(!sidebarOpen)}
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
 
-          <div className="admin-header-left">Welcome, {adminName}</div>
+    {/* <div className="admin-header-left-text">
+      Welcome, {adminName || "Admin"}
+    </div> */}
+  </div>
 
-          <div className="admin-header-center">
-            <div className="admin-restaurant-display">
-              <Utensils size={18} color="black" />
-              <span>{restaurantName}</span>
-            </div>
-          </div>
+  <div className="admin-header-center">
+    <div className="admin-restaurant-display">
+      <Utensils size={20} color="black" />
+      <span>{restaurantName || "Restaurant"}</span>
+    </div>
+  </div>
 
-          <div className="admin-header-right" ref={dropdownRef}>
-            {/* Search */}
-            <div className="admin-search-container">
-              <input
-                type="text"
-                placeholder="🔍 Search..."
-                className="admin-search-bar"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchResults.length > 0 && (
-                <div className="admin-search-results">
-                  {searchResults.map((res, i) => (
-                    <div key={i} className="admin-search-item">
-                      <strong>{res.type}:</strong> {res.label}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+  {/* Profile Dropdown */}
+  <div className="admin-header-right" ref={dropdownRef}>
+    <div
+      className="admin-profile-circle"
+      onClick={() => setDropdownOpen(!dropdownOpen)}
+    >
+      {profilePic ? (
+        <img src={profilePic} alt="Profile" className="admin-profile-pic" />
+      ) : (
+        (adminName || "A").charAt(0).toUpperCase()
+      )}
+    </div>
 
-            {/* Profile dropdown */}
-            <div className="admin-profile-dropdown">
-              <div
-                className="admin-profile-circle"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-              >
-                {profilePic ? (
-                  <img src={profilePic} alt="Profile" className="admin-profile-pic" />
-                ) : (
-                  adminName.charAt(0).toUpperCase()
-                )}
-              </div>
-              {dropdownOpen && (
-                <div className="admin-dropdown-menu">
-                  <button
-                    className="admin-dropdown-item"
-                    onClick={() => navigate("/AdminDashboard/profile")}
-                  >
-                    <User size={16} /> Profile
-                  </button>
-                  <button
-                    className="admin-dropdown-item"
-                    onClick={() => navigate("/AdminDashboard/settings")}
-                  >
-                    <Settings size={16} /> Settings
-                  </button>
-                  <button
-                    className="admin-dropdown-item"
-                    onClick={handleLogout}
-                  >
-                    <LogOut size={16} /> Logout
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </header>
+    {dropdownOpen && (
+      <div className="admin-dropdown-menu">
+        <button
+          className="admin-dropdown-item"
+          onClick={() => navigate("/AdminDashboard/profile")}
+        >
+          <User size={16} /> Profile
+        </button>
+        <button
+          className="admin-dropdown-item"
+          onClick={() => navigate("/AdminDashboard/settings")}
+        >
+          <Settings size={16} /> Settings
+        </button>
+        <button className="admin-dropdown-item" onClick={handleLogout}>
+          <LogOut size={16} /> Logout
+        </button>
+      </div>
+    )}
+  </div>
+</header>
+
 
         <main className="admin-dashboard-content">
           <Outlet />
         </main>
       </div>
 
-      {/* Toast notifications */}
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );

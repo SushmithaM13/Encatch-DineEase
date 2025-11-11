@@ -15,7 +15,7 @@
 }
 
 /* ✅ Welcome Section */
-.welcome-section {
+.chef-welcome-section {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -26,13 +26,13 @@
   box-shadow: 0 4px 10px var(--shadow);
 }
 
-.welcome-text h1 {
+.chef-welcome-text h1 {
   font-size: 2rem;
   font-weight: 700;
   color: var(--text-dark);
 }
 
-.welcome-text p {
+.chef-welcome-text p {
   font-size: 1rem;
   margin-top: 8px;
   color: var(--gray);
@@ -40,14 +40,14 @@
 }
 
 /* ✅ Buttons */
-.button-group {
+.chef-button-group {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 1rem;
 }
 
-.btn {
+.chef-btn {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -60,61 +60,61 @@
   font-weight: 600;
 }
 
-.btn-icon {
+.chef-btn-icon {
   font-size: 1rem;
 }
 
 /* Filled button */
-.btn-green {
+.chef-btn-green {
   background: var(--green);
   color: white;
 }
 
-.btn-green:hover {
+.chef-btn-green:hover {
   opacity: 0.85;
 }
 
 /* Outline buttons */
-.btn-outline-green {
+.chef-btn-outline-green {
   border: 2px solid var(--green);
   color: var(--green);
   background: transparent;
 }
 
-.btn-outline-green:hover {
+.chef-btn-outline-green:hover {
   background: var(--green);
   color: white;
 }
 
-.btn-outline-orange {
+.chef-btn-outline-orange {
   border: 2px solid var(--orange);
   color: var(--orange);
 }
 
-.btn-outline-orange:hover {
+.chef-btn-outline-orange:hover {
   background: var(--orange);
   color: white;
 }
 
-.btn-outline-red {
+.chef-btn-outline-red {
   border: 2px solid var(--red);
   color: var(--red);
 }
 
-.btn-outline-red:hover {
+.chef-btn-outline-red:hover {
   background: var(--red);
   color: white;
 }
 
 /* ✅ Badges */
-.badges {
+.chef-badges {
   display: flex;
   gap: 10px;
   margin-top: 1rem;
   flex-wrap: wrap;
 }
 
-.badge {
+.chef-badge {
   display: flex;
   align-items: center;
   padding: 8px 12px;
@@ -125,25 +125,25 @@
   font-weight: 600;
 }
 
-.badge.orange { background: var(--orange); }
-.badge.red { background: var(--red); }
-.badge.green { background: var(--green); }
+.chef-badge.chef-orange { background: var(--orange); }
+.chef-badge.chef-red { background: var(--red); }
+.chef-badge.chef-green { background: var(--green); }
 
 /* ✅ Welcome Image */
-.welcome-image img {
+.chef-welcome-image img {
   width: 260px;
   filter: drop-shadow(0 4px 8px var(--shadow));
 }
 
 /* ✅ Info Cards */
-.info-cards {
+.chef-info-cards {
   margin-top: 2rem;
   display: grid;
   gap: 1.2rem;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-.card {
+.chef-card {
   background: white;
   padding: 1.5rem;
   border-radius: 12px;
@@ -153,86 +153,86 @@
   transition: 0.25s ease;
 }
 
-.card:hover {
+.chef-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 5px 15px var(--shadow);
 }
 
-.card-icon {
+.chef-card-icon {
   font-size: 2rem;
   margin-bottom: 8px;
 }
 
-.card.green { border-left: 6px solid var(--green); }
-.card.orange { border-left: 6px solid var(--orange); }
-.card.red { border-left: 6px solid var(--red); }
-.card.green-light { border-left: 6px solid var(--light-green); }
+.chef-card.chef-green { border-left: 6px solid var(--green); }
+.chef-card.chef-orange { border-left: 6px solid var(--orange); }
+.chef-card.chef-red { border-left: 6px solid var(--red); }
+.chef-card.chef-green-light { border-left: 6px solid var(--light-green); }
 
 /* ✅ Bottom Section */
-.bottom-section {
+.chef-bottom-section {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.2rem;
   margin-top: 2rem;
 }
 
-.tips-card, 
-.shortcuts-card {
+.chef-tips-card, 
+.chef-shortcuts-card {
   background: white;
   padding: 1.6rem;
   border-radius: 12px;
   box-shadow: 0 4px 12px var(--shadow);
 }
 
-.tips-card h3,
-.shortcuts-card h3 {
+.chef-tips-card h3,
+.chef-shortcuts-card h3 {
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-dark);
   margin-bottom: 0.8rem;
 }
 
-.tips-card ul {
+.chef-tips-card ul {
   padding-left: 18px;
   color: var(--gray);
   font-size: 0.95rem;
 }
 
-.text-red {
+.chef-text-red {
   color: var(--red);
 }
 
 /* ✅ Shortcut Buttons */
-.shortcut-buttons {
+.chef-shortcut-buttons {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.btn-outline {
+.chef-btn-outline {
   border: 2px solid var(--gray);
   color: var(--text-dark);
   background: transparent;
   width: 100%;
 }
 
-.btn-outline:hover {
+.chef-btn-outline:hover {
   background: var(--text-dark);
   color: white;
 }
 
 /* ✅ Responsive */
 @media (max-width: 900px) {
-  .welcome-section {
+  .chef-welcome-section {
     flex-direction: column;
     text-align: center;
   }
 
-  .welcome-image img {
+  .chef-welcome-image img {
     width: 200px;
   }
 
-  .button-group {
+  .chef-button-group {
     justify-content: center;
   }
 }
@@ -242,7 +242,7 @@
     padding: 1rem;
   }
 
-  .welcome-text h1 {
+  .chef-welcome-text h1 {
     font-size: 1.6rem;
   }
 }
