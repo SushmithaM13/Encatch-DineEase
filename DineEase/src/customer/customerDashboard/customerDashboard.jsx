@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import "./customerDashboard.css";
 import CustomerDashboardNav from "../customerNavbar/customerDashboardNav";
 import CustomerMenuSection from "../customerMenu/customerMenuSection";
@@ -14,10 +14,17 @@ const CustomerDashboard = () => {
   const menuSectionRef = useRef(null);
   const [allMenuItems, setAllMenuItems] = useState([]);
 
+   //  Wrap this in useCallback
+  const handleMenuLoad = useCallback((data) => {
+    setAllMenuItems(data);
+    console.log("🍽️ Menu loaded in parent:", data.length, "items");
+  }, []);
+
   useEffect(() => {
     console.log("🏠 CustomerDashboard Loaded", { orgId, tableId });
   }, [orgId, tableId]);
 
+  // Handle category selection
   const handleCategorySelect = (category) => {
     if (selectedCategory?.id === category.id) {
       setSelectedCategory(null);
@@ -29,10 +36,12 @@ const CustomerDashboard = () => {
     }, 300);
   };
 
+  // Handle search from navbar
   const handleSearch = (keyword) => {
     setSearchKeyword(keyword);
   };
 
+  // Prevent back navigation
   useEffect(() => {
     const handlePopState = () => {
       window.history.pushState(null, null, window.location.pathname);
@@ -64,7 +73,7 @@ const CustomerDashboard = () => {
       <main className="customer-dashboard-content">
         {tab === "menu" && (
           <CustomerMenuSection ref={menuSectionRef} selectedCategory={selectedCategory} 
-          searchKeyword={searchKeyword} onMenuLoad={setAllMenuItems}/>
+          searchKeyword={searchKeyword} onMenuLoad={handleMenuLoad}/>
         )}
       </main>
 

@@ -40,7 +40,7 @@ const CustomerMenuSection = ({selectedCategory,searchKeyword, ref, onMenuLoad}) 
     };
 
     loadMenu();
-  }, [orgId]);
+  }, [orgId, onMenuLoad]);
 
   useEffect(() => {
     if(!orgId) return;
