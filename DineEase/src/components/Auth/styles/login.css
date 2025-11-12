@@ -57,22 +57,22 @@
   gap: 16px;
 }
 
-.login-title {
+.auth-login-title {
   text-align: center;
   font-size: 28px;
   margin-bottom: 20px;
   color:#ffd700;
 }
 
-.error-text {
+/* .error-text {
   color: white;
   font-size: 18px;
   margin-top: -8px;
   text-align: center;
-}
+} */
 
 /* ====== Inputs ====== */
-.login-input {
+.auth-login-input {
   padding: 12px 14px;
   margin-bottom: 18px;
   font-size: 15px;
@@ -84,18 +84,18 @@
   transition: all 0.3s ease;
    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.4);
 }
-.login-input::placeholder{
+.auth-login-input::placeholder{
   color: rgba(255, 255, 255, 0.7);
   color: rgba(0, 0, 0, 0.447);
 }
 
-.login-input:focus {
+.auth-login-input:focus {
   background: rgba(255, 255, 255, 0.895);
   box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.4);
 }
 
 /* ====== Buttons ====== */
-.login-btn {
+.auth-login-btn {
   padding: 12px;
   background: #ffd700;
   color: #3c1053;
@@ -107,10 +107,82 @@
   transition: background 0.3s ease, transform 0.2s ease;
 }
 
-.login-btn:hover {
+.auth-login-btn:hover {
   background: #f7c600;
   transform: translateY(-2px);
 }
+.alternative-login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 16px;
+}
+.divider-text {
+  margin: 12px 0;
+  color: #ffde8b;
+  font-size: 14px;
+  font-weight: 400;
+}
+/* .skip-btn {
+  background: none;
+  border: 2px solid #ffd700;
+  color: #ffd700;
+  padding: 8px 18px;
+  font-size: 15px;
+  border-radius: 8px;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.skip-btn:hover, .skip-btn:focus {
+  background: #ffd700;
+  color: #3c1053;
+}
+.skip-icon {
+  font-size: 20px;
+} */
+
+
+/* Animated login message */
+.login-message {
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  font-family: "Courier New", monospace;
+}
+
+.login-message.success {
+  color: #0f5132;
+  background-color: #d1e7dd;
+  border: 1px solid #badbcc;
+}
+
+.login-message.error {
+  color: #842029;
+  background-color: #f8d7da;
+  border: 1px solid #f5c2c7;
+}
+
+/* Blinking cursor */
+.cursor {
+  display: inline-block;
+  width: 1px;
+  background: black;
+  margin-left: 3px;
+  animation: blink 0.8s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
 
 /* ====== Row (Remember + Forgot) ====== */
 .auth-row {
@@ -181,7 +253,7 @@
     order: 1;
   }
 
-  .login-title {
+  .auth-login-title {
     font-size: 24px;
   }
 

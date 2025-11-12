@@ -1,5 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // ===== Auth Pages =====
 import Login from './components/Auth/login';
@@ -27,6 +29,12 @@ import Reservation from "./pages/Waiter/Reservation/Reservation";
 
 // ===== Footer =====
 import Footer from './components/footer/Footer';
+
+// ===== Customer pages =====
+import CustomerLogin from './customer/customerLogin/customerLogin';
+import OTPVerification from './customer/customerLogin/otpVerification';
+import CustomerDashboard from './customer/customerDashboard/CustomerDashboard';
+// import CustomerMenuPage from './customer/customerMenu/customerMenuPage';
 
 function App() {
   return (
@@ -81,9 +89,17 @@ function App() {
           <Route path="reservations" element={<Reservation />} />
         </Route>
 
+
+        {/* Customer Flow */}
+        <Route path='/customerLogin/customer/login' element={<CustomerLogin/>}/>
+        <Route path='/otpVerification' element={<OTPVerification/>}/>
+        <Route path='/customerDashboard' element={<CustomerDashboard/>}/>
+       
+
         {/* ===== Catch-all 404 ===== */}
         <Route path="*" element={<h2 className="text-center mt-10">404 - Page Not Found</h2>} />
       </Routes>
+      <ToastContainer position="top-center" autoClose={2000} />
       <Footer />
     </>
   );
