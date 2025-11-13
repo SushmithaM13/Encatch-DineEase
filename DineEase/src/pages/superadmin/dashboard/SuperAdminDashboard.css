@@ -427,7 +427,7 @@ body {
 .hello-bubble {
   display: flex;
   align-items: center;
-  background-color: #d60303;
+  background-color: #1e33f3;
   color: rgb(255, 255, 255);
   
   padding: -15px;
