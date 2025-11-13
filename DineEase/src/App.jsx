@@ -99,7 +99,7 @@ function App() {
 
         window.history.replaceState({}, document.title, cleanURL);
       }
-    } catch (e) { 
+    } catch (e) {
       console.error("Error processing auth token from URL:", e);
     }
   }, []);
@@ -126,8 +126,9 @@ function App() {
           <Route path="home" element={<SuperAdminHome />} />
           <Route path="profile" element={<SuperAdminProfile />} />
           <Route path="settings" element={<SuperAdminSettings />} />
+
+
           <Route path="menu-dashboard" element={<MenuDashboard />} />
-          <Route path="menu-list" element={<MenuList />} />
           <Route path="category-form" element={<CategoryForm />} />
           <Route path="add-item-type" element={<AddItemtype />} />
           <Route path="food-type" element={<Foodtype />} />
@@ -135,6 +136,7 @@ function App() {
           <Route path="variant-form" element={<VariantForm />} />
           <Route path="addon-form" element={<AddonForm />} />
           <Route path="customization-group-form" element={<CustomizationGroupForm />} />
+
           <Route path="staffrole" element={<AddStaffRole />} />
           <Route path="table" element={<TableManagement />} />
         </Route>
@@ -201,10 +203,10 @@ function App() {
 
 
         {/* Customer Flow */}
-        <Route path='/customerLogin/customer/login' element={<CustomerLogin/>}/>
-        <Route path='/otpVerification' element={<OTPVerification/>}/>
-        <Route path='/customerDashboard' element={<CustomerDashboard/>}/>
-       
+        <Route path='/customerLogin/customer/login' element={<CustomerLogin />} />
+        <Route path='/otpVerification' element={<OTPVerification />} />
+        <Route path='/customerDashboard' element={<CustomerDashboard />} />
+
 
         {/* ===== Catch-all 404 ===== */}
         <Route path="*" element={<h2 className="text-center mt-10">404 - Page Not Found</h2>} />

@@ -57,6 +57,8 @@ const [loadingSubcategories, setLoadingSubcategories] = useState(false);
       const list =
         data?.data?.content || data?.content || data?.data || data || [];
       setCategories(Array.isArray(list) ? list : []);
+console.log("wrong data getting")
+
     } catch (err) {
       console.error("Fetch error", err);
       setCategories([]);
