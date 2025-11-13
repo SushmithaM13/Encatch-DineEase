@@ -1,0 +1,47 @@
+.customer-dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #fffdfb;
+  color: #1f2937;
+  font-family: "Poppins", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.missing-org {
+  padding: 3rem 1rem;
+  color: #ff914d;
+  font-weight: 700;
+  font-size: 1.25rem;
+  text-align: center;
+}
+
+.customer-dashboard-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #ff914d;
+  box-shadow: 0 2px 16px #ff914d88;
+  /* border-radius: 0 0 18px 18px; */
+  padding: 10px 0px;
+  /* border: 2px solid red; */
+}
+
+.customer-dashboard-content {
+  flex-grow: 1;
+  /* padding: 2rem 1.5rem 3rem 1.5rem; */
+  max-width: 1200px;
+  /* margin: 2rem auto 4rem auto; */
+  margin: auto;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 18px #ff914d22;
+  /* border: 2px solid gold; */
+}
+
+/* .customer-dashboard-footer {
+  background: #fff9f0;
+  padding: 1.4rem 1.5rem;
+  text-align: center;
+  color: #888;
+  font-size: 0.95rem;
+} */
