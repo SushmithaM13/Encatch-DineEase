@@ -153,13 +153,9 @@ const DashboardHome = () => {
       {/* Welcome Header */}
       <div className="welcome-header">
         <div>
-          <h1 className="welcome-title">Dashboard</h1>
-          <p className="welcome-subtitle">Welcome to Dine Ease ! ! ! ..</p>
+          <h2 className="welcome-subtitle">Welcome to Dine_Ease ! ! ! ..</h2>
         </div>
-        <div className="date-filter">
-          <span className="filter-label">Filter Periode</span>
-          <span className="filter-value">4 June 2020 - 4 July 2020</span>
-        </div>
+        
       </div>
 
       {/* Stats Cards */}

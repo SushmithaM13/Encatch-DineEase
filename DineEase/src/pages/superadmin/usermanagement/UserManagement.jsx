@@ -20,7 +20,7 @@ export default function SuperAdminStaffManagement() {
     phoneNumber: "",
     staffRoleType: "",
     shiftTiming: "",
-    salary: 0,
+    salary: "",
     contractStartDate: "",
     contractEndDate: "",
     password: "",
@@ -37,7 +37,7 @@ export default function SuperAdminStaffManagement() {
 
   // ✅ Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, _setPageSize] = useState(10);
+  const [pageSize, _setPageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
   const [_loading, setLoading] = useState(false);
 
@@ -87,8 +87,8 @@ export default function SuperAdminStaffManagement() {
       const staffData = Array.isArray(data)
         ? data
         : Array.isArray(data.content)
-        ? data.content
-        : [];
+          ? data.content
+          : [];
 
       const mappedStaff = staffData.map((s) => ({
         id: s.id,
@@ -186,13 +186,13 @@ export default function SuperAdminStaffManagement() {
       staffRoleType: form.staffRoleType,
       shiftTiming: form.shiftTiming,
       salary: Number(form.salary),
-      contractStartDate: form.contractStartDate || null,
       contractEndDate: form.contractEndDate || null,
       staffStatus: form.status || "Pending",
       organizationId: ORG_ID,
     };
 
     if (!editId && form.password) payload.password = form.password;
+    if (!editId && form.contractStartDate) payload.contractStartDate = form.contractStartDate;
 
     try {
       const url = editId
@@ -281,36 +281,51 @@ export default function SuperAdminStaffManagement() {
     }
   };
 
-   // ✅ Filter staff by tab
+  // ✅ Filter staff by tab
   const filteredStaff =
     activeTab === "All Staff"
       ? staffList
-      : staffList.filter((s) =>
-          activeTab.toLowerCase() === "chef"
-            ? s.staffRoleType?.toLowerCase().includes("chef")
-            : activeTab.toLowerCase() === "waiters"
-            ? s.staffRoleType?.toLowerCase().includes("waiter")
-            : !s.staffRoleType?.toLowerCase().includes("chef") &&
-              !s.staffRoleType?.toLowerCase().includes("waiter")
-        );
+      : activeTab === "Admin"
+        ? staffList.filter((s) =>
+          s.staffRoleType?.toLowerCase().includes("admin")
+        )
+        : activeTab === "Waiters"
+          ? staffList.filter((s) =>
+            s.staffRoleType?.toLowerCase().includes("waiter")
+          )
+          : activeTab === "Chef"
+            ? staffList.filter((s) =>
+              s.staffRoleType?.toLowerCase().includes("chef")
+            )
+            : activeTab === "Acountent"
+              ? staffList.filter((s) =>
+                s.staffRoleType?.toLowerCase().includes("acountent")
+              )
+              : activeTab === "Other"
+                ? staffList.filter((s) =>
+                  !["admin", "waiter", "chef", "acountent"].some((role) =>
+                    s.staffRoleType?.toLowerCase().includes(role)
+                  )
+                )
+                : staffList;
 
   // ✅ PAGINATION (local, frontend-based)
-  const startIndex = currentPage * pageSize;
+  const startIndex = (currentPage ) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedStaff = filteredStaff.slice(startIndex, endIndex);
-  
 
-const handleNext = () => {
-  if (currentPage < totalPages) {
-    setCurrentPage(currentPage + 1);
-  }
-};
 
-const handlePrevious = () => {
-  if (currentPage > 1) {
-    setCurrentPage(currentPage - 1);
-  }
-};
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   useEffect(() => {
     setCurrentPage(0); // reset to first page on tab change
@@ -337,7 +352,7 @@ const handlePrevious = () => {
 
       {/* Tabs */}
       <div className="tab-navigation">
-        {["All Staff", "Admin", "Waiters", "Chef", "Other"].map((tab) => (
+        {["All Staff", "Admin", "Waiters", "Chef", "Acountent", "Other"].map((tab) => (
           <div
             key={tab}
             className={`tab ${activeTab === tab ? "active" : ""}`}
@@ -367,281 +382,266 @@ const handlePrevious = () => {
             </tr>
           </thead>
           <tbody>
-  {paginatedStaff.length > 0 ? (
-    paginatedStaff.map((staff, index) => (
-      <tr key={staff.id}>
-        <td>{index + 1 + currentPage * pageSize}</td>
-        <td>{staff.firstName} {staff.lastName}</td>
-        <td>{staff.email}</td>
-        <td>{staff.phoneNumber}</td>
-        <td>{staff.staffRoleType}</td>
-        <td>{staff.shiftTiming}</td>
-        <td>{staff.salary}</td>
-        <td>{staff.contractStartDate}</td>
-        <td>{staff.contractEndDate}</td>
-        <td>
-          <span className={`status ${staff.status?.toLowerCase()}`}>
-            {staff.status || "Inactive"}
-          </span>
-        </td>
-        <td>
-          <button className="action-btn edit" onClick={() => handleEdit(staff)}>
-            <Edit size={16} />
-          </button>
-          <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
-            <Trash2 size={16} />
-          </button>
-        </td>
-      </tr>
-    ))
-  ) : (
-    <tr>
-      <td colSpan={11} style={{ textAlign: "center", padding: "20px" }}>
-        No staff found in {activeTab}.
-      </td>
-    </tr>
-  )}
-</tbody>
-
+            {paginatedStaff.length > 0 ? (
+              paginatedStaff.map((staff, index) => (
+                <tr key={staff.id}>
+                  <td>{index + 1 + currentPage * pageSize}</td>
+                  <td>{staff.firstName} {staff.lastName}</td>
+                  <td>{staff.email}</td>
+                  <td>{staff.phoneNumber}</td>
+                  <td>{staff.staffRoleType}</td>
+                  <td>{staff.shiftTiming}</td>
+                  <td>{staff.salary}</td>
+                  <td>{staff.contractStartDate}</td>
+                  <td>{staff.contractEndDate}</td>
+                  <td>
+                    <span className={`status ${staff.status?.toLowerCase()}`}>
+                      {staff.status || "Inactive"}
+                    </span>
+                  </td>
+                  <td>
+                    <button className="action-btn edit" onClick={() => handleEdit(staff)}>
+                      <Edit size={16} />
+                    </button>
+                    <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={11} style={{ textAlign: "center", padding: "20px" }}>
+                  No staff found in {activeTab}.
+                </td>
+              </tr>
+            )}
+          </tbody>
         </table>
       </div>
 
       <div className="mobile-user-cards">
-  {paginatedStaff.length > 0 ? (
-    paginatedStaff.map((staff) => (
-      <div key={staff.id} className="user-card-mobile">
-        <div className="user-row user-name-cell">
-          <span className="cell-label">Name</span>
-          <span className="cell-value">{staff.firstName} {staff.lastName}</span>
-        </div>
-        <div className="user-row">
-          <span className="cell-label">Email</span>
-          <span className="cell-value">{staff.email}</span>
-        </div>
-        <div className="user-row">
-          <span className="cell-label">Phone</span>
-          <span className="cell-value">{staff.phoneNumber}</span>
-        </div>
-        <div className="user-row">
-          <span className="cell-label">Role</span>
-          <span className="cell-value">{staff.staffRoleType}</span>
-        </div>
-        <div className="user-row">
-          <span className="cell-label">Shift</span>
-          <span className="cell-value">{staff.shiftTiming}</span>
-        </div>
-        <div className="user-row">
-          <span className="cell-label">Status</span>
-          <span className={`status ${staff.status?.toLowerCase()}`}>
-            {staff.status || "Inactive"}
-          </span>
-        </div>
-        <div className="user-row actions-cell">
-          <div className="user-actions">
-            <button className="action-btn edit" onClick={() => handleEdit(staff)}>
-              <Edit size={16} />
-            </button>
-            <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
-              <Trash2 size={16} />
-            </button>
-          </div>
-        </div>
+        {paginatedStaff.length > 0 ? (
+          paginatedStaff.map((staff) => (
+            <div key={staff.id} className="user-card-mobile">
+              <div className="user-row user-name-cell">
+                <span className="cell-label">Name</span>
+                <span className="cell-value">{staff.firstName} {staff.lastName}</span>
+              </div>
+              <div className="user-row">
+                <span className="cell-label">Email</span>
+                <span className="cell-value">{staff.email}</span>
+              </div>
+              <div className="user-row">
+                <span className="cell-label">Phone</span>
+                <span className="cell-value">{staff.phoneNumber}</span>
+              </div>
+              <div className="user-row">
+                <span className="cell-label">Role</span>
+                <span className="cell-value">{staff.staffRoleType}</span>
+              </div>
+              <div className="user-row">
+                <span className="cell-label">Shift</span>
+                <span className="cell-value">{staff.shiftTiming}</span>
+              </div>
+              <div className="user-row">
+                <span className="cell-label">Status</span>
+                <span className={`status ${staff.status?.toLowerCase()}`}>
+                  {staff.status || "Inactive"}
+                </span>
+              </div>
+              <div className="user-row actions-cell">
+                <div className="user-actions">
+                  <button className="action-btn edit" onClick={() => handleEdit(staff)}>
+                    <Edit size={16} />
+                  </button>
+                  <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="no-users-mobile">No staff available in {activeTab}.</div>
+        )}
       </div>
-    ))
-  ) : (
-    <div className="no-users-mobile">No staff available in {activeTab}.</div>
-  )}
-</div>
 
 
       {/* ✅ Pagination controls */}
-   <div className="pagination-container">
-  <button
-    onClick={handlePrevious}
-    disabled={currentPage === 1}
-    className="pagination-btn"
-  >
-    ⬅ Previous
-  </button>
+      <div className="pagination-container">
+        <button
+          onClick={handlePrevious}
+          disabled={currentPage === 1}
+          className="pagination-btn"
+        >
+          ⬅ Previous
+        </button>
 
-  <span className="pagination-info">
-    Page {currentPage} of {totalPages}
-  </span>
+        <span className="pagination-info">
+          Page {currentPage} of {totalPages}
+        </span>
 
-  <button
-    onClick={handleNext}
-    disabled={currentPage === totalPages}
-    className="pagination-btn"
-  >
-    Next ➡
-  </button>
-</div>
+        <button
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+          className="pagination-btn"
+        >
+          Next ➡
+        </button>
+      </div>
 
-{popupOpen && (
-  <div className="popup">
-    <div className="popup-content">
-      <h3>{editId ? "Edit Staff" : "Add Staff"}</h3>
-      <form>
-        {/* Existing Basic Fields */}
-        {["firstName", "lastName", "email", "phoneNumber"].map((name) => (
-          <div className="form-group" key={name}>
-            <label>
-              {name
-                .replace(/([A-Z])/g, " $1")
-                .replace(/^./, (str) => str.toUpperCase())}
-            </label>
-            <input
-              type={name === "email" ? "email" : "text"}
-              name={name}
-              value={form[name]}
-              onChange={handleChange}
-              placeholder={name}
-            />
+      {popupOpen && (
+        <div className="popup">
+          <div className="popup-content wide-popup">
+             {/* Close (X) Button */}
+      <button
+        className="close-btn"
+        onClick={() => setPopupOpen(false)}
+        aria-label="Close"
+      >
+        ✕
+      </button>
+             <h3>{editId ? "Edit Staff Details" : "Add Staff Details"}</h3>
+            <form className="popup-form">
+              <div className="popup-grid">
+                <div className="form-group">
+                  <label>First Name</label>
+                  <input
+                    type="text"
+                    value={form.firstName || ""}
+  onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                    placeholder="Enter first name"
+                  />
+                </div>
+                {/* Last Name */}
+                <div className="form-group">
+                  <label>Last Name</label>
+                  <input
+                    type="text"
+                    value={form.lastName || ""}
+  onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                    placeholder="Enter last name"
+                  />
+                </div>
+                {/* Email */}
+                <div className="form-group">
+                  <label>Email ID</label>
+                  <input
+                    type="email"
+                    value={form.email || ""}
+  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="Enter email ID"
+                  />
+                </div>
+                {/* Phone */}
+                <div className="form-group">
+                  <label>Phone Number</label>
+                  <input
+                    type="text"
+                    value={form.phoneNumber || ""}
+onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+                    placeholder="Enter phone number"
+                  />
+                </div>
+
+                {/* Role */}
+                <div className="form-group">
+                  <label>Role</label>
+                  <select
+                    name="staffRoleType"
+                    value={form.staffRoleType}
+                    onChange={handleChange}
+                  >
+                    <option value="">Select Role</option>
+                    {roles.map((role) => (
+                      <option key={role.id} value={role.staffRoleName}>
+                        {role.staffRoleName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Existing Fields */}
+                <div className="form-group">
+                  <label>Shift Timing</label>
+                  <input
+                    type="text"
+                    name="shiftTiming"
+                    value={form.shiftTiming}
+                    onChange={handleChange}
+                    placeholder="Shift Timing"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Salary</label>
+                  <input
+                    type="number"
+                    name="salary"
+                    value={form.salary}
+                    onChange={handleChange}
+                    placeholder="Salary"
+                  />
+                </div>
+
+                {!editId && (
+                  <div className="form-group">
+                    <label>Contract Start</label>
+                    <input
+                      type="date"
+                      name="contractStartDate"
+                      value={form.contractStartDate}
+                      onChange={handleChange}
+                    />
+                  </div>
+                )}
+
+                <div className="form-group">
+                  <label>Contract End</label>
+                  <input
+                    type="date"
+                    name="contractEndDate"
+                    value={form.contractEndDate}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                {!editId && (
+                  <div className="form-group">
+                    <label>Password</label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={form.password}
+                      onChange={handleChange}
+                      placeholder="Password"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Footer Buttons */}
+              <div className="form-buttons center-buttons">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={() => setPopupOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="save-btn"
+                  onClick={handleAddOrUpdate}
+                >
+                  {editId ? "Update" : "Add"}
+                </button>
+              </div>
+            </form>
           </div>
-        ))}
-
-        {/* Role */}
-        <div className="form-group">
-          <label>Role</label>
-          <select
-            name="staffRoleType"
-            value={form.staffRoleType}
-            onChange={handleChange}
-          >
-            <option value="">Select Role</option>
-            {roles.map((role) => (
-              <option key={role.id} value={role.staffRoleName}>
-                {role.staffRoleName}
-              </option>
-            ))}
-          </select>
         </div>
-
-        {/* Added New Inputs (extra fields) */}
-        <div className="form-group">
-          <label>Address</label>
-          <input
-            type="text"
-            name="address"
-            value={form.address || ""}
-            onChange={handleChange}
-            placeholder="Enter address"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>City</label>
-          <input
-            type="text"
-            name="city"
-            value={form.city || ""}
-            onChange={handleChange}
-            placeholder="Enter city"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>State</label>
-          <input
-            type="text"
-            name="state"
-            value={form.state || ""}
-            onChange={handleChange}
-            placeholder="Enter state"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Emergency Contact</label>
-          <input
-            type="text"
-            name="emergencyContact"
-            value={form.emergencyContact || ""}
-            onChange={handleChange}
-            placeholder="Emergency contact number"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>ID Proof</label>
-          <input
-            type="text"
-            name="idProof"
-            value={form.idProof || ""}
-            onChange={handleChange}
-            placeholder="Aadhar / PAN / Passport"
-          />
-        </div>
-
-        {/* Existing Fields */}
-        <div className="form-group">
-          <label>Shift Timing</label>
-          <input
-            type="text"
-            name="shiftTiming"
-            value={form.shiftTiming}
-            onChange={handleChange}
-            placeholder="Shift Timing"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Salary</label>
-          <input
-            type="number"
-            name="salary"
-            value={form.salary}
-            onChange={handleChange}
-            placeholder="Salary"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Contract Start</label>
-          <input
-            type="date"
-            name="contractStartDate"
-            value={form.contractStartDate}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Contract End</label>
-          <input
-            type="date"
-            name="contractEndDate"
-            value={form.contractEndDate}
-            onChange={handleChange}
-          />
-        </div>
-
-        {!editId && (
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              value={form.password}
-              onChange={handleChange}
-              placeholder="Password"
-            />
-          </div>
-        )}
-
-        {/* Footer Buttons */}
-        <div className="form-buttons">
-          <button type="button" onClick={() => setPopupOpen(false)}>
-            Cancel
-          </button>
-          <button type="button" onClick={handleAddOrUpdate}>
-            {editId ? "Update" : "Add"}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
+      )}
       <ToastContainer />
     </div>
   );
