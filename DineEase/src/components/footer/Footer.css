@@ -1,6 +1,5 @@
-
 .footer {
-  background-color: #111;
+  background-color: #0b1220; /* slightly softer than pure black */
   color: #fff;
   padding: 40px 20px;
 }
@@ -34,25 +33,32 @@
 
 .footer-section ul li {
   margin: 8px 0;
+  color: #bbb;
 }
 
 .footer-section a {
-  color: #bbb;
+  color: #c9d1d9;
   text-decoration: none;
-  transition: color 0.3s;
+  transition: color 0.18s ease, transform 0.12s ease;
 }
 
-.footer-section a:hover {
+.footer-section a:hover,
+.footer-section a:focus {
   color: #facc15;
+  transform: translateX(4px);
+  outline: none;
 }
 
+/* --- CONTACT --- */
 .footer-contact li {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #bbb;
+  color: #c9d1d9;
+  font-size: 0.95rem;
 }
 
+/* --- SOCIALS --- */
 .footer-socials {
   display: flex;
   gap: 15px;
@@ -60,18 +66,22 @@
 
 .footer-socials a {
   background: #facc15;
-  color: #111;
+  color: #0b1220;
   padding: 10px;
   border-radius: 50%;
   display: inline-flex;
-  transition: background 0.3s;
+  transition: transform 0.12s ease, background 0.18s ease;
 }
 
-.footer-socials a:hover {
+.footer-socials a:hover,
+.footer-socials a:focus {
   background: #eab308;
+  transform: translateY(-3px);
+  outline: none;
 }
 
-.footer-bottom {
+/* --- COPYRIGHT --- */
+.footer-copy {
   text-align: center;
   margin-top: 30px;
   border-top: 1px solid #333;
@@ -79,16 +89,47 @@
   color: #888;
   font-size: 14px;
 }
-/* Responsive */
-@media (max-width: 600px) { 
-  .footer-container {
-    grid-template-columns: 1fr;
+
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 900px) {
+  .footer-bottom-container {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .footer-section {
     text-align: center;
   }
-  
+
   .footer-socials {
     justify-content: center;
   }
-}       
 
+  .footer-contact li {
+    justify-content: center;
+  }
+}
 
+@media (max-width: 600px) {
+  .footer-top-inline {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-size: 24px;
+  }
+
+  .footer-about-inline {
+    font-size: 14px;
+  }
+
+  .footer-section h3 {
+    font-size: 18px;
+  }
+
+  .footer-socials a {
+    padding: 8px;
+  }
+}

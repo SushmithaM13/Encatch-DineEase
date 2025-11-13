@@ -3,97 +3,165 @@ import { Pencil, Trash2, MoreVertical, User } from "lucide-react";
 import "./AdminProfile.css";
 
 export default function AdminProfile() {
-  // Profile details
-  const [name, setName] = useState("");
-  const [adminEmail, setAdminEmail] = useState("");
-  const [contact, setContact] = useState("");
-  const [restaurantName, setRestaurantName] = useState("");
-  const [restaurantAddress, setRestaurantAddress] = useState("");
-  const [restaurantPhone, setRestaurantPhone] = useState("");
-  const [restaurantDesc, setRestaurantDesc] = useState("");
-  const [role] = useState("Admin");
+  const API_URL = "http://localhost:8082/dine-ease/api/v1/staff/profile";
+  const TOKEN = localStorage.getItem("token"); // Get token from login
 
-  // Profile pic
-  const [profilePic, setProfilePic] = useState(null);
-  const [showMenu, setShowMenu] = useState(false);
+  const [profile, setProfile] = useState({
+    id: "",
+    organizationId: "",
+    organizationName: "",
+    fullName: "",
+    firstName: "",
+    lastName: "",
+    staffRoleName: "",
+    phoneNumber: "",
+    password: "",
+    shiftTiming: "",
+    staffStatus: "",
+    salary: "",
+    contractStartDate: "",
+    contractEndDate: "",
+    email: "",
+    profileImage: "",
+    accountCreatedAt: "",
+  });
 
-  // Edit state
   const [isEditing, setIsEditing] = useState(false);
-
-  // Password change
+  const [showMenu, setShowMenu] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [generatedOtp, setGeneratedOtp] = useState("");
+  const [otp, setOtp] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     current: "",
     newPass: "",
     confirm: "",
   });
-  const [otp, setOtp] = useState("");
-  const [generatedOtp, setGeneratedOtp] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [passwordSuccess, setPasswordSuccess] = useState(false);
 
-  // Load stored values
+  // ===== Fetch Profile (with token) =====
   useEffect(() => {
-    setName(localStorage.getItem("adminName") || "");
-    setAdminEmail(localStorage.getItem("adminEmail") || "");
-    setContact(localStorage.getItem("adminContact") || "");
-    setRestaurantName(localStorage.getItem("restaurantName") || "");
-    setRestaurantAddress(localStorage.getItem("restaurantLocation") || "");
-    setRestaurantPhone(localStorage.getItem("restaurantPhone") || "");
-    setRestaurantDesc(localStorage.getItem("restaurantDescription") || "");
-    setProfilePic(localStorage.getItem("adminProfilePic"));
-  }, []);
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(API_URL, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${TOKEN}`, //  Include token
+          },
+          credentials: "include", //  If your backend uses cookies
+        });
 
-  // Save profile
-  const handleSave = () => {
-    localStorage.setItem("adminName", name);
-    localStorage.setItem("adminEmail", adminEmail);
-    localStorage.setItem("adminContact", contact);
-    localStorage.setItem("restaurantName", restaurantName);
-    localStorage.setItem("restaurantLocation", restaurantAddress);
-    localStorage.setItem("restaurantPhone", restaurantPhone);
-    localStorage.setItem("restaurantDescription", restaurantDesc);
-    if (profilePic) {
-      localStorage.setItem("adminProfilePic", profilePic);
-    } else {
-      localStorage.removeItem("adminProfilePic");
+        if (!res.ok) {
+          console.error(`Profile fetch failed: ${res.status} ${res.statusText}`);
+          return;
+        }
+
+        const text = await res.text(); // Avoid crash if empty
+        if (!text) {
+          console.warn("Empty profile response");
+          return;
+        }
+
+        const data = JSON.parse(text);
+        console.log(" PROFILE RESPONSE FROM BACKEND:", data);
+        setProfile({
+        id: data.id || "",
+        fullName: data.fullName || "",
+        phoneNumber: data.phoneNumber || "",
+        email: data.email || "",
+        staffRoleName: data.staffRoleName || data.roleName || data.staffRole?.name || "",
+        organizationId: data.organizationId || data.organization?.id || "",
+        organizationName: data.organizationName || data.organization?.name || "",
+        contractStartDate: data.contractStartDate || "",
+        contractEndDate: data.contractEndDate || "",
+        profileImage: data.profileImage || "",
+      });
+
+      } catch (err) {
+        console.error("Error fetching profile:", err.message);
+      }
+    };
+
+    if (TOKEN) fetchProfile();
+    else console.warn("⚠️ No token found — please log in first.");
+  }, [TOKEN]);
+
+  // ===== Save (Update) Profile =====
+  const handleSave = async () => {
+    try {
+      const res = await fetch(API_URL, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+        body: JSON.stringify(profile),
+      });
+
+      if (res.ok) {
+        alert("Profile updated successfully!");
+        setIsEditing(false);
+      } else {
+        alert(`Failed to update profile (${res.status})`);
+      }
+    } catch (error) {
+      console.error("Update error:", error);
     }
-    setIsEditing(false);
-    alert("Profile updated successfully!");
   };
 
-  // Change profile picture
-  const handleImageChange = (e) => {
+  // ===== Handle Image Upload =====
+  const handleImageChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        setProfilePic(event.target?.result);
-        localStorage.setItem("adminProfilePic", event.target?.result);
+      reader.onload = async (event) => {
+        const base64Image = event.target.result;
+        setProfile((prev) => ({ ...prev, profileImage: base64Image }));
+
+        try {
+          await fetch(`${API_URL}/image`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${TOKEN}`,
+            },
+            body: JSON.stringify({ profileImage: base64Image }),
+          });
+        } catch (err) {
+          console.error("Image upload error:", err);
+        }
       };
       reader.readAsDataURL(e.target.files[0]);
     }
     setShowMenu(false);
   };
 
-  const handleRemoveImage = () => {
-    setProfilePic(null);
-    localStorage.removeItem("adminProfilePic");
+  // ===== Remove Profile Image =====
+  const handleRemoveImage = async () => {
+    try {
+      setProfile((prev) => ({ ...prev, profileImage: "" }));
+      await fetch(`${API_URL}/image`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+        body: JSON.stringify({ profileImage: "" }),
+      });
+    } catch (err) {
+      console.error("Image remove error:", err);
+    }
     setShowMenu(false);
   };
 
-  // OTP + Password change
+  // ===== OTP & Password Change =====
   const sendOtp = () => {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     setGeneratedOtp(code);
     setOtpSent(true);
-    alert(`OTP sent to ${adminEmail}: ${code}`);
+    alert(`OTP sent to ${profile.email}: ${code}`);
   };
 
-  const handlePasswordChange = () => {
-    const storedPass = localStorage.getItem("adminPassword") || "";
-    if (passwordForm.current !== storedPass) {
-      alert("Current password is incorrect!");
-      return;
-    }
+  const handlePasswordChange = async () => {
     if (passwordForm.newPass !== passwordForm.confirm) {
       alert("New passwords do not match!");
       return;
@@ -102,107 +170,126 @@ export default function AdminProfile() {
       alert("Invalid OTP!");
       return;
     }
-    localStorage.setItem("adminPassword", passwordForm.newPass);
-    setPasswordSuccess(true);
-    setOtpSent(false);
-    setPasswordForm({ current: "", newPass: "", confirm: "" });
-    setOtp("");
-    alert("Password updated successfully!");
+
+    try {
+      const res = await fetch(`${API_URL}/password`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+        body: JSON.stringify({ password: passwordForm.newPass }),
+      });
+
+      if (res.ok) {
+        setPasswordSuccess(true);
+        setOtpSent(false);
+        setPasswordForm({ current: "", newPass: "", confirm: "" });
+        setOtp("");
+        alert("Password updated successfully!");
+      } else {
+        alert("Failed to update password!");
+      }
+    } catch (error) {
+      console.error("Password update error:", error);
+    }
   };
 
   return (
-    <div className="profile-page">
-      {/* Heading with User Icon */}
-      <h2 className="profile-heading">
-        <User size={28} className="user-icon" /> Admin Profile
+    <div className="admin-profile-page">
+      <h2 className="admin-profile-heading">
+        <User size={28} className="admin-user-icon" /> Admin Profile
       </h2>
 
-      <div className="profile-container">
+      <div className="admin-profile-container">
         {/* Left Side */}
-        <div className="profile-details">
+        <div className="admin-profile-details">
           <section>
             <h3>Basic Info</h3>
             <label>
-              Name:
+              Full Name:
               <input
                 type="text"
-                value={name}
+                value={profile.fullName || ""}
                 disabled={!isEditing}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) =>
+                  setProfile({ ...profile, fullName: e.target.value })
+                }
               />
             </label>
             <label>
-              Email / Username:
-              <input type="email" value={adminEmail} disabled />
-            </label>
-            <label>
-              Contact Number:
-              <input
-                type="text"
-                value={contact}
-                disabled={!isEditing}
-                onChange={(e) => setContact(e.target.value)}
-              />
-            </label>
-          </section>
-
-          <section>
-            <h3>Restaurant Info</h3>
-            <label>
-              Name:
-              <input
-                type="text"
-                value={restaurantName}
-                disabled={!isEditing}
-                onChange={(e) => setRestaurantName(e.target.value)}
-              />
-            </label>
-            <label>
-              Address:
-              <input
-                type="text"
-                value={restaurantAddress}
-                disabled={!isEditing}
-                onChange={(e) => setRestaurantAddress(e.target.value)}
-              />
+              Email:
+              <input type="email" value={profile.email || ""} disabled />
             </label>
             <label>
               Phone:
               <input
                 type="text"
-                value={restaurantPhone}
+                value={profile.phoneNumber || ""}
                 disabled={!isEditing}
-                onChange={(e) => setRestaurantPhone(e.target.value)}
+                onChange={(e) =>
+                  setProfile({ ...profile, phoneNumber: e.target.value })
+                }
               />
             </label>
             <label>
-              Description:
-              <textarea
-                value={restaurantDesc}
-                disabled={!isEditing}
-                onChange={(e) => setRestaurantDesc(e.target.value)}
-              />
+              Role:
+              <input type="text" value={profile.staffRoleName || ""} disabled />
             </label>
           </section>
 
           <section>
-            <h3>Account Settings</h3>
+            <h3>Organization Info</h3>
             <label>
-              Role:
-              <input type="text" value={role} disabled />
+              Organization ID:
+              <input type="text" value={profile.organizationId || ""} disabled />
             </label>
-
-            <div className="password-box">
-              <h4>Change Password</h4>
+            <label>
+              Organization:
               <input
-                type="password"
-                placeholder="Current Password"
-                value={passwordForm.current}
-                onChange={(e) =>
-                  setPasswordForm({ ...passwordForm, current: e.target.value })
-                }
+                type="text"
+                value={profile.organizationName || ""}
                 disabled={!isEditing}
+                onChange={(e) =>
+                  setProfile({ ...profile, organizationName: e.target.value })
+                }
               />
+            </label>
+            <label>
+              Contract Start:
+              <input
+                type="date"
+                value={profile.contractStartDate?.substring(0, 10) || ""}
+                disabled={!isEditing}
+                onChange={(e) =>
+                  setProfile({
+                    ...profile,
+                    contractStartDate: e.target.value,
+                  })
+                }
+              />
+            </label>
+            <label>
+              Contract End:
+              <input
+                type="date"
+                value={profile.contractEndDate?.substring(0, 10) || ""}
+                disabled={!isEditing}
+                onChange={(e) =>
+                  setProfile({
+                    ...profile,
+                    contractEndDate: e.target.value,
+                  })
+                }
+              />
+            </label>
+          </section>
+
+          {/* Password Change */}
+          <section>
+            <h3>Account Settings</h3>
+            <div className="admin-password-box">
+              <h4>Change Password</h4>
               <input
                 type="password"
                 placeholder="New Password"
@@ -214,34 +301,32 @@ export default function AdminProfile() {
               />
               <input
                 type="password"
-                placeholder="Confirm New Password"
+                placeholder="Confirm Password"
                 value={passwordForm.confirm}
                 onChange={(e) =>
-                  setPasswordForm({ ...passwordForm, confirm: e.target.value })
+                  setPasswordForm({
+                    ...passwordForm,
+                    confirm: e.target.value,
+                  })
                 }
                 disabled={!isEditing}
               />
 
-              {isEditing && (
-                <>
-                  {otpSent ? (
-                    <>
-                      <input
-                        type="text"
-                        placeholder="Enter OTP"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                      />
-                      <button onClick={handlePasswordChange}>
-                        Save Password
-                      </button>
-                      <button onClick={() => setOtpSent(false)}>Cancel</button>
-                    </>
-                  ) : (
-                    <button onClick={sendOtp}>Send OTP</button>
-                  )}
-                </>
-              )}
+              {isEditing &&
+                (otpSent ? (
+                  <>
+                    <input
+                      type="text"
+                      placeholder="Enter OTP"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                    />
+                    <button onClick={handlePasswordChange}>Save Password</button>
+                    <button onClick={() => setOtpSent(false)}>Cancel</button>
+                  </>
+                ) : (
+                  <button onClick={sendOtp}>Send OTP</button>
+                ))}
 
               {passwordSuccess && (
                 <p style={{ color: "green" }}>
@@ -251,7 +336,7 @@ export default function AdminProfile() {
             </div>
           </section>
 
-          <div className="action-buttons">
+          <div className="admin-action-buttons">
             {isEditing ? (
               <>
                 <button onClick={handleSave}>Save Changes</button>
@@ -263,31 +348,33 @@ export default function AdminProfile() {
           </div>
         </div>
 
-        {/* Right Side Profile Picture */}
-        <div className="profile-picture">
-          <div className="image-wrapper">
-            {profilePic ? (
-              <img src={profilePic} alt="Profile" className="circle-img" />
+        {/* Right Side */}
+        <div className="admin-profile-picture">
+          <div className="admin-image-wrapper">
+            {profile.profileImage ? (
+              <img
+                src={profile.profileImage}
+                alt="Profile"
+                className="admin-circle-img"
+              />
             ) : (
-              <div className="circle-img placeholder">
-                {name ? name[0].toUpperCase() : "A"}
+              <div className="admin-circle-img placeholder">
+                {profile.fullName ? profile.fullName[0].toUpperCase() : "A"}
               </div>
             )}
 
-            {/* 3 Dots Menu (always visible) */}
-            <div className="menu-container">
+            <div className="admin-menu-container">
               <button
-                className="menu-button"
+                className="admin-menu-button"
                 onClick={() => setShowMenu((prev) => !prev)}
               >
                 <MoreVertical size={20} />
               </button>
 
               {showMenu && (
-                <div className="dropdown-menu">
-                  <label className="dropdown-item">
-                    <Pencil size={16} />
-                    Edit Photo
+                <div className="admin-dropdown-menu">
+                  <label className="admin-dropdown-item">
+                    <Pencil size={16} /> Edit Photo
                     <input
                       type="file"
                       accept="image/*"
@@ -295,9 +382,9 @@ export default function AdminProfile() {
                       hidden
                     />
                   </label>
-                  {profilePic && (
+                  {profile.profileImage && (
                     <button
-                      className="dropdown-item"
+                      className="admin-dropdown-item"
                       onClick={handleRemoveImage}
                     >
                       <Trash2 size={16} /> Remove Photo

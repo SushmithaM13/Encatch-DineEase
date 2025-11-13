@@ -1,0 +1,166 @@
+.cuisine-container {
+  padding: 20px;
+  background: #f9fafc;
+  min-height: 100vh;
+}
+
+.cuisine-heading {
+  text-align: center;
+  font-size: 26px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.cuisine-form {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.cuisine-form input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  min-width: 180px;
+}
+
+.cuisine-form button {
+  background-color: #0078d7;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.cuisine-form button:hover {
+  background-color: #005fa3;
+}
+
+/* ==== Web Table ==== */
+.cuisine-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.cuisine-table th,
+.cuisine-table td {
+  border: 1px solid #ddd;
+  padding: 10px 15px;
+  text-align: left;
+}
+
+.cuisine-table th {
+  background: #0078d7;
+  color: white;
+  font-weight: bold;
+}
+
+/* ==== Mobile Cards ==== */
+.mobile-view {
+  display: none;
+}
+
+.cuisine-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.cuisine-card h4 {
+  margin-bottom: 10px;
+  color: #0078d7;
+}
+
+.no-data {
+  text-align: center;
+  color: #555;
+  margin-top: 20px;
+}
+
+/* ==== Pagination ==== */
+.pagination {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  margin: 0 5px;
+  border: none;
+  background: #ddd;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.pagination button.active {
+  background: #0078d7;
+  color: white;
+}
+
+.pagination button:hover {
+  background: #005fa3;
+  color: white;
+}
+
+/* ==== Responsive Styles ==== */
+@media (max-width: 768px) {
+  .web-view {
+    display: none;
+  }
+
+  .mobile-view {
+    display: block;
+  }
+
+  .cuisine-form {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .cuisine-form input,
+  .cuisine-form button {
+    width: 90%;
+  }
+}
+.edit-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 6px;
+  transition: 0.2s;
+}
+
+.edit-btn:hover {
+  background: #1c7c31;
+}
+
+.delete-btn {
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.delete-btn:hover {
+  background: #c70000;
+}

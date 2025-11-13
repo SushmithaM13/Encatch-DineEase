@@ -40,11 +40,12 @@
   padding: 30px 25px;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  width: 100%;
-  max-width: 400px;
-  height: 100vh;   /* keep a minimum height */       /* allow to grow */
+  width: 28%;
+  /* max-width:400px; */
+  height: 90%;   /* keep a minimum height */       /* allow to grow */
   position: relative;
   z-index: 2;
+  margin-top: 0%;
   margin-bottom: 4%;
   overflow-y: auto;   /* scroll if needed */
 }
@@ -53,19 +54,16 @@
   text-align: center;
   margin-bottom: 10px;
 }
-
-.admin-icon {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
+.card-header h2{
+  margin-top: -10px;
 }
 
 .title {
   font-size: 28px;
   font-weight: 800;
-  color: #2d3748;
+  /* color: #005eff; */
   margin-bottom: 8px;
-  background: linear-gradient(135deg, #ff6b35, #ffa500);
+  background: linear-gradient(135deg, #ff4400, #ffa600);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

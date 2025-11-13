@@ -1,333 +1,1034 @@
-/* ============================= */
-/* 🍽️ Table Management Styles   */
-/* ============================= */
-
-.tables-page {
-  padding: 20px;
-  font-family: Arial, sans-serif;
+/* ========== GLOBAL STYLES ========== */
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f8fafc;
+  margin: 0;
+  padding: 0;
 }
 
-/* Page Title */
-.page-title {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  text-align: center;
+.admin-tables-page {
+  padding: 30px;
   color: #222;
+  background: linear-gradient(to bottom right, #fdfbfb, #ebedee);
+  min-height: 100vh;
 }
 
-/* Add Table Section */
-.add-table-section {
+/* ========== TITLE & HEADER ========== */
+.admin-page-title {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
   gap: 10px;
+  font-size: 26px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 15px;
+}
+
+/* ========== ADD BUTTON SECTION ========== */
+.admin-add-table-section {
+  text-align: right;
   margin-bottom: 20px;
 }
 
-.add-table-section button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 16px;
+.admin-add-table-section button {
+  background: #2563eb; 
   border: none;
-  border-radius: 6px;
-  background: black;
   color: white;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.add-table-section button:hover {
-  background: #333;
-}
-
-/* Stats Section */
-.stats {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-bottom: 20px;
+  padding: 10px 18px;
+  border-radius: 8px;
   font-size: 15px;
-  font-weight: 500;
-}
-.stats p {
-  display: flex;
+  cursor: pointer;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
+  transition: 0.2s ease-in-out;
 }
 
-/* Specific Status Colors */
-.stat-total {
-  background: #f3f4f6; /* light gray for total */
-  color: #111;
+.admin-add-table-section button:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
 }
 
-.stat-available {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.stat-booked {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.stat-cleaning {
-  background: #fef9c3;
-  color: #92400e;
-}
-
-/* Table Grid */
-.tables-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-/* Table Card */
-.table-card {
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.table-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.15);
-}
-
-/* Status Highlight Borders */
-.table-card.available { border: 2px solid #16a34a; }
-.table-card.booked { border: 2px solid #dc2626; }
-.table-card.cleaning { border: 2px solid #ca8a04; }
-
-/* Table Title */
-.table-card h3 {
-  font-size: 18px;
-  margin-bottom: 6px;
-  color: #111;
-}
-
-.table-card p {
-  font-size: 14px;
-  color: #555;
-  margin-bottom: 12px;
-}
-
-/* Status Buttons inside card */
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.actions button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background 0.2s;
-}
-.popup-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #111;
-  transition: 0.2s;
-}
-
-.popup-close:hover {
-  color: #ff0000;
-}
-
-/* Unique Button Colors */
-.actions button:nth-child(1) { background: #dcfce7; color: #166534; }
-.actions button:nth-child(1):hover { background: #bbf7d0; }
-
-.actions button:nth-child(2) { background: #fee2e2; color: #991b1b; }
-.actions button:nth-child(2):hover { background: #fecaca; }
-
-.actions button:nth-child(3) { background: #fef9c3; color: #92400e; }
-.actions button:nth-child(3):hover { background: #fde68a; }
-
-/* Table Card Header Dropdown */
-.table-card-header {
+/* ========== STATS BAR ========== */
+.admin-stats {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  flex-wrap: wrap;
+  background: #ffffff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
 }
 
-.dots-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
+.admin-stats p {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
 }
 
-.dropdown-container { position: relative; }
-
-.dropdown-menu {
-  position: absolute;
-  right: 0;
-  top: 28px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  min-width: 100px;
+/* ========== TABLE GRID ========== */
+.admin-tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 18px;
 }
 
-.dropdown-menu button {
-  background: none;
-  border: none;
-  padding: 8px 12px;
-  text-align: left;
-  cursor: pointer;
+/* ========== TABLE CARD ========== */
+.admin-table-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 6px 14px rgba(206, 7, 7, 0.07);
+  transition: 0.3s ease;
+  border-top: 4px solid #1d4ed8;
 }
 
-.dropdown-menu button:hover { background: #f2f2f2; }
+.admin-table-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.1);
+}
+/* ===== Dynamic Status Borders ===== */
+.admin-table-card.status-available {
+  border-top: 4px solid #16a34a; /* green */
+  box-shadow: 0 6px 14px rgba(22, 163, 74, 0.15);
+}
 
-/* Popup Modal */
-/* Overlay covers full screen */
-.popup-overlay {
+.admin-table-card.status-booked {
+  border-top: 4px solid #dc2626; /* red */
+  box-shadow: 0 6px 14px rgba(220, 38, 38, 0.15);
+}
+
+.admin-table-card.status-cleaning {
+  border-top: 4px solid #facc15; /* yellow */
+  box-shadow: 0 6px 14px rgba(250, 204, 21, 0.15);
+}
+.admin-table-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+/* ===== Success Popup Overlay ===== */
+.admin-success-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;  /* horizontal center */
-  align-items: center;      /* vertical center */
-  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* ===== Popup Box ===== */
+.admin-success-box {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  width: 340px;
+  text-align: center;
+  padding: 24px;
+  animation: fadeInScale 0.3s ease-in-out;
+}
+
+/* Title */
+.admin-success-box h2 {
+  color: #16a34a; /* green */
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Message text */
+.admin-success-box p {
+  color: #374151;
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+/* OK Button */
+.admin-success-box button {
+  background: #1d4ed8;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.admin-success-box button:hover {
+  background: #153ea8;
+}
+
+/* ===== Animation ===== */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+
+/* ========== CARD HEADER ========== */
+.admin-table-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.admin-table-card-header h3 {
+  margin: 0;
+  color: #111827;
+  font-size: 18px;
+}
+
+.admin-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4b5563;
+  margin-left: 8px;
+  transition: 0.2s;
+}
+
+.admin-actions button:hover {
+  color: #010906;
+}
+
+/* Overlay for delete popup */
+.delete-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
 }
 
 /* Popup card */
-.popup {
-  position: relative;       /* needed for close button */
-  background: white;
-  padding: 25px 20px;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 400px;         /* controls popup size */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+.delete-popup-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  width: 380px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.delete-popup-box h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 12px;
+}
+
+.delete-popup-box p {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.delete-popup-actions {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   gap: 12px;
 }
 
-/* Close button top-right */
-.popup-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: transparent;
+.delete-popup-actions button {
+  padding: 8px 14px;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
-  color: #111;
-  transition: 0.2s;
+  font-weight: 500;
 }
 
-.popup-close:hover {
-  color: black;
+.delete-popup-actions .cancel-btn {
+  background: #e5e5e5;
+  color: #333;
 }
 
+.delete-popup-actions .delete-btn {
+  background: #e53935;
+  color: #fff;
+}
 
-.popup h3 {
-  font-size: 18px;
+.delete-popup-actions .delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===========================
+   Admin Table Popup Styling
+   =========================== */
+
+.admin-table-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  animation: admin-fadeIn 0.25s ease-in-out;
+}
+
+.admin-table-popup-box {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.18);
+  padding: 28px 30px;
+  width: 370px;
+  text-align: center;
+  animation: admin-slideUp 0.25s ease-in-out;
+}
+
+.admin-table-popup-box h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 10px;
+}
+
+.admin-table-success-title {
+  color: #22c55e;
+  font-size: 20px;
   font-weight: 600;
   margin-bottom: 10px;
-  text-align: center;
 }
 
-.popup label {
+.admin-table-popup-box p {
+  font-size: 15px;
+  color: #555;
+  margin-bottom: 18px;
+}
+
+.admin-table-popup-buttons {
   display: flex;
-  flex-direction: column;
-  font-size: 14px;
-  font-weight: 500;
-  gap: 4px;
-}
-
-.popup input, 
-.popup select {
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  width: 100%;
-}
-
-.popup-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: center;
+  gap: 12px;
   margin-top: 10px;
 }
 
-.popup-actions button {
-  padding: 8px 14px;
-  border-radius: 6px;
+.admin-table-popup-btn {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 500;
   border: none;
   cursor: pointer;
-  font-weight: 500;
-  font-size: 14px;
-  transition: 0.2s;
+  transition: all 0.2s ease-in-out;
 }
 
-.popup-actions button:first-child {
-  background: black;
-  color: white;
+/* ===== Confirm Button ===== */
+.admin-table-confirm {
+  background-color: #22c55e;
+  color: #fff;
 }
 
-.popup-actions button:first-child:hover {
-  background: #333;
+.admin-table-confirm:hover {
+  background-color: #16a34a;
 }
 
-.popup-actions button:last-child {
-  background: #f3f3f3;
+/* ===== Cancel Button ===== */
+.admin-table-cancel {
+  background-color: #e5e7eb;
   color: #111;
 }
 
-.popup-actions button:last-child:hover {
-  background: #ddd;
+.admin-table-cancel:hover {
+  background-color: #d1d5db;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .tables-grid {
+/* ===== OK Button ===== */
+.admin-table-ok {
+  background-color: #2563eb;
+  color: #fff;
+}
+
+.admin-table-ok:hover {
+  background-color: #1d4ed8;
+}
+
+
+
+/* ===== Animations ===== */
+@keyframes admin-fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes admin-slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+
+/* ========== TEXT INFO ========== */
+.admin-table-card p {
+  font-size: 14px;
+  margin: 4px 0;
+  color: #374151;
+}
+
+/* ========== QR SECTION ========== */
+.admin-qr-section {
+  background: #ecfdf5;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.admin-qr-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  color: #065f46;
+}
+
+.admin-qr-section button {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-right: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-qr-section button:hover {
+  background: #059669;
+}
+
+/* ========== WAITER SECTION ========== */
+.admin-waiter-section {
+  background: #f0f9ff;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.admin-waiter-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  color: #0369a1;
+}
+
+.admin-waiter-section button {
+  background: #0284c7;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-top: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-waiter-section button:hover {
+  background: #0369a1;
+}
+
+/* ========== POPUPS ========== */
+.admin-popup-overlay,
+.admin-qr-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.admin-popup,
+.admin-qr-popup-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  width: 380px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: popupFade 0.3s ease;
+}
+/* Add Table / Popup Buttons */
+.admin-popup button {
+  background: #2563eb; 
+  color: #fff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.admin-popup button:hover {
+  background: #1d4ed8; 
+}
+
+
+@keyframes popupFade {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-popup-close,
+.admin-qr-popup-close {
+    background: none !important;
+  color: #9ca3af !important;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  transition: color 0.2s ease-in-out;
+}
+
+.admin-popup-close:hover,
+.admin-qr-popup-close:hover {
+  color: #ef4444 !important;
+}
+
+.admin-popup h3 {
+  margin-top: 0;
+  font-size: 18px;
+  color: #111827;
+}
+
+.admin-popup label {
+  display: block;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.admin-popup input,
+.admin-popup select,
+.admin-popup textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  margin-top: 4px;
+  font-size: 13px;
+  outline: none;
+}
+
+.admin-popup input:focus,
+.admin-popup select:focus,
+.admin-popup textarea:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 3px rgba(16, 185, 129, 0.4);
+}
+
+/* ========== POPUP BUTTONS ========== */
+.admin-popup-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.admin-popup-actions button {
+  flex: 1;
+  margin: 0 4px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-popup-actions button:first-child {
+  background: #ef4444;
+}
+
+.admin-popup-actions button:first-child:hover {
+  background: #dc2626;
+}
+
+.admin-popup-actions button:last-child {
+  background: #6b7280;
+}
+
+.admin-popup-actions button:last-child:hover {
+  background: #4b5563;
+}
+
+
+
+/* ========== QR POPUP MENU ========== */
+.admin-qr-popup-menu-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.admin-qr-popup-menu-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.admin-qr-popup-dropdown {
+  position: absolute;
+  right: 0;
+  top: 28px;
+  background: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 8px;
+  z-index: 10;
+}
+
+.admin-qr-popup-dropdown a,
+.admin-qr-popup-dropdown button {
+  display: block;
+  text-decoration: none;
+  color: #374151;
+  background: none;
+  border: none;
+  padding: 8px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: 0.2s;
+}
+
+.admin-qr-popup-dropdown a:hover,
+.admin-qr-popup-dropdown button:hover {
+  background: #f3f4f6;
+  color: #10b981;
+}
+
+.admin-qr-popup-image {
+  width: 200px;
+  height: 200px;
+  display: block;
+  margin: 20px auto;
+  border-radius: 10px;
+  border: 2px solid #e5e7eb;
+}
+
+.admin-qr-popup-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.admin-qr-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  text-decoration: none;
+}
+
+.admin-qr-btn.download {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.admin-qr-btn.download:hover {
+  background-color: #43a047;
+}
+
+.admin-qr-btn.delete {
+  background-color: #e53935;
+  color: #fff;
+}
+
+.admin-qr-btn.delete:hover {
+  background-color: #c62828;
+}
+/* ===== Delete Confirmation Popup ===== */
+.admin-qr-delete-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+.admin-qr-delete-card {
+  background: white;
+  padding: 25px 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.admin-qr-delete-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #111827;
+}
+
+.admin-qr-delete-text {
+  color: #4b5563;
+  margin-bottom: 20px;
+  font-size: 15px;
+}
+
+.admin-qr-delete-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.admin-qr-btn.delete {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.admin-qr-btn.delete:hover {
+  background: #dc2626;
+}
+
+.admin-qr-btn.cancel {
+  background: #e5e7eb;
+  color: #111827;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.admin-qr-btn.cancel:hover {
+  background: #d1d5db;
+}
+
+
+
+/* ========== CHECKBOX LISTS ========== */
+.admin-waiter-checkbox-list label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.admin-waiter-checkbox-list input {
+  margin-right: 6px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 600px) {
+  .admin-popup,
+  .admin-qr-popup-card {
+    width: 90%;
+  }
+
+  .admin-tables-grid {
     grid-template-columns: 1fr;
   }
 
-  .popup {
-    width: 90%;
+  .admin-popup-actions button {
+    font-size: 13px;
+    padding: 6px 8px;
+  }
+}
+
+
+
+
+/* ================= MOBILE RESPONSIVE ================= */
+@media (max-width: 768px) {
+  /* Tables page padding */
+  .admin-tables-page {
+    padding: 15px;
+  }
+
+  /* Title font smaller */
+  .admin-page-title {
+    font-size: 20px;
+    gap: 6px;
+  }
+
+  /* Add Table button full width */
+  .admin-add-table-section button {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 0;
+    font-size: 14px;
+  }
+
+  /* Stats bar vertical */
+  .admin-stats {
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  /* Table grid: single column with horizontal scroll if needed */
+  .admin-tables-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    overflow-x: hidden;
+  }
+
+  /* Table card smaller padding & font */
+  .admin-table-card {
+    padding: 12px;
+  }
+
+  .admin-table-card h3 {
+    font-size: 16px;
+  }
+
+  .admin-table-card p {
+    font-size: 13px;
+  }
+
+  /* QR & Waiter buttons full width */
+  .admin-qr-section button,
+  .admin-waiter-section button {
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  /* Popup width & font adjustment */
+  .admin-popup,
+  .admin-qr-popup-card {
+    width: 95%;
+    padding: 16px;
+  }
+
+  .admin-popup label,
+  .admin-popup input,
+  .admin-popup select,
+  .admin-popup textarea {
+    font-size: 13px;
+  }
+
+  .admin-popup-actions button {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  /* QR popup image smaller on mobile */
+  .admin-qr-popup-image {
+    width: 150px;
+    height: 150px;
+    margin: 15px auto;
+  }
+
+  /* Popup close button smaller */
+  .admin-popup-close,
+  .admin-qr-popup-close {
+    top: 8px;
+    right: 8px;
+  }
+}
+
+/* Optional: enable horizontal scroll for table grid if too wide */
+.admin-tables-grid {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+}
+
+
+/* ============================= */
+/* Mobile Responsive - Role Mgmt */
+/* ============================= */
+
+/* Tablet / small screens */
+@media (max-width: 768px) {
+  .admin-role-management-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .admin-page-title {
+    font-size: 1.3rem;
+    gap: 6px;
+  }
+
+  .admin-add-btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+
+  .admin-search-bar input {
+    padding: 6px 8px;
+    font-size: 0.9rem;
+  }
+
+  .admin-roles-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .admin-roles-table th,
+  .admin-roles-table td {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+
+  .admin-action-icons {
+    gap: 6px;
+  }
+
+  .admin-icon-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .admin-modal {
+    width: 95%;
+    max-height: 90vh;
+  }
+
+  .admin-modal-header h3 {
+    font-size: 1rem;
+  }
+
+  .admin-modal-body input {
+    padding: 6px 8px;
+    font-size: 0.85rem;
+  }
+
+  .admin-modal-footer button {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Mobile / very small screens */
+@media (max-width: 480px) {
+  .admin-page-title {
+    font-size: 1.1rem;
+    gap: 4px;
+  }
+
+  .admin-add-btn {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+
+  .admin-search-bar input {
+    padding: 5px 6px;
+    font-size: 0.8rem;
+  }
+
+  .admin-roles-table th,
+  .admin-roles-table td {
+    padding: 6px;
+    font-size: 0.8rem;
+  }
+
+  .admin-action-icons svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .admin-modal {
+    width: 98%;
+    max-height: 90vh;
+  }
+
+  .admin-modal-header h3 {
+    font-size: 0.95rem;
+  }
+
+  .admin-modal-body input {
+    padding: 5px 6px;
+    font-size: 0.8rem;
+  }
+
+  .admin-modal-footer button {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+}
+/* ============================= */
+/* Modal Footer Mobile Fix       */
+/* ============================= */
+@media (max-width: 768px) {
+  .admin-modal-footer {
+    flex-direction: column;       /* Stack buttons vertically */
+    align-items: stretch;         /* Make buttons full width */
+    gap: 8px;                     /* Spacing between buttons */
+    padding: 12px 16px;           /* Adjust padding */
+  }
+
+  .admin-modal-footer button {
+    width: 100%;                  /* Full width buttons */
+    padding: 10px 0;              /* Adjust vertical padding */
+    font-size: 0.9rem;            /* Slightly smaller font */
   }
 }
 
 @media (max-width: 480px) {
-  .popup {
-    width: 95%;
+  .admin-modal-footer {
+    gap: 6px;                     /* Smaller gap for very small screens */
+    padding: 10px 12px;           /* Reduce padding */
+  }
+
+  .admin-modal-footer button {
+    padding: 8px 0;               /* Compact button height */
+    font-size: 0.85rem;           /* Smaller font */
   }
 }

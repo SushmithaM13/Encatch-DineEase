@@ -78,36 +78,37 @@ export default function AdminRevenueManagement() {
     revenueFilter === "Weekly" ? 700 : revenueFilter === "Monthly" ? 1200 : 900;
 
   return (
-    <div className="revenue-page">
-      <h2 className="page-title">
+    <div className="admin-revenue-page">
+      <h2 className="admin-page-title">
         <IndianRupee size={25} /> Revenue Management
       </h2>
 
-   {/* Revenue Summary Cards */}
-<div className="revenue-cards">
-  <div className="card">
-    <h4>₹{todayRevenue.toLocaleString()}</h4>
-    <p>Daily Revenue</p>
-  </div>
-  <div className="card">
-    <h4>₹{weekRevenue.toLocaleString()}</h4>
-    <p>Weekly Revenue</p>
-  </div>
-  <div className="card">
-    <h4>₹{monthRevenue.toLocaleString()}</h4>
-    <p>Monthly Revenue</p>
-  </div>
-  <div className="card">
-    <h4>₹{yearRevenue.toLocaleString()}</h4>
-    <p>Yearly Revenue</p>
-  </div>
-</div>
+      {/* Revenue Summary Cards */}
+      <div className="admin-revenue-cards">
+        <div className="admin-card">
+          <h4>₹{todayRevenue.toLocaleString()}</h4>
+          <p>Daily Revenue</p>
+        </div>
+        <div className="admin-card">
+          <h4>₹{weekRevenue.toLocaleString()}</h4>
+          <p>Weekly Revenue</p>
+        </div>
+        <div className="admin-card">
+          <h4>₹{monthRevenue.toLocaleString()}</h4>
+          <p>Monthly Revenue</p>
+        </div>
+        <div className="admin-card">
+          <h4>₹{yearRevenue.toLocaleString()}</h4>
+          <p>Yearly Revenue</p>
+        </div>
+      </div>
 
       {/* Graph Box */}
       <div
+        className="admin-revenue-graph-box"
         style={{
           width: "100%",
-          overflowX: "auto", // enables horizontal scroll
+          overflowX: "auto",
           marginTop: 20,
           border: "1px solid #ddd",
           borderRadius: 8,
@@ -116,6 +117,7 @@ export default function AdminRevenueManagement() {
         }}
       >
         <div
+          className="admin-revenue-graph-header"
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -127,6 +129,7 @@ export default function AdminRevenueManagement() {
           <select
             value={revenueFilter}
             onChange={(e) => setRevenueFilter(e.target.value)}
+            className="admin-revenue-filter"
             style={{
               padding: "6px 12px",
               borderRadius: 6,
@@ -141,7 +144,10 @@ export default function AdminRevenueManagement() {
         </div>
 
         {revenueFilter === "Custom" && (
-          <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+          <div
+            className="admin-revenue-custom-dates"
+            style={{ display: "flex", gap: 10, marginBottom: 10 }}
+          >
             <DatePicker
               selected={customStart}
               onChange={(date) => setCustomStart(date)}
@@ -165,7 +171,7 @@ export default function AdminRevenueManagement() {
         )}
 
         {/* Scrollable Chart */}
-        <div style={{ minWidth: minChartWidth, height: 300 }}>
+        <div className="admin-revenue-chart-container" style={{ minWidth: minChartWidth, height: 300 }}>
           <LineChart width={minChartWidth} height={300} data={revenueData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis

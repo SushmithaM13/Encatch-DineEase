@@ -1,59 +1,356 @@
-.role-management {
-  padding: 20px;
+/* ========================================================= */
+/* 💙 Admin Role Add - Home Dashboard Theme                  */
+/* ========================================================= */
+
+.admin-role-add-page {
+  padding: 30px;
+  font-family: "Inter", sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #f8fafc;
+  color: #1e293b;
+  min-height: 100vh;
 }
 
-.role-form {
+/* ============================= */
+/* Title                         */
+/* ============================= */
+.admin-role-add-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-align: center;
+  color: #0f172a;
+  margin-bottom: 24px;
+}
+
+/* ============================= */
+/* Search Bar + Add Button       */
+/* ============================= */
+.admin-role-add-header {
   display: flex;
-  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
-}
-
-.role-form input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  flex: 1;
-}
-
-.role-form button {
-  background: #3b82f6;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.roles-list {
-  display: grid;
+  flex-wrap: wrap;
   gap: 12px;
 }
 
-.role-card {
-  padding: 12px;
-  border: 1px solid #eee;
+.admin-role-add-search input {
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
-  background: #f9f9f9;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background: #fff;
+  transition: all 0.25s ease;
 }
 
-.role-card h4 {
-  margin: 0 0 4px;
+.admin-role-add-search input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  outline: none;
 }
 
-.actions {
-  margin-top: 8px;
+.admin-role-add-btn {
   display: flex;
-  gap: 10px;
-}
-
-.actions button {
-  background: #f1f1f1;
+  align-items: center;
+  gap: 6px;
+  background: #2563eb;
+  color: #fff;
   border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 10px 18px;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+.admin-role-add-btn:hover {
+  background: #1e40af;
 }
 
-.actions button:hover {
-  background: #e0e0e0;
+/* ============================= */
+/* Table Styles                  */
+/* ============================= */
+.admin-role-add-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-top: 12px;
+}
+
+.admin-role-add-table th,
+.admin-role-add-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+.admin-role-add-table th {
+  background: #f1f5f9;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.admin-role-add-table tr:hover td {
+  background: #f8fafc;
+}
+
+.admin-role-add-loading,
+.admin-role-add-empty {
+  text-align: center;
+  padding: 20px;
+  color: #64748b;
+}
+
+/* ============================= */
+/* Action Buttons                */
+/* ============================= */
+.admin-role-add-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.admin-role-add-edit,
+.admin-role-add-delete {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.admin-role-add-edit {
+  background: #dbeafe;
+  color: #2563eb;
+}
+.admin-role-add-edit:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+.admin-role-add-delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.admin-role-add-delete:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* ============================= */
+/* Modal Overlay & Box           */
+/* ============================= */
+.admin-role-add-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.admin-role-add-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 420px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+  animation: fadeIn 0.3s ease;
+}
+
+/* Modal Header */
+.admin-role-add-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.admin-role-add-modal-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* Close Button */
+.admin-role-add-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  color: #475569;
+  transition: all 0.25s ease;
+}
+.admin-role-add-close-btn:hover {
+  color: #dc2626;
+}
+
+/* Modal Body */
+.admin-role-add-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.admin-role-add-modal-body input,
+.admin-role-add-modal-body select,
+.admin-role-add-modal-body textarea {
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background: #fff;
+  transition: all 0.25s ease;
+}
+.admin-role-add-modal-body input:focus,
+.admin-role-add-modal-body select:focus,
+.admin-role-add-modal-body textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  outline: none;
+}
+
+/* Modal Footer */
+.admin-role-add-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-role-add-page {
+    padding: 16px;
+  }
+  .admin-role-add-title {
+    font-size: 1.4rem;
+  }
+  .admin-role-add-table {
+    display: block;
+    overflow-x: auto;
+  }
+  .admin-role-add-modal {
+    width: 95%;
+  }
+  .admin-role-add-btn {
+    width: 100%;
+  }
+}
+
+/* ===== Toast Notifications ===== */
+.admin-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 16px 24px;
+  border-radius: 12px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+  z-index: 2000;
+  animation: slideInRight 0.3s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.admin-toast-success {
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+}
+
+.admin-toast-error {
+  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .admin-role-management-page {
+    padding: 20px;
+  }
+
+  .admin-page-title {
+    font-size: 1.5rem;
+  }
+
+  .admin-role-management-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-header-buttons {
+    justify-content: stretch;
+  }
+
+  .admin-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .admin-roles-table {
+    font-size: 0.9rem;
+  }
+
+  .admin-roles-table th,
+  .admin-roles-table td {
+    padding: 10px;
+  }
+
+  .admin-modal {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .admin-toast {
+    right: 10px;
+    left: 10px;
+    top: 10px;
+  }
 }

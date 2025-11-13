@@ -143,7 +143,7 @@ const CustomerMenuSection = ({selectedCategory,searchKeyword, ref, onMenuLoad}) 
               <div key={item.id} className="customer-menu-card">
                 <div className="customer-menu-img-wrap">
                   <img src={`data:image/jpeg;base64,${item.imageData}`} alt={item.itemName} />
-                  {item.isBestseller && <span className="badge bestseller">🔥 Bestseller</span>}
+                  {item.isBestseller && <span className="customer-badge bestseller">🔥 Bestseller</span>}
                 </div>
 
                 <div className="customer-menu-info">

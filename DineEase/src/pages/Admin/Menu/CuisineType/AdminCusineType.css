@@ -1,0 +1,206 @@
+/* ========== GLOBAL STYLES ========== */
+.admin-cusine-page {
+  padding: 30px;
+  background: linear-gradient(to bottom right, #fdfbfb, #ebedee);
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+  color: #222;
+}
+
+/* ========== TITLE ========== */
+.admin-cusine-page h2 {
+  text-align: center;
+  font-size: 26px;
+  font-weight: 600;
+  color: #2b2b2b;
+  margin-bottom: 20px;
+}
+
+/* ========== SUBTEXT ========== */
+.admin-cusine-page p {
+  text-align: center;
+  font-size: 16px;
+  color: #555;
+  max-width: 700px;
+  margin: 0 auto 30px auto;
+}
+
+/* ========== ADD SECTION ========== */
+.admin-cusine-add-section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.admin-cusine-add-heading {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.admin-cusine-add-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-cusine-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.admin-cusine-input:focus {
+  border-color: #007bff;
+}
+
+.admin-cusine-add-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.admin-cusine-add-btn:hover {
+  background-color: #0056b3;
+}
+
+/* ========== TABLE LIST ========== */
+.admin-cusine-list-section {
+  background: #fff;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.admin-cusine-list-heading {
+  font-size: 20px;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.admin-cusine-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-cusine-table th,
+.admin-cusine-table td {
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.admin-cusine-table th {
+  background-color: #f5f5f5;
+  color: #333;
+  font-weight: 600;
+}
+
+.admin-cusine-table td {
+  font-size: 15px;
+}
+
+.admin-cusine-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin: 0 5px;
+}
+
+.admin-cusine-edit-btn {
+  color: #007bff;
+}
+
+.admin-cusine-delete-btn {
+  color: #dc3545;
+}
+
+/* ========== POPUP ========== */
+.admin-cusine-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.admin-cusine-popup {
+  background: #fff;
+  padding: 25px;
+  border-radius: 15px;
+  width: 350px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.admin-cusine-popup-title {
+  font-size: 20px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.admin-cusine-popup-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  outline: none;
+}
+
+.admin-cusine-popup-input:focus {
+  border-color: #007bff;
+}
+
+.admin-cusine-popup-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.admin-cusine-update-btn {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.admin-cusine-update-btn:hover {
+  background: #218838;
+}
+
+.admin-cusine-cancel-btn {
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.admin-cusine-cancel-btn:hover {
+  background: #5a6268;
+}

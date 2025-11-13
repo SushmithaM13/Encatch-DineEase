@@ -11,7 +11,9 @@ const Login = () => {
   const [messageType, setMessageType] = useState("");
   const navigate = useNavigate();
 
+  // Check if already logged in
   useEffect(() => {
+    // Pre-fill username if "remember me" was checked
     const remembered = localStorage.getItem("rememberEmail");
     if (remembered) setUsername(remembered);
   }, []);
@@ -34,6 +36,7 @@ const Login = () => {
       setTypedMessage(message);
     }
   }, [message, messageType]);
+  // }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -72,16 +75,19 @@ const Login = () => {
         setTimeout(() => {
           switch (data.role) {
             case "SUPER_ADMIN":
-              navigate("/superAdminDashboard");
+              navigate("/superAdminDashboard", { replace: true });
               break;
             case "ADMIN":
-              navigate("/AdminDashboard");
+              navigate("/AdminDashboard", { replace: true });
               break;
             case "WAITER":
-              navigate("/WaiterDashboard");
+              navigate("/WaiterDashboard", { replace: true });
               break;
+              case "CHEF":
+              navigate("/ChefDashboard", { replace: true });
+              break
             default:
-              navigate("/");
+              navigate("/", { replace: true });
           }
         }, 2000);
       } else {
@@ -106,7 +112,6 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-container-left"></div>
-
       <div className="auth-container-right">
         <form onSubmit={handleLogin} className="auth-form">
           {/* Animated message above title */}
@@ -164,6 +169,8 @@ const Login = () => {
           </p>
         </form>
       </div>
+
+      {/* <ToastContainer position="top-center" autoClose={2000} /> */}
     </div>
   );
 };

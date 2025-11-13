@@ -141,7 +141,7 @@
 }
 
 /* Bestseller badge */
-.badge.bestseller {
+.customer-badge.bestseller {
   position: absolute;
   top: 8px;
   left: 8px;

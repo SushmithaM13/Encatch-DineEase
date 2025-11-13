@@ -1,44 +1,146 @@
-.revenue-container {
+/* ============================= */
+/* 🍛 Admin Revenue Management Styles */
+/* ============================= */
+
+.admin-revenue-page {
   padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  min-height: 100vh;
 }
 
-.revenue-cards {
+/* Page Title */
+.admin-page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #222;
   display: flex;
-  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Revenue Summary Cards */
+.admin-revenue-cards {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
   margin-bottom: 20px;
 }
 
-.card {
-  flex: 1;
+.admin-card {
+  flex: 1 1 200px;
   background: #fff;
-  padding: 15px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 16px;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.revenue-chart {
-  margin: 30px 0;
+.admin-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.admin-card h4 {
+  font-size: 20px;
+  margin-bottom: 6px;
+  color: #111;
+}
+
+.admin-card p {
+  font-size: 14px;
+  color: #555;
+  margin: 0;
+}
+
+/* Graph Box */
+.admin-revenue-graph-box {
   background: #fff;
-  padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #ddd;
+  padding: 15px;
+  overflow-x: auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.revenue-table {
+/* Graph Header */
+.admin-revenue-graph-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.admin-revenue-graph-header h3 {
+  font-size: 18px;
+  color: #111;
+  margin: 0;
+}
+
+.admin-revenue-filter {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
   background: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  font-size: 14px;
 }
 
-.revenue-table table {
-  width: 100%;
-  border-collapse: collapse;
+.admin-revenue-filter:hover {
+  border-color: #888;
 }
 
-.revenue-table th, .revenue-table td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
+/* Custom Date Picker */
+.admin-revenue-custom-dates {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* Chart Container */
+.admin-revenue-chart-container {
+  min-height: 300px;
+}
+
+/* Scrollbar Styling */
+.admin-revenue-graph-box::-webkit-scrollbar {
+  height: 6px;
+}
+
+.admin-revenue-graph-box::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 6px;
+}
+
+.admin-revenue-graph-box::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-revenue-cards {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-page-title {
+    font-size: 20px;
+  }
+
+  .admin-card h4 {
+    font-size: 18px;
+  }
+
+  .admin-revenue-graph-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
 }
