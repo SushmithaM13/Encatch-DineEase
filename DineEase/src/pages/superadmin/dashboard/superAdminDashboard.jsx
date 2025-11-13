@@ -47,13 +47,14 @@ const SuperAdminDashboard = () => {
   ];
 
   const menuOptions = [
-    { path: "/superAdminDashboard/Menu/category", label: "Add Category", icon: <FaFolder /> },
-    { path: "/superAdminDashboard/Menu/item", label: "Add Item", icon: <FaPlusCircle /> },
-    { path: "/superAdminDashboard/Menu/food", label: "Food Type", icon: <FaUtensils /> },
-    { path: "/superAdminDashboard/Menu/cuisine", label: "Cuisine Type", icon: <FaBars /> },
-    { path: "/superAdminDashboard/Menu/variant", label: "Add Variant", icon: <FaTags /> },
-    { path: "/superAdminDashboard/Menu/addon", label: "Add Addon", icon: <FaPuzzlePiece /> },
-    { path: "/superAdminDashboard/Menu/customization", label: "Customization Group", icon: <FaMagic /> },
+   //  { path: "/superAdminDashboard/menu-dashboard", label: "Menu Dashboard", icon: <FaChartBar /> },
+    { path: "/superAdminDashboard/category-form", label: "Add Category", icon: <FaFolder /> },
+    { path: "/superAdminDashboard/add-item-type", label: "Add Item", icon: <FaPlusCircle /> },
+    { path: "/superAdminDashboard/food-type", label: "Food Type", icon: <FaUtensils /> },
+    { path: "/superAdminDashboard/cuisine-type", label: "Cuisine Type", icon: <FaBars /> },
+    { path: "/superAdminDashboard/variant-form", label: "Add Variant", icon: <FaTags /> },
+    { path: "/superAdminDashboard/addon-form", label: "Add Addon", icon: <FaPuzzlePiece /> },
+    { path: "/superAdminDashboard/customization-group-form", label: "Customization Group", icon: <FaMagic /> },
   ];
 
   useEffect(() => {
@@ -61,6 +62,7 @@ const SuperAdminDashboard = () => {
     try {
       const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
       setHotels(storedHotels);
+      console.log(storedHotels)
     } catch (e) {
       console.error("Invalid hotels data in localStorage:", e);
       setHotels([]);
@@ -320,6 +322,10 @@ const SuperAdminDashboard = () => {
         </div>
 
         <Outlet context={{ hotels }} />
+        <p style={{ color: 'white' }}></p>
+
+
+
       </main>
     </div>
   );
