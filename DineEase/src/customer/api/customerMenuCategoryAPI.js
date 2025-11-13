@@ -31,23 +31,3 @@ export const fetchMenuCategories = async (orgId) => {
 };
 
 
-// export const fetchMenuCategories = async (orgId) => {
-//   try {
-//     const res = await fetch(
-//       `http://localhost:8082/dine-ease/api/v1/menu-category/${orgId}?page=0&size=10&sortBy=id&sortDir=desc`
-//     );
-
-//     if (!res.ok) {
-//       throw new Error(`HTTP error! status: ${res.status}`);
-//     }
-
-//     const data = await res.json();
-//     return data.content || [];
-//   } catch (error) {
-//     console.error("Error fetching menu categories:", error);
-//     throw error;
-//   }
-// };
-
-
-
