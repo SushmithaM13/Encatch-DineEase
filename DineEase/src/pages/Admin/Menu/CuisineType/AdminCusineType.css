@@ -204,3 +204,98 @@
 .admin-cusine-cancel-btn:hover {
   background: #5a6268;
 }
+
+/* Overlay background */
+.admin-cusine-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Popup container */
+.admin-cusine-popup {
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  width: 400px;
+  max-width: 90%;
+  text-align: center;
+  animation: popupFade 0.3s ease-in-out;
+}
+
+/* Popup title */
+.admin-cusine-popup-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Popup message text */
+.admin-cusine-popup p {
+  font-size: 16px;
+  margin-bottom: 20px;
+  color: #555;
+}
+
+/* Actions container */
+.admin-cusine-popup-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+/* Delete confirm button */
+.admin-cusine-delete-confirm-btn {
+  background-color: #e53935; /* red */
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.admin-cusine-delete-confirm-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Cancel / OK button */
+.admin-cusine-cancel-btn {
+  background-color: #ccc; /* gray */
+  color: #333;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.admin-cusine-cancel-btn:hover {
+  background-color: #bbb;
+}
+
+/* Popup animation */
+@keyframes popupFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Optional: make strong text stand out */
+.admin-cusine-popup p strong {
+  color: #e53935;
+}

@@ -1,285 +1,224 @@
-/* ===== Admin Add-Ons Management Page ===== */
+/* =============== PAGE CONTAINER =============== */
 .admin-addons-page {
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(to bottom right, #fdfbfb, #ebedee);
+  padding: 20px;
+  background: #f9fafb;
   min-height: 100vh;
-  padding: 30px;
-  color: #222;
+  font-family: "Inter", sans-serif;
 }
 
-/* ===== Headings ===== */
-.admin-addons-title {
-  text-align: center;
-  font-size: 28px;
-  font-weight: 600;
-  margin-bottom: 25px;
-  color: #2c3e50;
-}
-
-.admin-addons-subtitle {
-  margin-top: 40px;
-  font-size: 22px;
-  font-weight: 500;
-  color: #34495e;
-  border-bottom: 2px solid #ddd;
-  padding-bottom: 8px;
-}
-
-/* ===== Form Styling ===== */
-.admin-addons-form {
-  background-color: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  padding: 25px;
-  max-width: 600px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.admin-addons-input,
-.admin-addons-textarea,
-.admin-addons-select,
-.admin-addons-file {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 15px;
-  outline: none;
-  transition: all 0.3s ease;
-}
-
-.admin-addons-input:focus,
-.admin-addons-textarea:focus,
-.admin-addons-select:focus,
-.admin-addons-file:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-}
-
-.admin-addons-textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-/* ===== Buttons ===== */
-.admin-addons-btn-group {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.admin-addons-submit-btn,
-.admin-addons-cancel-btn {
-  border: none;
-  border-radius: 8px;
-  padding: 10px 18px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
-}
-
-.admin-addons-submit-btn {
-  background-color: #007bff;
-  color: #fff;
-}
-
-.admin-addons-submit-btn:hover {
-  background-color: #0056b3;
-}
-
-.admin-addons-cancel-btn {
-  background-color: #e74c3c;
-  color: #fff;
-}
-
-.admin-addons-cancel-btn:hover {
-  background-color: #c0392b;
-}
-
-/* ===== Add-On List ===== */
-.admin-addons-list {
-  margin-top: 25px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
-}
-
-.admin-addons-empty {
-  text-align: center;
-  color: #888;
-  font-style: italic;
-}
-
-/* ===== Add-On Card ===== */
-.admin-addons-card {
-  background-color: #fff;
-  border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  display: flex;
-  align-items: flex-start;
-  gap: 15px;
-}
-
-.admin-addons-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* ===== Image ===== */
-.admin-addons-image {
-  width: 90px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-}
-
-/* ===== Info Section ===== */
-.admin-addons-info {
-  flex: 1;
-}
-
-.admin-addons-name {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 5px;
-  color: #2c3e50;
-}
-
-.admin-addons-description {
-  font-size: 14px;
-  color: #555;
-  margin-bottom: 6px;
-}
-
-.admin-addons-price {
-  font-weight: 600;
-  color: #16a085;
-  margin-bottom: 5px;
-}
-
-.admin-addons-type {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 8px;
-}
-
-/* ===== Status Labels ===== */
-.admin-addons-status {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #fff;
-  margin-bottom: 8px;
-}
-
-.admin-addons-status.available {
-  background-color: #28a745;
-}
-
-.admin-addons-status.unavailable {
-  background-color: #dc3545;
-}
-
-/* ===== Edit Button ===== */
-.admin-addons-edit-btn {
-  border: none;
-  background-color: #f39c12;
-  color: #fff;
-  border-radius: 6px;
-  padding: 6px 12px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.3s ease;
-}
-
-.admin-addons-edit-btn:hover {
-  background-color: #d68910;
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 600px) {
-  .admin-addons-form {
-    padding: 20px;
-  }
-
-  .admin-addons-card {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .admin-addons-image {
-    width: 100%;
-    height: 180px;
-  }
-
-  .admin-addons-btn-group {
-    flex-direction: column;
-    gap: 8px;
-  }
-}
+/* ===== HEADER ===== */
 .admin-addons-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
-.admin-addons-add-btn {
-  background-color: #007bff;
+.admin-addons-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.admin-addons-header button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #2563eb;
   color: #fff;
+  padding: 8px 14px;
   border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: 0.2s ease-in-out;
+  font-size: 14px;
 }
 
-.admin-addons-add-btn:hover {
-  background-color: #0056b3;
+.admin-addons-header button:hover {
+  background: #1d4ed8;
 }
 
-/* ===== Modal Styles ===== */
+/* =============== MODAL =============== */
 .admin-addons-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 1000;
+  justify-content: center;
+  z-index: 50;
 }
 
 .admin-addons-modal {
   background: #fff;
-  padding: 25px;
-  border-radius: 10px;
-  width: 400px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  position: relative;
-  animation: fadeIn 0.3s ease-in-out;
+  padding: 25px 30px;
+  border-radius: 12px;
+  width: 380px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  animation: popupScale 0.2s ease;
+}
+
+@keyframes popupScale {
+  from {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .admin-addons-modal h3 {
+  font-size: 18px;
+  font-weight: 600;
   margin-bottom: 15px;
-  text-align: center;
-  color: #333;
+  color: #111827;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+/* =============== FORM =============== */
+.admin-addons-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-addons-modal input,
+.admin-addons-modal select,
+.admin-addons-modal textarea {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.admin-addons-modal input:focus,
+.admin-addons-modal select:focus,
+.admin-addons-modal textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.admin-addons-btn-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.admin-addons-btn-group button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s;
+  border: none;
+}
+
+.admin-addons-btn-group button[type="submit"] {
+  background: #2563eb;
+  color: #fff;
+}
+
+.admin-addons-btn-group button[type="submit"]:hover {
+  background: #1d4ed8;
+}
+
+.admin-addons-btn-group button[type="button"] {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.admin-addons-btn-group button[type="button"]:hover {
+  background: #e5e7eb;
+}
+
+.admin-addons-delete-confirm-btn {
+  background: #dc2626;
+  color: white;
+}
+
+.admin-addons-delete-confirm-btn:hover {
+  background: #b91c1c;
+}
+
+/* =============== TABLE =============== */
+.admin-addons-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.admin-addons-table th,
+.admin-addons-table td {
+  padding: 12px 18px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+  font-size: 14px;
+  color: #374151;
+}
+
+.admin-addons-table th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+
+.admin-addons-table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+/* =============== TABLE ACTION BUTTONS =============== */
+.admin-addons-table td button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+}
+
+.admin-addons-table td button:first-child {
+  background: #e0f2fe;
+  color: #0369a1;
+  margin-right: 5px;
+}
+
+.admin-addons-table td button:first-child:hover {
+  background: #bae6fd;
+}
+
+.admin-addons-table td button:last-child {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.admin-addons-table td button:last-child:hover {
+  background: #fecaca;
+}
+
+/* =============== IMAGE IN TABLE =============== */
+.addon-img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* =============== EMPTY TABLE ROW =============== */
+.admin-addons-table td[colspan] {
+  text-align: center;
+  color: #6b7280;
+  padding: 25px 0;
+  font-size: 15px;
 }

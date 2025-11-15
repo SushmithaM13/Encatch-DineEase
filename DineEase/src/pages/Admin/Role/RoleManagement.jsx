@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { Plus, Edit, Trash2, X, User } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
@@ -18,7 +19,7 @@ export default function AdminRoleManagement() {
   const [loading, setLoading] = useState(false);
   const [organizationId, setOrganizationId] = useState("");
 
-  // ✅ Fetch organization ID
+  //  Fetch organization ID
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -36,7 +37,7 @@ export default function AdminRoleManagement() {
     if (TOKEN) fetchProfile();
   }, [TOKEN]);
 
-  // ✅ Fetch roles
+  //  Fetch roles
   const fetchRoles = async () => {
     if (!TOKEN || !organizationId) return;
     setLoading(true);
@@ -47,11 +48,14 @@ export default function AdminRoleManagement() {
       if (!res.ok) throw new Error("Failed to fetch roles");
       const data = await res.json();
 
-      // 🧠 Normalize key name if backend uses staffDescription
+      // Normalize key name if backend uses staffDescription
       const normalized = data.map((r) => ({
         ...r,
         staffDescription: r.staffDescription || r.staffRoleDescription || "",
-      }));
+      }))
+      .filter(
+        (r) => r.staffRoleName.toLowerCase() !== "admin"
+      );
 
       setRoles(normalized.sort((a, b) => a.id - b.id));
     } catch (err) {
@@ -67,13 +71,13 @@ export default function AdminRoleManagement() {
     if (organizationId) fetchRoles();
   }, [organizationId]);
 
-  // ✅ Handle input
+  //  Handle input
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
 
-  // ✅ Add / Update role
+  //  Add / Update role
   const handleAddOrUpdate = async () => {
     if (!form.staffRoleName || !form.staffDescription) {
       toast.error("Please fill all fields", { position: "top-center" });
@@ -98,7 +102,7 @@ export default function AdminRoleManagement() {
 
       const payload = {
         staffRoleName: form.staffRoleName,
-        staffRoleDescription: form.staffDescription, // ✅ backend expects this
+        staffRoleDescription: form.staffDescription, 
       };
 
       const res = await fetch(url, {
@@ -129,7 +133,7 @@ export default function AdminRoleManagement() {
     }
   };
 
-  // ✅ Delete role
+  //  Delete role
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this role?")) return;
     try {
@@ -146,7 +150,7 @@ export default function AdminRoleManagement() {
     }
   };
 
-  // ✅ Search
+  //  Search
   const filteredRoles = roles.filter(
     (r) =>
       r.staffRoleName.toLowerCase().includes(searchTerm.toLowerCase()) ||
