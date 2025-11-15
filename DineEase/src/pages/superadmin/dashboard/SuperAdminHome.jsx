@@ -124,31 +124,41 @@ const DashboardHome = () => {
     setEditData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleUpdate = (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem("token");
+ 
+const handleUpdate = (e) => {
+  e.preventDefault();
+  const token = localStorage.getItem("token");
 
-    fetch(`${API_BASE}/admin/organization/update`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(editData),
+  fetch(`${API_BASE}/admin/organization/update`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(editData),
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Update failed");
+      return res.json();
     })
-      .then((res) => {
-        if (!res.ok) throw new Error("Update failed");
-        return res.json();
-      })
-      .then((updatedData) => {
-        setHotel(updatedData);
-        setShowPopup(false);
-        alert("Organization details updated successfully!");
-      })
-      .catch((err) => console.error("Error updating:", err));
-  };
+    .then((updatedData) => {
+      setHotel(updatedData);
+      setShowPopup(false);
 
-  return (
+      // ⭐ Save updated names to localStorage
+      localStorage.setItem("organizationName", updatedData.organizationName || "");
+      localStorage.setItem("organizationFullName", updatedData.organizationName || "");
+
+      // ⭐ Notify other components immediately
+      window.dispatchEvent(new Event("storage"));
+
+      alert("Organization details updated successfully!");
+    })
+    .catch((err) => console.log(err));
+};
+
+
+  return(
     <div className="dashboard-container">
       {/* Welcome Header */}
       <div className="welcome-header">
@@ -228,10 +238,7 @@ const DashboardHome = () => {
                 <span className="org-label">Organization Name</span>
                 <span className="org-value">{hotel.organizationName || "N/A"}</span>
               </div>
-              <div className="org-item">
-                <span className="org-label">Full Name</span>
-                <span className="org-value">{hotel.FullName || "N/A"}</span>
-              </div>
+              
               <div className="org-item">
                 <span className="org-label">Business Type</span>
                 <span className="org-value">{hotel.businessType || "N/A"}</span>

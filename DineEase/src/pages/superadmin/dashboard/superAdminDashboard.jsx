@@ -29,7 +29,7 @@ const SuperAdminDashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
   const [dashboardDropdownOpen, setDashboardDropdownOpen] = useState(false);
-  const [staffDropdownOpen, setStaffDropdownOpen] = useState(false); // staff management dropdown
+  const [staffDropdownOpen, setStaffDropdownOpen] = useState(false);
   const [userName, setUserName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -47,7 +47,6 @@ const SuperAdminDashboard = () => {
   ];
 
   const menuOptions = [
-   //  { path: "/superAdminDashboard/menu-dashboard", label: "Menu Dashboard", icon: <FaChartBar /> },
     { path: "/superAdminDashboard/category-form", label: "Add Category", icon: <FaFolder /> },
     { path: "/superAdminDashboard/add-item-type", label: "Add Item", icon: <FaPlusCircle /> },
     { path: "/superAdminDashboard/food-type", label: "Food Type", icon: <FaUtensils /> },
@@ -58,34 +57,27 @@ const SuperAdminDashboard = () => {
   ];
 
   useEffect(() => {
-
     try {
       const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
       setHotels(storedHotels);
-      console.log(storedHotels)
-    } catch (e) {
-      console.error("Invalid hotels data in localStorage:", e);
+    } catch {
       setHotels([]);
     }
 
     try {
       const storedUserRaw = localStorage.getItem("user");
-      const storedUser = storedUserRaw && storedUserRaw !== "undefined"
-        ? JSON.parse(storedUserRaw)
-        : {};
+      const storedUser =
+        storedUserRaw && storedUserRaw !== "undefined"
+          ? JSON.parse(storedUserRaw)
+          : {};
 
-      // ✅ Check for name from localStorage (saved by Profile page)
       const profileFullName = localStorage.getItem("superAdminFullName");
 
       setUserName(profileFullName || storedUser?.name || "User");
-    } catch (e) {
-      console.error("Invalid user data in localStorage:", e);
+    } catch {
       setUserName("User");
     }
 
-
-
-    // Load organization info
     try {
       const storedOrgRaw = localStorage.getItem("organization");
       const storedOrg =
@@ -97,11 +89,10 @@ const SuperAdminDashboard = () => {
         setOrganizationName(storedOrg.name || "");
         setOrganizationFullName(storedOrg.fullName || "");
       }
-    } catch (e) {
-      console.error("Invalid organization data in localStorage:", e);
+    } catch {
       setOrganizationName("");
       setOrganizationFullName("");
-      localStorage.removeItem("organization"); // remove bad data
+      localStorage.removeItem("organization");
     }
 
     const orgName = localStorage.getItem("organizationName");
@@ -126,7 +117,6 @@ const SuperAdminDashboard = () => {
 
   const handleMobileMenuClose = () => setMobileMenuOpen(false);
 
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -137,7 +127,6 @@ const SuperAdminDashboard = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Prevent back navigation for logged-in SuperAdmin
   useEffect(() => {
     const handlePopState = () => {
       const token = localStorage.getItem("token");
@@ -151,7 +140,6 @@ const SuperAdminDashboard = () => {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  //  Logout
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -173,7 +161,6 @@ const SuperAdminDashboard = () => {
     }
   };
 
-  //  Search functionality
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (searchQuery.trim() !== "") {
@@ -195,7 +182,11 @@ const SuperAdminDashboard = () => {
 
       <aside className={`sidebar ${sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed"} ${mobileMenuOpen ? "mobile-open" : ""}`}>
         <div className="sidebar-header">
-          <div className="logo-container" onClick={() => { navigate("/superAdminDashboard"); window.location.reload(); }} style={{ cursor: "pointer" }}>
+          <div
+            className="logo-container"
+            onClick={() => { navigate("/superAdminDashboard"); window.location.reload(); }}
+            style={{ cursor: "pointer" }}
+          >
             <div className="logo-icon"><SoupIcon size={58} /></div>
             {sidebarOpen && <h2 className="logo">DINE_EASE</h2>}
           </div>
@@ -204,19 +195,27 @@ const SuperAdminDashboard = () => {
         <ul className="sidebar-menu">
           {/* Dashboard Dropdown */}
           <li className={`menu-dropdown ${dashboardDropdownOpen ? "active" : ""}`}>
-            <div className="menu-link" onClick={() => setDashboardDropdownOpen(prev => !prev)}>
+            <div className="menu-link" onClick={() => setDashboardDropdownOpen((prev) => !prev)}>
               <FaHome />
-              {sidebarOpen && <>
-                <span>Super Admin Console</span>
-                <FaChevronRight className={`dropdown-icon ${dashboardDropdownOpen ? "rotated" : ""}`} />
-              </>}
+              {sidebarOpen && (
+                <>
+                  <span>Super Admin Console</span>
+                  <FaChevronRight className={`dropdown-icon ${dashboardDropdownOpen ? "rotated" : ""}`} />
+                </>
+              )}
             </div>
+
             {dashboardDropdownOpen && sidebarOpen && (
               <ul className="submenu">
                 {dashboardOptions.map((option) => (
                   <li key={option.path}>
-                    <NavLink to={option.path} onClick={() => { if (window.innerWidth <= 768) handleMobileMenuClose(); }}>
-                      {option.icon}<span>{option.label}</span>
+                    <NavLink
+                      to={option.path}
+                      onClick={() => {
+                        if (window.innerWidth <= 768) handleMobileMenuClose();
+                      }}
+                    >
+                      {option.icon} <span>{option.label}</span>
                     </NavLink>
                   </li>
                 ))}
@@ -224,46 +223,68 @@ const SuperAdminDashboard = () => {
             )}
           </li>
 
-          {/* Staff Management Dropdown */}
+          {/* Staff Dropdown */}
           <li className={`menu-dropdown ${staffDropdownOpen ? "active" : ""}`}>
-            <div className="menu-link" onClick={() => setStaffDropdownOpen(prev => !prev)}>
+            <div className="menu-link" onClick={() => setStaffDropdownOpen((prev) => !prev)}>
               <FaUsers />
-              {sidebarOpen && <>
-                <span>Staff Management</span>
-                <FaChevronRight className={`dropdown-icon ${staffDropdownOpen ? "rotated" : ""}`} />
-              </>}
+              {sidebarOpen && (
+                <>
+                  <span>Staff Management</span>
+                  <FaChevronRight className={`dropdown-icon ${staffDropdownOpen ? "rotated" : ""}`} />
+                </>
+              )}
             </div>
+
             {staffDropdownOpen && sidebarOpen && (
               <ul className="submenu">
                 <li>
-                  <NavLink to="/superAdminDashboard/staff" onClick={() => { if (window.innerWidth <= 768) handleMobileMenuClose(); }}>
-                    <FaUsers /><span>Staff</span>
+                  <NavLink
+                    to="/superAdminDashboard/staff"
+                    onClick={() => {
+                      if (window.innerWidth <= 768) handleMobileMenuClose();
+                    }}
+                  >
+                    <FaUsers /> <span>Staff</span>
                   </NavLink>
                 </li>
+
                 <li>
-                  <NavLink to="/superAdminDashboard/staffrole" onClick={() => { if (window.innerWidth <= 768) handleMobileMenuClose(); }}>
-                    <FaIdBadge /><span>Staff Role</span>
+                  <NavLink
+                    to="/superAdminDashboard/staffrole"
+                    onClick={() => {
+                      if (window.innerWidth <= 768) handleMobileMenuClose();
+                    }}
+                  >
+                    <FaIdBadge /> <span>Staff Role</span>
                   </NavLink>
                 </li>
               </ul>
             )}
           </li>
 
-          {/* Menu Dashboard Dropdown */}
+          {/* Menu Dropdown */}
           <li className={`menu-dropdown ${menuDropdownOpen ? "active" : ""}`}>
-            <div className="menu-link" onClick={() => setMenuDropdownOpen(prev => !prev)}>
+            <div className="menu-link" onClick={() => setMenuDropdownOpen((prev) => !prev)}>
               <FaUtensils />
-              {sidebarOpen && <>
-                <span>Menu Dashboard</span>
-                <FaChevronRight className={`dropdown-icon ${menuDropdownOpen ? "rotated" : ""}`} />
-              </>}
+              {sidebarOpen && (
+                <>
+                  <span>Menu Dashboard</span>
+                  <FaChevronRight className={`dropdown-icon ${menuDropdownOpen ? "rotated" : ""}`} />
+                </>
+              )}
             </div>
+
             {menuDropdownOpen && sidebarOpen && (
               <ul className="submenu">
                 {menuOptions.map((option) => (
                   <li key={option.path}>
-                    <NavLink to={option.path} onClick={() => { if (window.innerWidth <= 768) handleMobileMenuClose(); }}>
-                      {option.icon}<span>{option.label}</span>
+                    <NavLink
+                      to={option.path}
+                      onClick={() => {
+                        if (window.innerWidth <= 768) handleMobileMenuClose();
+                      }}
+                    >
+                      {option.icon} <span>{option.label}</span>
                     </NavLink>
                   </li>
                 ))}
@@ -273,7 +294,8 @@ const SuperAdminDashboard = () => {
 
           <li>
             <NavLink to="/superAdminDashboard/table">
-              <FaTable />{sidebarOpen && <span>Table Management</span>}
+              <FaTable />
+              {sidebarOpen && <span>Table Management</span>}
             </NavLink>
           </li>
         </ul>
@@ -282,39 +304,77 @@ const SuperAdminDashboard = () => {
       {/* Main Content */}
       <main className="main-content">
         <div className="topbar">
-          <div className={`menu-toggle ${mobileMenuOpen || !sidebarOpen ? "active" : ""}`} onClick={() => {
-            if (window.innerWidth <= 768) setMobileMenuOpen(prev => !prev);
-            else setSidebarOpen(prev => { const newState = !prev; localStorage.setItem("sidebarOpen", JSON.stringify(newState)); return newState; });
-          }}>
-            <span></span><span></span><span></span>
+          <div
+            className={`menu-toggle ${mobileMenuOpen || !sidebarOpen ? "active" : ""}`}
+            onClick={() => {
+              if (window.innerWidth <= 768) setMobileMenuOpen((prev) => !prev);
+              else
+                setSidebarOpen((prev) => {
+                  const newState = !prev;
+                  localStorage.setItem("sidebarOpen", JSON.stringify(newState));
+                  return newState;
+                });
+            }}
+          >
+            <span></span> <span></span> <span></span>
           </div>
 
+          {/* Search Bar */}
           <div className="search-bar">
             <FaSearch className="Search-icon" />
-            <input type="text" placeholder="Search here..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            <input
+              type="text"
+              placeholder="Search here..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+
             {searchResults.length > 0 && (
               <div className="search-results">
-                {searchResults.map((item, idx) => <div key={idx} className="search-item">{item.name || item.title}</div>)}
+                {searchResults.map((item, idx) => (
+                  <div key={idx} className="search-item">
+                    {item.name || item.title}
+                  </div>
+                ))}
               </div>
             )}
           </div>
 
+          {/* Center Organization Title */}
           <div className="organization-center">
-            <h2 className="organization-title">{organizationName || "Organization Name"}</h2>
+            <h2 className="organization-title">
+              {organizationName || "Organization Name"}
+            </h2>
           </div>
 
+          {/* Profile */}
           <div className="topbar-actions" ref={dropdownRef}>
             <button className="icon-btn notification-btn"></button>
+
             <div className="profile-info">
-              <div className="hello-bubble" onClick={() => setDropdownOpen(prev => !prev)}>
+              <div
+                className="hello-bubble"
+                onClick={() => setDropdownOpen((prev) => !prev)}
+              >
                 <span>Hello, {organizationFullName || userName}</span>
-                <img src="https://via.placeholder.com/40" alt="profile" className="profile-avatar-curved" />
+                <img
+                  src="https://via.placeholder.com/40"
+                  alt="profile"
+                  className="profile-avatar-curved"
+                />
               </div>
+
               {dropdownOpen && (
                 <div className="profile-dropdown">
-                  <button onClick={() => navigate("/superAdminDashboard/profile")}><FaIdBadge /> Profile</button>
-                  <button onClick={() => navigate("/superAdminDashboard/settings")}><FaCog /> Settings</button>
-                  <button className="logout-btn" onClick={handleLogout}><FaSignOutAlt /> Logout</button>
+                  <button onClick={() => navigate("/superAdminDashboard/profile")}>
+                    <FaIdBadge /> Profile
+                  </button>
+                  <button onClick={() => navigate("/superAdminDashboard/settings")}>
+                    <FaCog /> Settings
+                  </button>
+                  <button className="logout-btn" onClick={handleLogout}>
+                    <FaSignOutAlt /> Logout
+                  </button>
                 </div>
               )}
             </div>
@@ -322,10 +382,7 @@ const SuperAdminDashboard = () => {
         </div>
 
         <Outlet context={{ hotels }} />
-        <p style={{ color: 'white' }}></p>
-
-
-
+        <p style={{ color: "white" }}></p>
       </main>
     </div>
   );

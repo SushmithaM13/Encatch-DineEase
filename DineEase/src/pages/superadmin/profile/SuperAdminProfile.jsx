@@ -63,6 +63,9 @@ export default function SuperAdminProfile() {
       toast.success("Profile updated successfully!");
       setProfile(formData);
       setEditing(false);
+      
+ localStorage.setItem("superAdminFullName", formData.fullName);
+
     } catch (err) {
       toast.error(err.message || "Update failed");
     }
