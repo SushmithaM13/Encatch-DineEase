@@ -10,6 +10,7 @@ export default function ItemType() {
   const itemsPerPage = 5;
 
   const organizationId = localStorage.getItem("organizationId");
+  console.log("orgsnizationid for additemstype:", organizationId)
   const token = localStorage.getItem("token");
 
   // === Fetch Item Types (GET) ===
@@ -26,6 +27,7 @@ export default function ItemType() {
       );
       if (!res.ok) throw new Error("Failed to fetch item types");
       const data = await res.json();
+      console.log("data for additemtype",data);
       setItemTypes(data);
     } catch (err) {
       console.error("Error fetching item types:", err);

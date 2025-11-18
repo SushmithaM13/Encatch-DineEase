@@ -158,10 +158,9 @@ const DashboardHome = () => {
       {/* Welcome Header */}
       <div className="welcome-header">
         <div>
-          {/* <h1 className="welcome-title">Dashboard</h1> */}
-          <h2 className="welcome-subtitle">Welcome to DINE_EASE ! ! ! ..</h2>
+          <h2 className="welcome-subtitle">Welcome to Dine_Ease ! ! ! ..</h2>
         </div>
-
+        
       </div>
 
       {/* Stats Cards */}

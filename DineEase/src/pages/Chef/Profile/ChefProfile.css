@@ -1,0 +1,221 @@
+:root {
+  --primary: #16a34a;
+  --primary-dark: #0f7a34;
+  --text: #1a1a1a;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --bg: #f8fafc;
+  --card: #ffffff;
+}
+
+/* Base */
+.chef-profile-page {
+  min-height: 100vh;
+  padding: clamp(16px, 2vw, 32px);
+  background: var(--bg);
+  font-family: "Inter", sans-serif;
+}
+
+.chef-profile-heading {
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+/* Card Container */
+.chef-profile-container {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: clamp(18px, 2vw, 32px);
+  background: var(--card);
+  padding: clamp(16px, 2vw, 32px);
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,0.08);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.08);
+}
+
+/* Left Panel Form */
+.chef-profile-details section {
+  margin-bottom: clamp(16px, 2vw, 28px);
+}
+
+.chef-profile-details h3 {
+  font-size: clamp(14px, 1.4vw, 17px);
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.chef-profile-details label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.chef-profile-details input {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  font-size: 0.95rem;
+  transition: 0.2s;
+}
+
+.chef-profile-details input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(22,163,74,0.15);
+  outline: none;
+}
+
+.chef-profile-details input:disabled {
+  background: #f2f3f5;
+  color: var(--muted);
+}
+
+/* Password Box */
+.chef-password-box input {
+  margin-bottom: 8px;
+}
+
+.chef-password-box button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.chef-password-box button:first-child {
+  background: var(--primary);
+  color: #fff;
+}
+
+.chef-password-box button:last-child {
+  background: #e5e7eb;
+  color: #000;
+}
+
+/* Action Buttons */
+.chef-action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.chef-action-buttons button {
+  flex: 1;
+  padding: 11px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: 0.2s;
+}
+
+.chef-action-buttons button:first-child {
+  background: var(--primary);
+  color: #fff;
+}
+
+.chef-action-buttons button:last-child {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* Right Profile Card */
+.chef-profile-picture {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+}
+
+.chef-image-wrapper {
+  position: relative;
+}
+
+.chef-circle-img {
+  width: clamp(130px, 22vw, 180px);
+  height: clamp(130px, 22vw, 180px);
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--primary);
+  background: #f0f0f0;
+  font-size: clamp(38px, 4vw, 50px);
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Menu top of image */
+.chef-menu-container {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+}
+
+.chef-menu-button {
+  padding: 8px;
+  background: #fff;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: 0.2s;
+}
+
+.chef-menu-button:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* Dropdown */
+.chef-dropdown-menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: white;
+  width: 160px;
+  border-radius: 12px;
+  padding: 6px 0;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+}
+
+.chef-dropdown-item {
+  padding: 10px 12px;
+  width: 100%;
+  font-size: 0.9rem;
+  display: flex;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+}
+
+.chef-dropdown-item:hover {
+  background: #f3f4f6;
+}
+
+/* 📱 Mobile Responsive */
+@media (max-width: 900px) {
+  .chef-profile-container {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+
+  .chef-profile-picture {
+    justify-content: center;
+  }
+}

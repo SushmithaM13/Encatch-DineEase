@@ -1,5 +1,9 @@
-import { Routes, Route } from "react-router-dom";
-import "./App.css";
+import { Routes, Route } from 'react-router-dom';
+import './App.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useEffect } from 'react';
+
 
 // ===== Auth Pages =====
 import Login from "./components/Auth/login";
@@ -11,8 +15,8 @@ import SuperAdminRegistration from "./components/signup/SuperAdminRegistration";
 // ===== Super Admin Pages =====
 import SuperAdminDashboard from "./pages/superadmin/dashboard/superAdminDashboard";
 import UserManagement from "./pages/superadmin/usermanagement/UserManagement";
+// import Reports from "./pages/superadmin/Reports/Reports";
 import SuperAdminHome from "./pages/superadmin/dashboard/SuperAdminHome";
-import Analytics from "./pages/superadmin/Analytics/Analytics";
 import TableManagement from "./pages/superadmin/tablemanagemnet/TableManagement";
 import AddStaffRole from './pages/superadmin/staffroles/AddStaffRole';
 import SuperAdminProfile from "./pages/superadmin/profile/SuperAdminProfile";
@@ -57,46 +61,88 @@ import WaiterReservation from "./pages/Waiter/WaiterReservation/WaiterReservatio
 import WaiterSettings from "./pages/Admin/Settings/AdminSettings";
 import WaiterProfile from "./pages/Waiter/Profile/WaiterProfile";
 
-import Footer from "./components/footer/Footer";
+// ===== Chef Pages =====
+import ChefHome from "./pages/Chef/ChefHome/ChefHome";
+import ChefHomePage from "./pages/Chef/ChefHomepage/ChefHomepage";
+import ChefDashboard from "./pages/Chef/ChefDashboard/ChefDashboard";
+import ChefMenuCatalog from './pages/Chef/ChefMenuCatalog/ChefMenuCatalog';
+import OrderQueue from "./pages/Chef/OrderQueue/OrderQueue";
+import Inventory from "./pages/Chef/Inventory/Inventory";
+import ChefProfile from "./pages/Chef/Profile/ChefProfile";
+
+import Footer from './components/footer/Footer';
+
+// ===== Customer pages =====
+import CustomerLogin from './customer/customerLogin/customerLogin';
+import OTPVerification from './customer/customerLogin/otpVerification';
+import CustomerDashboard from './customer/customerDashboard/CustomerDashboard';
+// import CustomerMenuPage from './customer/customerMenu/customerMenuPage';
 
 function App() {
+
+  // ✅ Only store URL token — do NOT redirect auto
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const authToken = params.get("authToken");
+      const role = params.get("role");
+
+      if (authToken && role) {
+        localStorage.setItem("token", authToken);
+        localStorage.setItem("role", role);
+
+        // Remove token from URL after storing
+        const cleanURL =
+          window.location.origin +
+          window.location.pathname +
+          window.location.hash;
+
+        window.history.replaceState({}, document.title, cleanURL);
+      }
+    } catch (e) {
+      console.error("Error processing auth token from URL:", e);
+    }
+  }, []);
 
   return (
     <>
       <Routes>
-        <Route path='/' element={<Login />} />
-        <Route path='/forgotPassword' element={<ForgotPassword />} />
-        <Route path='/resetPassword' element={<ResetPassword />} />
-        <Route path='/SuperAdminRegistration' element={<SuperAdminRegistration />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/forgotPassword" element={<ForgotPassword />} />
+        <Route path="/resetPassword" element={<ResetPassword />} />
+        <Route path="/SuperAdminRegistration" element={<SuperAdminRegistration />} />
 
-        {/* Private Routes */}
-        <Route path='superAdminDashboard/*' element={<ProtectedRoute allowedRoles={["SUPER_ADMIN"]}><SuperAdminDashboard /></ProtectedRoute>}>
-
+        {/* SUPER ADMIN */}
+        <Route path="/superAdminDashboard/*"
+          element={
+            <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
+              <SuperAdminDashboard />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<SuperAdminHome />} />
-<Route path="analytics" element={<Analytics />} />
-  {/* <Route path="reports" element={<Reports />} />
-  <Route path="settings" element={<Settings />} /> */}
-
           <Route path="staff" element={<UserManagement />} />
-          <Route path="menu" element={<MenuDashboard />} />
-          <Route path="staffrole" element={<AddStaffRole />} />
-          <Route path="table" element={<TableManagement />} />
+          {/* <Route path="reports" element={<Reports />} /> */}
+          <Route path="home" element={<SuperAdminHome />} />
           <Route path="profile" element={<SuperAdminProfile />} />
           <Route path="settings" element={<SuperAdminSettings />} />
 
-          <Route path="menu" element={<MenuList />} />
-          <Route path="menu/category" element={<CategoryForm />} />
-          <Route path="menu/item" element={<AddItemtype />} />
-          <Route path="menu/food" element={<Foodtype />} />
-          <Route path="menu/cuisine" element={<Cuisinetype />} />
-          <Route path="menu/variant" element={<VariantForm />} />
-          <Route path="menu/addon" element={<AddonForm />} />
-          <Route path="menu/customization" element={<CustomizationGroupForm />} />
 
+          <Route path="menu-dashboard" element={<MenuDashboard />} />
+          <Route path="category-form" element={<CategoryForm />} />
+          <Route path="add-item-type" element={<AddItemtype />} />
+          <Route path="food-type" element={<Foodtype />} />
+          <Route path="cuisine-type" element={<Cuisinetype />} />
+          <Route path="variant-form" element={<VariantForm />} />
+          <Route path="addon-form" element={<AddonForm />} />
+          <Route path="customization-group-form" element={<CustomizationGroupForm />} />
+
+          <Route path="staffrole" element={<AddStaffRole />} />
+          <Route path="table" element={<TableManagement />} />
         </Route>
-        {/* ===== Admin Dashboard Routes ===== */}
-        <Route
-          path="/AdminDashboard"
+
+        {/* ADMIN */}
+        <Route path="/AdminDashboard"
           element={
             <ProtectedRoute allowedRoles={["ADMIN"]}>
               <AdminDashboard />
@@ -138,9 +184,34 @@ function App() {
           <Route path="profile" element={<WaiterProfile />} />
         </Route>
 
+        {/* CHEF */}
+        <Route path="/chefDashboard"
+          element={
+            <ProtectedRoute allowedRoles={["CHEF"]}>
+              <ChefHome />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<ChefHomePage />} />
+          <Route path="home" element={<ChefHomePage />} />
+          <Route path="chefDashboard" element={<ChefDashboard />} />
+          <Route path="menu" element={<ChefMenuCatalog />} />
+          <Route path="OrdersQueue" element={<OrderQueue />} />
+          <Route path="profile" element={<ChefProfile />} />
+          <Route path="inventory" element={<Inventory />} />
+        </Route>
+
+
+        {/* Customer Flow */}
+        <Route path='/customerLogin/customer/login' element={<CustomerLogin />} />
+        <Route path='/otpVerification' element={<OTPVerification />} />
+        <Route path='/customerDashboard' element={<CustomerDashboard />} />
+
+
         {/* ===== Catch-all 404 ===== */}
         <Route path="*" element={<h2 className="text-center mt-10">404 - Page Not Found</h2>} />
       </Routes>
+      <ToastContainer position="top-center" autoClose={2000} />
       <Footer />
     </>
   );

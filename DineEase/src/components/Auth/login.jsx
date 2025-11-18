@@ -1,23 +1,47 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import "../Auth/styles/login.css";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
+  const [message, setMessage] = useState("");
+  const [typedMessage, setTypedMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
   const navigate = useNavigate();
 
-  // Pre-fill username if "remember me" was checked
+  // Check if already logged in
   useEffect(() => {
+    // Pre-fill username if "remember me" was checked
     const remembered = localStorage.getItem("rememberEmail");
     if (remembered) setUsername(remembered);
   }, []);
 
+  // Typing animation for messages
+  useEffect(() => {
+    if (message && messageType === "success") {
+      setTypedMessage("");
+      let i = 0;
+      const typing = setInterval(() => {
+        if (i < message.length) {
+          setTypedMessage((prev) => prev + message[i]);
+          i++;
+        } else {
+          clearInterval(typing);
+        }
+      }, 50);
+      return () => clearInterval(typing);
+    } else {
+      setTypedMessage(message);
+    }
+  }, [message, messageType]);
+  // }, [navigate]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
+    setMessage("");
+    setTypedMessage("");
 
     try {
       const response = await fetch(
@@ -32,43 +56,41 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Save token & role
         localStorage.setItem("token", data.token);
         localStorage.setItem("role", data.role);
 
-        // Save waiter name if role is WAITER
         if (data.role === "WAITER" && data.name) {
           localStorage.setItem("waiterName", data.name);
         }
 
-        // Remember email if checkbox is ticked
         if (remember) {
           localStorage.setItem("rememberEmail", username);
         } else {
           localStorage.removeItem("rememberEmail");
         }
 
-        toast.success("Login successful! Redirecting...");
+        setMessageType("success");
+        setMessage("Login successful! Redirecting...");
 
-        // Redirect based on role after 1.5s
         setTimeout(() => {
           switch (data.role) {
             case "SUPER_ADMIN":
-              navigate("/superAdminDashboard");
+              navigate("/superAdminDashboard", { replace: true });
               break;
             case "ADMIN":
-              navigate("/AdminDashboard");
+              navigate("/AdminDashboard", { replace: true });
               break;
             case "WAITER":
-              navigate("/WaiterDashboard");
-              console.log("Logged in as Waiter");
+              navigate("/WaiterDashboard", { replace: true });
               break;
+              case "CHEF":
+              navigate("/ChefDashboard", { replace: true });
+              break
             default:
-              navigate("/");
+              navigate("/", { replace: true });
           }
-        }, 1500);
+        }, 2000);
       } else {
-        // Handle backend error messages
         let errorMsg = "Invalid credentials. Please try again.";
         if (data.message?.toLowerCase().includes("not found")) {
           errorMsg = "User not found. Please register first.";
@@ -77,27 +99,39 @@ const Login = () => {
         } else if (data.message?.toLowerCase().includes("verify")) {
           errorMsg = "Please verify your email before login.";
         }
-
-        toast.error(errorMsg);
+        setMessageType("error");
+        setMessage(errorMsg);
       }
     } catch (err) {
       console.error(err);
-      toast.error("Server error. Please try again later.");
+      setMessageType("error");
+      setMessage("Server error. Please try again later.");
     }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-container-left"></div>
-
       <div className="auth-container-right">
         <form onSubmit={handleLogin} className="auth-form">
-          <h2 className="login-title">Login</h2>
+          {/* Animated message above title */}
+          {typedMessage && (
+            <p
+              className={`login-message ${
+                messageType === "success" ? "success" : "error"
+              }`}
+            >
+              {typedMessage}
+              <span className="cursor">|</span>
+            </p>
+          )}
+
+          <h2 className="auth-login-title">Login</h2>
 
           <input
             type="text"
             placeholder="Email address"
-            className="login-input"
+            className="auth-login-input"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -106,7 +140,7 @@ const Login = () => {
           <input
             type="password"
             placeholder="Password"
-            className="login-input"
+            className="auth-login-input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -126,7 +160,7 @@ const Login = () => {
             </Link>
           </div>
 
-          <button type="submit" className="login-btn">
+          <button type="submit" className="auth-login-btn">
             Login
           </button>
 
@@ -136,7 +170,7 @@ const Login = () => {
         </form>
       </div>
 
-      <ToastContainer position="top-center" autoClose={2000} />
+      {/* <ToastContainer position="top-center" autoClose={2000} /> */}
     </div>
   );
 };

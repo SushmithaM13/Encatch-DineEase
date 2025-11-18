@@ -10,29 +10,17 @@ import {
 import "./Footer.css";
 
 const Footer = () => {
-  return (
-    <footer className="footer">
-      {/* Top Section - Logo and About */}
-      <div className="footer-top">
-        <h2 className="footer-logo">🍴 DINEEASE</h2>
-        <p className="footer-about">
-          Serving delicious food made with love and fresh ingredients.
-          Your satisfaction is our top priority.
-        </p>
-      </div>
+    return (
+        <footer className="footer">
+        <div className="footer-container">
 
-      {/* Bottom Section - 3 Columns */}
-      <div className="footer-bottom-container">
-        {/* Quick Links */}
-        <div className="footer-section">
-          <h3>Quick Links</h3>
-          <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/">Menu</a></li>
-            <li><a href="/">About-Us</a></li>
-            <li><a href="/">Contact</a></li>
-          </ul>
-        </div>
+                <div className="footer-section">
+                    <h2 className="footer-logo">🍴 DINEEASE</h2>
+                <p className="footer-about">
+                         Serving delicious food made with love and fresh ingredients.  
+                         Your satisfaction is our top priority.
+                    </p>
+                </div>
 
         {/* Follow Us */}
         <div className="footer-section">
