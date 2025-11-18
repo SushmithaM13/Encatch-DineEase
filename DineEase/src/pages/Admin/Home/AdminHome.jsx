@@ -64,11 +64,26 @@ export default function AdminHome() {
 
         // Menu
         const menuRes = await fetch(
-          `http://localhost:8082/dine-ease/api/v1/menu/organization/${organizationId}?page=0&size=20`,
+          `http://localhost:8082/dine-ease/api/v1/menu/getAll?organizationId=${organizationId}&pageNumber=0&pageSize=20`,
           { headers: { Authorization: `Bearer ${TOKEN}` } }
         );
+
         const menuData = await menuRes.json();
-        setMenu(menuData.content || menuData || []);
+
+        // Ensure always array to prevent menu.slice error
+        let menuList = [];
+
+        if (Array.isArray(menuData.content)) {
+          menuList = menuData.content;
+        } else if (Array.isArray(menuData)) {
+          menuList = menuData;
+        } else {
+          menuList = []; 
+        }
+
+        setMenu(menuList);
+
+
 
         // Tables
         const tableRes = await fetch(
@@ -211,8 +226,8 @@ export default function AdminHome() {
                 <p>Capacity: {t.capacity || "N/A"}</p>
                 <span
                   className={`status-tag ${t.tableStatus?.toLowerCase() === "booked"
-                      ? "booked"
-                      : "available"
+                    ? "booked"
+                    : "available"
                     }`}
                 >
                   {t.tableStatus}

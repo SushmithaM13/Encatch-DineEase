@@ -249,99 +249,99 @@ export default function AdminMenuCategory() {
         </thead>
 
         <tbody>
-  {categories
-    .filter(c => !c.parentCategoryId) 
-    .map((parent) => (
-      <React.Fragment key={parent.id}>
-        <tr>
-          <td>
-            <button
-              onClick={() => toggleExpand(parent.id)}
-              className="expand-btn"
-              style={{ marginRight: "8px", cursor: "pointer", background: "none", border: "none" }}
-            >
-              <span style={{marginRight: "8px",fontWeight: "bold", color: "#000" }}>
-              {expandedParents.includes(parent.id) ? "v" : ">"}
-              </span>
-              {parent.menuCategoryName}
-            </button>{" "}
-          </td>
-          <td>
-            <button
-              className="admin-menucategory-subBtn"
-              onClick={() => handleAddSubcategory(parent)}
-            >
-              + Subcategory
-            </button>
-          </td>
-          <td>
-            {parent.imageData ? (
-              <img
-                src={`data:image/jpeg;base64,${parent.imageData}`}
-                alt={parent.menuCategoryName}
-                className="admin-menucategory-img"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "/no-image.png";
-                }}
-              />
-            ) : (
-              <div className="no-img">No Image</div>
-            )}
-          </td>
-          <td>{parent.description || "—"}</td>
-          <td>{parent.displayOrder}</td>
-          <td>
-            <Edit3 className="admin-menucategory-icon-edit" onClick={() => handleEdit(parent)} />
-            <Trash2 className="admin-menucategory-icon-delete" onClick={() => confirmDelete(parent)} />
-          </td>
-        </tr>
+          {categories
+            .filter(c => !c.parentCategoryId)
+            .map((parent) => (
+              <React.Fragment key={parent.id}>
+                <tr>
+                  <td>
+                    <button
+                      onClick={() => toggleExpand(parent.id)}
+                      className="expand-btn"
+                      style={{ marginRight: "8px", cursor: "pointer", background: "none", border: "none" }}
+                    >
+                      <span style={{ marginRight: "8px", fontWeight: "bold", color: "#000" }}>
+                        {expandedParents.includes(parent.id) ? "v" : ">"}
+                      </span>
+                      {parent.menuCategoryName}
+                    </button>{" "}
+                  </td>
+                  <td>
+                    <button
+                      className="admin-menucategory-subBtn"
+                      onClick={() => handleAddSubcategory(parent)}
+                    >
+                      + Subcategory
+                    </button>
+                  </td>
+                  <td>
+                    {parent.imageData ? (
+                      <img
+                        src={`data:image/jpeg;base64,${parent.imageData}`}
+                        alt={parent.menuCategoryName}
+                        className="admin-menucategory-img"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "/no-image.png";
+                        }}
+                      />
+                    ) : (
+                      <div className="no-img">No Image</div>
+                    )}
+                  </td>
+                  <td>{parent.description || "—"}</td>
+                  <td>{parent.displayOrder}</td>
+                  <td>
+                    <Edit3 className="admin-menucategory-icon-edit" onClick={() => handleEdit(parent)} />
+                    <Trash2 className="admin-menucategory-icon-delete" onClick={() => confirmDelete(parent)} />
+                  </td>
+                </tr>
 
-        {expandedParents.includes(parent.id) && (
-          <>
-            {categories.filter(sub => sub.parentCategoryId === parent.id).length > 0 ? (
-              categories
-                .filter(sub => sub.parentCategoryId === parent.id)
-                .map(sub => (
-                  <tr key={sub.id} className="subcategory-row">
-                    <td style={{ paddingLeft: "30px" }}> </td>
-                    <td>{sub.menuCategoryName}</td>
-                    <td>
-                      {sub.imageData ? (
-                        <img
-                          src={`data:image/jpeg;base64,${sub.imageData}`}
-                          alt={sub.menuCategoryName}
-                          className="admin-menucategory-img"
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "/no-image.png";
-                          }}
-                        />
-                      ) : (
-                        <div className="no-img">No Image</div>
-                      )}
-                    </td>
-                    <td>{sub.description || "—"}</td>
-                    <td>{sub.displayOrder}</td>
-                    <td>
-                      <Edit3 className="admin-menucategory-icon-edit" onClick={() => handleEdit(sub)} />
-                      <Trash2 className="admin-menucategory-icon-delete" onClick={() => confirmDelete(sub)} />
-                    </td>
-                  </tr>
-                ))
-            ) : (
-              <tr className="subcategory-row">
-                <td style={{ paddingLeft: "30px" }}></td>
-                <td colSpan={5} style={{ fontStyle: "italic", color: "#6b7280" }}>
-                  No Subcategories
-                </td>
-              </tr>
-            )}
-          </>
-        )}
-      </React.Fragment>
-    ))}
-</tbody>
+                {expandedParents.includes(parent.id) && (
+                  <>
+                    {categories.filter(sub => sub.parentCategoryId === parent.id).length > 0 ? (
+                      categories
+                        .filter(sub => sub.parentCategoryId === parent.id)
+                        .map(sub => (
+                          <tr key={sub.id} className="subcategory-row">
+                            <td style={{ paddingLeft: "30px" }}> </td>
+                            <td>{sub.menuCategoryName}</td>
+                            <td>
+                              {sub.imageData ? (
+                                <img
+                                  src={`data:image/jpeg;base64,${sub.imageData}`}
+                                  alt={sub.menuCategoryName}
+                                  className="admin-menucategory-img"
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = "/no-image.png";
+                                  }}
+                                />
+                              ) : (
+                                <div className="no-img">No Image</div>
+                              )}
+                            </td>
+                            <td>{sub.description || "—"}</td>
+                            <td>{sub.displayOrder}</td>
+                            <td>
+                              <Edit3 className="admin-menucategory-icon-edit" onClick={() => handleEdit(sub)} />
+                              <Trash2 className="admin-menucategory-icon-delete" onClick={() => confirmDelete(sub)} />
+                            </td>
+                          </tr>
+                        ))
+                    ) : (
+                      <tr className="subcategory-row">
+                        <td style={{ paddingLeft: "30px" }}></td>
+                        <td colSpan={5} style={{ fontStyle: "italic", color: "#6b7280" }}>
+                          No Subcategories
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                )}
+              </React.Fragment>
+            ))}
+        </tbody>
 
 
       </table>

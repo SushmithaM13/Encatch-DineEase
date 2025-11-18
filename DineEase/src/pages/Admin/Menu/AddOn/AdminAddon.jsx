@@ -22,11 +22,13 @@ export default function AdminAddon() {
   const [editingAddon, setEditingAddon] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [deleteAddonPopup, setDeleteAddonPopup] = useState({
-    show: false,
-    addonId: null,
-    addonName: "",
-    error: false,
-  });
+  show: false,
+  addonId: null,
+  addonName: "",
+  error: false,
+  backendMessage: "",
+});
+   
 
   // Fetch organization ID
   useEffect(() => {
@@ -73,78 +75,78 @@ export default function AdminAddon() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!formData.addOnName.trim()) return toast.warning("Add-On Name required!");
-  if (!editingAddon && !imageFile) return toast.warning("Please upload an image!");
-  if (!formData.price) return toast.warning("Price is required!");
+    if (!formData.addOnName.trim()) return toast.warning("Add-On Name required!");
+    if (!editingAddon && !imageFile) return toast.warning("Please upload an image!");
+    if (!formData.price) return toast.warning("Price is required!");
 
-  try {
-    const token = localStorage.getItem("token");
-    const addOnId = editingAddon?.id || editingAddon?.addOnId;
-    const url = editingAddon ? `${BASE_URL}/update/details/${addOnId}` : `${BASE_URL}/add`;
-    const method = editingAddon ? "PUT" : "POST";
+    try {
+      const token = localStorage.getItem("token");
+      const addOnId = editingAddon?.id || editingAddon?.addOnId;
+      const url = editingAddon ? `${BASE_URL}/update/details/${addOnId}` : `${BASE_URL}/add`;
+      const method = editingAddon ? "PUT" : "POST";
 
-    let body;
-    let headers = { Authorization: `Bearer ${token}` };
+      let body;
+      let headers = { Authorization: `Bearer ${token}` };
 
-    if (editingAddon) {
-      // Send JSON for update
-      body = {
-        organizationId,
-        addOnName: formData.addOnName,
-        addOnDescription: formData.addOnDescription,
-        price: parseFloat(formData.price).toFixed(2),
-        isAvailable: formData.isAvailable,
-        addOnType: formData.addOnType,
-        addOnImageBase64: imageFile
-          ? await toBase64(imageFile)
-          : editingAddon.addOnImageData || null,
-      };
-      headers["Content-Type"] = "application/json";
-      body = JSON.stringify(body);
-    } else {
-      // Send FormData for create
-      body = new FormData();
-      body.append("organizationId", organizationId.toString());
-      body.append("addOnName", formData.addOnName);
-      body.append("addOnDescription", formData.addOnDescription);
-      body.append("price", parseFloat(formData.price).toFixed(2));
-      body.append("isAvailable", formData.isAvailable.toString());
-      body.append("addOnType", formData.addOnType);
-      if (imageFile) body.append("addOnImage", imageFile);
+      if (editingAddon) {
+        // Send JSON for update
+        body = {
+          organizationId,
+          addOnName: formData.addOnName,
+          addOnDescription: formData.addOnDescription,
+          price: parseFloat(formData.price).toFixed(2),
+          isAvailable: formData.isAvailable,
+          addOnType: formData.addOnType,
+          addOnImageBase64: imageFile
+            ? await toBase64(imageFile)
+            : editingAddon.addOnImageData || null,
+        };
+        headers["Content-Type"] = "application/json";
+        body = JSON.stringify(body);
+      } else {
+        // Send FormData for create
+        body = new FormData();
+        body.append("organizationId", organizationId.toString());
+        body.append("addOnName", formData.addOnName);
+        body.append("addOnDescription", formData.addOnDescription);
+        body.append("price", parseFloat(formData.price).toFixed(2));
+        body.append("isAvailable", formData.isAvailable.toString());
+        body.append("addOnType", formData.addOnType);
+        if (imageFile) body.append("addOnImage", imageFile);
+      }
+
+      const res = await fetch(url, {
+        method,
+        headers,
+        body,
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error(errorText);
+        throw new Error("Failed to save add-on");
+      }
+
+      toast.success(editingAddon ? "Updated successfully!" : "Added successfully!");
+      handleCancelEdit();
+      fetchAddons(organizationId);
+      setShowModal(false);
+    } catch (err) {
+      console.error(err);
+      toast.error("Error saving add-on");
     }
+  };
 
-    const res = await fetch(url, {
-      method,
-      headers,
-      body,
+  // Helper to convert file to base64
+  const toBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result.split(",")[1]); // remove prefix
+      reader.onerror = (error) => reject(error);
     });
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error(errorText);
-      throw new Error("Failed to save add-on");
-    }
-
-    toast.success(editingAddon ? "Updated successfully!" : "Added successfully!");
-    handleCancelEdit();
-    fetchAddons(organizationId);
-    setShowModal(false);
-  } catch (err) {
-    console.error(err);
-    toast.error("Error saving add-on");
-  }
-};
-
-// Helper to convert file to base64
-const toBase64 = (file) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result.split(",")[1]); // remove prefix
-    reader.onerror = (error) => reject(error);
-  });
 
 
   // Edit add-on
@@ -164,26 +166,56 @@ const toBase64 = (file) =>
 
   // Delete add-on
   const handleDeleteAddon = async (addonId) => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${BASE_URL}/delete/${addonId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(`${BASE_URL}/delete/${addonId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Backend sends 409 when used in menu
+    if (res.status === 409) {
+      const errorData = await res.json();
+      setDeleteAddonPopup({
+        show: true,
+        addonId,
+        addonName: "",
+        error: true,
+        backendMessage: errorData.message,
       });
-
-      if (res.status === 409) {
-        setDeleteAddonPopup((prev) => ({ ...prev, show: true, error: true }));
-        return;
-      }
-      if (!res.ok) throw new Error("Failed to delete add-on");
-
-      fetchAddons(organizationId);
-      setDeleteAddonPopup({ show: false, addonId: null, addonName: "", error: false });
-    } catch (err) {
-      console.error(err);
-      setDeleteAddonPopup({ show: true, addonId, addonName: "", error: true });
+      return;
     }
-  };
+
+    // ✅ SUCCESS (204 No Content OR 200 OK)
+    if (res.status === 204 || res.status === 200) {
+      fetchAddons(organizationId);
+      setDeleteAddonPopup({
+        show: false,
+        addonId: null,
+        addonName: "",
+        error: false,
+        backendMessage: "",
+      });
+      toast.success("Add-On deleted successfully!");
+      return;
+    }
+
+    // If still not ok → error
+    throw new Error("Failed to delete add-on");
+
+  } catch (err) {
+    console.error(err);
+    setDeleteAddonPopup({
+      show: true,
+      addonId,
+      addonName: "",
+      error: true,
+      backendMessage: "Deletion failed due to server error.",
+    });
+  }
+};
+
+
 
   const handleCancelEdit = () => {
     setEditingAddon(null);
@@ -261,7 +293,7 @@ const toBase64 = (file) =>
                 <option value="ALLERGY_FRIENDLY">Allergy Friendly</option>
               </select>
 
-              
+
 
               <input
                 type="file"
@@ -303,7 +335,7 @@ const toBase64 = (file) =>
             </tr>
           ) : (
             addons.map((addon, index) => (
-              <tr key={addon.id || index}>
+              <tr key={addon.addOnId || index}>
                 <td>{index + 1}</td>
                 <td>
                   {addon.addOnImageData ? (
@@ -330,7 +362,7 @@ const toBase64 = (file) =>
                     onClick={() =>
                       setDeleteAddonPopup({
                         show: true,
-                        addonId: addon.id,
+                        addonId: addon.addOnId,
                         addonName: addon.addOnName,
                         error: false,
                       })
@@ -349,12 +381,38 @@ const toBase64 = (file) =>
       {deleteAddonPopup.show && (
         <div className="admin-addons-modal-overlay">
           <div className="admin-addons-modal">
-            {!deleteAddonPopup.error ? (
+
+            {deleteAddonPopup.error ? (
+              // ---------------------- ERROR POPUP (409) ----------------------
+              <>
+                <h3>Cannot Delete Add-On</h3>
+                <p>
+                  {deleteAddonPopup.backendMessage
+                    ? deleteAddonPopup.backendMessage
+                    : "This add-on cannot be deleted because it is used in menu."}
+                </p>
+                <div className="admin-addons-btn-group">
+                  <button
+                    onClick={() =>
+                      setDeleteAddonPopup({
+                        show: false,
+                        addonId: null,
+                        addonName: "",
+                        error: false,
+                        backendMessage: "",
+                      })
+                    }
+                  >
+                    OK
+                  </button>
+                </div>
+              </>
+            ) : (
+              // ---------------------- NORMAL DELETE CONFIRMATION ----------------------
               <>
                 <h3>Delete Add-On</h3>
                 <p>
-                  Are you sure you want to delete{" "}
-                  <strong>{deleteAddonPopup.addonName}</strong>?
+                  Are you sure you want to delete <strong>{deleteAddonPopup.addonName}</strong>?
                 </p>
                 <div className="admin-addons-btn-group">
                   <button
@@ -365,34 +423,25 @@ const toBase64 = (file) =>
                   </button>
                   <button
                     onClick={() =>
-                      setDeleteAddonPopup({ show: false, addonId: null, addonName: "", error: false })
+                      setDeleteAddonPopup({
+                        show: false,
+                        addonId: null,
+                        addonName: "",
+                        error: false,
+                        backendMessage: "",
+                      })
                     }
                   >
                     Cancel
                   </button>
                 </div>
               </>
-            ) : (
-              <>
-                <h3>Cannot Delete Add-On</h3>
-                <p>
-                  <strong>{deleteAddonPopup.addonName}</strong> cannot be deleted
-                  because it is used in menu.
-                </p>
-                <div className="admin-addons-btn-group">
-                  <button
-                    onClick={() =>
-                      setDeleteAddonPopup({ show: false, addonId: null, addonName: "", error: false })
-                    }
-                  >
-                    OK
-                  </button>
-                </div>
-              </>
             )}
+
           </div>
         </div>
       )}
+
     </div>
   );
 }

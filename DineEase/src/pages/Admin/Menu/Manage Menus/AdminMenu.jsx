@@ -19,6 +19,8 @@ export default function AdminMenu() {
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
 
+
+
   // dropdowns
   const [categories, setCategories] = useState([]);
   const [itemTypes, setItemTypes] = useState([]);
@@ -89,7 +91,7 @@ export default function AdminMenu() {
           addonsRes,
           groupsRes,
         ] = await Promise.all([
-          fetch(`${API_BASE}/menu-category/${organizationId}?page=0&size=10&sortBy=id&sortDir=desc`, { headers }),
+          fetch(`${API_BASE}/menu-category/parent-categories`, { headers }),
           fetch(`${API_BASE}/menu/item-types?organizationId=${organizationId}&active=true`, { headers }),
           fetch(`${API_BASE}/menu/food-types?organizationId=${organizationId}`, { headers }),
           fetch(`${API_BASE}/menu/cuisine-types?organizationId=${organizationId}&active=true`, { headers }),
@@ -107,7 +109,9 @@ export default function AdminMenu() {
             groupsRes.json(),
           ]);
 
-        setCategories(categoryJson.content || []);
+        setCategories(Array.isArray(categoryJson) ? categoryJson : categoryJson.content || []);
+        console.log("Category Response:", categoryJson);
+        console.log("Fetched Categories:", categoryJson);
         setItemTypes(itemTypesJson.content || itemTypesJson || []);
         setFoodTypes(foodTypesJson.content || foodTypesJson || []);
         setCuisines(Array.isArray(cuisinesJson) ? cuisinesJson : cuisinesJson.content || []);
@@ -125,25 +129,36 @@ export default function AdminMenu() {
     }
   }, [organizationId]);
 
+
+
   // ---------- FETCH MENUS ----------
-  const fetchMenus = async () => {
-    if (!organizationId) return;
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${MENU_API}/organization/${organizationId}?page=0&size=50`, {
+ const fetchMenus = async () => {
+  if (!organizationId) return;
+  setLoading(true);
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(
+      `${API_BASE}/menu/getAll?organizationId=${organizationId}&page=0&size=20`,
+      {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to fetch menus");
-      const data = await res.json();
-      setMenus(Array.isArray(data) ? data : data.content || []);
-    } catch (err) {
-      console.error("Menus fetch error:", err);
-      toast.error("Failed to load menus");
-    } finally {
-      setLoading(false);
-    }
-  };
+      }
+    );
+
+    if (!res.ok) throw new Error("Failed to fetch menus");
+
+    const data = await res.json();
+    console.log("Fetched Menus:", data);
+
+    setMenus(Array.isArray(data) ? data : data.content || []);
+
+  } catch (err) {
+    console.error("Menus fetch error:", err);
+    toast.error("Failed to load menus");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // ---------- IMAGE PREVIEW ----------
   const handleImageUpload = (e) => {
@@ -207,9 +222,10 @@ export default function AdminMenu() {
       if (imageFile) form.append("image", imageFile);
 
       // Append category, item type, food type, cuisine type
-      const category = categories.find((c) => c.name === newMenu.categoryId);
+      const category = categories.find((c) => c.id.toString() === newMenu.categoryId.toString());
       if (!category) return toast.error("Please select a valid Category!");
-      form.append("categoryName", category.name);
+      form.append("categoryId", category.id); 
+      form.append("categoryName", category.categoryName);
 
       const itemType = itemTypes.find((it) => it.id.toString() === newMenu.itemTypeId.toString());
       if (!itemType) return toast.error("Please select a valid Item Type!");
@@ -416,11 +432,14 @@ export default function AdminMenu() {
                 >
                   <option value="">Select category</option>
                   {categories.map((cat) => (
-                    <option key={cat.id} value={cat.name}>
-                      {cat.name}
+                    <option key={cat.id} value={cat.id}>
+                      {cat.categoryName}
+
                     </option>
                   ))}
                 </select>
+
+
               </div>
               <div className="admin-grid-2">
                 <div>

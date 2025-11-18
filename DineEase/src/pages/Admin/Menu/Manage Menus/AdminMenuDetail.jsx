@@ -13,7 +13,6 @@ export default function AdminMenuDetail() {
   const [itemTypes, setItemTypes] = useState([]);
   const [foodTypes, setFoodTypes] = useState([]);
   const [cuisines, setCuisines] = useState([]);
-  const [recommendedItems, setRecommendedItems] = useState([]);
   const [organizationId, setOrganizationId] = useState("");
   const [loading, setLoading] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
@@ -102,23 +101,7 @@ export default function AdminMenuDetail() {
     fetchMenu();
   }, [organizationId, id]);
 
-  // ---------- Fetch Recommended Items ----------
-  useEffect(() => {
-    if (!organizationId) return;
-    const token = localStorage.getItem("token");
-    fetch(`${API_BASE}/organization/${organizationId}/recommended`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Status: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => Array.isArray(data) && setRecommendedItems(data))
-      .catch((err) => {
-        console.error("Error fetching recommended items:", err);
-        setRecommendedItems([]);
-      });
-  }, [organizationId]);
+
 
   // ---------- Update Handler ----------
   const handleUpdate = async () => {
@@ -330,493 +313,478 @@ export default function AdminMenuDetail() {
         </div>
       )}
 
-      {/* Recommended Items */}
-      {recommendedItems.length > 0 && (
-        <div className="admin-menu-detail-section">
-          <h3>Recommended Items</h3>
-          <div className="admin-menu-detail-grid">
-            {recommendedItems.map((item) => {
-              const img = item.imageData
-                ? `data:image/jpeg;base64,${item.imageData}`
-                : item.imageUrl
-                  ?.replace(/\\/g, "/")
-                  .replace("C:/dine-ease-backend/dine-ease/uploads/", "http://localhost:8082/dine-ease/uploads/");
-              return (
-                <div
-                  key={item.id}
-                  className="admin-menu-detail-recommended-card"
-                  onClick={() => navigate(`/AdminDashboard/menu/${item.id}`)}
-                >
-                  <img src={img} alt={item.itemName} className="admin-menu-detail-recommended-img" />
-                  <h4>{item.itemName}</h4>
+
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-container large">
+            <button className="popup-close" onClick={() => setShowPopup(false)}>
+              ✖
+            </button>
+
+            <h2>Edit Menu Item</h2>
+
+            <div className="popup-content">
+              {/* ---------- Basic Info ---------- */}
+              <label>Item Name *</label>
+              <input
+                type="text"
+                value={menu.itemName || ""}
+                onChange={(e) => setMenu({ ...menu, itemName: e.target.value })}
+                required
+              />
+
+              <label>Description</label>
+              <textarea
+                value={menu.description || ""}
+                onChange={(e) => setMenu({ ...menu, description: e.target.value })}
+              />
+
+              {/* ---------- Category ---------- */}
+              <label>Category</label>
+              <select
+                value={menu.categoryId || ""}
+                onChange={(e) => setMenu({ ...menu, categoryId: e.target.value })}
+              >
+                <option value="">Select category</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+
+              {/* ---------- Type, Food, Cuisine, Spice ---------- */}
+              <div className="admin-grid-2">
+                <div>
+                  <label>Item Type</label>
+                  <select
+                    value={menu.itemTypeId || ""}
+                    onChange={(e) => setMenu({ ...menu, itemTypeId: e.target.value })}
+                  >
+                    <option value="">Select item type</option>
+                    {itemTypes.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name || t.itemTypeName}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              );
-            })}
+
+                <div>
+                  <label>Food Type</label>
+                  <select
+                    value={menu.foodTypeId || ""}
+                    onChange={(e) => setMenu({ ...menu, foodTypeId: e.target.value })}
+                  >
+                    <option value="">Select food type</option>
+                    {foodTypes.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.foodTypeName || f.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label>Cuisine</label>
+                  <select
+                    value={menu.cuisineTypeId || ""}
+                    onChange={(e) =>
+                      setMenu({ ...menu, cuisineTypeId: e.target.value })
+                    }
+                  >
+                    <option value="">Select cuisine</option>
+                    {cuisines.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label>Spice Level</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={5}
+                    value={menu.spiceLevel || 1}
+                    onChange={(e) =>
+                      setMenu({ ...menu, spiceLevel: Number(e.target.value) })
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* ---------- Image Upload ---------- */}
+              <label>Upload Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setMenu({ ...menu, imageFile: e.target.files?.[0] || null })
+                }
+              />
+              {menu.imageData && (
+                <img
+                  src={`data:image/jpeg;base64,${menu.imageData}`}
+                  alt="preview"
+                  className="admin-menu-preview"
+                />
+              )}
+
+              {/* ---------- Variants ---------- */}
+              <h4>Variants</h4>
+              {menu.variants?.map((v, i) => (
+                <div key={i} className="admin-menu-variant-row">
+                  <input
+                    value={v.variantName || ""}
+                    placeholder="Variant Name"
+                    onChange={(e) => {
+                      const updated = [...menu.variants];
+                      updated[i].variantName = e.target.value;
+                      setMenu({ ...menu, variants: updated });
+                    }}
+                  />
+
+                  <select
+                    value={v.variantType || ""}
+                    onChange={(e) => {
+                      const updated = [...menu.variants];
+                      updated[i].variantType = e.target.value;
+                      setMenu({ ...menu, variants: updated });
+                    }}
+                  >
+                    <option value="">Select Type</option>
+                    <option value="SIZE">Size</option>
+                    <option value="PORTION">Portion</option>
+                    <option value="FLAVOR">Flavor</option>
+                    <option value="QUANTITY">Quantity</option>
+                  </select>
+
+                  <input
+                    type="number"
+                    value={v.quantityValue || ""}
+                    placeholder="Quantity Value"
+                    onChange={(e) => {
+                      const updated = [...menu.variants];
+                      updated[i].quantityValue = e.target.value;
+                      setMenu({ ...menu, variants: updated });
+                    }}
+                  />
+
+                  <input
+                    value={v.quantityUnit || ""}
+                    placeholder="Unit (e.g., g/ml)"
+                    onChange={(e) => {
+                      const updated = [...menu.variants];
+                      updated[i].quantityUnit = e.target.value;
+                      setMenu({ ...menu, variants: updated });
+                    }}
+                  />
+
+                  <input
+                    type="number"
+                    value={v.price || ""}
+                    placeholder="Price"
+                    onChange={(e) => {
+                      const updated = [...menu.variants];
+                      updated[i].price = e.target.value;
+                      setMenu({ ...menu, variants: updated });
+                    }}
+                  />
+
+                  <input
+                    type="number"
+                    value={v.discountPrice || ""}
+                    placeholder="Discount Price"
+                    onChange={(e) => {
+                      const updated = [...menu.variants];
+                      updated[i].discountPrice = e.target.value;
+                      setMenu({ ...menu, variants: updated });
+                    }}
+                  />
+
+                  <label>
+                    Default{" "}
+                    <input
+                      type="checkbox"
+                      checked={v.isDefault || false}
+                      onChange={(e) => {
+                        const updated = [...menu.variants];
+                        updated[i].isDefault = e.target.checked;
+                        setMenu({ ...menu, variants: updated });
+                      }}
+                    />
+                  </label>
+
+                  <label>
+                    Available{" "}
+                    <input
+                      type="checkbox"
+                      checked={v.isAvailable || false}
+                      onChange={(e) => {
+                        const updated = [...menu.variants];
+                        updated[i].isAvailable = e.target.checked;
+                        setMenu({ ...menu, variants: updated });
+                      }}
+                    />
+                  </label>
+
+                  <button
+                    className="variant-remove-btn"
+                    onClick={() => {
+                      const updated = menu.variants.filter((_, idx) => idx !== i);
+                      setMenu({ ...menu, variants: updated });
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+
+              <button
+                className="variant-add-btn"
+                onClick={() =>
+                  setMenu({
+                    ...menu,
+                    variants: [
+                      ...(menu.variants || []),
+                      {
+                        variantName: "",
+                        variantType: "",
+                        quantityValue: "",
+                        quantityUnit: "",
+                        price: "",
+                        discountPrice: "",
+                        isDefault: false,
+                        isAvailable: true,
+                      },
+                    ],
+                  })
+                }
+              >
+                + Add Variant
+              </button>
+
+              {/* ---------- Flags ---------- */}
+              <div className="admin-menu-grid-2">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={menu.isAvailable || false}
+                    onChange={(e) => setMenu({ ...menu, isAvailable: e.target.checked })}
+                  />{" "}
+                  Available
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={menu.isRecommended || false}
+                    onChange={(e) =>
+                      setMenu({ ...menu, isRecommended: e.target.checked })
+                    }
+                  />{" "}
+                  Recommended
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={menu.isBestseller || false}
+                    onChange={(e) =>
+                      setMenu({ ...menu, isBestseller: e.target.checked })
+                    }
+                  />{" "}
+                  Bestseller
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={menu.chefSpecial || false}
+                    onChange={(e) =>
+                      setMenu({ ...menu, chefSpecial: e.target.checked })
+                    }
+                  />{" "}
+                  Chef’s Special
+                </label>
+              </div>
+
+              {/* ---------- Preparation & Allergen Info ---------- */}
+              <label>Preparation Time (minutes)</label>
+              <input
+                type="number"
+                value={menu.preparationTime || ""}
+                onChange={(e) =>
+                  setMenu({ ...menu, preparationTime: e.target.value })
+                }
+              />
+
+              <label>Allergen Info</label>
+              <input
+                type="text"
+                value={menu.allergenInfo || ""}
+                onChange={(e) => setMenu({ ...menu, allergenInfo: e.target.value })}
+              />
+
+              {/* ---------- Addons Section ---------- */}
+              <h4>Addons</h4>
+              <select
+                className="admin-addon-select"
+                value=""
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  if (!selectedId) return;
+
+                  const selectedAddon = addons.find(
+                    (a) => (a.id || a.addOnId).toString() === selectedId
+                  );
+
+                  if (
+                    selectedAddon &&
+                    !menu.availableAddons?.some(
+                      (item) =>
+                        (item.id || item.addOnId) ===
+                        (selectedAddon.id || selectedAddon.addOnId)
+                    )
+                  ) {
+                    setMenu({
+                      ...menu,
+                      availableAddons: [
+                        ...(menu.availableAddons || []),
+                        selectedAddon,
+                      ],
+                    });
+                  }
+                }}
+              >
+                <option value="">Select Addon</option>
+                {addons.map((a) => (
+                  <option key={a.addOnId || a.id} value={a.id || a.addOnId}>
+                    {a.addOnName || a.name}
+                  </option>
+                ))}
+              </select>
+
+              <div className="admin-addon-section">
+                <label>Selected Addons</label>
+                <div className="admin-addon-box">
+                  {menu.availableAddons?.length > 0 ? (
+                    <div className="admin-addon-grid">
+                      {menu.availableAddons.map((a) => (
+                        <span key={a.id || a.addOnId} className="admin-addon-tag">
+                          {a.addOnName || a.name}
+                          <button
+                            type="button"
+                            className="admin-addon-remove-btn"
+                            onClick={() => {
+                              const updated = menu.availableAddons.filter(
+                                (item) =>
+                                  (item.id || item.addOnId) !==
+                                  (a.id || a.addOnId)
+                              );
+                              setMenu({ ...menu, availableAddons: updated });
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="admin-addon-empty">No addons selected</p>
+                  )}
+                </div>
+              </div>
+
+              {/* ---------- Customization Groups Section ---------- */}
+              <h4>Customization Groups</h4>
+              <select
+                className="admin-customize-select"
+                value=""
+                onChange={(e) => {
+                  const selected = customizationGroups.find(
+                    (g) => g.name === e.target.value || g.groupName === e.target.value
+                  );
+
+                  if (!selected) return;
+
+                  if (!menu.customizationGroups?.some((g) => g.id === selected.id)) {
+                    setMenu({
+                      ...menu,
+                      customizationGroups: [
+                        ...(menu.customizationGroups || []),
+                        selected,
+                      ],
+                    });
+                  }
+                }}
+
+              >
+                <option value="">Select Customization Group</option>
+                {customizationGroups.map((g) => (
+                  <option
+                    key={g.id || g.customizationGroupId}
+                    value={g.name || g.groupName}
+                  >
+                    {g.name || g.groupName}
+                  </option>
+                ))}
+              </select>
+
+              <div className="admin-customize-section">
+                <label>Selected Customization Groups</label>
+                <div className="admin-customize-box">
+                  {menu.customizationGroups?.length > 0 ? (
+                    <div className="admin-customize-grid">
+                      {menu.customizationGroups.map((name) => (
+                        <span key={name} className="admin-customize-tag">
+                          {name}
+                          <button
+                            type="button"
+                            className="admin-customize-remove-btn"
+                            onClick={() => {
+                              const updated = menu.customizationGroups.filter(
+                                (n) => n !== name
+                              );
+                              setMenu({ ...menu, customizationGroups: updated });
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="admin-customize-empty">
+                      No customization groups selected
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* ---------- Actions ---------- */}
+              <div className="admin-menu-modal-actions">
+                <button
+                  type="button"
+                  className="admin-menu-save-btn"
+                  onClick={handleUpdate}
+                >
+                  Save Menu
+                </button>
+
+                <button
+                  type="button"
+                  className="admin-menu-cancel-btn"
+                  onClick={() => setShowPopup(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
-      {showPopup && (
-  <div className="popup-overlay">
-    <div className="popup-container large">
-      <button className="popup-close" onClick={() => setShowPopup(false)}>
-        ✖
-      </button>
-
-      <h2>Edit Menu Item</h2>
-
-      <div className="popup-content">
-        {/* ---------- Basic Info ---------- */}
-        <label>Item Name *</label>
-        <input
-          type="text"
-          value={menu.itemName || ""}
-          onChange={(e) => setMenu({ ...menu, itemName: e.target.value })}
-          required
-        />
-
-        <label>Description</label>
-        <textarea
-          value={menu.description || ""}
-          onChange={(e) => setMenu({ ...menu, description: e.target.value })}
-        />
-
-        {/* ---------- Category ---------- */}
-        <label>Category</label>
-        <select
-          value={menu.categoryId || ""}
-          onChange={(e) => setMenu({ ...menu, categoryId: e.target.value })}
-        >
-          <option value="">Select category</option>
-          {categories.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.name}
-            </option>
-          ))}
-        </select>
-
-        {/* ---------- Type, Food, Cuisine, Spice ---------- */}
-        <div className="admin-grid-2">
-          <div>
-            <label>Item Type</label>
-            <select
-              value={menu.itemTypeId || ""}
-              onChange={(e) => setMenu({ ...menu, itemTypeId: e.target.value })}
-            >
-              <option value="">Select item type</option>
-              {itemTypes.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name || t.itemTypeName}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label>Food Type</label>
-            <select
-              value={menu.foodTypeId || ""}
-              onChange={(e) => setMenu({ ...menu, foodTypeId: e.target.value })}
-            >
-              <option value="">Select food type</option>
-              {foodTypes.map((f) => (
-                <option key={f.id} value={f.id}>
-                  {f.foodTypeName || f.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label>Cuisine</label>
-            <select
-              value={menu.cuisineTypeId || ""}
-              onChange={(e) =>
-                setMenu({ ...menu, cuisineTypeId: e.target.value })
-              }
-            >
-              <option value="">Select cuisine</option>
-              {cuisines.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label>Spice Level</label>
-            <input
-              type="number"
-              min={1}
-              max={5}
-              value={menu.spiceLevel || 1}
-              onChange={(e) =>
-                setMenu({ ...menu, spiceLevel: Number(e.target.value) })
-              }
-            />
-          </div>
-        </div>
-
-        {/* ---------- Image Upload ---------- */}
-        <label>Upload Image</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) =>
-            setMenu({ ...menu, imageFile: e.target.files?.[0] || null })
-          }
-        />
-        {menu.imageData && (
-          <img
-            src={`data:image/jpeg;base64,${menu.imageData}`}
-            alt="preview"
-            className="admin-menu-preview"
-          />
-        )}
-
-        {/* ---------- Variants ---------- */}
-        <h4>Variants</h4>
-        {menu.variants?.map((v, i) => (
-          <div key={i} className="admin-menu-variant-row">
-            <input
-              value={v.variantName || ""}
-              placeholder="Variant Name"
-              onChange={(e) => {
-                const updated = [...menu.variants];
-                updated[i].variantName = e.target.value;
-                setMenu({ ...menu, variants: updated });
-              }}
-            />
-
-            <select
-              value={v.variantType || ""}
-              onChange={(e) => {
-                const updated = [...menu.variants];
-                updated[i].variantType = e.target.value;
-                setMenu({ ...menu, variants: updated });
-              }}
-            >
-              <option value="">Select Type</option>
-              <option value="SIZE">Size</option>
-              <option value="PORTION">Portion</option>
-              <option value="FLAVOR">Flavor</option>
-              <option value="QUANTITY">Quantity</option>
-            </select>
-
-            <input
-              type="number"
-              value={v.quantityValue || ""}
-              placeholder="Quantity Value"
-              onChange={(e) => {
-                const updated = [...menu.variants];
-                updated[i].quantityValue = e.target.value;
-                setMenu({ ...menu, variants: updated });
-              }}
-            />
-
-            <input
-              value={v.quantityUnit || ""}
-              placeholder="Unit (e.g., g/ml)"
-              onChange={(e) => {
-                const updated = [...menu.variants];
-                updated[i].quantityUnit = e.target.value;
-                setMenu({ ...menu, variants: updated });
-              }}
-            />
-
-            <input
-              type="number"
-              value={v.price || ""}
-              placeholder="Price"
-              onChange={(e) => {
-                const updated = [...menu.variants];
-                updated[i].price = e.target.value;
-                setMenu({ ...menu, variants: updated });
-              }}
-            />
-
-            <input
-              type="number"
-              value={v.discountPrice || ""}
-              placeholder="Discount Price"
-              onChange={(e) => {
-                const updated = [...menu.variants];
-                updated[i].discountPrice = e.target.value;
-                setMenu({ ...menu, variants: updated });
-              }}
-            />
-
-            <label>
-              Default{" "}
-              <input
-                type="checkbox"
-                checked={v.isDefault || false}
-                onChange={(e) => {
-                  const updated = [...menu.variants];
-                  updated[i].isDefault = e.target.checked;
-                  setMenu({ ...menu, variants: updated });
-                }}
-              />
-            </label>
-
-            <label>
-              Available{" "}
-              <input
-                type="checkbox"
-                checked={v.isAvailable || false}
-                onChange={(e) => {
-                  const updated = [...menu.variants];
-                  updated[i].isAvailable = e.target.checked;
-                  setMenu({ ...menu, variants: updated });
-                }}
-              />
-            </label>
-
-            <button
-              className="variant-remove-btn"
-              onClick={() => {
-                const updated = menu.variants.filter((_, idx) => idx !== i);
-                setMenu({ ...menu, variants: updated });
-              }}
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-
-        <button
-          className="variant-add-btn"
-          onClick={() =>
-            setMenu({
-              ...menu,
-              variants: [
-                ...(menu.variants || []),
-                {
-                  variantName: "",
-                  variantType: "",
-                  quantityValue: "",
-                  quantityUnit: "",
-                  price: "",
-                  discountPrice: "",
-                  isDefault: false,
-                  isAvailable: true,
-                },
-              ],
-            })
-          }
-        >
-          + Add Variant
-        </button>
-
-        {/* ---------- Flags ---------- */}
-        <div className="admin-menu-grid-2">
-          <label>
-            <input
-              type="checkbox"
-              checked={menu.isAvailable || false}
-              onChange={(e) => setMenu({ ...menu, isAvailable: e.target.checked })}
-            />{" "}
-            Available
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={menu.isRecommended || false}
-              onChange={(e) =>
-                setMenu({ ...menu, isRecommended: e.target.checked })
-              }
-            />{" "}
-            Recommended
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={menu.isBestseller || false}
-              onChange={(e) =>
-                setMenu({ ...menu, isBestseller: e.target.checked })
-              }
-            />{" "}
-            Bestseller
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={menu.chefSpecial || false}
-              onChange={(e) =>
-                setMenu({ ...menu, chefSpecial: e.target.checked })
-              }
-            />{" "}
-            Chef’s Special
-          </label>
-        </div>
-
-        {/* ---------- Preparation & Allergen Info ---------- */}
-        <label>Preparation Time (minutes)</label>
-        <input
-          type="number"
-          value={menu.preparationTime || ""}
-          onChange={(e) =>
-            setMenu({ ...menu, preparationTime: e.target.value })
-          }
-        />
-
-        <label>Allergen Info</label>
-        <input
-          type="text"
-          value={menu.allergenInfo || ""}
-          onChange={(e) => setMenu({ ...menu, allergenInfo: e.target.value })}
-        />
-
-        {/* ---------- Addons Section ---------- */}
-        <h4>Addons</h4>
-        <select
-          className="admin-addon-select"
-          value=""
-          onChange={(e) => {
-            const selectedId = e.target.value;
-            if (!selectedId) return;
-
-            const selectedAddon = addons.find(
-              (a) => (a.id || a.addOnId).toString() === selectedId
-            );
-
-            if (
-              selectedAddon &&
-              !menu.availableAddons?.some(
-                (item) =>
-                  (item.id || item.addOnId) ===
-                  (selectedAddon.id || selectedAddon.addOnId)
-              )
-            ) {
-              setMenu({
-                ...menu,
-                availableAddons: [
-                  ...(menu.availableAddons || []),
-                  selectedAddon,
-                ],
-              });
-            }
-          }}
-        >
-          <option value="">Select Addon</option>
-          {addons.map((a) => (
-            <option key={a.addOnId || a.id} value={a.id || a.addOnId}>
-              {a.addOnName || a.name}
-            </option>
-          ))}
-        </select>
-
-        <div className="admin-addon-section">
-          <label>Selected Addons</label>
-          <div className="admin-addon-box">
-            {menu.availableAddons?.length > 0 ? (
-              <div className="admin-addon-grid">
-                {menu.availableAddons.map((a) => (
-                  <span key={a.id || a.addOnId} className="admin-addon-tag">
-                    {a.addOnName || a.name}
-                    <button
-                      type="button"
-                      className="admin-addon-remove-btn"
-                      onClick={() => {
-                        const updated = menu.availableAddons.filter(
-                          (item) =>
-                            (item.id || item.addOnId) !==
-                            (a.id || a.addOnId)
-                        );
-                        setMenu({ ...menu, availableAddons: updated });
-                      }}
-                    >
-                      ✕
-                    </button>
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="admin-addon-empty">No addons selected</p>
-            )}
-          </div>
-        </div>
-
-        {/* ---------- Customization Groups Section ---------- */}
-        <h4>Customization Groups</h4>
-        <select
-          className="admin-customize-select"
-          value=""
-          onChange={(e) => {
-            const selectedName = e.target.value;
-            if (!selectedName) return;
-
-            if (!menu.customizationGroups?.includes(selectedName)) {
-              setMenu({
-                ...menu,
-                customizationGroups: [
-                  ...(menu.customizationGroups || []),
-                  selectedName,
-                ],
-              });
-            }
-          }}
-        >
-          <option value="">Select Customization Group</option>
-          {customizationGroups.map((g) => (
-            <option
-              key={g.id || g.customizationGroupId}
-              value={g.name || g.groupName}
-            >
-              {g.name || g.groupName}
-            </option>
-          ))}
-        </select>
-
-        <div className="admin-customize-section">
-          <label>Selected Customization Groups</label>
-          <div className="admin-customize-box">
-            {menu.customizationGroups?.length > 0 ? (
-              <div className="admin-customize-grid">
-                {menu.customizationGroups.map((name) => (
-                  <span key={name} className="admin-customize-tag">
-                    {name}
-                    <button
-                      type="button"
-                      className="admin-customize-remove-btn"
-                      onClick={() => {
-                        const updated = menu.customizationGroups.filter(
-                          (n) => n !== name
-                        );
-                        setMenu({ ...menu, customizationGroups: updated });
-                      }}
-                    >
-                      ✕
-                    </button>
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="admin-customize-empty">
-                No customization groups selected
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* ---------- Actions ---------- */}
-        <div className="admin-menu-modal-actions">
-          <button type="submit" className="admin-menu-save-btn">
-            Save Menu
-          </button>
-          <button
-            type="button"
-            className="admin-menu-cancel-btn"
-            onClick={() => setShowPopup(false)}
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
     </div>
-  </div>
-)}
-</div>
   );
 }
 
