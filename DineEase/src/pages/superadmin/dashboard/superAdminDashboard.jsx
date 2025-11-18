@@ -63,7 +63,7 @@ const SuperAdminDashboard = () => {
       const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
       setHotels(storedHotels);
       console.log(storedHotels)
-    } catch (e) {
+    } catch (e) { 
       console.error("Invalid hotels data in localStorage:", e);
       setHotels([]);
     }

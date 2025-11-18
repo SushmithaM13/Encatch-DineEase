@@ -254,3 +254,61 @@
     margin-top: 1rem;
   }
 }
+/* --------------- */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.popup-container {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.popup-close {
+  position: absolute;
+  right: 24px;
+  top: 16px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.popup-content label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 500;
+}
+
+.popup-content input,
+.popup-content textarea {
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.popup-save-btn {
+  margin-top: 20px;
+  background: #2563eb;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+.popup-save-btn:hover {
+  background: #1d4ed8;
+}

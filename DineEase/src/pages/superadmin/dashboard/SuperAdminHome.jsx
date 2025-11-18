@@ -41,8 +41,8 @@ const DashboardHome = () => {
       const staffData = Array.isArray(data)
         ? data
         : Array.isArray(data.content)
-        ? data.content
-        : [];
+          ? data.content
+          : [];
 
       const total = staffData.length;
       const active = staffData.filter(
@@ -96,7 +96,12 @@ const DashboardHome = () => {
         setHotel(orgData);
         setEditData(orgData);
         setLoading(false);
-
+        if (orgData?.organizationName) {
+          localStorage.setItem("organizationName", orgData.organizationName);
+        }
+        if (orgData?.FullName) {
+          localStorage.setItem("organizationFullName", orgData.FullName);
+        }
         if (orgData?.id) {
           localStorage.setItem("organizationId", orgData.id);
           fetchStaffStats(orgData.id, token);
@@ -201,6 +206,48 @@ const DashboardHome = () => {
         </div>
       </div>
 
+{/* Revenue & Customer Map Section */}
+<div className="dashboard-additional">
+  {/* Revenue Card */}
+  <div className="revenue-card">
+    <div className="revenue-header">
+      <h3>Revenue Overview</h3>
+    </div>
+    <div className="revenue-content">
+      {/* Replace with actual chart later */}
+      <div className="revenue-chart-placeholder">
+        <p>Revenue Chart Here</p>
+      </div>
+      <div className="revenue-stats">
+        <div>
+          <span>Total Revenue:</span> <strong>$12,345</strong>
+        </div>
+        <div>
+          <span>Monthly Revenue:</span> <strong>$3,210</strong>
+        </div>
+        <div>
+          <span>Weekly Revenue:</span> <strong>$780</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Customer Map */}
+  <div className="customer-map-card">
+    <div className="map-header">
+      <h3>Customer Map</h3>
+    </div>
+    <div className="map-content">
+      {/* Replace with actual map component later */}
+      <div className="map-placeholder">
+        <p>Map showing customer locations</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
       {/* Organization Details Section */}
       <div className="content-row">
         <section className="organization-section">
@@ -227,10 +274,6 @@ const DashboardHome = () => {
               <div className="org-item">
                 <span className="org-label">Organization Name</span>
                 <span className="org-value">{hotel.organizationName || "N/A"}</span>
-              </div>
-              <div className="org-item">
-                <span className="org-label">Full Name</span>
-                <span className="org-value">{hotel.FullName || "N/A"}</span>
               </div>
               <div className="org-item">
                 <span className="org-label">Business Type</span>
@@ -285,7 +328,7 @@ const DashboardHome = () => {
                     required
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label>Business Type</label>
                   <input

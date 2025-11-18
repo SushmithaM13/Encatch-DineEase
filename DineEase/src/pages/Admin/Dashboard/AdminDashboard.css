@@ -367,3 +367,9 @@
 .admin-dashboard::-webkit-scrollbar-thumb:hover {
   background-color: #a0a0a0;
 }
+.admin-dashboard-content {
+  flex: 1;
+  background: #f8fafc; /* ensures no purple on the right */
+  min-height: 100vh;
+  overflow-x: hidden;
+}

@@ -1,367 +1,281 @@
-/* =======================================
-   ✅ Admin Menu Category Management Page
-   ======================================= */
-
-.admin-menu-category-page {
-  padding: 25px;
-  font-family: "Poppins", sans-serif;
-  color: #333;
-  background: #f8fafc;
+/* =============== PAGE CONTAINER =============== */
+.admin-menucategory-page {
+  padding: 20px;
+  background: #f9fafb;
   min-height: 100vh;
+  font-family: "Inter", sans-serif;
 }
 
-/* ======= Header Section ======= */
-.admin-page-title {
-  font-size: 22px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #222;
-}
-
-.admin-category-header {
+/* ===== HEADER ===== */
+.admin-menucategory-header {
   display: flex;
-  justify-content: flex-end;
-  margin-bottom: 16px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-.admin-add-btn {
+.admin-menucategory-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* ------------ BUTTONS ------------ */
+.admin-menucategory-addBtn {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: #007bff;
+  background: #2563eb;
   color: #fff;
-  border: none;
   padding: 8px 14px;
-  border-radius: 6px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: 500;
-  transition: background 0.3s ease;
+  font-size: 14px;
+  transition: 0.2s ease-in-out;
 }
 
-.admin-add-btn:hover {
-  background: #0056b3;
+.admin-menucategory-addBtn:hover {
+  background: #1d4ed8;
 }
 
-/* ======= Table Layout ======= */
-.admin-table-wrapper {
-  background: #fff;
-  border-radius: 10px;
-  padding: 10px 16px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  animation: fadeIn 0.3s ease;
+.admin-menucategory-subBtn {
+  background: #2196f3;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 8px;
+  transition: 0.2s;
 }
 
-.admin-category-table {
+.admin-menucategory-subBtn:hover {
+  background: #1e88e5;
+}
+
+/* =============== TABLE SECTION =============== */
+.admin-menucategory-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-.admin-category-table th,
-.admin-category-table td {
-  padding: 10px 14px;
+.admin-menucategory-table thead {
+  background: #f3f4f6;
+}
+
+.admin-menucategory-table th,
+.admin-menucategory-table td {
+  padding: 12px 18px;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e5e7eb;
   font-size: 14px;
-}
-
-.admin-category-table th {
-  background: #f4f6f8;
-  font-weight: 600;
-  color: #333;
-}
-
-/* ===== Expand/Collapse Button ===== */
-.expand-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-right: 6px;
   vertical-align: middle;
 }
 
-/* ===== Category Image ===== */
-.admin-category-photo {
-  width: 45px;
-  height: 45px;
-  object-fit: cover;
-  border-radius: 6px;
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  padding: 4px;
+.admin-menucategory-table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
 }
 
-.no-img {
-  width: 45px;
-  height: 45px;
-  background: #f3f4f6;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  color: #9ca3af;
+.admin-menucategory-table tr:hover {
+  background-color: #f1f5f9;
 }
 
-/* ===== Column Widths ===== */
-.admin-category-table th:nth-child(3),
-.admin-category-table td:nth-child(3) {
-  width: 18%;
-}
-
-.admin-category-table th:nth-child(4),
-.admin-category-table td:nth-child(4) {
-  width: 25%;
-}
-
-/* ===== Status Badge ===== */
-.status-badge {
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: capitalize;
-}
-
-.status-badge.active {
-  background: #d4edda;
-  color: #155724;
-}
-
-.status-badge.inactive {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-.filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.filter-dropdown {
-  padding: 5px 10px;
-  border-radius: 5px;
-}
-
-/* ===== Action Buttons ===== */
-.admin-action-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.admin-action-buttons button {
-  border: none;
-  background: transparent;
+/* ------------ ICONS ------------ */
+.admin-menucategory-icon {
   cursor: pointer;
-  padding: 4px;
-  transition: transform 0.2s ease, color 0.2s ease;
+  margin-right: 10px;
+  color: #555;
+  transition: 0.2s;
 }
 
-.admin-action-buttons button:hover {
-  transform: scale(1.1);
+.admin-menucategory-icon:hover {
+  color: #111;
 }
 
-.admin-action-buttons svg {
-  color: #333;
-}
-
-/* ===== Pagination ===== */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 18px 0 5px 0;
-  gap: 10px;
-  font-size: 14px;
-}
-
-.pagination button {
-  background: #007bff;
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.pagination button:hover {
-  background: #0056b3;
-}
-
-.pagination button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-/* ===== Modal Overlay ===== */
-.admin-category-modal-overlay {
+/* ------------ MODAL OVERLAY ------------ */
+.admin-menucategory-modalOverlay,
+.admin-menucategory-popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0,0,0,0.45);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
-/* ===== Modal Box ===== */
-.admin-category-modal {
+/* ------------ MODAL CONTENT ------------ */
+.admin-menucategory-modalContent,
+.admin-menucategory-popup {
   background: #fff;
+  width: 400px;
+  padding: 25px 30px;
   border-radius: 12px;
-  width: 420px;
-  padding: 22px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  animation: fadeIn 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  animation: popupScale 0.2s ease;
+  text-align: center;
 }
 
-.admin-category-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
+@keyframes popupScale {
+  from {
+    transform: scale(0.95);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.admin-category-modal-header h3 {
-  font-size: 20px;
+.admin-menucategory-modalHeader h2,
+.admin-menucategory-popup h3 {
+  font-size: 18px;
   font-weight: 600;
-  color: #333;
-  margin: 0;
+  color: #111827;
+  margin-bottom: 15px;
 }
 
-.admin-category-close-btn {
-  background: transparent;
-  border: 2px solid #000;
-  border-radius: 6px;
+.admin-menucategory-modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* FORM GROUP */
+.admin-menucategory-formGroup label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.admin-menucategory-formGroup input,
+.admin-menucategory-formGroup textarea,
+.admin-menucategory-formGroup select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.admin-menucategory-formGroup input:focus,
+.admin-menucategory-formGroup textarea:focus,
+.admin-menucategory-formGroup select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+}
+
+/* MODAL ACTIONS */
+.admin-menucategory-modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.admin-menucategory-cancelBtn {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  padding: 4px 6px;
+  transition: 0.2s;
+}
+
+.admin-menucategory-cancelBtn:hover {
+  background: #e5e7eb;
+}
+
+.admin-menucategory-saveBtn,
+.admin-menucategory-delete-confirm-btn {
+  background: #2563eb;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.admin-menucategory-saveBtn:hover,
+.admin-menucategory-delete-confirm-btn:hover {
+  background: #1d4ed8;
+}
+
+/* ------------ IMAGE PLACEHOLDER ------------ */
+.admin-menucategory-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.no-img {
+  width: 60px;
+  height: 60px;
+  border: 1px dashed #bbb;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.25s ease;
-}
-
-.admin-category-close-btn svg {
-  stroke: #000 !important;
-  transition: stroke 0.25s ease;
-}
-
-.admin-category-close-btn:hover {
-  background: #000;
-}
-
-.admin-category-close-btn:hover svg {
-  stroke: #fff !important;
-}
-
-/* ===== Modal Body ===== */
-.admin-modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.admin-modal-body input[type="text"],
-.admin-modal-body input[type="number"],
-.admin-modal-body textarea,
-.admin-modal-body select {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #ccc;
+  font-size: 10px;
+  color: #666;
   border-radius: 6px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s ease;
 }
 
-.admin-modal-body input:focus,
-.admin-modal-body textarea:focus,
-.admin-modal-body select:focus {
-  border-color: #007bff;
-}
-
-.admin-modal-body textarea {
-  resize: none;
-  min-height: 60px;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 4px 0 10px 0;
-  font-size: 14px;
-}
-.admin-category-disabled-delete-btn {
-  background: transparent;
-  border: none;
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.admin-category-disabled-delete-btn:hover {
-  opacity: 0.6;
-}
-
-/* ===== Save Button ===== */
-.admin-save-btn {
-  width: 100%;
-  background: #28a745;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 9px 14px;
-  font-size: 15px;
-  transition: background 0.25s ease;
-  margin-top: 4px;
-}
-
-.admin-save-btn:hover {
-  background: #218838;
-}
-
-/* ===== Empty Data ===== */
-.no-data {
+/* ------------ PAGINATION ------------ */
+.admin-menucategory-pagination-container {
+  margin-top: 20px;
   text-align: center;
-  color: #888;
-  padding: 20px;
-  font-style: italic;
 }
 
-/* ===== Animation ===== */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.admin-menucategory-pagination-btn {
+  padding: 6px 12px;
+  margin: 0 10px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
-  .admin-category-table th,
-  .admin-category-table td {
-    font-size: 13px;
-    padding: 8px;
-  }
+.admin-menucategory-pagination-btn:disabled {
+  background: #9bbdf2;
+  cursor: not-allowed;
+}
 
-  .admin-category-photo,
-  .no-img {
-    width: 60px;
-    height: 60px;
-  }
+.admin-menucategory-pagination-info {
+  font-weight: bold;
+  font-size: 14px;
+}
+.admin-menucategory-icon-edit {
+  background: #e0f2fe;
+  color: #0369a1;
+}
 
-  .admin-category-modal {
-    width: 90%;
-  }
+.admin-menucategory-icon-edit:hover {
+  background: #bae6fd;
+}
+
+.admin-menucategory-icon-delete {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.admin-menucategory-icon-delete:hover {
+  background: #fecaca;
 }
