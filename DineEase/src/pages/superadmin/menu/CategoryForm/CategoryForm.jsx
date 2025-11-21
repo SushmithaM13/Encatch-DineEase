@@ -7,9 +7,6 @@ export default function CategoryForm() {
   const CATEGORY_API = "http://localhost:8082/dine-ease/api/v1/menu-category";
   const TOKEN = localStorage.getItem("token");
 
-  const token = localStorage.getItem("token");
-
-
   const location = useLocation();
   const organizationId =
     location.state?.organizationId || localStorage.getItem("organizationId");
@@ -24,6 +21,7 @@ export default function CategoryForm() {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  // Parent add form state (your existing add category)
   const [menuCategoryName, setMenuCategoryName] = useState("");
   const [description, setDescription] = useState("");
   const [displayOrder, setDisplayOrder] = useState(0);
@@ -33,151 +31,43 @@ export default function CategoryForm() {
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
 
+  // image / url for main add
   const [useExternalUrl, setUseExternalUrl] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
 
-  const handleImageUrlChange = (e) => {
-    setImageUrl(e.target.value);
-    setImagePreview(e.target.value);
-  };
+  // ===== Subcategory states (for modal and inline form) =====
+  const [showSubModal, setShowSubModal] = useState(false); // popup modal for subcategory
+  const [selectedParent, setSelectedParent] = useState(null); // parent object when adding sub
+  const [expandedParents, setExpandedParents] = useState([]); // parents with inline form open
 
-  const [showSubCategoryPopup, setShowSubCategoryPopup] = useState(false);
-  const [selectedParent, setSelectedParent] = useState(null);
-  const [selectedParentForView, setSelectedParentForView] = useState(null);
-  const [subCategories, setSubCategories] = useState([]);
-  const [loadingSubcategories, setLoadingSubcategories] = useState(false);
-  const [subCategoryName, setSubCategoryName] = useState("");
+  // shared subcategory form fields (will be used both by modal & inline)
+  const [subMenuCategoryName, setSubMenuCategoryName] = useState("");
   const [subDescription, setSubDescription] = useState("");
   const [subDisplayOrder, setSubDisplayOrder] = useState(0);
   const [subIsActive, setSubIsActive] = useState(true);
-  const [subImage, setSubImage] = useState(null);
-
+  const [subImageFile, setSubImageFile] = useState(null);
+  const [subImagePreview, setSubImagePreview] = useState(null);
   const [subUseExternalUrl, setSubUseExternalUrl] = useState(false);
   const [subImageUrl, setSubImageUrl] = useState("");
-  const [subImagePreview, setSubImagePreview] = useState(null);
 
-
-  // ✅ helper for category name
+  // helper: get name (keeps your helper)
   const getName = (cat) =>
     cat.menuCategoryName || cat.name || cat.parentCategoryName || "Unnamed";
 
-  // ✅ Convert image path or base64 to valid image src
+  // Convert image path or base64 to valid image src (kept from your code)
   const getImageUrl = (cat) => {
     if (cat.imageData) return `data:image/jpeg;base64,${cat.imageData}`;
-
-    // handle base64 image
-    if (cat.imageData) return `data:image/jpeg;base64,${cat.imageData}`;
-
-    // handle backend windows path
     if (cat.imageUrl) {
       const cleanedPath = cat.imageUrl.replace(/\\/g, "/");
       if (cleanedPath.includes("uploads"))
         return `http://localhost:8082/${cleanedPath.split("Backend/")[1]}`;
       return cleanedPath;
     }
-
     return "/default-image.png";
   };
 
-  // ✅ Fetch subcategories by parent ID
-
-
-  const fetchSubcategories = async (parentCategoryId) => {
-    try {
-      const response = await fetch(
-        `http://localhost:8082/dine-ease/api/v1/menu-category/sub-categories/${parentCategoryId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error("Failed to fetch subcategories");
-
-      const data = await response.json();
-      console.log("✅ Fetched subcategories:", data);
-
-      // Make sure data is an array
-      if (Array.isArray(data)) {
-        setSubCategories(data);
-      } else if (data.subCategories) {
-        setSubCategories(data.subCategories);
-      } else {
-        console.warn("⚠️ Unexpected data format:", data);
-        setSubCategories([]);
-      }
-    } catch (error) {
-      console.error("❌ Subcategory fetch error:", error);
-      setSubCategories([]);
-    } finally {
-      setLoadingSubcategories(false);
-    }
-  };
-
-
-  const openSubcategoryModalForParentName = (cat) => {
-    setSelectedParent(cat);
-    setShowSubCategoryPopup(true);
-  };
-
-  const handleAddSubCategory = async () => {
-    if (!selectedParent || !organizationId) {
-      toast.error("Parent category missing");
-      return;
-    }
-    if (!subCategoryName.trim()) {
-      toast.error("Subcategory name is required");
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append("organizationId", organizationId);
-      formData.append("menuCategoryName", subCategoryName.trim());
-      formData.append("description", subDescription || "");
-      formData.append("displayOrder", subDisplayOrder || 0);
-      formData.append("isActive", subIsActive);
-      formData.append(
-        "parentCategoryName",
-        selectedParent.menuCategoryName || selectedParent.name
-      );
-      if (!subUseExternalUrl) {
-        if (subImage) formData.append("image", subImage);
-      } else {
-        formData.append("imageUrl", subImageUrl);
-      }
-
-
-      const res = await fetch(`${CATEGORY_API}/create`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${TOKEN}` },
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Failed to create subcategory");
-
-      toast.success("✅ Subcategory added successfully!");
-      setShowSubCategoryPopup(false);
-      setSubCategoryName("");
-      setSubDescription("");
-      setSubDisplayOrder(0);
-      setSubImage(null);
-
-      // 🔥 ALWAYS refresh the UI after adding
-      setSelectedParentForView(selectedParent);
-      fetchSubcategories(selectedParent.id);
-
-    } catch (err) {
-      console.error(err);
-      toast.error("Error adding subcategory");
-    }
-  };
-
-
-  // ====== Fetch categories ======
+  // ===== Fetch categories (kept mostly identical, but set parentCategoryName like admin) =====
   const fetchCategories = useCallback(async () => {
     if (!organizationId) {
       toast.warn("Organization ID missing — reload dashboard");
@@ -191,7 +81,23 @@ export default function CategoryForm() {
       );
       if (!res.ok) throw new Error("Failed to fetch categories");
       const data = await res.json();
-      setCategories(data.content || []);
+      const list = data.content || [];
+
+      // ensure menuCategoryName exists and compute parentCategoryName (like Admin)
+      let formatted = list.map((cat) => ({
+        ...cat,
+        menuCategoryName: cat.menuCategoryName || cat.name,
+      }));
+
+      formatted = formatted.map((cat) => {
+        const parent = formatted.find((p) => p.id === cat.parentCategoryId);
+        return {
+          ...cat,
+          parentCategoryName: parent ? parent.menuCategoryName : cat.parentCategoryName || null,
+        };
+      });
+
+      setCategories(formatted);
       setTotalPages(data.totalPages || 1);
     } catch (err) {
       toast.error("Error loading categories");
@@ -205,26 +111,27 @@ export default function CategoryForm() {
     fetchCategories();
   }, [fetchCategories]);
 
-  // ===== Search + Pagination =====
+  // ===== Search + Pagination (kept behavior as you had) =====
   useEffect(() => {
-    // ✅ Step 1: Show only parent categories (no parentCategoryName)
     const parentOnly = categories.filter(
       (cat) => !cat.parentCategoryId && !cat.parentCategoryName
     );
 
-    // ✅ Step 2: Apply search filter
     const filteredList = parentOnly.filter((cat) =>
       (cat.menuCategoryName || "").toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // ✅ Step 3: Apply pagination
     setFiltered(filteredList);
     const start = (currentPage - 1) * 5;
     const end = start + 5;
     setPaginated(filteredList.slice(start, end));
   }, [categories, searchTerm, currentPage]);
 
-
+  // ===== Image handlers for parent form (kept) =====
+  const handleImageUrlChange = (e) => {
+    setImageUrl(e.target.value);
+    setImagePreview(e.target.value);
+  };
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -234,7 +141,22 @@ export default function CategoryForm() {
     }
   };
 
-  // ===== Add Category =====
+  // ===== Sub image handlers =====
+  const handleSubImagePreview = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setSubImagePreview(reader.result);
+      reader.readAsDataURL(file);
+      setSubImageFile(file);
+    }
+  };
+  const handleSubImageUrlChange = (e) => {
+    setSubImageUrl(e.target.value);
+    setSubImagePreview(e.target.value);
+  };
+
+  // ===== Add Parent Category (kept your existing function) =====
   const handleAddCategory = async () => {
     if (!organizationId) {
       toast.error("Organization ID missing");
@@ -252,8 +174,7 @@ export default function CategoryForm() {
       formData.append("description", description || "");
       formData.append("displayOrder", displayOrder || 0);
       formData.append("isActive", isActive);
-      if (parentCategoryName)
-        formData.append("parentCategoryName", parentCategoryName);
+      if (parentCategoryName) formData.append("parentCategoryName", parentCategoryName);
       if (imagePreview) {
         const blob = await fetch(imagePreview).then((r) => r.blob());
         formData.append("image", blob, "category.jpg");
@@ -281,6 +202,7 @@ export default function CategoryForm() {
     }
   };
 
+  // ===== Edit & Update (kept) =====
   const handleEditClick = (cat) => {
     setEditingCategory(cat);
     setShowModal(true);
@@ -315,6 +237,7 @@ export default function CategoryForm() {
     }
   };
 
+  // ===== Delete (kept) =====
   const handleDeleteCategory = async (id) => {
     const cat = categories.find((c) => c.id === id);
     if (!window.confirm(`Delete category "${cat.menuCategoryName}"?`)) return;
@@ -327,11 +250,12 @@ export default function CategoryForm() {
       toast.success("🗑️ Category deleted");
       fetchCategories();
     } catch (err) {
-      console.error(err)
+      console.error(err);
       toast.error("Delete failed");
     }
   };
 
+  // ===== Category image component (kept) =====
   const CategoryImage = ({ cat, className }) => (
     <img
       src={getImageUrl(cat)}
@@ -341,95 +265,130 @@ export default function CategoryForm() {
     />
   );
 
-  const getImageSrc = (sub) => {
-    const base64 = sub.imageData;
-    const url = sub.imageUrl;
+  // ===== Inline dropdown toggle helpers =====
 
-    if (base64) return `data:image/jpeg;base64,${base64}`;
-    if (url) {
-      let clean = url.replace(/\\/g, "/");
-      const index = clean.indexOf("uploads/");
-      if (index !== -1) clean = clean.substring(index);
-      return `http://localhost:8082/${clean}`;
+const getSubcategories = (parentId) => {
+  return categories.filter((cat) => cat.parentCategoryId === parentId);
+};
+
+const toggleExpand = (id) => {
+  const opening = !expandedParents.includes(id);
+
+  setExpandedParents((prev) =>
+    prev.includes(id)
+      ? prev.filter((pid) => pid !== id)
+      : [...prev, id]
+  );
+
+  if (opening) {
+    const parent = categories.find((c) => c.id === id);
+    setSelectedParent(parent || null);
+    resetSubForm();
+  } else {
+    setSelectedParent(null);
+    resetSubForm();
+  }
+};
+
+
+  // ===== Reset subcategory form =====
+  const resetSubForm = () => {
+    setSubMenuCategoryName("");
+    setSubDescription("");
+    setSubDisplayOrder(0);
+    setSubIsActive(true);
+    setSubImageFile(null);
+    setSubImagePreview(null);
+    setSubUseExternalUrl(false);
+    setSubImageUrl("");
+  };
+
+  // ===== Open modal for subcategory (when clicking "Add Sub Category" button) =====
+  const openSubModalFor = (parent) => {
+    setSelectedParent(parent);
+    // prefill parent id in sub form (we use parent on submit)
+    resetSubForm();
+    setShowSubModal(true);
+  };
+
+  // ===== Create subcategory (used by both modal and inline) =====
+  const handleSaveSubcategory = async (closeAfter = true) => {
+    if (!selectedParent) {
+      toast.error("Parent category not selected");
+      return;
     }
-
-    return "/default-image.png";
-  };
-
-
-
-  const handleSubImagePreview = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setSubImagePreview(reader.result);
-      reader.readAsDataURL(file);
-      setSubImage(file);
+    if (!subMenuCategoryName.trim()) {
+      toast.error("Subcategory name required");
+      return;
     }
-  };
-
-  const handleSubImageUrlChange = (e) => {
-    setSubImageUrl(e.target.value);
-    setSubImagePreview(e.target.value);
-  };
-
-
-
-
-
-  // ======= Subcategory Edit & Delete Handlers =======
-  const handleEdit = (sub) => {
-    console.log("Edit subcategory:", sub);
-    // You can later open a popup to update subcategory details here
-    toast.info(`Editing subcategory: ${sub.subCategoryName}`);
-  };
-
-  const handleDelete = async (subCategoryId) => {
-    if (!window.confirm("Are you sure you want to delete this subcategory?")) return;
 
     try {
-      const response = await fetch(
-        `http://localhost:8082/dine-ease/api/v1/menu-category/sub-categories/${subCategoryId}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${TOKEN}` },
+      const formData = new FormData();
+      formData.append("organizationId", organizationId);
+      formData.append("menuCategoryName", subMenuCategoryName.trim());
+      formData.append("description", subDescription || "");
+      formData.append("displayOrder", subDisplayOrder || 0);
+      formData.append("isActive", subIsActive);
+
+      // Option C: include both parentCategoryId and parentCategoryName
+      formData.append("parentCategoryId", selectedParent.id);
+      formData.append("parentCategoryName", selectedParent.menuCategoryName || selectedParent.name);
+
+      if (subImagePreview) {
+        // if preview is a data URL (file) convert to blob
+        if (subImageFile) {
+          formData.append("image", subImageFile);
+        } else {
+          // if user provided URL (string), try to fetch and append blob
+          try {
+            const blob = await fetch(subImagePreview).then((r) => r.blob());
+            formData.append("image", blob, "subcategory.jpg");
+          } catch {
+            // ignore if URL fetch fails; backend may accept imageUrl separately
+          }
         }
-      );
+      }
 
-      if (!response.ok) throw new Error("Failed to delete subcategory");
+      const res = await fetch(`${CATEGORY_API}/create`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${TOKEN}` },
+        body: formData,
+      });
 
-      toast.success("🗑️ Subcategory deleted successfully!");
-      fetchSubcategories(selectedParentForView?.id); // refresh after delete
-    } catch (error) {
-      console.error("Error deleting subcategory:", error);
-      toast.error("Error deleting subcategory");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed");
+
+      toast.success("✅ Subcategory added!");
+      // close modal or collapse inline form depending on how it was invoked
+      if (closeAfter) setShowSubModal(false);
+      // ensure inline form closes and selection cleared
+      setExpandedParents((prev) => prev.filter((id) => id !== selectedParent.id));
+      setSelectedParent(null);
+      resetSubForm();
+      // refresh immediately
+      fetchCategories();
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Error adding subcategory");
     }
   };
 
-
-
-
+  // ===== Render =====
   return (
     <div className="category-form-container">
       <h2>🍽️ Manage Menu Categories</h2>
 
-      {/* ======= Top Buttons ======= */}
+      {/* Top buttons */}
       <div className="buttons">
-        <button
-          className="btn toggle-form-btn"
-          onClick={() => setShowForm((prev) => !prev)}
-        >
+        <button className="btn toggle-form-btn" onClick={() => setShowForm((p) => !p)}>
           {showForm ? "✕ Hide Form" : "➕ Add Category"}
         </button>
-        <button
-          className="btn toggle-view-btn"
-          onClick={() => setShowCategories((prev) => !prev)}
-        >
+        <button className="btn toggle-view-btn" onClick={() => setShowCategories((p) => !p)}>
           {showCategories ? "✕ Hide List" : "📋 View Categories"}
         </button>
       </div>
 
-      {/* ======= Add Category Form ======= */}
+      {/* Add Parent Category Form */}
       {showForm && (
         <div className="category-form">
           <div className="form-row">
@@ -500,7 +459,7 @@ export default function CategoryForm() {
                 type="text"
                 value={imageUrl}
                 onChange={handleImageUrlChange}
-                placeholder="Paste image URL (e.g., https://example.com/image.jpg)"
+                placeholder="Paste image URL"
               />
             )}
 
@@ -511,7 +470,6 @@ export default function CategoryForm() {
                   alt="Preview"
                   className="image-preview"
                   onError={(e) => {
-                    console.error("Preview failed:", imagePreview);
                     e.target.style.display = "none";
                   }}
                 />
@@ -522,28 +480,20 @@ export default function CategoryForm() {
           <div className="form-row">
             <div className="form-group">
               <label>Status</label>
-              <select
-                value={isActive}
-                onChange={(e) => setIsActive(e.target.value === "true")}
-              >
+              <select value={isActive} onChange={(e) => setIsActive(e.target.value === "true")}>
                 <option value="true">Active</option>
                 <option value="false">Inactive</option>
               </select>
             </div>
           </div>
 
-          <button
-            type="button"
-            className="submit-btn"
-            disabled={loading}
-            onClick={handleAddCategory}
-          >
+          <button type="button" className="submit-btn" disabled={loading} onClick={handleAddCategory}>
             {loading ? "Adding..." : "Add Category"}
           </button>
         </div>
       )}
 
-      {/* ======= View Categories Section ======= */}
+      {/* View Categories */}
       {showCategories && (
         <>
           <div className="categories-section">
@@ -562,9 +512,9 @@ export default function CategoryForm() {
               <table className="category-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Image</th>
                     <th>Parent Category</th>
+                    <th>Sub Category</th>
+                    <th>Image</th>
                     <th>Description</th>
                     <th>Order</th>
                     <th>Status</th>
@@ -572,61 +522,81 @@ export default function CategoryForm() {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginated.map((cat) => (
-                    <tr key={cat.id}>
-                      <td>{cat.id}</td>
-                      <td><CategoryImage cat={cat} className="table-image" /></td>
-                      <td>{cat.parentCategoryName || getName(cat) || "—"}</td>
-                      <td>{cat.description || "—"}</td>
-                      <td>{cat.displayOrder ?? "—"}</td>
-                      <td>
-                        <span className={`status-badge ${cat.isActive ? "status-active" : "status-inactive"}`}>
-                          {cat.isActive ? "Active" : "Inactive"}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="table-actions">
-                          <button
-                            className="table-btn edit-btn"
-                            onClick={() => handleEditClick(cat)}
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            className="table-btn delete-btn"
-                            onClick={() => handleDeleteCategory(cat.id)}
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                        <div className="subcategory-actions">
-                          <button
-                            className="subcategory-btn"
-                            onClick={() => {
-                              setSelectedParentForView(cat);
-                              fetchSubcategories(cat.id);
-                            }}
-                          >
-                            👁️ View Subcategories
-                          </button>
-                          <button
-                            className="subcategory-btn add-sub-btn"
-                            onClick={() => openSubcategoryModalForParentName(cat)}
-                          >
-                            ➕ Add Subcategory
-                          </button>
-                        </div>
+                  {paginated.map((cat) => {
+                    const subs = getSubcategories(cat.id);
 
+                    return (
+                      <React.Fragment key={cat.id}>
+                        {/* Parent row */}
+                        <tr>
+                          <td>
+                            <button
+                              className="link-like"
+                              onClick={() => toggleExpand(cat.id)}
+                              style={{ background: "none", border: "none", cursor: "pointer" }}
+                            >
+                              {cat.menuCategoryName || "—"}
+                            </button>
+                          </td>
 
-                      </td>
-                    </tr>
-                  ))}
+                          <td>
+                            <button className="btn small" onClick={() => openSubModalFor(cat)}>
+                              ➕ Add Sub Category
+                            </button>
+                          </td>
+
+                          <td><CategoryImage cat={cat} className="table-image" /></td>
+                          <td>{cat.description || "—"}</td>
+                          <td>{cat.displayOrder ?? "—"}</td>
+                          <td>
+                            <span className={`status-badge ${cat.isActive ? "status-active" : "status-inactive"}`}>
+                              {cat.isActive ? "Active" : "Inactive"}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="table-actions">
+                              <button className="table-btn edit-btn" onClick={() => handleEditClick(cat)}>✏️</button>
+                              <button className="table-btn delete-btn" onClick={() => handleDeleteCategory(cat.id)}>🗑️</button>
+                            </div>
+                          </td>
+                        </tr>
+
+                        {/* Subcategory rows (visible only when expanded) */}
+                        {expandedParents.includes(cat.id) &&
+                          subs.map((sub) => (
+                            <tr key={sub.id} className="subcategory-row">
+                              <td style={{ paddingLeft: "40px", fontWeight: "bold", color: "#444" }}>
+                                ↳ {sub.menuCategoryName}
+                              </td>
+                              <td>—</td>
+                              <td><CategoryImage cat={sub} className="table-image" /></td>
+                              <td>{sub.description || "—"}</td>
+                              <td>{sub.displayOrder !== null && sub.displayOrder !== undefined ? sub.displayOrder : "—"}</td>
+
+                              <td>
+                                <span className={`status-badge ${sub.isActive ? "status-active" : "status-inactive"}`}>
+                                  {sub.isActive ? "Active" : "Inactive"}
+                                </span>
+                              </td>
+                              <td>
+                                <div className="table-actions">
+                                  <button className="table-btn edit-btn" onClick={() => handleEditClick(sub)}>✏️</button>
+                                  <button className="table-btn delete-btn" onClick={() => handleDeleteCategory(sub.id)}>🗑️</button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
+                        }
+                      </React.Fragment>
+                    );
+                  })}
+
                 </tbody>
               </table>
             </div>
           </div>
 
-          {/* ======= Pagination ======= */}
+          {/* Pagination */}
           <div className="pagination">
             <button
               className="page-btn"
@@ -640,271 +610,60 @@ export default function CategoryForm() {
             </span>
             <button
               className="page-btn"
-              onClick={() =>
-                setCurrentPage((p) => Math.min(totalPages, p + 1))
-              }
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
             >
               Next →
             </button>
           </div>
-
-          {/* ======= Mobile View ======= */}
-          <div className="mobile-view">
-            <div className="categories-container">
-              {paginated.map((cat) => (
-                <div className="category-card" key={cat.id}>
-                  <div className="card-image-container">
-                    <CategoryImage cat={cat} className="card-image" />
-                  </div>
-                  <div className="card-content">
-                    <h4 className="card-title">{getName(cat)}</h4>
-                    <p className="card-desc">{cat.description || "No description"}</p>
-                    <div className="card-meta">
-                      <span>Order: {cat.displayOrder ?? "—"}</span>
-                      <span>•</span>
-                      <span>{cat.parentCategoryName || "No parent"}</span>
-                    </div>
-                    <span
-                      className={`status-badge ${cat.isActive ? "status-active" : "status-inactive"}`}
-                    >
-                      {cat.isActive ? "● Active" : "● Inactive"}
-                    </span>
-                    <div className="card-actions">
-                      <button
-                        className="card-btn edit-btn"
-                        onClick={() => handleEditClick(cat)}
-                      >
-                        ✏️ Edit
-                      </button>
-                      <button
-                        className="card-btn delete-btn"
-                        onClick={() => handleDeleteCategory(cat.id)}
-                      >
-                        🗑️ Delete
-                      </button>
-                      <button
-                        className="card-btn sub-btn"
-                        onClick={() => {
-                          setSelectedParent(cat);
-                          setShowSubCategoryPopup(true);
-                        }}
-                      >
-                        ➕ Subcategory
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="pagination mobile-pagination">
-              <button
-                className="page-btn"
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-              >
-                ←
-              </button>
-              <span className="page-info">
-                {currentPage} / {totalPages}
-              </span>
-              <button
-                className="page-btn"
-                onClick={() =>
-                  setCurrentPage((p) => Math.min(totalPages, p + 1))
-                }
-                disabled={currentPage === totalPages}
-              >
-                →
-              </button>
-            </div>
-          </div>
         </>
       )}
 
-      {/* ======= Subcategory Popup ======= */}
-      {showSubCategoryPopup && (
-        <div className="modal-overlay" onClick={() => setShowSubCategoryPopup(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>➕ Add Subcategory</h3>
-            <div className="popup-field">
-              <label>Parent Category</label>
-              <input
-                type="text"
-                value={
-                  selectedParent?.menuCategoryName ||
-                  selectedParent?.name ||
-                  selectedParent?.parentCategoryName ||
-                  ""
-                }
-                readOnly
-                className="readonly-input"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Subcategory Name *</label>
-              <input
-                type="text"
-                value={subCategoryName}
-                onChange={(e) => setSubCategoryName(e.target.value)}
-                placeholder="Enter subcategory name"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Description</label>
-              <input
-                type="text"
-                value={subDescription}
-                onChange={(e) => setSubDescription(e.target.value)}
-                placeholder="Enter description"
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Display Order</label>
-              <input
-                type="number"
-                value={subDisplayOrder}
-                onChange={(e) => setSubDisplayOrder(e.target.value)}
-                placeholder="0"
-              />
-            </div>
-
-            <div className="form-group full-width">
-              <label>Image</label>
-
-              <div className="image-input-toggle">
-                <button
-                  type="button"
-                  className={`toggle-btn ${!subUseExternalUrl ? "active" : ""}`}
-                  onClick={() => {
-                    setSubUseExternalUrl(false);
-                    setSubImageUrl("");
-                    setSubImagePreview(null);
-                  }}
-                >
-                  📁 Upload File
-                </button>
-
-                {/* <button
-      type="button"
-      className={`toggle-btn ${subUseExternalUrl ? "active" : ""}`}
-      onClick={() => {
-        setSubUseExternalUrl(true);
-        setSubImage("");
-      }}
-    >
-      🌐 External URL
-    </button> */}
-              </div>
-
-              {!subUseExternalUrl ? (
-                <input type="file" accept="image/*" onChange={handleSubImagePreview} />
-              ) : (
-                <input
-                  type="text"
-                  value={subImageUrl}
-                  onChange={handleSubImageUrlChange}
-                  placeholder="Paste image URL"
-                />
-              )}
-
-              {subImagePreview && (
-                <div className="image-preview-container">
-                  <img src={subImagePreview} className="image-preview" />
+      {/* Mobile view (kept) */}
+      {showCategories && (
+        <div className="mobile-view">
+          <div className="categories-container">
+            {paginated.map((cat) => (
+              <div className="category-card" key={cat.id}>
+                <div className="card-image-container">
+                  <CategoryImage cat={cat} className="card-image" />
                 </div>
-              )}
-            </div>
-
-
-            <div className="form-group">
-              <label>Status</label>
-              <select
-                value={subIsActive}
-                onChange={(e) => setSubIsActive(e.target.value === "true")}
-              >
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
-              </select>
-            </div>
-
-            <div className="modal-actions">
-              <button className="modal-btn add-btn" onClick={handleAddSubCategory}>
-                Add
-              </button>
-              <button
-                className="modal-btn cancel-btn"
-                onClick={() => setShowSubCategoryPopup(false)}
-              >
-                Cancel
-              </button>
-            </div>
+                <div className="card-content">
+                  <h4 className="card-title">{getName(cat)}</h4>
+                  <p className="card-desc">{cat.description || "No description"}</p>
+                  <div className="card-meta">
+                    <span>Order: {cat.displayOrder ?? "—"}</span>
+                    <span>•</span>
+                    <span>{cat.parentCategoryName || "No parent"}</span>
+                  </div>
+                  <span className={`status-badge ${cat.isActive ? "status-active" : "status-inactive"}`}>
+                    {cat.isActive ? "● Active" : "● Inactive"}
+                  </span>
+                  <div className="card-actions">
+                    <button className="card-btn edit-btn" onClick={() => handleEditClick(cat)}>
+                      ✏️ Edit
+                    </button>
+                    <button className="card-btn delete-btn" onClick={() => handleDeleteCategory(cat.id)}>
+                      🗑️ Delete
+                    </button>
+                    <button
+                      className="card-btn sub-btn"
+                      onClick={() => {
+                        setSelectedParent(cat);
+                        setShowSubModal(true);
+                      }}
+                    >
+                      ➕ Subcategory
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {selectedParentForView && (
-        <div className="subcategory-section">
-          <h3>
-            📂 Subcategories of{" "}
-            <span className="parent-highlight">
-              {getName(selectedParentForView)}
-            </span>
-          </h3>
-
-          {loadingSubcategories ? (
-            <p>Loading subcategories...</p>
-          ) : subCategories.length === 0 ? (
-            <p className="no-subcategories">No subcategories found.</p>
-          ) : (
-            <div className="subcategory-table-wrapper">
-              <table className="subcategory-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Order</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {subCategories.map((sub, index) => (
-                    <tr key={sub.id || index}>
-                      <td>{index + 1}</td>
-                      <td>
-                        <img
-                          src={getImageSrc(sub)}
-                          alt={sub.menuCategoryName || "Subcategory"}
-                          style={{ width: "40px", height: "40px", borderRadius: "6px", objectFit: "cover" }}
-                          onError={(e) => (e.target.src = "/default-image.png")}
-                        />
-                      </td>
-                      <td>{sub.menuCategoryName || "—"}</td>
-                      <td>{sub.description || "—"}</td>
-                      <td>{sub.displayOrder ?? "—"}</td>
-                      <td>{sub.isActive ? "Active" : "Inactive"}</td>
-                      <td>
-                        <button onClick={() => handleEdit(sub)}>Edit</button>
-                        <button onClick={() => handleDelete(sub.id)}>Delete</button>
-                      </td>
-                    </tr>
-                  ))}
-
-                </tbody>
-
-
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ======= Edit Modal ======= */}
+      {/* Edit Modal (kept) */}
       {showModal && editingCategory && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -957,11 +716,7 @@ export default function CategoryForm() {
                 <input type="file" accept="image/*" onChange={handleImageChange} />
                 {imagePreview && (
                   <div className="image-preview-container">
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="image-preview"
-                    />
+                    <img src={imagePreview} alt="Preview" className="image-preview" />
                   </div>
                 )}
               </div>
@@ -984,16 +739,89 @@ export default function CategoryForm() {
             </div>
 
             <div className="modal-actions">
-              <button
-                className="modal-btn update-btn"
-                onClick={handleUpdateCategory}
-              >
+              <button className="modal-btn update-btn" onClick={handleUpdateCategory}>
                 ✓ Update
               </button>
+              <button className="modal-btn cancel-btn" onClick={() => setShowModal(false)}>
+                ✕ Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Subcategory Modal (same inputs as Add Category but WITHOUT parent input) */}
+      {showSubModal && selectedParent && (
+        <div className="modal-overlay" onClick={() => setShowSubModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Subcategory for {selectedParent.menuCategoryName}</h3>
+
+            <div className="form-group">
+              <label>Category Name *</label>
+              <input type="text" value={subMenuCategoryName} onChange={(e) => setSubMenuCategoryName(e.target.value)} />
+            </div>
+
+            <div className="form-group">
+              <label>Description</label>
+              <input type="text" value={subDescription} onChange={(e) => setSubDescription(e.target.value)} />
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label>Display Order</label>
+                <input type="number" value={subDisplayOrder} onChange={(e) => setSubDisplayOrder(e.target.value)} />
+              </div>
+
+              <div className="form-group full-width">
+                <label>Image</label>
+                <div className="image-input-toggle">
+                  <button
+                    type="button"
+                    className={`toggle-btn ${!subUseExternalUrl ? "active" : ""}`}
+                    onClick={() => {
+                      setSubUseExternalUrl(false);
+                      setSubImageUrl("");
+                      setSubImagePreview(null);
+                    }}
+                  >
+                    📁 Upload File
+                  </button>
+                  
+                </div>
+
+                {!subUseExternalUrl ? (
+                  <input type="file" accept="image/*" onChange={handleSubImagePreview} />
+                ) : (
+                  <input type="text" value={subImageUrl} onChange={handleSubImageUrlChange} placeholder="Image URL" />
+                )}
+
+                {subImagePreview && (
+                  <div className="image-preview-container">
+                    <img src={subImagePreview} alt="Preview" className="image-preview" />
+                  </div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Status</label>
+                <select value={subIsActive ? "true" : "false"} onChange={(e) => setSubIsActive(e.target.value === "true")}>
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="modal-actions">
               <button
-                className="modal-btn cancel-btn"
-                onClick={() => setShowModal(false)}
+                className="modal-btn update-btn"
+                onClick={() => {
+                  // ensure selected parent is set and save
+                  handleSaveSubcategory(true);
+                }}
               >
+                ✓ Save
+              </button>
+              <button className="modal-btn cancel-btn" onClick={() => setShowSubModal(false)}>
                 ✕ Cancel
               </button>
             </div>

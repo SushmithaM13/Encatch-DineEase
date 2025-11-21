@@ -21,6 +21,7 @@ import {
   FaChartBar,
   FaFileAlt,
 } from "react-icons/fa";
+import { icon } from "@fortawesome/fontawesome-svg-core";
 
 const SuperAdminDashboard = () => {
   const [hotels, setHotels] = useState([]);
@@ -30,11 +31,13 @@ const SuperAdminDashboard = () => {
   const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
   const [dashboardDropdownOpen, setDashboardDropdownOpen] = useState(false);
   const [staffDropdownOpen, setStaffDropdownOpen] = useState(false);
+
   const [userName, setUserName] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
   const [organizationName, setOrganizationName] = useState("");
   const [organizationFullName, setOrganizationFullName] = useState("");
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -47,76 +50,109 @@ const SuperAdminDashboard = () => {
   ];
 
   const menuOptions = [
+    {path: "/superAdminDashboard/AddMenu-form", lable: "MenuList", icon:<FaUtensils/>},
     { path: "/superAdminDashboard/category-form", label: "Add Category", icon: <FaFolder /> },
     { path: "/superAdminDashboard/add-item-type", label: "Add Item", icon: <FaPlusCircle /> },
     { path: "/superAdminDashboard/food-type", label: "Food Type", icon: <FaUtensils /> },
     { path: "/superAdminDashboard/cuisine-type", label: "Cuisine Type", icon: <FaBars /> },
-    { path: "/superAdminDashboard/variant-form", label: "Add Variant", icon: <FaTags /> },
     { path: "/superAdminDashboard/addon-form", label: "Add Addon", icon: <FaPuzzlePiece /> },
     { path: "/superAdminDashboard/customization-group-form", label: "Customization Group", icon: <FaMagic /> },
   ];
 
+
   useEffect(() => {
-    try {
-      const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
-      setHotels(storedHotels);
-    } catch {
-      setHotels([]);
+  // ======================
+  //  LOAD DATA ONCE
+  // ======================
+
+  try {
+    const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
+    setHotels(storedHotels);
+  } catch {
+    setHotels([]);
+  }
+
+  // USER NAME LOAD
+  const updatedFullName = localStorage.getItem("superAdminFullName");
+  if (updatedFullName && updatedFullName !== "null" && updatedFullName !== "undefined") {
+    setUserName(updatedFullName);
+  } else {
+    const userRaw = localStorage.getItem("user");
+    const userObj =
+      userRaw && userRaw !== "undefined" ? JSON.parse(userRaw) : {};
+    setUserName(userObj?.name || "User");
+  }
+
+  // ORGANIZATION LOAD
+  const storedOrgRaw = localStorage.getItem("organization");
+  if (storedOrgRaw) {
+    const org = JSON.parse(storedOrgRaw);
+    setOrganizationName(org.name || "");
+    setOrganizationFullName(org.fullName || "");
+  }
+
+  // FALLBACK
+  const orgName = localStorage.getItem("organizationName");
+  const orgFull = localStorage.getItem("organizationFullName");
+
+  if (orgName) setOrganizationName(orgName);
+  if (orgFull) setOrganizationFullName(orgFull);
+
+  // ======================
+  //  LISTENERS FOR DYNAMIC UPDATE
+  // ======================
+
+  // USER NAME dynamic update
+  const handleNameUpdate = () => {
+    const newName = localStorage.getItem("superAdminFullName") || "User";
+    setUserName(newName);
+  };
+
+  // ORGANIZATION dynamic update
+  const handleOrgUpdate = () => {
+    const newOrgName = localStorage.getItem("organizationName") || "";
+    const newOrgFullName = localStorage.getItem("organizationFullName") || "";
+
+    setOrganizationName(newOrgName);
+    setOrganizationFullName(newOrgFullName);
+  };
+
+  window.addEventListener("superAdminNameUpdated", handleNameUpdate);
+  window.addEventListener("organizationUpdated", handleOrgUpdate);
+
+  // When localStorage changes (other tabs)
+  const handleStorage = (e) => {
+    if (e.key === "superAdminFullName") {
+      setUserName(e.newValue || "User");
     }
-
-    try {
-      const storedUserRaw = localStorage.getItem("user");
-      const storedUser =
-        storedUserRaw && storedUserRaw !== "undefined"
-          ? JSON.parse(storedUserRaw)
-          : {};
-
-      const profileFullName = localStorage.getItem("superAdminFullName");
-
-      setUserName(profileFullName || storedUser?.name || "User");
-    } catch {
-      setUserName("User");
+    if (e.key === "organizationName") {
+      setOrganizationName(e.newValue || "");
     }
-
-    try {
-      const storedOrgRaw = localStorage.getItem("organization");
-      const storedOrg =
-        storedOrgRaw && storedOrgRaw !== "undefined"
-          ? JSON.parse(storedOrgRaw)
-          : null;
-
-      if (storedOrg) {
-        setOrganizationName(storedOrg.name || "");
-        setOrganizationFullName(storedOrg.fullName || "");
-      }
-    } catch {
-      setOrganizationName("");
-      setOrganizationFullName("");
-      localStorage.removeItem("organization");
+    if (e.key === "organizationFullName") {
+      setOrganizationFullName(e.newValue || "");
     }
+  };
 
-    const orgName = localStorage.getItem("organizationName");
-    const fullName = localStorage.getItem("organizationFullName");
+  window.addEventListener("storage", handleStorage);
 
-    if (orgName) setOrganizationName(orgName);
-    if (fullName) setOrganizationFullName(fullName);
+  return () => {
+    window.removeEventListener("superAdminNameUpdated", handleNameUpdate);
+    window.removeEventListener("organizationUpdated", handleOrgUpdate);
+    window.removeEventListener("storage", handleStorage);
+  };
+}, []);
 
-    const handleStorageChange = (e) => {
-      if (e.key === "organizationName") setOrganizationName(e.newValue || "");
-      if (e.key === "organizationFullName") setOrganizationFullName(e.newValue || "");
-    };
 
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
 
+  // ======================
+  //  MOBILE MENU HANDLER
+  // ======================
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? "hidden" : "unset";
     return () => (document.body.style.overflow = "unset");
   }, [mobileMenuOpen]);
 
-  const handleMobileMenuClose = () => setMobileMenuOpen(false);
-
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -127,6 +163,9 @@ const SuperAdminDashboard = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // ======================
+  // PREVENT BACK NAVIGATION
+  // ======================
   useEffect(() => {
     const handlePopState = () => {
       const token = localStorage.getItem("token");
@@ -140,6 +179,9 @@ const SuperAdminDashboard = () => {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
+  // ======================
+  // LOGOUT
+  // ======================
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -152,7 +194,9 @@ const SuperAdminDashboard = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+
       if (!response.ok) throw new Error("Logout failed");
+
       localStorage.removeItem("token");
       localStorage.removeItem("role");
       navigate("/", { replace: true });
@@ -161,25 +205,29 @@ const SuperAdminDashboard = () => {
     }
   };
 
+  // ======================
+  // SEARCH BAR HANDLER
+  // ======================
   useEffect(() => {
-    const delayDebounce = setTimeout(() => {
+    const t = setTimeout(() => {
       if (searchQuery.trim() !== "") {
         fetch(`http://localhost:8082/dine-ease/api/v1/search?query=${searchQuery}`)
           .then((res) => res.json())
           .then((data) => setSearchResults(data))
-          .catch((err) => console.error("Search error:", err));
+          .catch(() => setSearchResults([]));
       } else {
         setSearchResults([]);
       }
     }, 400);
 
-    return () => clearTimeout(delayDebounce);
+    return () => clearTimeout(t);
   }, [searchQuery]);
 
   return (
     <div className={`dashboard ${sidebarOpen ? "expanded" : "collapsed"}`}>
-      <div className={`sidebar-overlay ${mobileMenuOpen ? "active" : ""}`} onClick={handleMobileMenuClose}></div>
+      <div className={`sidebar-overlay ${mobileMenuOpen ? "active" : ""}`} onClick={() => setMobileMenuOpen(false)}></div>
 
+      {/* SIDEBAR */}
       <aside className={`sidebar ${sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed"} ${mobileMenuOpen ? "mobile-open" : ""}`}>
         <div className="sidebar-header">
           <div
@@ -192,7 +240,9 @@ const SuperAdminDashboard = () => {
           </div>
         </div>
 
+        {/* ALL MENU ITEMS */}
         <ul className="sidebar-menu">
+
           {/* Dashboard Dropdown */}
           <li className={`menu-dropdown ${dashboardDropdownOpen ? "active" : ""}`}>
             <div className="menu-link" onClick={() => setDashboardDropdownOpen((prev) => !prev)}>
@@ -211,9 +261,7 @@ const SuperAdminDashboard = () => {
                   <li key={option.path}>
                     <NavLink
                       to={option.path}
-                      onClick={() => {
-                        if (window.innerWidth <= 768) handleMobileMenuClose();
-                      }}
+                      onClick={() => window.innerWidth <= 768 && setMobileMenuOpen(false)}
                     >
                       {option.icon} <span>{option.label}</span>
                     </NavLink>
@@ -223,7 +271,7 @@ const SuperAdminDashboard = () => {
             )}
           </li>
 
-          {/* Staff Dropdown */}
+          {/* STAFF Dropdown */}
           <li className={`menu-dropdown ${staffDropdownOpen ? "active" : ""}`}>
             <div className="menu-link" onClick={() => setStaffDropdownOpen((prev) => !prev)}>
               <FaUsers />
@@ -238,23 +286,13 @@ const SuperAdminDashboard = () => {
             {staffDropdownOpen && sidebarOpen && (
               <ul className="submenu">
                 <li>
-                  <NavLink
-                    to="/superAdminDashboard/staff"
-                    onClick={() => {
-                      if (window.innerWidth <= 768) handleMobileMenuClose();
-                    }}
-                  >
+                  <NavLink to="/superAdminDashboard/staff" onClick={() => window.innerWidth <= 768 && setMobileMenuOpen(false)}>
                     <FaUsers /> <span>Staff</span>
                   </NavLink>
                 </li>
 
                 <li>
-                  <NavLink
-                    to="/superAdminDashboard/staffrole"
-                    onClick={() => {
-                      if (window.innerWidth <= 768) handleMobileMenuClose();
-                    }}
-                  >
+                  <NavLink to="/superAdminDashboard/staffrole" onClick={() => window.innerWidth <= 768 && setMobileMenuOpen(false)}>
                     <FaIdBadge /> <span>Staff Role</span>
                   </NavLink>
                 </li>
@@ -262,7 +300,7 @@ const SuperAdminDashboard = () => {
             )}
           </li>
 
-          {/* Menu Dropdown */}
+          {/* MENU Dropdown */}
           <li className={`menu-dropdown ${menuDropdownOpen ? "active" : ""}`}>
             <div className="menu-link" onClick={() => setMenuDropdownOpen((prev) => !prev)}>
               <FaUtensils />
@@ -280,9 +318,7 @@ const SuperAdminDashboard = () => {
                   <li key={option.path}>
                     <NavLink
                       to={option.path}
-                      onClick={() => {
-                        if (window.innerWidth <= 768) handleMobileMenuClose();
-                      }}
+                      onClick={() => window.innerWidth <= 768 && setMobileMenuOpen(false)}
                     >
                       {option.icon} <span>{option.label}</span>
                     </NavLink>
@@ -292,6 +328,7 @@ const SuperAdminDashboard = () => {
             )}
           </li>
 
+          {/* TABLE MANAGEMENT */}
           <li>
             <NavLink to="/superAdminDashboard/table">
               <FaTable />
@@ -301,33 +338,29 @@ const SuperAdminDashboard = () => {
         </ul>
       </aside>
 
-      {/* Main Content */}
+      {/* MAIN CONTENT */}
       <main className="main-content">
         <div className="topbar">
           <div
             className={`menu-toggle ${mobileMenuOpen || !sidebarOpen ? "active" : ""}`}
             onClick={() => {
-              if (window.innerWidth <= 768) setMobileMenuOpen((prev) => !prev);
-              else
+              if (window.innerWidth <= 768) {
+                setMobileMenuOpen((prev) => !prev);
+              } else {
                 setSidebarOpen((prev) => {
                   const newState = !prev;
                   localStorage.setItem("sidebarOpen", JSON.stringify(newState));
                   return newState;
                 });
+              }
             }}
           >
             <span></span> <span></span> <span></span>
           </div>
 
-          {/* Search Bar */}
+          {/* Search */}
           <div className="search-bar">
-            <FaSearch className="Search-icon" />
-            <input
-              type="text"
-              placeholder="Search here..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+           
 
             {searchResults.length > 0 && (
               <div className="search-results">
@@ -340,17 +373,15 @@ const SuperAdminDashboard = () => {
             )}
           </div>
 
-          {/* Center Organization Title */}
+          {/* CENTER TITLE */}
           <div className="organization-center">
             <h2 className="organization-title">
               {organizationName || "Organization Name"}
             </h2>
           </div>
 
-          {/* Profile */}
+          {/* PROFILE */}
           <div className="topbar-actions" ref={dropdownRef}>
-            <button className="icon-btn notification-btn"></button>
-
             <div className="profile-info">
               <div
                 className="hello-bubble"
@@ -382,7 +413,6 @@ const SuperAdminDashboard = () => {
         </div>
 
         <Outlet context={{ hotels }} />
-        <p style={{ color: "white" }}></p>
       </main>
     </div>
   );

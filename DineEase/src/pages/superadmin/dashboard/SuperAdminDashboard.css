@@ -1,26 +1,26 @@
 /* ==================== ROOT VARIABLES ==================== */
 :root {
-  --primary: #5f63f2;
-  --primary-dark: #4b4ed6;
-  --primary-light: #8487ff;
-  --secondary: #FF6C6C;
-  --success: #00D285;
-  --warning: #FFA83D;
-  --danger: #FF3D57;
-  --dark: #1b1d21;
-  --dark-light: #2a2d35;
-  --gray: #8a8d97;
-  --gray-light: #b7bbc9;
-  --bg-main: #f8f9fe;
-  --white: #ffffff;
-  --sidebar-bg: #1b1d21;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
+  --primary: #5f63f2!important;
+  --primary-dark: #4b4ed6!important;
+  --primary-light: #8487ff!important;
+  --secondary: #FF6C6C!important;
+  --success: #00D285!important;
+  --warning: #FFA83D!important;
+  --danger: #FF3D57!important;
+  --dark: #1b1d21!important;
+  --dark-light: #2a2d35!important;
+  --gray: #8a8d97!important;
+  --gray-light: #b7bbc9!important;
+  --bg-main: #f8f9fe!important;
+  --white: #ffffff!important;
+  --sidebar-bg: #1b1d21!important;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06)!important;
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08)!important;
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12)!important;
+  --radius-sm: 6px!important;
+  --radius-md: 10px!important;
+  --radius-lg: 14px!important;
+  --radius-xl: 18px!important;
 }
 
 /* ==================== GENERAL LAYOUT ==================== */

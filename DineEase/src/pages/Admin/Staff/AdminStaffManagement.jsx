@@ -138,6 +138,15 @@ export default function AdminStaffManagement() {
     if (organizationId) fetchStaff();
   }, [organizationId]);
 
+// Auto-refresh staff list every 10 seconds to catch activation updates
+// useEffect(() => {
+//   if (!organizationId) return;
+//   const interval = setInterval(() => {
+//     fetchStaff(page);
+//   }, 10000); // every 10 seconds
+//   return () => clearInterval(interval);
+// }, [organizationId, page]);
+
   // Fetch roles
   useEffect(() => {
     if (!organizationId || !TOKEN) return;
@@ -194,7 +203,7 @@ export default function AdminStaffManagement() {
       return;
     }
 
-    // ✅ If editing, ask for confirmation first
+    //  If editing, ask for confirmation first
     if (editId) {
       setConfirmMessage("Are you sure you want to update this staff?");
       setConfirmAction(() => async () => {
@@ -212,7 +221,7 @@ export default function AdminStaffManagement() {
     today.setHours(0, 0, 0, 0);
     selectedStart.setHours(0, 0, 0, 0);
 
-    // ✅ Validate start date only for Add mode
+    //  Validate start date only for Add mode
     if (!editId && selectedStart < today) {
       toast.error("Contract start date must be today or in the future.", {
         position: "top-center",
@@ -220,20 +229,20 @@ export default function AdminStaffManagement() {
       return;
     }
 
-    // ✅ Common payload: rename phoneNumber → phone
+    //  Common payload: rename phoneNumber → phone
     const payload = {
       organizationId,
       firstName: form.firstName,
       lastName: form.lastName,
       email: form.email,
-      phone: form.phoneNumber, // ✅ Backend expects 'phone'
+      phone: form.phoneNumber, //  Backend expects 'phone'
       staffRoleType: form.staffRoleType,
       shiftTiming: form.shiftTiming,
       salary: Number(form.salary),
       contractEndDate: form.contractEndDate,
     };
 
-    // ✅ Only in Add mode → include password + start date
+    //  Only in Add mode → include password + start date
     if (!editId) {
       payload.contractStartDate = form.contractStartDate;
       payload.password = form.password;

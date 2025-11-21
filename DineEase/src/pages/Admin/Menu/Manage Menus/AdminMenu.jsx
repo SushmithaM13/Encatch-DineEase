@@ -19,6 +19,8 @@ export default function AdminMenu() {
   const [loading, setLoading] = useState(false);
   const [imageFile, setImageFile] = useState(null);
 
+
+
   // dropdowns
   const [categories, setCategories] = useState([]);
   const [itemTypes, setItemTypes] = useState([]);
@@ -89,7 +91,7 @@ export default function AdminMenu() {
           addonsRes,
           groupsRes,
         ] = await Promise.all([
-          fetch(`${API_BASE}/menu-category/${organizationId}?page=0&size=10&sortBy=id&sortDir=desc`, { headers }),
+          fetch(`${API_BASE}/menu-category/parent-categories`, { headers }),
           fetch(`${API_BASE}/menu/item-types?organizationId=${organizationId}&active=true`, { headers }),
           fetch(`${API_BASE}/menu/food-types?organizationId=${organizationId}`, { headers }),
           fetch(`${API_BASE}/menu/cuisine-types?organizationId=${organizationId}&active=true`, { headers }),
@@ -107,7 +109,9 @@ export default function AdminMenu() {
             groupsRes.json(),
           ]);
 
-        setCategories(categoryJson.content || []);
+        setCategories(Array.isArray(categoryJson) ? categoryJson : categoryJson.content || []);
+        console.log("Category Response:", categoryJson);
+        console.log("Fetched Categories:", categoryJson);
         setItemTypes(itemTypesJson.content || itemTypesJson || []);
         setFoodTypes(foodTypesJson.content || foodTypesJson || []);
         setCuisines(Array.isArray(cuisinesJson) ? cuisinesJson : cuisinesJson.content || []);
@@ -125,25 +129,36 @@ export default function AdminMenu() {
     }
   }, [organizationId]);
 
+
+
   // ---------- FETCH MENUS ----------
-  const fetchMenus = async () => {
-    if (!organizationId) return;
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${MENU_API}/organization/${organizationId}?page=0&size=50`, {
+ const fetchMenus = async () => {
+  if (!organizationId) return;
+  setLoading(true);
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch(
+      `${API_BASE}/menu/getAll?organizationId=${organizationId}&page=0&size=20`,
+      {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error("Failed to fetch menus");
-      const data = await res.json();
-      setMenus(Array.isArray(data) ? data : data.content || []);
-    } catch (err) {
-      console.error("Menus fetch error:", err);
-      toast.error("Failed to load menus");
-    } finally {
-      setLoading(false);
-    }
-  };
+      }
+    );
+
+    if (!res.ok) throw new Error("Failed to fetch menus");
+
+    const data = await res.json();
+    console.log("Fetched Menus:", data);
+
+    setMenus(Array.isArray(data) ? data : data.content || []);
+
+  } catch (err) {
+    console.error("Menus fetch error:", err);
+    toast.error("Failed to load menus");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // ---------- IMAGE PREVIEW ----------
   const handleImageUpload = (e) => {
@@ -170,37 +185,27 @@ export default function AdminMenu() {
     updated.splice(index, 1);
     setNewMenu({ ...newMenu, variants: updated });
   };
-
-  // ---------- ADDONS & CUSTOMIZATION ----------
-  const toggleAddonSelection = (addon) => {
-    const exists = newMenu.selectedAddons.find((a) => a.id === addon.id);
-    if (exists) {
-      setNewMenu({
-        ...newMenu,
-        selectedAddons: newMenu.selectedAddons.filter((a) => a.id !== addon.id),
-      });
-    } else {
-      setNewMenu({
-        ...newMenu,
-        selectedAddons: [...newMenu.selectedAddons, addon],
-      });
+  {/* ---------- Auto-select all logic ---------- */ }
+  useEffect(() => {
+    // only run once when data is loaded
+    if (addons.length > 0 && newMenu.selectedAddons.length === 0) {
+      setNewMenu((prev) => ({
+        ...prev,
+        selectedAddons: addons,
+      }));
     }
-  };
 
-  const toggleCustomizationGroup = (group) => {
-    const exists = newMenu.customizationGroupNames.includes(group.name);
-    if (exists) {
-      setNewMenu({
-        ...newMenu,
-        customizationGroupNames: newMenu.customizationGroupNames.filter((n) => n !== group.name),
-      });
-    } else {
-      setNewMenu({
-        ...newMenu,
-        customizationGroupNames: [...newMenu.customizationGroupNames, group.name],
-      });
+    if (customizeGroups.length > 0 && newMenu.customizationGroupNames.length === 0) {
+      setNewMenu((prev) => ({
+        ...prev,
+        customizationGroupNames: customizeGroups.map(
+          (g) => g.name || g.groupName
+        ),
+      }));
     }
-  };
+  }, [addons, customizeGroups]);
+
+
 
   // ---------- SAVE MENU (ONLY ADD) ----------
   const handleSave = async (e) => {
@@ -217,9 +222,10 @@ export default function AdminMenu() {
       if (imageFile) form.append("image", imageFile);
 
       // Append category, item type, food type, cuisine type
-      const category = categories.find((c) => c.name === newMenu.categoryId);
+      const category = categories.find((c) => c.id.toString() === newMenu.categoryId.toString());
       if (!category) return toast.error("Please select a valid Category!");
-      form.append("categoryName", category.name);
+      form.append("categoryId", category.id); 
+      form.append("categoryName", category.categoryName);
 
       const itemType = itemTypes.find((it) => it.id.toString() === newMenu.itemTypeId.toString());
       if (!itemType) return toast.error("Please select a valid Item Type!");
@@ -253,17 +259,20 @@ export default function AdminMenu() {
 
       // Addons
       newMenu.selectedAddons.forEach((a, i) => {
-        form.append(`availableAddons[${i}].name`, a.name || a.addOnName);
-        form.append(`availableAddons[${i}].price`, a.price?.toString() || "0");
+        form.append(`addons[${i}].addonName`, a.addOnName || a.name);
+        form.append(`addons[${i}].isDefault`, "false");
+        form.append(`addons[${i}].maxQuantity`, "1");
       });
 
+
+
       // Customization groups
+      // Customization group names
       newMenu.customizationGroupNames.forEach((g, i) => {
-        form.append(`customizationGroups[${i}].name`, g);
-        form.append(`customizationGroups[${i}].isRequired`, "false");
-        form.append(`customizationGroups[${i}].selectionType`, "SINGLE");
-        form.append(`customizationGroups[${i}].maxSelections`, "1");
+        form.append(`customizationGroupNames[${i}]`, g);
       });
+
+
 
       const res = await fetch(`${MENU_API}/add`, {
         method: "POST",
@@ -307,7 +316,7 @@ export default function AdminMenu() {
   };
 
   // ---------- UI ----------
-  
+
   return (
     <div className="admin-menu-page">
       <ToastContainer />
@@ -325,9 +334,12 @@ export default function AdminMenu() {
         <div>
           <button
             className="admin-menu-add-btn"
-            onClick={() => setShowModal(true)}
+            onClick={() => {
+              resetForm();
+              setShowModal(true);
+            }}
           >
-            <PlusSquare size={16} /> Add Menu
+            <PlusSquare size={16} /> Add New Menu
           </button>
         </div>
       </div>
@@ -375,9 +387,15 @@ export default function AdminMenu() {
                   ) : (
                     <div className="no-img">No Image</div>
                   )}
-
                   <h3 className="admin-menu-name">{menu.itemName}</h3>
+                  <p className="admin-menu-type">{menu.itemType || "N/A"}</p>
                   <p className="admin-menu-desc">{menu.description}</p>
+                  <p className="admin-menu-price">
+                    ₹{" "}
+                    {menu.variants && menu.variants.length > 0
+                      ? Math.min(...menu.variants.map((v) => Number(v.price || 0)))
+                      : "N/A"}
+                  </p>
                 </div>
               ))
           )}
@@ -414,14 +432,15 @@ export default function AdminMenu() {
                 >
                   <option value="">Select category</option>
                   {categories.map((cat) => (
-                    <option key={cat.id} value={cat.name}>
-                      {cat.name}
+                    <option key={cat.id} value={cat.id}>
+                      {cat.categoryName}
+
                     </option>
                   ))}
                 </select>
 
-              </div>
 
+              </div>
               <div className="admin-grid-2">
                 <div>
                   <label>Item Type</label>
@@ -511,10 +530,6 @@ export default function AdminMenu() {
                     <option value="FLAVOR">Flavor</option>
                     <option value="QUANTITY">Quantity</option>
                   </select>
-
-
-
-
                   <input
                     type="number"
                     value={v.quantityValue}
@@ -525,7 +540,6 @@ export default function AdminMenu() {
                       setNewMenu({ ...newMenu, variants: updated });
                     }}
                   />
-
                   <input
                     value={v.quantityUnit}
                     placeholder="Quantity Unit (e.g., g / ml / pcs / plate)"
@@ -535,7 +549,6 @@ export default function AdminMenu() {
                       setNewMenu({ ...newMenu, variants: updated });
                     }}
                   />
-
                   <input
                     type="number"
                     value={v.price}
@@ -546,7 +559,6 @@ export default function AdminMenu() {
                       setNewMenu({ ...newMenu, variants: updated });
                     }}
                   />
-
                   <input
                     type="number"
                     value={v.discountPrice}
@@ -557,7 +569,6 @@ export default function AdminMenu() {
                       setNewMenu({ ...newMenu, variants: updated });
                     }}
                   />
-
                   <input
                     type="number"
                     value={v.displayOrder}
@@ -568,7 +579,6 @@ export default function AdminMenu() {
                       setNewMenu({ ...newMenu, variants: updated });
                     }}
                   />
-
                   <label>
                     Default{" "}
                     <input
@@ -581,7 +591,6 @@ export default function AdminMenu() {
                       }}
                     />
                   </label>
-
                   <label>
                     Available{" "}
                     <input
@@ -594,13 +603,11 @@ export default function AdminMenu() {
                       }}
                     />
                   </label>
-
                   <button type="button" onClick={() => removeVariant(i)}>
                     <Minus size={14} />
                   </button>
                 </div>
               ))}
-
               <button
                 type="button"
                 className="admin-menu-add-variant-btn"
@@ -608,9 +615,6 @@ export default function AdminMenu() {
               >
                 <Plus size={12} /> Add Variant
               </button>
-
-
-
               <div className="admin-menu-grid-2">
                 <label>
                   <input
@@ -620,7 +624,6 @@ export default function AdminMenu() {
                   />{" "}
                   Available
                 </label>
-
                 <label>
                   <input
                     type="checkbox"
@@ -629,7 +632,6 @@ export default function AdminMenu() {
                   />{" "}
                   Recommended
                 </label>
-
                 <label>
                   <input
                     type="checkbox"
@@ -638,7 +640,6 @@ export default function AdminMenu() {
                   />{" "}
                   Bestseller
                 </label>
-
                 <label>
                   <input
                     type="checkbox"
@@ -648,7 +649,6 @@ export default function AdminMenu() {
                   Chef’s Special
                 </label>
               </div>
-
               <label>Preparation Time (minutes)</label>
               <input
                 type="number"
@@ -658,48 +658,135 @@ export default function AdminMenu() {
                   setNewMenu({ ...newMenu, preparationTime: (e.target.value) })
                 }
               />
-
               <label>Allergen Info</label>
               <input
                 type="text"
                 value={newMenu.allergenInfo}
                 onChange={(e) => setNewMenu({ ...newMenu, allergenInfo: e.target.value })}
               />
+              {/* ---------- Addons Section ---------- */}
+              {/* ---------- Addons Section ---------- */}
+              <h4>Addons</h4>
+              <select
+                className="admin-addon-select"
+                value=""
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  if (!selectedId) return;
 
+                  const selectedAddon = addons.find(
+                    (a) => (a.id || a.addOnId).toString() === selectedId
+                  );
 
-              <h4>Addons (select)</h4>
-              <div className="admin-menu-checkbox-grid">
+                  if (
+                    selectedAddon &&
+                    !newMenu.selectedAddons.some(
+                      (item) =>
+                        (item.id || item.addOnId) === (selectedAddon.id || selectedAddon.addOnId)
+                    )
+                  ) {
+                    setNewMenu({
+                      ...newMenu,
+                      selectedAddons: [...newMenu.selectedAddons, selectedAddon],
+                    });
+                  }
+                }}
+              >
+                <option value="">Select Addon</option>
                 {addons.map((a) => (
-                  <label key={a.addOnId || a.id} className="admin-menu-checkbox-item">
-                    <input
-                      type="checkbox"
-                      checked={!!newMenu.selectedAddons.find((s) => s.addOnId === a.addOnId)}
-                      onChange={() => toggleAddonSelection(a)}
-                    />
+                  <option key={a.addOnId || a.id} value={a.id || a.addOnId}>
                     {a.addOnName || a.name}
-                  </label>
+                  </option>
                 ))}
-                {addons.length === 0 && <p className="admin-menu-muted">No addons available</p>}
+              </select>
+              {/* Display selected Addons in a box */}
+              <div className="admin-addon-section">
+                <label>Selected Addons</label>
+                <div className="admin-addon-box">
+                  {newMenu.selectedAddons.length > 0 ? (
+                    <div className="admin-addon-grid">
+                      {newMenu.selectedAddons.map((a) => (
+                        <span key={a.id || a.addOnId} className="admin-addon-tag">
+                          {a.addOnName || a.name}
+                          <button
+                            type="button"
+                            className="admin-addon-remove-btn"
+                            onClick={() => {
+                              const updated = newMenu.selectedAddons.filter(
+                                (item) =>
+                                  (item.id || item.addOnId) !== (a.id || a.addOnId)
+                              );
+                              setNewMenu({ ...newMenu, selectedAddons: updated });
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="admin-addon-empty">No addons selected</p>
+                  )}
+                </div>
               </div>
 
-              <h4>Customization Groups (select)</h4>
-              <div className="admin-menu-checkbox-grid">
+              {/* ---------- Customization Groups Section ---------- */}
+              <h4>Customization Groups</h4>
+              <select
+                className="admin-customize-select"
+                value=""
+                onChange={(e) => {
+                  const selectedName = e.target.value;
+                  if (!selectedName) return;
+
+                  if (!newMenu.customizationGroupNames.includes(selectedName)) {
+                    setNewMenu({
+                      ...newMenu,
+                      customizationGroupNames: [
+                        ...newMenu.customizationGroupNames,
+                        selectedName,
+                      ],
+                    });
+                  }
+                }}
+              >
+                <option value="">Select Customization Group</option>
                 {customizeGroups.map((g) => (
-                  <label key={g.id} className="admin-menu-checkbox-item">
-                    <input
-                      type="checkbox"
-                      checked={newMenu.customizationGroupNames.includes(g.name)}
-                      onChange={() => toggleCustomizationGroup(g)}
-                    />
-                    {g.name}
-                  </label>
+                  <option key={g.id || g.customizationGroupId} value={g.name || g.groupName}>
+                    {g.name || g.groupName}
+                  </option>
                 ))}
-                {customizeGroups.length === 0 && <p className="admin-mneu-muted">No customization groups</p>}
+              </select>
+
+              {/* Display selected Customization Groups in a box */}
+              <div className="admin-customize-section">
+                <label>Selected Customization Groups</label>
+                <div className="admin-customize-box">
+                  {newMenu.customizationGroupNames.length > 0 ? (
+                    <div className="admin-customize-grid">
+                      {newMenu.customizationGroupNames.map((name) => (
+                        <span key={name} className="admin-customize-tag">
+                          {name}
+                          <button
+                            type="button"
+                            className="admin-customize-remove-btn"
+                            onClick={() => {
+                              const updated = newMenu.customizationGroupNames.filter(
+                                (n) => n !== name
+                              );
+                              setNewMenu({ ...newMenu, customizationGroupNames: updated });
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="admin-customize-empty">No customization groups selected</p>
+                  )}
+                </div>
               </div>
-        
-
-
-
               <div className="admin-menu-modal-actions">
                 <button type="submit" className="admin-menu-save-btn">
                   Save Menu

@@ -41,8 +41,8 @@ const DashboardHome = () => {
       const staffData = Array.isArray(data)
         ? data
         : Array.isArray(data.content)
-        ? data.content
-        : [];
+          ? data.content
+          : [];
 
       const total = staffData.length;
       const active = staffData.filter(
@@ -96,7 +96,12 @@ const DashboardHome = () => {
         setHotel(orgData);
         setEditData(orgData);
         setLoading(false);
-
+        if (orgData?.organizationName) {
+          localStorage.setItem("organizationName", orgData.organizationName);
+        }
+        if (orgData?.FullName) {
+          localStorage.setItem("organizationFullName", orgData.FullName);
+        }
         if (orgData?.id) {
           localStorage.setItem("organizationId", orgData.id);
           fetchStaffStats(orgData.id, token);
@@ -211,6 +216,8 @@ const handleUpdate = (e) => {
         </div>
       </div>
 
+
+
       {/* Organization Details Section */}
       <div className="content-row">
         <section className="organization-section">
@@ -238,7 +245,6 @@ const handleUpdate = (e) => {
                 <span className="org-label">Organization Name</span>
                 <span className="org-value">{hotel.organizationName || "N/A"}</span>
               </div>
-              
               <div className="org-item">
                 <span className="org-label">Business Type</span>
                 <span className="org-value">{hotel.businessType || "N/A"}</span>
@@ -292,7 +298,7 @@ const handleUpdate = (e) => {
                     required
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label>Business Type</label>
                   <input

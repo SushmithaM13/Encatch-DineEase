@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { PlusCircle, Edit3, Trash2 } from "lucide-react";
+import { PlusSquare, Edit3, Trash2 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./AdminItemType.css";
@@ -10,11 +10,17 @@ export default function AdminItemType() {
 
   const [organizationId, setOrganizationId] = useState(null);
   const [itemTypes, setItemTypes] = useState([]);
-  const [newItemType, setNewItemType] = useState({ name: "", sortOrder: 0, active: true });
-  const [editItem, setEditItem] = useState(null);
-  // const [deleteItem, setDeleteItem] = useState(null);
+  const [formData, setFormData] = useState({ name: "", sortOrder: 0, active: true });
+  const [editingItem, setEditingItem] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [deletePopup, setDeletePopup] = useState({
+    show: false,
+    itemId: null,
+    itemName: "",
+    error: false,
+  });
 
-  // ✅ Fetch organizationId from staff profile
+  // ✅ Fetch organizationId
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -23,22 +29,10 @@ export default function AdminItemType() {
           toast.error("No token found. Please login again.");
           return;
         }
-
         const res = await fetch(PROFILE_API, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (res.status === 401 || res.status === 403) {
-          toast.error("Session expired or unauthorized. Please login again.");
-          localStorage.removeItem("token");
-          // window.location.href = "/login"; // Uncomment if routing enabled
-          return;
-        }
-
-        if (!res.ok) throw new Error("Failed to fetch profile");
+        if (!res.ok) throw new Error("Profile fetch failed");
         const data = await res.json();
         setOrganizationId(data.organizationId);
       } catch (err) {
@@ -46,229 +40,258 @@ export default function AdminItemType() {
         console.error(err);
       }
     };
-
     fetchProfile();
   }, []);
 
-  // ✅ Fetch item types
-  useEffect(() => {
-    if (!organizationId) return;
-
-    const fetchItemTypes = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`${ITEM_TYPE_API}?organizationId=${organizationId}&active=true`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Failed to fetch item types");
-        const data = await res.json();
-        setItemTypes(data);
-      } catch (err) {
-        toast.error("Item types fetch failed!");
-        console.error(err);
-      }
-    };
-
-    fetchItemTypes();
-  }, [organizationId]);
-
-  // ✅ Add new item type
-  const handleAddItemType = async () => {
-    if (!newItemType.name.trim()) return toast.warning("Name is required");
+  // ✅ Fetch Item Types
+  const fetchItemTypes = async (orgId) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(ITEM_TYPE_API, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ ...newItemType, organizationId }),
-      });
-
-      if (!res.ok) throw new Error("Failed to add item type");
-
-      toast.success("Item type added successfully!");
-      setNewItemType({ name: "", sortOrder: 0, active: true });
-
-      const data = await fetch(`${ITEM_TYPE_API}?organizationId=${organizationId}&active=true`, {
+      const res = await fetch(`${ITEM_TYPE_API}?organizationId=${orgId}&active=true`, {
         headers: { Authorization: `Bearer ${token}` },
-      }).then((r) => r.json());
+      });
+      if (!res.ok) throw new Error("Failed to fetch item types");
+      const data = await res.json();
       setItemTypes(data);
     } catch (err) {
-      toast.error("Add failed!");
+      toast.error("Item types fetch failed!");
       console.error(err);
     }
   };
 
-  // ✅ Update item type
-  const handleUpdateItemType = async () => {
+  useEffect(() => {
+    if (organizationId) fetchItemTypes(organizationId);
+  }, [organizationId]);
+
+  // ✅ Add / Update Item Type
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name.trim()) return toast.warning("Name is required");
+
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${ITEM_TYPE_API}/${editItem.id}`, {
-        method: "PUT",
+      const method = editingItem ? "PUT" : "POST";
+      const url = editingItem ? `${ITEM_TYPE_API}/${editingItem.id}` : ITEM_TYPE_API;
+
+      const res = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          name: editItem.name,
-          sortOrder: editItem.sortOrder,
-          active: editItem.active,
+          ...formData,
+          organizationId,
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to update item type");
+      if (!res.ok) throw new Error("Failed to save item type");
+      toast.success(editingItem ? "Updated successfully!" : "Added successfully!");
 
-      toast.success("Item type updated!");
-      setEditItem(null);
-
-      const data = await fetch(`${ITEM_TYPE_API}?organizationId=${organizationId}&active=true`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }).then((r) => r.json());
-      setItemTypes(data);
+      setFormData({ name: "", sortOrder: 0, active: true });
+      setEditingItem(null);
+      setShowModal(false);
+      fetchItemTypes(organizationId);
     } catch (err) {
-      toast.error("Update failed!");
+      toast.error("Save failed!");
       console.error(err);
     }
   };
 
-  // // ✅ Delete item type (simulated until backend DELETE API ready)
-  // const handleDeleteItemType = async () => {
-  //   try {
-  //     const token = localStorage.getItem("token");
+  // ✅ Delete Item Type
+  const handleDeleteItem = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${ITEM_TYPE_API}/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-  //     // Uncomment below when backend DELETE API is implemented
-  //     /*
-  //     const res = await fetch(`${ITEM_TYPE_API}/${deleteItem.id}`, {
-  //       method: "DELETE",
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-  //     if (!res.ok) throw new Error("Failed to delete item type");
-  //     */
+      if (res.status === 409) {
+        setDeletePopup((prev) => ({ ...prev, show: true, error: true }));
+        return;
+      }
 
-  //     toast.info(`(Simulated) Deleted "${deleteItem.name}"`);
-  //     setItemTypes((prev) => prev.filter((item) => item.id !== deleteItem.id));
-  //     setDeleteItem(null);
-  //   } catch (err) {
-  //     toast.error("Delete failed!");
-  //     console.error(err);
-  //   }
-  // };
+      if (!res.ok) throw new Error("Delete failed");
+      toast.success("Deleted successfully!");
+      setDeletePopup({ show: false, itemId: null, itemName: "", error: false });
+      fetchItemTypes(organizationId);
+    } catch (err) {
+      console.error(err);
+      setDeletePopup({ ...deletePopup, error: true });
+    }
+  };
 
   return (
-    <div className="admin-item-container">
-      <ToastContainer />
-      <h2 className="admin-item-title">Item Types</h2>
-
-      {/* ➕ Add Item Type */}
-      <div className="admin-item-add-section">
-        <h3 className="admin-item-add-heading">Add Item Type</h3>
-        <div className="admin-item-add-form">
-          <input
-            type="text"
-            className="admin-item-input"
-            placeholder="Enter name"
-            value={newItemType.name}
-            onChange={(e) => setNewItemType({ ...newItemType, name: e.target.value })}
-          />
-          <input
-            type="number"
-            className="admin-item-input small"
-            placeholder="Sort Order"
-            value={newItemType.sortOrder}
-            onChange={(e) => setNewItemType({ ...newItemType, sortOrder: +e.target.value })}
-          />
-          <button onClick={handleAddItemType} className="admin-item-add-btn">
-            <PlusCircle size={18} /> Add
-          </button>
-        </div>
+    <div className="admin-itemtype-page">
+      <ToastContainer position="top-center" />
+      <div className="admin-itemtype-header">
+        <h2 className="admin-itemtype-title">Item Type Management</h2>
+        <button className="admin-itemtype-add-btn" onClick={() => setShowModal(true)}>
+          <PlusSquare size={18} /> Add Item Type
+        </button>
       </div>
 
-      {/* 📋 List */}
-      <div className="admin-item-list-section">
-        <h3 className="admin-item-list-heading">Existing Item Types</h3>
-        {itemTypes.length === 0 ? (
-          <p className="admin-item-empty">No item types found.</p>
-        ) : (
-          <table className="admin-item-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Sort Order</th>
-                <th>Active</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {itemTypes.map((type) => (
-                <tr key={type.id}>
-                  <td>{type.name}</td>
-                  <td>{type.sortOrder}</td>
-                  <td>{type.active ? "Yes" : "No"}</td>
-                  <td className="admin-item-actions">
-                    <button onClick={() => setEditItem(type)} className="admin-item-edit-btn">
-                      <Edit3 size={18} />
-                    </button>
-                    {/* <button onClick={() => setDeleteItem(type)} className="admin-item-delete-btn">
-                      <Trash2 size={18} />
-                    </button> */}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {/* Popup Form */}
+      {showModal && (
+        <div className="admin-itemtype-modal-overlay">
+          <div className="admin-itemtype-modal">
+            <h3>{editingItem ? "Edit Item Type" : "Add New Item Type"}</h3>
+            <form onSubmit={handleSubmit} className="admin-itemtype-form">
+              <input
+                type="text"
+                placeholder="Item Type Name"
+                className="admin-itemtype-input"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Sort Order"
+                className="admin-itemtype-input small"
+                value={formData.sortOrder}
+                onChange={(e) => setFormData({ ...formData, sortOrder: +e.target.value })}
+                required
+              />
+              <select
+                className="admin-itemtype-select"
+                value={formData.active}
+                onChange={(e) => setFormData({ ...formData, active: e.target.value === "true" })}
+              >
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
 
-      {/* ✏️ Edit Popup */}
-      {editItem && (
-        <div className="admin-item-popup-overlay">
-          <div className="admin-item-popup">
-            <h3 className="admin-item-popup-title">Edit Item Type</h3>
-            <input
-              type="text"
-              className="admin-item-popup-input"
-              value={editItem.name}
-              onChange={(e) => setEditItem({ ...editItem, name: e.target.value })}
-            />
-            <input
-              type="number"
-              className="admin-item-popup-input"
-              value={editItem.sortOrder}
-              onChange={(e) => setEditItem({ ...editItem, sortOrder: +e.target.value })}
-            />
-            <div className="admin-item-popup-actions">
-              <button onClick={handleUpdateItemType} className="admin-item-update-btn">
-                Update
-              </button>
-              <button onClick={() => setEditItem(null)} className="admin-item-cancel-btn">
-                Cancel
-              </button>
-            </div>
+              <div className="admin-itemtype-btn-group">
+                <button type="submit" className="admin-itemtype-submit-btn">
+                  {editingItem ? "Update" : "Add"}
+                </button>
+                <button
+                  type="button"
+                  className="admin-itemtype-cancel-btn"
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingItem(null);
+                    setFormData({ name: "", sortOrder: 0, active: true });
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
-      {/* 🗑️ Delete Confirmation Popup
-      {deleteItem && (
-        <div className="admin-item-popup-overlay">
-          <div className="admin-item-popup">
-            <h3 className="admin-item-popup-title">Confirm Delete</h3>
-            <p className="admin-item-delete-msg">
-              Are you sure you want to delete <strong>{deleteItem.name}</strong>?
-            </p>
-            <div className="admin-item-popup-actions">
-              <button onClick={handleDeleteItemType} className="admin-item-delete-confirm-btn">
-                Yes, Delete
+      {/* List of Item Types as Table */}
+<h3 className="admin-itemtype-subtitle">Available Item Types</h3>
+<div className="admin-itemtype-list">
+  {itemTypes.length === 0 ? (
+    <p className="admin-itemtype-empty">No item types found.</p>
+  ) : (
+    <table className="admin-itemtype-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Sort Order</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {itemTypes.map((item, index) => (
+          <tr key={item.id || index}>
+            <td>{index + 1}</td>
+            <td>{item.name}</td>
+            <td>{item.sortOrder}</td>
+            <td>{item.active ? "Active" : "Inactive"}</td>
+            <td>
+              <button
+                className="admin-itemtype-edit-btn"
+                onClick={() => {
+                  setEditingItem(item);
+                  setFormData({
+                    name: item.name,
+                    sortOrder: item.sortOrder,
+                    active: item.active,
+                  });
+                  setShowModal(true);
+                }}
+              >
+                <Edit3 size={16} /> 
               </button>
-              <button onClick={() => setDeleteItem(null)} className="admin-item-cancel-btn">
-                Cancel
+              <button
+                className="admin-itemtype-delete-btn"
+                onClick={() =>
+                  setDeletePopup({
+                    show: true,
+                    itemId: item.id,
+                    itemName: item.name,
+                    error: false,
+                  })
+                }
+              >
+                <Trash2 size={16} /> 
               </button>
-            </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</div>
+
+
+      {/* Delete Popup */}
+      {deletePopup.show && (
+        <div className="admin-itemtype-popup-overlay">
+          <div className="admin-itemtype-popup">
+            {!deletePopup.error ? (
+              <>
+                <h3>Delete Item Type</h3>
+                <p>
+                  Are you sure you want to delete <strong>{deletePopup.itemName}</strong>?
+                </p>
+                <div className="admin-itemtype-btn-group">
+                  <button
+                    onClick={() => handleDeleteItem(deletePopup.itemId)}
+                    className="admin-itemtype-delete-confirm-btn"
+                  >
+                    Yes, Delete
+                  </button>
+                  <button
+                    onClick={() =>
+                      setDeletePopup({ show: false, itemId: null, itemName: "", error: false })
+                    }
+                    className="admin-itemtype-cancel-btn"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3>Cannot Delete Item Type</h3>
+                <p>
+                  <strong>{deletePopup.itemName}</strong> is used in menu and cannot be deleted.
+                </p>
+                <div className="admin-itemtype-btn-group">
+                  <button
+                    onClick={() =>
+                      setDeletePopup({ show: false, itemId: null, itemName: "", error: false })
+                    }
+                    className="admin-itemtype-cancel-btn"
+                  >
+                    OK
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
-      )} */}
+      )}
     </div>
   );
 }

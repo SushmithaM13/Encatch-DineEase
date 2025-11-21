@@ -16,13 +16,10 @@ export default function SuperAdminProfile() {
   // ✅ Fetch profile data
   useEffect(() => {
     const fetchProfile = async () => {
-
       try {
         const res = await fetch(API_URL, {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-          },
+          headers: { Authorization: `Bearer ${TOKEN}` },
         });
 
         if (!res.ok) throw new Error("Failed to fetch profile");
@@ -30,6 +27,11 @@ export default function SuperAdminProfile() {
         const data = await res.json();
         setProfile(data);
         setFormData(data);
+
+        // Save full name initially
+        if (data.fullName) {
+          localStorage.setItem("superAdminFullName", data.fullName);
+        }
       } catch (err) {
         toast.error(err.message || "Failed to load profile");
       } finally {
@@ -40,13 +42,24 @@ export default function SuperAdminProfile() {
     fetchProfile();
   }, [TOKEN]);
 
-  // ✅ Handle input changes
+  // =====================================
+  // ⛔ Prevent crash if loading or no data
+  // =====================================
+  if (loading) {
+    return <div className="profile-loader">Loading profile...</div>;
+  }
+
+  if (!profile) {
+    return <div className="profile-loader">No profile data found</div>;
+  }
+
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Update profile
+  // Update profile
   const handleUpdate = async () => {
     try {
       const res = await fetch(API_URL, {
@@ -61,19 +74,23 @@ export default function SuperAdminProfile() {
       if (!res.ok) throw new Error("Failed to update profile");
 
       toast.success("Profile updated successfully!");
-      setProfile(formData);
+
+      // Save updated full name
+      localStorage.setItem("superAdminFullName", formData.fullName || "");
+
+      // Notify dashboard → update instantly
+      window.dispatchEvent(new Event("superAdminNameUpdated"));
+
+      // Exit edit mode
       setEditing(false);
-      
- localStorage.setItem("superAdminFullName", formData.fullName);
+
+      // Update local UI
+      setProfile(formData);
 
     } catch (err) {
-      toast.error(err.message || "Update failed");
+      toast.error(err.message || "Profile Update failed");
     }
   };
-
-  if (loading) {
-    return <div className="profile-loader">Loading profile...</div>;
-  }
 
   return (
     <div className="superadmin-profile-container">
@@ -86,6 +103,7 @@ export default function SuperAdminProfile() {
         </div>
 
         <div className="profile-details">
+
           <div className="profile-field">
             <label>User ID:</label>
             <span>{profile.userId}</span>
@@ -140,9 +158,7 @@ export default function SuperAdminProfile() {
 
           <div className="profile-field">
             <label>Status:</label>
-            <span
-              className={`status-tag ${profile.isActive ? "active" : "inactive"}`}
-            >
+            <span className={`status-tag ${profile.isActive ? "active" : "inactive"}`}>
               {profile.isActive ? "Active" : "Inactive"}
             </span>
           </div>
@@ -164,10 +180,7 @@ export default function SuperAdminProfile() {
                 <button className="save-btn" onClick={handleUpdate}>
                   <FaSave /> Save
                 </button>
-                <button
-                  className="cancel-btn"
-                  onClick={() => setEditing(false)}
-                >
+                <button className="cancel-btn" onClick={() => setEditing(false)}>
                   <FaTimes /> Cancel
                 </button>
               </>
@@ -177,6 +190,7 @@ export default function SuperAdminProfile() {
               </button>
             )}
           </div>
+
         </div>
       </div>
     </div>

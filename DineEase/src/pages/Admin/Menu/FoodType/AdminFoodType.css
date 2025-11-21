@@ -1,175 +1,72 @@
-/* ========== GLOBAL CONTAINER ========== */
-.admin-food-container {
-  padding: 30px;
-  color: #222;
-  background: linear-gradient(to bottom right, #fdfbfb, #ebedee);
-  min-height: 100vh;
-  font-family: "Poppins", sans-serif;
-}
-
-.admin-food-title {
-  font-size: 26px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #1a1a1a;
-}
-
-/* ========== ADD SECTION ========== */
-.admin-food-add-section {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+/* =============== PAGE CONTAINER =============== */
+.admin-foodtype-page {
   padding: 20px;
-  margin-bottom: 30px;
+  background: #f9fafb;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
 }
 
-.admin-food-add-heading {
-  font-size: 18px;
-  margin-bottom: 15px;
-  font-weight: 500;
-}
-
-.admin-food-add-form {
+/* ===== HEADER FIX ===== */
+.admin-foodtype-header {
   display: flex;
-  gap: 10px;
   align-items: center;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 0 10px;
 }
 
-.admin-food-input {
-  padding: 10px 14px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 14px;
-  outline: none;
-  transition: border 0.2s;
+.admin-foodtype-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
 }
 
-.admin-food-input:focus {
-  border-color: GRAY;
-}
-
-.admin-food-input.small {
-  width: 100px;
-}
-
-.admin-food-add-btn {
-  background: BLACK;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 10px;
-  cursor: pointer;
+.admin-foodtype-add-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 500;
-  transition: background 0.2s;
-}
-
-.admin-food-add-btn:hover {
-  background: GRAY;
-}
-
-/* ========== TABLE SECTION ========== */
-.admin-food-list-section {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-  padding: 20px;
-}
-
-.admin-food-list-heading {
-  font-size: 18px;
-  margin-bottom: 15px;
-  font-weight: 500;
-}
-
-.admin-food-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.admin-food-table th,
-.admin-food-table td {
-  padding: 12px 14px;
-  border-bottom: 1px solid #ddd;
-  text-align: left;
-}
-
-.admin-food-table th {
-  background-color: #f1f5f9;
-  font-weight: 600;
-  color: #374151;
-}
-
-.admin-food-empty {
-  color: #666;
-  font-style: italic;
-}
-
-/* ========== ACTION BUTTONS ========== */
-.admin-food-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.admin-food-edit-btn {
-  background: #10b981;
+  background: #2563eb;
+  color: #fff;
+  padding: 8px 14px;
   border: none;
-  color: white;
-  padding: 6px 10px;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: 0.2s ease-in-out;
+  font-size: 14px;
 }
 
-.admin-food-edit-btn:hover {
-  background: #059669;
+.admin-foodtype-add-btn:hover {
+  background: #1d4ed8;
 }
 
-.admin-food-delete-btn {
-  background: #ef4444;
-  border: none;
-  color: white;
-  padding: 6px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.admin-food-delete-btn:hover {
-  background: #b91c1c;
-}
-
-/* ========== POPUP OVERLAY ========== */
-.admin-food-popup-overlay {
+/* =============== MODAL =============== */
+.admin-foodtype-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 50;
 }
 
-/* ========== POPUP BOX ========== */
-.admin-food-popup {
-  background: white;
-  padding: 25px;
-  border-radius: 16px;
-  width: 350px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  animation: popupScale 0.25s ease;
+.admin-foodtype-modal {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  width: 380px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  animation: popupScale 0.2s ease;
 }
 
 @keyframes popupScale {
   from {
     transform: scale(0.95);
-    opacity: 0;
+    opacity: 0.7;
   }
   to {
     transform: scale(1);
@@ -177,57 +74,220 @@
   }
 }
 
-.admin-food-popup-title {
-  font-size: 20px;
+.admin-foodtype-modal h3 {
+  font-size: 18px;
   font-weight: 600;
   margin-bottom: 15px;
-  text-align: center;
+  color: #111827;
 }
 
-.admin-food-popup-input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  margin-bottom: 12px;
-  outline: none;
-}
-
-.admin-food-popup-input:focus {
-  border-color: GRAY;
-}
-
-.admin-food-popup-actions {
+/* =============== FORM =============== */
+.admin-foodtype-form {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-foodtype-input,
+.admin-foodtype-select {
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.admin-foodtype-input:focus,
+.admin-foodtype-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.admin-foodtype-input.small {
+  width: 120px;
+}
+
+.admin-foodtype-btn-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.admin-foodtype-submit-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 14px;
+}
+
+.admin-foodtype-submit-btn:hover {
+  background: #1d4ed8;
+}
+
+.admin-foodtype-cancel-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 14px;
+}
+
+.admin-foodtype-cancel-btn:hover {
+  background: #e5e7eb;
+}
+
+/* =============== SUBTITLE =============== */
+.admin-foodtype-subtitle {
+  font-size: 18px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 15px;
+}
+
+/* =============== DELETE POPUP =============== */
+.admin-foodtype-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.admin-foodtype-popup {
+  background: white;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 360px;
+  text-align: center;
+  animation: popupScale 0.2s ease;
+}
+
+.admin-foodtype-popup h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 10px;
+}
+
+.admin-foodtype-popup p {
+  font-size: 14px;
+  color: #4b5563;
+  margin-bottom: 20px;
+}
+
+.admin-foodtype-delete-confirm-btn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-foodtype-delete-confirm-btn:hover {
+  background: #b91c1c;
+}
+
+/* =============== TABLE SECTION =============== */
+.admin-foodtype-table-container {
+  margin-top: 10px;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.admin-foodtype-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.admin-foodtype-table th,
+.admin-foodtype-table td {
+  padding: 12px 18px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.admin-foodtype-table th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.admin-foodtype-table td {
+  font-size: 14px;
+  color: #374151;
+}
+/* Even row shading for better readability */
+.admin-foodtype-table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+/* =============== ACTION BUTTONS IN TABLE =============== */
+.admin-foodtype-actions {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
   gap: 10px;
 }
 
-.admin-food-update-btn {
-  background: BLACK;
-  color: white;
+.admin-foodtype-edit-btn,
+.admin-foodtype-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   border: none;
-  padding: 8px 14px;
-  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
 }
 
-.admin-food-update-btn:hover {
-  background: GRAY;
+.admin-foodtype-edit-btn {
+  background: #e0f2fe;
+  color: #0369a1;
 }
 
-.admin-food-cancel-btn {
-  background: #6b7280;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.2s;
+.admin-foodtype-edit-btn:hover {
+  background: #bae6fd;
 }
 
-.admin-food-cancel-btn:hover {
-  background: #4b5563;
+.admin-foodtype-delete-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.admin-foodtype-delete-btn:hover {
+  background: #fecaca;
+}
+
+/* Empty row style */
+.admin-foodtype-empty {
+  text-align: center;
+  color: #6b7280;
+  padding: 25px 0;
+  font-size: 15px;
 }

@@ -49,7 +49,7 @@ export default function ItemType() {
 
     const apiUrl = editId
       ? `http://localhost:8082/dine-ease/api/v1/menu/item-types/${editId}`
-      : "http://localhost:8082/dine-ease/api/v1/menu/item-types/add";
+      : "http://localhost:8082/dine-ease/api/v1/menu/item-types";
 
     const method = editId ? "PUT" : "POST";
 
@@ -159,7 +159,7 @@ export default function ItemType() {
         <table>
           <thead>
             <tr>
-              <th>ID</th>
+              <th>SL.No</th>
               <th>Item Type Name</th>
               <th>Active</th>
               <th>Sort Order</th>

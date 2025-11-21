@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { PlusCircle, Edit3, Trash2 } from "lucide-react";
+import { PlusSquare, Edit3, Trash2 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./AdminFoodType.css";
@@ -10,11 +10,17 @@ export default function AdminFoodType() {
 
   const [organizationId, setOrganizationId] = useState(null);
   const [foodTypes, setFoodTypes] = useState([]);
-  const [newFoodType, setNewFoodType] = useState({ name: "", sortOrder: 0, active: true });
-  const [editFood, setEditFood] = useState(null);
-  // const [deleteFood, setDeleteFood] = useState(null);
+  const [formData, setFormData] = useState({ name: "", sortOrder: 0, active: true });
+  const [editingFood, setEditingFood] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [deletePopup, setDeletePopup] = useState({
+    show: false,
+    foodId: null,
+    foodName: "",
+    error: false,
+  });
 
-  // ✅ Fetch organizationId from staff profile
+  // ✅ Fetch organizationId
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -23,21 +29,10 @@ export default function AdminFoodType() {
           toast.error("No token found. Please login again.");
           return;
         }
-
         const res = await fetch(PROFILE_API, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
-        if (res.status === 401 || res.status === 403) {
-          toast.error("Session expired or unauthorized. Please login again.");
-          localStorage.removeItem("token");
-          return;
-        }
-
-        if (!res.ok) throw new Error("Failed to fetch profile");
+        if (!res.ok) throw new Error("Profile fetch failed");
         const data = await res.json();
         setOrganizationId(data.organizationId);
       } catch (err) {
@@ -45,180 +40,260 @@ export default function AdminFoodType() {
         console.error(err);
       }
     };
-
     fetchProfile();
   }, []);
 
-  // ✅ Fetch food types
-  useEffect(() => {
-    if (!organizationId) return;
-
-    const fetchFoodTypes = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`${FOOD_TYPE_API}?organizationId=${organizationId}&active=true`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Failed to fetch food types");
-        const data = await res.json();
-        setFoodTypes(data);
-      } catch (err) {
-        toast.error("Food types fetch failed!");
-        console.error(err);
-      }
-    };
-
-    fetchFoodTypes();
-  }, [organizationId]);
-
-  // ✅ Add new food type
-  const handleAddFoodType = async () => {
-    if (!newFoodType.name.trim()) return toast.warning("Name is required");
+  // ✅ Fetch Food Types
+  const fetchFoodTypes = async (orgId) => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(FOOD_TYPE_API, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ ...newFoodType, organizationId }),
-      });
-
-      if (!res.ok) throw new Error("Failed to add food type");
-
-      toast.success("Food type added successfully!");
-      setNewFoodType({ name: "", sortOrder: 0, active: true });
-
-      const data = await fetch(`${FOOD_TYPE_API}?organizationId=${organizationId}&active=true`, {
+      const res = await fetch(`${FOOD_TYPE_API}?organizationId=${orgId}&active=true`, {
         headers: { Authorization: `Bearer ${token}` },
-      }).then((r) => r.json());
+      });
+      if (!res.ok) throw new Error("Failed to fetch food types");
+      const data = await res.json();
       setFoodTypes(data);
     } catch (err) {
-      toast.error("Add failed!");
+      toast.error("Food types fetch failed!");
       console.error(err);
     }
   };
 
-  // ✅ Update food type
-  const handleUpdateFoodType = async () => {
+  useEffect(() => {
+    if (organizationId) fetchFoodTypes(organizationId);
+  }, [organizationId]);
+
+  // ✅ Add / Update Food Type
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name.trim()) return toast.warning("Name is required");
+
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`${FOOD_TYPE_API}/${editFood.id}`, {
-        method: "PUT",
+      const method = editingFood ? "PUT" : "POST";
+      const url = editingFood
+        ? `${FOOD_TYPE_API}/${editingFood.id}`
+        : FOOD_TYPE_API;
+
+      const res = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          name: editFood.name,
-          sortOrder: editFood.sortOrder,
-          active: editFood.active,
+          ...formData,
+          organizationId,
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to update food type");
+      if (!res.ok) throw new Error("Failed to save food type");
+      toast.success(editingFood ? "Updated successfully!" : "Added successfully!");
 
-      toast.success("Food type updated!");
-      setEditFood(null);
-
-      const data = await fetch(`${FOOD_TYPE_API}?organizationId=${organizationId}&active=true`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }).then((r) => r.json());
-      setFoodTypes(data);
+      setFormData({ name: "", sortOrder: 0, active: true });
+      setEditingFood(null);
+      setShowModal(false);
+      fetchFoodTypes(organizationId);
     } catch (err) {
-      toast.error("Update failed!");
+      toast.error("Save failed!");
       console.error(err);
     }
   };
 
-  return (
-    <div className="admin-food-container">
-      <ToastContainer />
-      <h2 className="admin-food-title">Food Types</h2>
+  // ✅ Delete Food Type
+  const handleDeleteFood = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${FOOD_TYPE_API}/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      {/* ➕ Add Food Type */}
-      <div className="admin-food-add-section">
-        <h3 className="admin-food-add-heading">Add Food Type</h3>
-        <div className="admin-food-add-form">
-          <input
-            type="text"
-            className="admin-food-input"
-            placeholder="Enter name"
-            value={newFoodType.name}
-            onChange={(e) => setNewFoodType({ ...newFoodType, name: e.target.value })}
-          />
-          <input
-            type="number"
-            className="admin-food-input small"
-            placeholder="Sort Order"
-            value={newFoodType.sortOrder}
-            onChange={(e) => setNewFoodType({ ...newFoodType, sortOrder: +e.target.value })}
-          />
-          <button onClick={handleAddFoodType} className="admin-food-add-btn">
-            <PlusCircle size={18} /> Add
-          </button>
-        </div>
+      if (res.status === 409) {
+        setDeletePopup((prev) => ({ ...prev, show: true, error: true }));
+        return;
+      }
+
+      if (!res.ok) throw new Error("Delete failed");
+      toast.success("Deleted successfully!");
+      setDeletePopup({ show: false, foodId: null, foodName: "", error: false });
+      fetchFoodTypes(organizationId);
+    } catch (err) {
+      console.error(err);
+      setDeletePopup({ ...deletePopup, error: true });
+    }
+  };
+
+  return (
+    <div className="admin-foodtype-page">
+      <ToastContainer position="top-center" />
+
+      {/* ---------- Header ---------- */}
+      <div className="admin-foodtype-header">
+        <h2 className="admin-foodtype-title">Food Type Management</h2>
+        <button className="admin-foodtype-add-btn" onClick={() => setShowModal(true)}>
+          <PlusSquare size={18} /> Add Food Type
+        </button>
       </div>
 
-      {/* 📋 List */}
-      <div className="admin-food-list-section">
-        <h3 className="admin-food-list-heading">Existing Food Types</h3>
-        {foodTypes.length === 0 ? (
-          <p className="admin-food-empty">No food types found.</p>
-        ) : (
-          <table className="admin-food-table">
-            <thead>
+      {/* ---------- Popup Add/Edit Form ---------- */}
+      {showModal && (
+        <div className="admin-foodtype-modal-overlay">
+          <div className="admin-foodtype-modal">
+            <h3>{editingFood ? "Edit Food Type" : "Add New Food Type"}</h3>
+            <form onSubmit={handleSubmit} className="admin-foodtype-form">
+              <input
+                type="text"
+                placeholder="Food Type Name"
+                className="admin-foodtype-input"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Sort Order"
+                className="admin-foodtype-input small"
+                value={formData.sortOrder}
+                onChange={(e) => setFormData({ ...formData, sortOrder: +e.target.value })}
+                required
+              />
+              <select
+                className="admin-foodtype-select"
+                value={formData.active}
+                onChange={(e) => setFormData({ ...formData, active: e.target.value === "true" })}
+              >
+                <option value="true">Active</option>
+                <option value="false">Inactive</option>
+              </select>
+
+              <div className="admin-foodtype-btn-group">
+                <button type="submit" className="admin-foodtype-submit-btn">
+                  {editingFood ? "Update" : "Add"}
+                </button>
+                <button
+                  type="button"
+                  className="admin-foodtype-cancel-btn"
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditingFood(null);
+                    setFormData({ name: "", sortOrder: 0, active: true });
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ---------- Table View ---------- */}
+      <h3 className="admin-foodtype-subtitle">Available Food Types</h3>
+      <div className="admin-foodtype-table-container">
+        <table className="admin-foodtype-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Food Type Name</th>
+              <th>Sort Order</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {foodTypes.length === 0 ? (
               <tr>
-                <th>Name</th>
-                <th>Sort Order</th>
-                <th>Active</th>
-                <th>Actions</th>
+                <td colSpan="5" className="admin-foodtype-empty">No food types found.</td>
               </tr>
-            </thead>
-            <tbody>
-              {foodTypes.map((type) => (
-                <tr key={type.id}>
-                  <td>{type.name}</td>
-                  <td>{type.sortOrder}</td>
-                  <td>{type.active ? "Yes" : "No"}</td>
-                  <td className="admin-food-actions">
-                    <button onClick={() => setEditFood(type)} className="admin-food-edit-btn">
-                      <Edit3 size={18} />
+            ) : (
+              foodTypes.map((food, index) => (
+                <tr key={food.id || index}>
+                  <td>{index + 1}</td>
+                  <td>{food.name}</td>
+                  <td>{food.sortOrder}</td>
+                  <td>{food.active ? "Active" : "Inactive"}</td>
+                  <td className="admin-foodtype-actions">
+                    <button
+                      className="admin-foodtype-edit-btn"
+                      onClick={() => {
+                        setEditingFood(food);
+                        setFormData({
+                          name: food.name,
+                          sortOrder: food.sortOrder,
+                          active: food.active,
+                        });
+                        setShowModal(true);
+                      }}
+                    >
+                      <Edit3 size={16} /> 
+                    </button>
+                    <button
+                      className="admin-foodtype-delete-btn"
+                      onClick={() =>
+                        setDeletePopup({
+                          show: true,
+                          foodId: food.id,
+                          foodName: food.name,
+                          error: false,
+                        })
+                      }
+                    >
+                      <Trash2 size={16} /> 
                     </button>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
-      {/* ✏️ Edit Popup */}
-      {editFood && (
-        <div className="admin-food-popup-overlay">
-          <div className="admin-food-popup">
-            <h3 className="admin-food-popup-title">Edit Food Type</h3>
-            <input
-              type="text"
-              className="admin-food-popup-input"
-              value={editFood.name}
-              onChange={(e) => setEditFood({ ...editFood, name: e.target.value })}
-            />
-            <input
-              type="number"
-              className="admin-food-popup-input"
-              value={editFood.sortOrder}
-              onChange={(e) => setEditFood({ ...editFood, sortOrder: +e.target.value })}
-            />
-            <div className="admin-food-popup-actions">
-              <button onClick={handleUpdateFoodType} className="admin-food-update-btn">
-                Update
-              </button>
-              <button onClick={() => setEditFood(null)} className="admin-food-cancel-btn">
-                Cancel
-              </button>
-            </div>
+      {/* ---------- Delete Popup ---------- */}
+      {deletePopup.show && (
+        <div className="admin-foodtype-popup-overlay">
+          <div className="admin-foodtype-popup">
+            {!deletePopup.error ? (
+              <>
+                <h3>Delete Food Type</h3>
+                <p>
+                  Are you sure you want to delete <strong>{deletePopup.foodName}</strong>?
+                </p>
+                <div className="admin-foodtype-btn-group">
+                  <button
+                    onClick={() => handleDeleteFood(deletePopup.foodId)}
+                    className="admin-foodtype-delete-confirm-btn"
+                  >
+                    Yes, Delete
+                  </button>
+                  <button
+                    onClick={() =>
+                      setDeletePopup({ show: false, foodId: null, foodName: "", error: false })
+                    }
+                    className="admin-foodtype-cancel-btn"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3>Cannot Delete Food Type</h3>
+                <p>
+                  <strong>{deletePopup.foodName}</strong> is used in menu and cannot be deleted.
+                </p>
+                <div className="admin-foodtype-btn-group">
+                  <button
+                    onClick={() =>
+                      setDeletePopup({ show: false, foodId: null, foodName: "", error: false })
+                    }
+                    className="admin-foodtype-cancel-btn"
+                  >
+                    OK
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

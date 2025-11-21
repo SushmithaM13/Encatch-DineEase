@@ -1,110 +1,25 @@
-/* Global responsive base styles and utilities */
-/* Applied automatically by import in src/main.jsx */
+/* === Reset Scrollbar to Default Gray === */
 
-:root {
-  --max-width: 1200px;
-  --gap-sm: 0.5rem;
-  --gap-md: 1rem;
-  --gap-lg: 1.5rem;
-  --radius: 8px;
-  --color-bg: #ffffff;
-  --color-muted: #6b7280;
-  --color-primary: #1e90ff;
-  --text-base: 16px;
+/* For Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 10px;
 }
 
-/* Reset & box-sizing */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-html, body, #root {
-  height: 100%;
-}
-body {
-  margin: 0;
-  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: #f8fafc;
-  color: #111827;
-  font-size: 16px;
-  line-height: 1.4;
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* light gray track */
 }
 
-/* Responsive root font scaling */
-@media (max-width: 1200px) {
-  html { font-size: 15px; }
-}
-@media (max-width: 992px) {
-  html { font-size: 14px; }
-}
-@media (max-width: 576px) {
-  html { font-size: 13px; }
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1; /* medium gray handle */
+  border-radius: 5px;
 }
 
-/* Container helpers */
-.container {
-  max-width: var(--max-width);
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
+::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0; /* darker on hover */
 }
 
-.row {
-  display: flex;
-  gap: var(--gap-md);
-  flex-wrap: wrap;
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
 }
-.col {
-  flex: 1 1 0;
-}
-
-/* Utility helpers */
-.flex { display: flex; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.stack { display: flex; flex-direction: column; gap: var(--gap-md); }
-.hide-sm { display: none; }
-.show-sm { display: inline-block; }
-
-/* Buttons */
-.btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.9rem; border-radius: var(--radius); border: none; cursor: pointer; }
-.btn-primary { background: var(--color-primary); color: white; }
-.btn-ghost { background: transparent; border: 1px solid #e5e7eb; color: inherit; }
-
-/* Images and icons */
-img { max-width: 100%; height: auto; display: block; }
-svg { display: inline-block; vertical-align: middle; }
-
-/* Text helpers */
-.muted { color: var(--color-muted); }
-.small { font-size: 0.9rem; }
-
-/* Mobile-first visibility helpers
-   .hide-mobile hides at small widths; .only-mobile shows only on small widths
-*/
-.hide-mobile { display: none; }
-.only-mobile { display: inline-block; }
-
-@media (min-width: 769px) {
-  .hide-sm { display: inline-block; }
-  .show-sm { display: none; }
-  .hide-mobile { display: inline-block; }
-  .only-mobile { display: none; }
-}
-
-/* Make tables and cards responsive */
-.table-responsive { width: 100%; overflow-x: auto; }
-.card { background: var(--color-bg); border-radius: var(--radius); padding: 1rem; box-shadow: 0 6px 20px rgba(16,24,40,0.04); }
-
-/* Small-screen specific tweaks to help fit content (iPhone SE etc.) */
-@media (max-width: 360px) {
-  body { font-size: 13px; }
-  .btn { padding: 0.5rem; font-size: 0.95rem; }
-}
-
-/* Accessibility: focus outlines */
-:focus { outline: 3px solid rgba(30,144,255,0.18); outline-offset: 2px; }
