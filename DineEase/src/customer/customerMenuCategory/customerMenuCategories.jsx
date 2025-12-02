@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { fetchMenuCategories } from "../api/customerMenuCategoryAPI";
-import { useCustomer } from "../../context/CustomerContext";
+// import { useCustomer } from "../../context/CustomerContext";
 import "./customerMenuCategories.css";
+import { useSession } from "../../context/SessionContext";
 
 const CustomerMenuCategories = ({ onCategorySelect, selectedCategory }) => {
-  const { orgId } = useCustomer();
+  // const { orgId } = useCustomer();
+  const { orgId } = useSession();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

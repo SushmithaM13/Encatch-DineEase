@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { verifyOtp, resendOtp } from "../api/customerLoginAPI";
+import { updateCustomerDetails } from "../api/customerProfileAPI";
 import { toast } from "react-toastify";
 import "./otpVerification.css";
+import { useSession } from "../../context/SessionContext";
 
 const OTPVerification = () => {
   const [otp, setOtp] = useState("");
@@ -15,42 +17,51 @@ const OTPVerification = () => {
   const navigate = useNavigate();
 
   const { login } = useContext(AuthContext);
+  const { sessionId, tableId } = useSession();
 
-  const { identifier, tableId, orgId } = location.state || {};
-  const BASE_URL = "http://localhost:8082/dine-ease/api/v1/customers";
+  const { identifier, orgId} = location.state || {};
 
+  // Auto focus + countdown timer
   useEffect(() => {
     inputRef.current?.focus();
 
     if (timer === 0) return;
-    const countdown = setTimeout(() => setTimer(timer - 1), 1000);
-
+    const countdown = setTimeout(() => setTimer((prev) => prev - 1), 1000);
     return () => clearTimeout(countdown);
   }, [timer]);
 
+  // OTP Verification Handler
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     if (!otp || otp.length !== 6) {
       toast.error("Please enter a valid 6-digit OTP");
       return;
     }
-    try {
-      const response = await fetch(
-        `${BASE_URL}/verify-otp?identifier=${encodeURIComponent(identifier)}&otp=${otp}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      const data = await response.json();
+     try {
+      const { ok, data } = await verifyOtp(identifier, otp);
 
-      if (response.ok) {
-    toast.success(data.message || "OTP verified successfully!");
-    login(data); // store customer data (no longer need to write to localStorage manually)
-    setTimeout(() => {
-      navigate(`/customerDashboard?table=${tableId}&organization=${orgId}`);
-    }, 1200);
-  } else {
+      if (ok) {
+        toast.success(data.message || "OTP verified successfully!");
+
+        login(data); // Save customer data in AuthContext
+        console.log("Customer logged in:", data);
+        console.log("OTP Response = ", data);
+console.log("Customer ID = ", data?.id);
+
+
+        // UPDATE CUSTOMER DETAILS
+        await updateCustomerDetails({
+  sessionId,
+  organizationId: orgId,
+  tableNumber: tableId,    // clean fix
+  customerId: data?.id,
+  reservedTableSource: "CUSTOMER"
+});
+        console.log("Customer details updated");
+        setTimeout(() => {
+          navigate("/customerDashboard");
+        }, 1200);
+      } else {
         toast.error(data.message || "Invalid OTP. Please try again.");
       }
     } catch (err) {
@@ -59,14 +70,13 @@ const OTPVerification = () => {
     }
   };
 
+  //  RESEND OTP Handler
   const handleResendOtp = async () => {
     setIsResending(true);
     try {
-      const response = await fetch(
-        `${BASE_URL}/resend-otp?identifier=${encodeURIComponent(identifier)}`,
-        { method: "POST" }
-      );
-      if (response.ok) {
+      const { ok } = await resendOtp(identifier);
+
+      if (ok) {
         toast.success("OTP resent! Please check your email or phone.");
         setTimer(59);
       } else {
