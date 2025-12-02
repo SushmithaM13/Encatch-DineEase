@@ -1,138 +1,157 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./ChefMenuCatalog.css";
 
 export default function ChefMenuCatalog() {
-  const [menuItems, setMenuItems] = useState([
-    {
-      name: "Grilled Salmon",
-      desc: "Fresh Atlantic salmon with herbs and lemon butter sauce",
-      price: 24.99,
-      category: "Main Course",
-      status: "In Stock",
-      img: "https://via.placeholder.com/300x200/FF8F00/FFFFFF?text=Grilled+Salmon",
-    },
-    {
-      name: "Vegetarian Pasta",
-      desc: "Penne pasta with seasonal vegetables in creamy sauce",
-      price: 16.99,
-      category: "Vegetarian",
-      status: "In Stock",
-      img: "https://via.placeholder.com/300x200/2E7D32/FFFFFF?text=Veg+Pasta",
-    },
-    {
-      name: "Chocolate Cake",
-      desc: "Rich chocolate cake with ganache frosting",
-      price: 8.99,
-      category: "Desserts",
-      status: "Out of Stock",
-      img: "https://via.placeholder.com/300x200/EF5350/FFFFFF?text=Chocolate+Cake",
-    },
-  ]);
+  const API_PROFILE = "http://localhost:8082/dine-ease/api/v1/staff/profile";
+  const API_MENU = "http://localhost:8082/dine-ease/api/v1/menu/getAll";
 
-  const [activeFilter, setActiveFilter] = useState("All Items");
+  const [token, setToken] = useState(localStorage.getItem("jwtToken"));
+  const [organizationId, setOrganizationId] = useState(
+    localStorage.getItem("chefOrgId")
+  );
 
-  const categories = [
-    "All Items",
-    "Starters",
-    "Main Course",
-    "Vegetarian",
-    "Non-Vegetarian",
-    "Beverages",
-    "Desserts",
-  ];
+  const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredItems =
-    activeFilter === "All Items"
-      ? menuItems
-      : menuItems.filter((item) => item.category === activeFilter);
+  // ===================================================================================
+  // 1️⃣ FETCH STAFF PROFILE → GET ORGANIZATION ID
+  // ===================================================================================
+  const fetchStaffProfile = async () => {
+    try {
+      if (!token) {
+        console.log("⏳ Waiting for token...");
+        return;
+      }
 
-  const toggleStock = (name) => {
-    const updated = menuItems.map((item) =>
-      item.name === name
-        ? {
-            ...item,
-            status: item.status === "Out of Stock" ? "In Stock" : "Out of Stock",
-          }
-        : item
-    );
-    setMenuItems(updated);
+      const res = await fetch(API_PROFILE, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        console.error("❌ Profile API failed");
+        return;
+      }
+
+      const data = await res.json();
+      console.log("👨‍🍳 Staff Profile:", data);
+
+      if (data.organizationId) {
+        localStorage.setItem("chefOrgId", data.organizationId);
+        setOrganizationId(data.organizationId);
+      } else {
+        console.error("❌ No organizationId found in profile response!");
+      }
+    } catch (err) {
+      console.error("❌ Staff Profile Fetch Error:", err);
+    }
   };
 
-  const handleReportOut = () => {
-    const outItems = menuItems.filter((i) => i.status === "Out of Stock");
-    alert(
-      outItems.length
-        ? `Out of Stock Items:\n${outItems.map((i) => i.name).join("\n")}`
-        : "No items are out of stock!"
-    );
+  // ===================================================================================
+  // 2️⃣ FETCH MENU ITEMS USING ORGANIZATION ID
+  // ===================================================================================
+  const fetchMenuItems = async (orgId) => {
+    try {
+      const url = `${API_MENU}?organizationId=${orgId}&page=0&size=20`;
+
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        console.error("❌ Menu API failed");
+        setLoading(false);
+        return;
+      }
+
+      const data = await res.json();
+      console.log("🍽 Menu Items:", data);
+
+      const formatted = data?.content?.map((item) => ({
+        id: item.id,
+        name: item.itemName,
+        desc: item.description,
+        price: item.price,
+        img: item.itemImage,
+        category: item.categoryName,
+        status: item.inStock ? "In Stock" : "Out of Stock",
+      }));
+
+      setMenuItems(formatted || []);
+      setLoading(false);
+    } catch (err) {
+      console.error("❌ Menu Fetch Error:", err);
+      setLoading(false);
+    }
   };
+
+  // ===================================================================================
+  // STEP 1: Fetch staff → STEP 2: Fetch menu
+  // ===================================================================================
+  useEffect(() => {
+    if (token) {
+      fetchStaffProfile();
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (organizationId) {
+      fetchMenuItems(organizationId);
+    }
+  }, [organizationId]);
+
+  // Listen for token updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newToken = localStorage.getItem("jwtToken");
+      if (newToken !== token) setToken(newToken);
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, [token]);
 
   return (
     <div className="chef-menu-catalog chef-container">
       <div className="chef-menu-header">
-        <h2>Menu Catalog</h2>
-        <button className="chef-btn chef-btn-outline" onClick={handleReportOut}>
-          ⚠ Report Out of Stock
-        </button>
+        <h2>🍽 Menu Catalog</h2>
       </div>
 
-      <div className="chef-filter-chips">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            className={`chef-chip ${activeFilter === cat ? "chef-active" : ""}`}
-            onClick={() => setActiveFilter(cat)}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      <div className="chef-menu-grid">
-        {filteredItems.length === 0 ? (
-          <p className="chef-no-items">No items in this category.</p>
-        ) : (
-          filteredItems.map((item) => (
-            <div
-              key={item.name}
-              className={`chef-menu-card ${
-                item.status === "Out of Stock" ? "chef-out-of-stock" : ""
-              }`}
-            >
+      {loading ? (
+        <p>⏳ Loading menu items...</p>
+      ) : menuItems.length === 0 ? (
+        <p>No menu items found.</p>
+      ) : (
+        <div className="chef-menu-grid">
+          {menuItems.map((item) => (
+            <div key={item.id} className="chef-menu-card">
               <div
                 className="chef-menu-img"
                 style={{ backgroundImage: `url(${item.img})` }}
               ></div>
+
               <div className="chef-menu-body">
                 <div className="chef-menu-title">
                   <span>{item.name}</span>
-                  <span className="chef-price">${item.price.toFixed(2)}</span>
-                </div>
-                <p className="chef-desc">{item.desc}</p>
-                <div className="chef-menu-footer">
-                  <span
-                    className={`chef-badge ${
-                      item.status === "Out of Stock"
-                        ? "chef-badge-error"
-                        : "chef-badge-success"
-                    }`}
-                  >
-                    {item.status}
+                  <span className="chef-price">
+                    ₹{Number(item.price).toFixed(2)}
                   </span>
-                  <button
-                    className="chef-btn chef-btn-sm chef-btn-outline"
-                    onClick={() => toggleStock(item.name)}
-                  >
-                    {item.status === "Out of Stock"
-                      ? "Mark In Stock"
-                      : "Mark Out"}
-                  </button>
                 </div>
+
+                <p className="chef-desc">{item.desc}</p>
+
+                <span
+                  className={`chef-badge ${
+                    item.status === "Out of Stock"
+                      ? "chef-badge-error"
+                      : "chef-badge-success"
+                  }`}
+                >
+                  {item.status}
+                </span>
               </div>
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

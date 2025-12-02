@@ -10,138 +10,151 @@ import {
   faHourglassHalf,
   faExclamationTriangle,
   faLeaf,
-  faEdit,
-  faWarehouse
+  faClock,
+  faFire,
+  faArrowRight
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function ChefHomePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="chef-home-container chef-container">
-      {/* Welcome Section */}
-      <div className="chef-welcome-section">
-        <div className="chef-welcome-text">
-          <h1>Welcome, Chef!</h1>
-          <p>
-            Track orders in real-time, prioritize urgent tickets, and keep your
-            menu & inventory in sync — all in one clean workspace.
+    <div className="chef-homepage-wrapper">
+      {/* Main Welcome Banner */}
+      <div className="chef-hero-section">
+        <div className="chef-hero-content">
+          <h1 className="chef-hero-title">Welcome, Chef!</h1>
+          <p className="chef-hero-subtitle">
+            Track orders in real-time, prioritize urgent tickets, and keep your menu & inventory in sync — all in one clean workspace.
           </p>
 
-          <div className="chef-button-group">
+          {/* Action Buttons */}
+          <div className="chef-action-buttons">
             <button
-              className="chef-btn chef-btn-green"
+              className="chef-action-btn btn-primary"
               onClick={() => navigate("ChefDashboard")}
             >
-              <FontAwesomeIcon icon={faChartLine} className="chef-btn-icon" />
+              <FontAwesomeIcon icon={faChartLine} />
               Go to Dashboard
+              <FontAwesomeIcon icon={faArrowRight} className="btn-arrow" />
             </button>
             <button
-              className="chef-btn chef-btn-outline-green"
+              className="chef-action-btn btn-outline"
               onClick={() => navigate("OrdersQueue")}
             >
-              <FontAwesomeIcon icon={faClipboardList} className="chef-btn-icon" />
+              <FontAwesomeIcon icon={faClipboardList} />
               Order Queue
             </button>
             <button
-              className="chef-btn chef-btn-outline-orange"
+              className="chef-action-btn btn-outline-warning"
               onClick={() => navigate("menu")}
             >
-              <FontAwesomeIcon icon={faUtensils} className="chef-btn-icon" />
+              <FontAwesomeIcon icon={faUtensils} />
               Menu Catalog
             </button>
             <button
-              className="chef-btn chef-btn-outline-red"
+              className="chef-action-btn btn-outline-danger"
               onClick={() => navigate("inventory")}
             >
-              <FontAwesomeIcon icon={faBoxes} className="chef-btn-icon" />
+              <FontAwesomeIcon icon={faBoxes} />
               Inventory
             </button>
           </div>
 
-          <div className="chef-badges">
-            <span className="chef-badge chef-orange">
-              <FontAwesomeIcon icon={faHourglassHalf} className="chef-badge-icon" />
+          {/* Feature Tags */}
+          <div className="chef-feature-tags">
+            <span className="feature-tag tag-orange">
+              <FontAwesomeIcon icon={faClock} />
               Timers & Overdue alerts
             </span>
-            <span className="chef-badge chef-red">
-              <FontAwesomeIcon icon={faExclamationTriangle} className="chef-badge-icon" />
+            <span className="feature-tag tag-red">
+              <FontAwesomeIcon icon={faFire} />
               Urgent ticket highlighting
             </span>
-            <span className="chef-badge chef-green">
-              <FontAwesomeIcon icon={faLeaf} className="chef-badge-icon" />
+            <span className="feature-tag tag-green">
+              <FontAwesomeIcon icon={faLeaf} />
               Stock-aware menu
             </span>
           </div>
         </div>
 
-        <div className="chef-welcome-image">
+         {/* Chef Illustration */}
+        <div className="chef-hero-image">
           <img
-            src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png"
+            src="src/Images/chef.png"
             alt="Chef Illustration"
           />
         </div>
       </div>
 
-      {/* Info Cards Section */}
-      <div className="chef-info-cards">
-        <div className="chef-card chef-green" onClick={() => navigate("ChefDashboard")}>
-          <FontAwesomeIcon icon={faChartLine} className="chef-card-icon" />
-          <h3>Dashboard</h3>
-          <p>Overview & Kanban board</p>
+      {/* Quick Access Cards Grid */}
+      <div className="chef-cards-grid">
+        <div className="chef-feature-card card-green" onClick={() => navigate("ChefDashboard")}>
+          <div className="card-icon-wrapper">
+            <FontAwesomeIcon icon={faChartLine} className="card-main-icon" />
+          </div>
+          <div className="card-text">
+            <h3>Dashboard</h3>
+            <p>Overview & Kanban board</p>
+          </div>
         </div>
-        <div className="chef-card chef-orange" onClick={() => navigate("OrdersQueue")}>
-          <FontAwesomeIcon icon={faClipboardList} className="chef-card-icon" />
-          <h3>Order Queue</h3>
-          <p>Accept, ready, reopen</p>
+
+        <div className="chef-feature-card card-yellow" onClick={() => navigate("OrdersQueue")}>
+          <div className="card-icon-wrapper">
+            <FontAwesomeIcon icon={faClipboardList} className="card-main-icon" />
+          </div>
+          <div className="card-text">
+            <h3>Order Queue</h3>
+            <p>Accept, ready, reopen</p>
+          </div>
         </div>
-        <div className="chef-card chef-green-light" onClick={() => navigate("menu")}>
-          <FontAwesomeIcon icon={faUtensils} className="chef-card-icon" />
-          <h3>Menu Catalog</h3>
-          <p>Stock-aware menu cards</p>
+
+        <div className="chef-feature-card card-green-light" onClick={() => navigate("menu")}>
+          <div className="card-icon-wrapper">
+            <FontAwesomeIcon icon={faUtensils} className="card-main-icon" />
+          </div>
+          <div className="card-text">
+            <h3>Menu Catalog</h3>
+            <p>Stock-aware menu cards</p>
+          </div>
         </div>
-        <div className="chef-card chef-red" onClick={() => navigate("inventory")}>
-          <FontAwesomeIcon icon={faBoxes} className="chef-card-icon" />
-          <h3>Inventory</h3>
-          <p>Low & OOS at a glance</p>
+
+        <div className="chef-feature-card card-red" onClick={() => navigate("inventory")}>
+          <div className="card-icon-wrapper">
+            <FontAwesomeIcon icon={faBoxes} className="card-main-icon" />
+          </div>
+          <div className="card-text">
+            <h3>Inventory</h3>
+            <p>Low & OOS at a glance</p>
+          </div>
         </div>
       </div>
 
-      {/* Tips & Shortcuts Section */}
-      <div className="chef-bottom-section">
-        <div className="chef-tips-card">
-          <h3>Today’s Tips</h3>
+      {/* Bottom Info Section */}
+      <div className="chef-bottom-grid">
+        <div className="chef-info-card">
+          <h3>Today's Tips</h3>
           <ul>
             <li>
-              Focus on cards with <span className="chef-text-red">Overdue</span>{" "}
-              badges first.
+              Focus on cards with <span className="text-highlight">Overdue</span> badges first.
             </li>
             <li>Use drag-and-drop to move tickets between stages.</li>
           </ul>
         </div>
 
-        <div className="chef-shortcuts-card">
+        <div className="chef-info-card">
           <h3>Shortcuts</h3>
-          <div className="chef-shortcut-buttons">
-            <button
-              className="chef-btn chef-btn-outline"
-              onClick={() => navigate("OrdersQueue")}
-            >
-              <FontAwesomeIcon icon={faClipboardList} className="chef-btn-icon" />
+          <div className="shortcuts-grid">
+            <button className="shortcut-item" onClick={() => navigate("OrdersQueue")}>
+              <FontAwesomeIcon icon={faClipboardList} />
               View Orders
             </button>
-            <button
-              className="chef-btn chef-btn-outline"
-              onClick={() => navigate("menu")}
-            >
-              <FontAwesomeIcon icon={faEdit} className="chef-btn-icon" />
+            <button className="shortcut-item" onClick={() => navigate("menu")}>
+              <FontAwesomeIcon icon={faUtensils} />
               Edit Menu
             </button>
-            <button
-              className="chef-btn chef-btn-outline"
-              onClick={() => navigate("inventory")}
-            >
-              <FontAwesomeIcon icon={faWarehouse} className="chef-btn-icon" />
+            <button className="shortcut-item" onClick={() => navigate("inventory")}>
+              <FontAwesomeIcon icon={faBoxes} />
               Check Inventory
             </button>
           </div>

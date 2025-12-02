@@ -50,14 +50,15 @@ const SuperAdminDashboard = () => {
   ];
 
   const menuOptions = [
-    {path: "/superAdminDashboard/AddMenu-form", lable: "MenuList", icon:<FaUtensils/>},
-    { path: "/superAdminDashboard/category-form", label: "Add Category", icon: <FaFolder /> },
-    { path: "/superAdminDashboard/add-item-type", label: "Add Item", icon: <FaPlusCircle /> },
-    { path: "/superAdminDashboard/food-type", label: "Food Type", icon: <FaUtensils /> },
-    { path: "/superAdminDashboard/cuisine-type", label: "Cuisine Type", icon: <FaBars /> },
-    { path: "/superAdminDashboard/addon-form", label: "Add Addon", icon: <FaPuzzlePiece /> },
-    { path: "/superAdminDashboard/customization-group-form", label: "Customization Group", icon: <FaMagic /> },
-  ];
+  { path: "/superAdminDashboard/AddMenu-form", label: "Menu List", icon: <FaUtensils /> },
+  { path: "/superAdminDashboard/category-form", label: "Add Category", icon: <FaFolder /> },
+  { path: "/superAdminDashboard/add-item-type", label: "Add Item", icon: <FaPlusCircle /> },
+  { path: "/superAdminDashboard/food-type", label: "Food Type", icon: <FaUtensils /> },
+  { path: "/superAdminDashboard/cuisine-type", label: "Cuisine Type", icon: <FaBars /> },
+  { path: "/superAdminDashboard/addon-form", label: "Add Addon", icon: <FaPuzzlePiece /> },
+  { path: "/superAdminDashboard/customization-group-form", label: "Customization Group", icon: <FaMagic /> },
+];
+
 
 
   useEffect(() => {
@@ -387,7 +388,7 @@ const SuperAdminDashboard = () => {
                 className="hello-bubble"
                 onClick={() => setDropdownOpen((prev) => !prev)}
               >
-                <span>Hello, {organizationFullName || userName}</span>
+                <span>Hello, {userName}</span>
                 <img
                   src="https://via.placeholder.com/40"
                   alt="profile"

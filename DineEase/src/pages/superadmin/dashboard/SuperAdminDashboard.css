@@ -1,26 +1,26 @@
 /* ==================== ROOT VARIABLES ==================== */
 :root {
-  --primary: #5f63f2!important;
-  --primary-dark: #4b4ed6!important;
-  --primary-light: #8487ff!important;
-  --secondary: #FF6C6C!important;
-  --success: #00D285!important;
-  --warning: #FFA83D!important;
-  --danger: #FF3D57!important;
-  --dark: #1b1d21!important;
-  --dark-light: #2a2d35!important;
-  --gray: #8a8d97!important;
-  --gray-light: #b7bbc9!important;
-  --bg-main: #f8f9fe!important;
-  --white: #ffffff!important;
-  --sidebar-bg: #1b1d21!important;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06)!important;
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08)!important;
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12)!important;
-  --radius-sm: 6px!important;
-  --radius-md: 10px!important;
-  --radius-lg: 14px!important;
-  --radius-xl: 18px!important;
+  --primary: #5f63f2 !important;
+  --primary-dark: #4b4ed6 !important;
+  --primary-light: #8487ff !important;
+  --secondary: #FF6C6C !important;
+  --success: #00D285 !important;
+  --warning: #FFA83D !important;
+  --danger: #FF3D57 !important;
+  --dark: #1b1d21 !important;
+  --dark-light: #2a2d35 !important;
+  --gray: #8a8d97 !important;
+  --gray-light: #b7bbc9 !important;
+  --bg-main: #f8f9fe !important;
+  --white: #ffffff !important;
+  --sidebar-bg: #1b1d21 !important;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+  --radius-sm: 6px !important;
+  --radius-md: 10px !important;
+  --radius-lg: 14px !important;
+  --radius-xl: 18px !important;
 }
 
 /* ==================== GENERAL LAYOUT ==================== */
@@ -65,18 +65,22 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #e0e0e0; /* Scrollbar background */
+  background: #e0e0e0;
+  /* Scrollbar background */
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--dark-light); /* Scrollbar color */
+  background-color: var(--dark-light);
+  /* Scrollbar color */
   border-radius: 10px;
-  border: 2px solid #e0e0e0; /* Adds spacing effect */
+  border: 2px solid #e0e0e0;
+  /* Adds spacing effect */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--primary); /* Hover color */
+  background-color: var(--primary);
+  /* Hover color */
 }
 
 /* Works in Firefox */
@@ -421,7 +425,7 @@ body {
 /* ==================== PROFILE SECTION ==================== */
 .profile-info {
   position: relative;
-  
+
 }
 
 .hello-bubble {
@@ -429,7 +433,7 @@ body {
   align-items: center;
   background-color: #1e33f3;
   color: rgb(255, 255, 255);
-  
+
   padding: -15px;
   border-radius: 25px;
   cursor: pointer;
@@ -492,6 +496,7 @@ body {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -585,18 +590,24 @@ body {
 
 /* Floating animation keyframes */
 @keyframes floatUp {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-15px);
   }
 }
 
 @keyframes floatDown {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(15px);
   }
@@ -604,9 +615,12 @@ body {
 
 /* Subtle pulse animation */
 @keyframes subtlePulse {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: var(--shadow-sm);
   }
+
   50% {
     box-shadow: var(--shadow-md);
   }
@@ -657,12 +671,10 @@ body {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: linear-gradient(
-    45deg,
-    transparent 30%,
-    rgba(255, 255, 255, 0.1) 50%,
-    transparent 70%
-  );
+  background: linear-gradient(45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 70%);
   transform: rotate(45deg);
   animation: shimmer 8s infinite;
 }
@@ -671,6 +683,7 @@ body {
   0% {
     transform: translateX(-100%) translateY(-100%) rotate(45deg);
   }
+
   100% {
     transform: translateX(100%) translateY(100%) rotate(45deg);
   }
@@ -866,6 +879,7 @@ body {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -887,6 +901,7 @@ body {
     transform: translateY(30px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -1083,6 +1098,7 @@ body {
 
 /* Mobile (below 600px) */
 @media (max-width: 599px) {
+
   /* Sidebar */
   .sidebar {
     left: -300px;
@@ -1427,17 +1443,17 @@ body {
   }
 }
 
-  .organization-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.organization-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
 
-  .welcome-title {
-    font-size: 28px;
-  }
+.welcome-title {
+  font-size: 28px;
+}
 
-  .form-grid {
-    padding: 24px;
-  }
+.form-grid {
+  padding: 24px;
+}
 
 
 /* Tablet Portrait (600px - 767px) */
@@ -1534,10 +1550,106 @@ body {
   }
 
   .stat-content h3 {
-  font-size: 24px;
+    font-size: 24px;
+  }
+
+  .stat-content p {
+    font-size: 12px;
+  }
 }
 
-.stat-content p {
-  font-size: 12px;
+/* Grid for all screen sizes */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  padding: 16px;
 }
+
+/* Menu card */
+.menu-card {
+  background: #f7f1f1;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgb(0, 0, 0);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  padding: 10%;
+  flex-direction: column;
+}
+
+.menu-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.menu-card-image-wrapper {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  margin-left: 15%;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.menu-card-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.menu-card-content {
+  padding: 12px;
+}
+
+.menu-card-title {
+  font-size: 1.1rem;
+   margin-left: 35%;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.menu-card-type {
+  font-size: 0.9rem;
+     margin-left: 35%;
+
+  color: #000000;
+  margin-bottom: 6px;
+}
+
+.menu-card-desc {
+  font-size: 0.85rem;
+  color: #000000;
+     margin-left: 35%;
+  margin-bottom: 8px;
+  height: 40px;
+  /* truncate */
+  overflow: hidden;
+}
+
+.menu-card-price {
+  font-size: 1rem;
+  font-weight: 500;
+   margin-left: 35%;
+  color: #333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .menu-card-desc {
+    height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-card-title {
+    font-size: 1rem;
+  }
+
+  .menu-card-price {
+    font-size: 0.95rem;
+  }
 }

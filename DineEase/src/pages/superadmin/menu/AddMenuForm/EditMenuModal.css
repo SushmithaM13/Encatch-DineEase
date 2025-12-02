@@ -1,0 +1,244 @@
+/* src/pages/Admin/Menu/ManageMenus/EditMenuModal.css */
+
+/* ------------------------------
+   MODAL OVERLAY & BOX
+------------------------------- */
+.Super-admin-menuedit-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.Super-admin-menuedit-modal-box {
+  background-color: #fff;
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.Super-admin-menuedit-modal-box h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ------------------------------
+   SECTIONS
+------------------------------- */
+.Super-admin-menuedit-section {
+  margin-bottom: 25px;
+}
+
+.Super-admin-menuedit-section label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 6px;
+  margin-top: 12px;
+  color: #333;
+}
+
+.Super-admin-menuedit-section input[type="text"],
+.Super-admin-menuedit-section input[type="number"],
+.Super-admin-menuedit-section textarea,
+.Super-admin-menuedit-section select {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.Super-admin-menuedit-section textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* ------------------------------
+   ROWS
+------------------------------- */
+.Super-admin-menuedit-row-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+/* ------------------------------
+   FLAGS
+------------------------------- */
+.Super-admin-menuedit-flags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 12px;
+}
+
+.Super-admin-menuedit-flags-row label {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ------------------------------
+   IMAGE PREVIEW
+------------------------------- */
+.Super-admin-menuedit-image-preview {
+  display: block;
+  max-width: 120px;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+}
+
+/* ------------------------------
+   VARIANTS TABLE
+------------------------------- */
+.Super-admin-menuedit-variant-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.Super-admin-menuedit-variant-table th,
+.Super-admin-menuedit-variant-table td {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.Super-admin-menuedit-variant-table th {
+  background-color: #f8f8f8;
+  font-weight: 600;
+}
+
+/* ------------------------------
+   ADDONS
+------------------------------- */
+.Super-admin-menuedit-addons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.Super-admin-menuedit-addon-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f5f5f5;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.Super-admin-menuedit-addon-box input[type="checkbox"] {
+  transform: scale(1.2);
+}
+
+/* ------------------------------
+   CUSTOMIZATION GROUPS
+------------------------------- */
+.Super-admin-menuedit-customize-group-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.Super-admin-menuedit-group-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #e8f0fe;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.Super-admin-menuedit-group-box input[type="checkbox"] {
+  transform: scale(1.2);
+}
+
+/* ------------------------------
+   ACTION BUTTONS
+------------------------------- */
+.Super-admin-menuedit-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.Super-admin-menuedit-save-btn,
+.Super-admin-menuedit-close-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.Super-admin-menuedit-save-btn {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.Super-admin-menuedit-save-btn:hover {
+  background-color: #45a049;
+}
+
+.Super-admin-menuedit-close-btn {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.Super-admin-menuedit-close-btn:hover {
+  background-color: #e53935;
+}
+
+/* ------------------------------
+   BUTTONS INSIDE SECTIONS
+------------------------------- */
+.Super-admin-menuedit-section button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background-color: #1976d2;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.Super-admin-menuedit-section button:hover {
+  background-color: #1565c0;
+}
+
+/* ------------------------------
+   RESPONSIVE
+------------------------------- */
+@media (max-width: 768px) {
+  .Super-admin-menuedit-row-3 {
+    grid-template-columns: 1fr;
+  }
+}

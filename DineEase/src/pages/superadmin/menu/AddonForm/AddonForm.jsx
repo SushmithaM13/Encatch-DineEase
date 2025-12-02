@@ -98,15 +98,15 @@ export default function AddonForm() {
     e.preventDefault();
 
     const orgId = getOrgId();
-    const formData = new FormData();
-
-    formData.append("organizationId", orgId);
-    formData.append("addOnName", addon.addOnName);
-    formData.append("addOnDescription", addon.addOnDescription);
-    formData.append("price", Number(addon.price));
-    formData.append("isAvailable", addon.isAvailable);
-    formData.append("addOnType", addon.addOnType.toUpperCase());
-    if (image) formData.append("addOnImage", image);
+    
+   const formData = new FormData();
+formData.append("organizationId", orgId);
+formData.append("addOnName", addon.addOnName);
+formData.append("addOnDescription", addon.addOnDescription);
+formData.append("price", Number(addon.price));
+formData.append("isAvailable", addon.isAvailable);
+formData.append("addOnType", addon.addOnType.toUpperCase());
+if (image) formData.append("addOnImage", image);
 
     if (editId) {
       await updateAddon(editId, formData);

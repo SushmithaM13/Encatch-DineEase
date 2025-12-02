@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from "react";
 import {
   FaUsers,
-  FaUserPlus,
-  FaUserCheck,
-  FaUserSlash,
+
   FaEdit,
-  FaUtensils,
-  FaDollarSign,
-  FaShoppingCart,
+
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "./SuperAdminDashboard.css";
 
-const DashboardHome = () => {
+const SuperAdminHome = () => {
   const [hotel, setHotel] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -21,12 +17,21 @@ const DashboardHome = () => {
     activeStaff: 0,
     inactiveStaff: 0,
   });
+
+
+  const [menuStats, setMenuStats] = useState({ totalMenu: 0, });
   const [showPopup, setShowPopup] = useState(false);
   const [editData, setEditData] = useState({});
   const [role, setRole] = useState("");
+  const [menuList, setMenuList] = useState([]);
+  const [search, setSearch] = useState("");
+
+
 
   const navigate = useNavigate();
   const API_BASE = "http://localhost:8082/dine-ease/api/v1";
+
+  // ----------------- STAFF STATS -----------------
 
   const fetchStaffStats = async (orgId, token) => {
     try {
@@ -65,6 +70,38 @@ const DashboardHome = () => {
       console.error("Error fetching staff stats:", error);
     }
   };
+
+  // ----------------- MENU STATS -----------------
+
+  const fetchMenuStats = async (orgId, token) => {
+    try {
+      const response = await fetch(
+        `${API_BASE}/menu/getAll?organizationId=${orgId}&page=0&size=500`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = await response.json();
+
+      const menuData = Array.isArray(data)
+        ? data
+        : Array.isArray(data.content)
+          ? data.content
+          : [];
+
+      setMenuStats({
+        totalMenu: menuData.length,
+      });
+
+      setMenuList(menuData);
+
+    } catch (error) {
+      console.error("Error fetching menu stats:", error);
+    }
+  };
+
+  // ----------------- INITIAL LOAD -----------------
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -105,6 +142,7 @@ const DashboardHome = () => {
         if (orgData?.id) {
           localStorage.setItem("organizationId", orgData.id);
           fetchStaffStats(orgData.id, token);
+          fetchMenuStats(orgData.id, token);
         }
       })
       .catch((err) => {
@@ -113,6 +151,8 @@ const DashboardHome = () => {
       });
   }, [navigate]);
 
+  // ----------------- LISTEN TO STAFF AND MENU UPDATES -----------------
+
   useEffect(() => {
     const handleStaffUpdate = () => {
       const orgId = localStorage.getItem("organizationId");
@@ -120,8 +160,19 @@ const DashboardHome = () => {
       if (orgId && token) fetchStaffStats(orgId, token);
     };
 
+    const handleMenuUpdate = () => {
+      const orgId = localStorage.getItem("organizationId");
+      const token = localStorage.getItem("token");
+      if (orgId && token) fetchMenuStats(orgId, token);
+    };
+
     window.addEventListener("staffUpdated", handleStaffUpdate);
-    return () => window.removeEventListener("staffUpdated", handleStaffUpdate);
+    window.addEventListener("menuUpdated", handleMenuUpdate);
+
+    return () => {
+      window.removeEventListener("staffUpdated", handleStaffUpdate);
+      window.removeEventListener("menuUpdated", handleMenuUpdate);
+    };
   }, []);
 
   const handleChange = (e) => {
@@ -129,48 +180,44 @@ const DashboardHome = () => {
     setEditData((prev) => ({ ...prev, [name]: value }));
   };
 
- 
-const handleUpdate = (e) => {
-  e.preventDefault();
-  const token = localStorage.getItem("token");
 
-  fetch(`${API_BASE}/admin/organization/update`, {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(editData),
-  })
-    .then((res) => {
-      if (!res.ok) throw new Error("Update failed");
-      return res.json();
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    fetch(`${API_BASE}/admin/organization/update`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(editData),
     })
-    .then((updatedData) => {
-      setHotel(updatedData);
-      setShowPopup(false);
+      .then((res) => {
+        if (!res.ok) throw new Error("Update failed");
+        return res.json();
+      })
+      .then((updatedData) => {
+        setHotel(updatedData);
+        setShowPopup(false);
+        localStorage.setItem("organizationName", updatedData.organizationName || "");
+        localStorage.setItem("organizationFullName", updatedData.organizationName || "");
+        window.dispatchEvent(new Event("storage"));
+        alert("Organization details updated successfully!");
+      })
+      .catch((err) => console.log(err));
+  };
 
-      // ⭐ Save updated names to localStorage
-      localStorage.setItem("organizationName", updatedData.organizationName || "");
-      localStorage.setItem("organizationFullName", updatedData.organizationName || "");
+  // ----------------- RENDER -----------------
 
-      // ⭐ Notify other components immediately
-      window.dispatchEvent(new Event("storage"));
-
-      alert("Organization details updated successfully!");
-    })
-    .catch((err) => console.log(err));
-};
-
-
-  return(
+  return (
     <div className="dashboard-container">
-      {/* Welcome Header */}
+
       <div className="welcome-header">
         <div>
           <h2 className="welcome-subtitle">Welcome to Dine_Ease ! ! ! ..</h2>
         </div>
-        
+
       </div>
 
       {/* Stats Cards */}
@@ -187,13 +234,14 @@ const handleUpdate = (e) => {
 
         <div className="stat-card purple">
           <div className="stat-icon-wrapper">
-            {/* <FaFood size={28} /> */}
+            {/* <FaUtensils size={28} /> */}
           </div>
           <div className="stat-content">
-            <h3>{stats.pendingStaff}</h3>
+            <h3>{menuStats.totalMenu}</h3>
             <p>TOTAL MENU</p>
           </div>
         </div>
+
 
         <div className="stat-card cyan">
           <div className="stat-icon-wrapper">
@@ -217,6 +265,76 @@ const handleUpdate = (e) => {
       </div>
 
 
+
+      {/* ================== MENU LIST SECTION ================== */}
+      <div className="menu-grid">
+        {menuList.length === 0 ? (
+          <p>No menu items yet.</p>
+        ) : (
+          menuList
+            .filter((m) => m.itemName?.toLowerCase().includes(search.toLowerCase()))
+            .map((menu) => {
+              const imageUrl = menu.imageData
+                ? `data:image/jpeg;base64,${menu.imageData}`
+                : menu.imageUrl
+                  ? menu.imageUrl.replace(
+                    /C:\\\\dine-ease-backend\\\\dine-ease\\\\uploads\\\\/g,
+                    "http://localhost:8082/dine-ease/uploads/"
+                  )
+                  : "/images/placeholder.png";
+
+
+              const price =
+                menu.variants && menu.variants.length > 0
+                  ? Math.min(...menu.variants.map((v) => Number(v.price || 0)))
+                  : "N/A";
+              return (
+                <div
+                  key={menu.id}
+                  className="menu-card"
+                  onClick={() => navigate(`/SuperAdminDashboard/menu/${menu.id}`)}
+                >
+                  <div className="menu-card-image-wrapper">
+                   {menu.imageData ? (
+      <img
+        src={`data:image/jpeg;base64,${menu.imageData}`}
+        alt={menu.itemName}
+        style={{ width: "200px", height: "150px", border: "1px solid red" }}
+        onError={(e) => {
+          e.target.src = "/images/placeholder.png";
+        }}
+      />
+    ) : menu.imageUrl ? (
+      <img
+        src={menu.imageUrl.replace(
+          /C:\\dine-ease-backend\\dine-ease\\uploads\\/g,
+          "http://localhost:8082/dine-ease/uploads/"
+        )}
+        alt={menu.itemName}
+        style={{ width: "200px", height: "150px", border: "1px solid red" }}
+        onError={(e) => {
+          console.log("Image failed:", menu.imageUrl);
+          e.target.src = "/images/placeholder.png";
+        }}
+      />
+    ) : (
+      <img
+        src="/images/placeholder.png"
+        alt="No Image"
+        style={{ width: "200px", height: "150px", border: "1px solid red" }}
+      />
+    )}
+                  </div>
+                  <div className="menu-card-content">
+                    <h3 className="menu-card-title">Name:{menu.itemName}</h3>
+                    <p className="menu-card-price">Price-₹ {price}</p>
+                  </div>
+                </div>
+
+              );
+            })
+        )}
+      </div>
 
       {/* Organization Details Section */}
       <div className="content-row">
@@ -364,4 +482,4 @@ const handleUpdate = (e) => {
   );
 };
 
-export default DashboardHome;
+export default SuperAdminHome;
