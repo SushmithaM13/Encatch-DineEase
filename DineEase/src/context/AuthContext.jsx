@@ -17,6 +17,7 @@ const AuthProvider = ({ children }) => {
     localStorage.setItem("isGuest", "false");
     localStorage.setItem("customerData", JSON.stringify(customerData));
     setAuthState({ isLoggedIn: true, isGuest: false, customer: customerData });
+    console.log("User logged in:", customerData);
   };
 
   const loginAsGuest = () => {
@@ -24,6 +25,7 @@ const AuthProvider = ({ children }) => {
     localStorage.setItem("isGuest", "true");
     localStorage.removeItem("customerData");
     setAuthState({ isLoggedIn: false, isGuest: true, customer: null });
+    console.log("Guest login");
   };
 
   const logout = () => {

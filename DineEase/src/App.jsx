@@ -76,7 +76,7 @@ import Footer from './components/footer/Footer';
 import CustomerLogin from './customer/customerLogin/customerLogin';
 import OTPVerification from './customer/customerLogin/otpVerification';
 import CustomerDashboard from './customer/customerDashboard/CustomerDashboard';
-// import CustomerMenuPage from './customer/customerMenu/customerMenuPage';
+import EnterSessionId from './customer/customerLogin/EnterSessionId';
 
 function App() {
 
@@ -203,7 +203,8 @@ function App() {
 
 
         {/* Customer Flow */}
-        <Route path='/customerLogin/customer/login' element={<CustomerLogin />} />
+        <Route path='/customerLogin' element={<CustomerLogin />} />
+        <Route path='/enterSessionId' element={<EnterSessionId/>}/>
         <Route path='/otpVerification' element={<OTPVerification />} />
         <Route path='/customerDashboard' element={<CustomerDashboard />} />
 
