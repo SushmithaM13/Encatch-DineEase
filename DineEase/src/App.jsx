@@ -25,12 +25,15 @@ import SuperAdminSettings from "./pages/superadmin/settings/SuperAdminSettings";
 // ===== New Menu Dashboard (Tabbed) =====
 import MenuDashboard from "./pages/superadmin/menu/MenuDashboard/MenuDashboard";
 
-import MenuList from "./pages/superadmin/menu/MenuList/MenuList";
+//ADD menu Iteams 
+import AddMenuForm from "./pages/superadmin/menu/AddMenuForm/SuperAdminMenu";
+import SuperAdminMenuDetail from "./pages/superadmin/menu/AddMenuForm/SuperAdminMenuDetail";
+
+//Menu Categoryes
 import CategoryForm from "./pages/superadmin/menu/CategoryForm/CategoryForm";
 import AddItemtype from "./pages/superadmin/menu/AddItemForm/AddItemtype";
 import Foodtype from "./pages/superadmin/menu/Foodtype/Foodtype";
 import Cuisinetype from "./pages/superadmin/menu/cuisinetype/cuisinetype";
-import VariantForm from "./pages/superadmin/menu/VariantForm/VariantForm";
 import AddonForm from "./pages/superadmin/menu/AddonForm/AddonForm";
 import CustomizationGroupForm from "./pages/superadmin/menu/CustomizationGroupForm/CustomizationGroupForm";
 
@@ -129,11 +132,13 @@ function App() {
 
 
           <Route path="menu-dashboard" element={<MenuDashboard />} />
+          <Route path="AddMenu-form" element={<AddMenuForm />} />
+          <Route path="menu/:id" element={<SuperAdminMenuDetail />} />
           <Route path="category-form" element={<CategoryForm />} />
           <Route path="add-item-type" element={<AddItemtype />} />
           <Route path="food-type" element={<Foodtype />} />
           <Route path="cuisine-type" element={<Cuisinetype />} />
-          <Route path="variant-form" element={<VariantForm />} />
+          
           <Route path="addon-form" element={<AddonForm />} />
           <Route path="customization-group-form" element={<CustomizationGroupForm />} />
 

@@ -1,0 +1,128 @@
+/* Main container */
+.Super-admin-menudetail-container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  font-family: "Inter", sans-serif;
+}
+
+/* Heading */
+.Super-admin-menudetail-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 10px;
+  text-transform: capitalize;
+}
+
+/* Image */
+.Super-admin-menudetail-image {
+  width: 220px;
+  height: 220px;
+  border-radius: 10px;
+  object-fit: cover;
+  margin: 10px 0 15px 0;
+  border: 1px solid #e2e2e2;
+}
+
+/* Description */
+.Super-admin-menudetail-description {
+  font-size: 16px;
+  color: #444;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Action buttons */
+.Super-admin-menudetail-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.Super-admin-menudetail-btn {
+  padding: 8px 16px;
+  background: #2a7ae4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease-in-out;
+}
+
+.Super-admin-menudetail-btn:hover {
+  background: #1e5fb7;
+}
+
+.Super-admin-menudetail-btn-delete {
+  background: #e63946;
+}
+
+.Super-admin-menudetail-btn-delete:hover {
+  background: #c42532;
+}
+
+.Super-admin-menudetail-btn-back {
+  background: #6c757d;
+}
+
+.Super-admin-menudetail-btn-back:hover {
+  background: #555b61;
+}
+
+/* Section headers */
+.Super-admin-menudetail-section h3 {
+  margin-top: 25px;
+  margin-bottom: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* Table */
+.Super-admin-menudetail-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.Super-admin-menudetail-table th,
+.Super-admin-menudetail-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #e2e2e2;
+  text-align: left;
+  font-size: 14px;
+}
+
+.Super-admin-menudetail-table th {
+  background: #f7f7f7;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Addon & customization lists */
+.Super-admin-menudetail-list {
+  list-style: none;
+  padding-left: 10px;
+}
+
+.Super-admin-menudetail-list li {
+  padding: 4px 0;
+  font-size: 15px;
+}
+
+/* Sub-options list */
+.Super-admin-menudetail-sublist {
+  list-style: circle;
+  padding-left: 25px;
+}
+
+.Super-admin-menudetail-sublist li {
+  font-size: 14px;
+  color: #444;
+}
