@@ -203,7 +203,7 @@ function App() {
 
 
         {/* Customer Flow */}
-        <Route path='/customerLogin/customer/login' element={<CustomerLogin />} />
+        <Route path='/customerLoginy67uj6ty7' element={<CustomerLogin />} />
         <Route path='/otpVerification' element={<OTPVerification />} />
         <Route path='/customerDashboard' element={<CustomerDashboard />} />
 

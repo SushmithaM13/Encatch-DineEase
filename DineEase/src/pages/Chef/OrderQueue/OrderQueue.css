@@ -211,3 +211,12 @@
     gap: 10px;
   }
 }
+.chef-btn-danger {
+  background-color: #e53935;
+  color: #fff;
+}
+
+.chef-btn-success {
+  background-color: #43a047;
+  color: #fff;
+}

@@ -1,35 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./ChefMenuCatalog.css";
 
 export default function ChefMenuCatalog() {
-  const [menuItems, setMenuItems] = useState([
-    {
-      name: "Grilled Salmon",
-      desc: "Fresh Atlantic salmon with herbs and lemon butter sauce",
-      price: 24.99,
-      category: "Main Course",
-      status: "In Stock",
-      img: "https://via.placeholder.com/300x200/FF8F00/FFFFFF?text=Grilled+Salmon",
-    },
-    {
-      name: "Vegetarian Pasta",
-      desc: "Penne pasta with seasonal vegetables in creamy sauce",
-      price: 16.99,
-      category: "Vegetarian",
-      status: "In Stock",
-      img: "https://via.placeholder.com/300x200/2E7D32/FFFFFF?text=Veg+Pasta",
-    },
-    {
-      name: "Chocolate Cake",
-      desc: "Rich chocolate cake with ganache frosting",
-      price: 8.99,
-      category: "Desserts",
-      status: "Out of Stock",
-      img: "https://via.placeholder.com/300x200/EF5350/FFFFFF?text=Chocolate+Cake",
-    },
-  ]);
+  const TOKEN = localStorage.getItem("chefToken");
 
+  // FIXED API URL
+  const API_URL_MENU =
+    "http://localhost:8082/dine-ease/api/v1/menu/getAll?organizationId=5a812c7d-c96f-4929-823f-86b4a62be304";
+
+  const [menuItems, setMenuItems] = useState([]);
   const [activeFilter, setActiveFilter] = useState("All Items");
+  const [loading, setLoading] = useState(true);
 
   const categories = [
     "All Items",
@@ -41,23 +22,84 @@ export default function ChefMenuCatalog() {
     "Desserts",
   ];
 
+  // --------------------------------------------------
+  // 1️⃣ DIRECTLY FETCH MENU FROM FIXED API
+  // --------------------------------------------------
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        setLoading(true);
+
+        const res = await fetch(API_URL_MENU, {
+          headers: { Authorization: `Bearer ${TOKEN}` },
+        });
+
+        const data = await res.json();
+        console.log("MENU API RESPONSE:", data);
+
+        const items = Array.isArray(data) ? data : [];
+
+        const mapped = items.map((item) => ({
+          id: item.id,
+          name: item.itemName,
+          desc: item.description || "No description available",
+          price:
+            item.variants?.length > 0
+              ? Math.min(...item.variants.map((v) => Number(v.price)))
+              : 0,
+          category: item.categoryName || "Uncategorized",
+
+          img: item.imageData
+            ? `data:image/jpeg;base64,${item.imageData}`
+            : item.imageUrl
+            ? item.imageUrl.replace(
+                "C:\\dine-ease-backend\\dine-ease\\uploads\\",
+                "http://localhost:8082/dine-ease/uploads/"
+              )
+            : "https://dummyimage.com/300x200/000/fff&text=No+Image",
+
+          status: item.isAvailable ? "In Stock" : "Out of Stock",
+        }));
+
+        setMenuItems(mapped);
+      } catch (err) {
+        console.error("Menu error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMenu();
+  }, []);
+
+  // --------------------------------------------------
+  // 2️⃣ FILTER MENU ITEMS
+  // --------------------------------------------------
   const filteredItems =
     activeFilter === "All Items"
       ? menuItems
       : menuItems.filter((item) => item.category === activeFilter);
 
+  // --------------------------------------------------
+  // 3️⃣ TOGGLE STOCK (UI ONLY)
+  // --------------------------------------------------
   const toggleStock = (name) => {
-    const updated = menuItems.map((item) =>
-      item.name === name
-        ? {
-            ...item,
-            status: item.status === "Out of Stock" ? "In Stock" : "Out of Stock",
-          }
-        : item
+    setMenuItems((prev) =>
+      prev.map((item) =>
+        item.name === name
+          ? {
+              ...item,
+              status:
+                item.status === "Out of Stock" ? "In Stock" : "Out of Stock",
+            }
+          : item
+      )
     );
-    setMenuItems(updated);
   };
 
+  // --------------------------------------------------
+  // 4️⃣ REPORT OUT OF STOCK
+  // --------------------------------------------------
   const handleReportOut = () => {
     const outItems = menuItems.filter((i) => i.status === "Out of Stock");
     alert(
@@ -66,6 +108,8 @@ export default function ChefMenuCatalog() {
         : "No items are out of stock!"
     );
   };
+
+  if (loading) return <p>Loading Menu...</p>;
 
   return (
     <div className="chef-menu-catalog chef-container">
@@ -94,7 +138,7 @@ export default function ChefMenuCatalog() {
         ) : (
           filteredItems.map((item) => (
             <div
-              key={item.name}
+              key={item.id}
               className={`chef-menu-card ${
                 item.status === "Out of Stock" ? "chef-out-of-stock" : ""
               }`}
@@ -103,12 +147,15 @@ export default function ChefMenuCatalog() {
                 className="chef-menu-img"
                 style={{ backgroundImage: `url(${item.img})` }}
               ></div>
+
               <div className="chef-menu-body">
                 <div className="chef-menu-title">
                   <span>{item.name}</span>
-                  <span className="chef-price">${item.price.toFixed(2)}</span>
+                  <span className="chef-price">${item.price}</span>
                 </div>
+
                 <p className="chef-desc">{item.desc}</p>
+
                 <div className="chef-menu-footer">
                   <span
                     className={`chef-badge ${
@@ -119,6 +166,7 @@ export default function ChefMenuCatalog() {
                   >
                     {item.status}
                   </span>
+
                   <button
                     className="chef-btn chef-btn-sm chef-btn-outline"
                     onClick={() => toggleStock(item.name)}

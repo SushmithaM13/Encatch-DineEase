@@ -16,128 +16,77 @@ import {
   FaTags,
   FaPuzzlePiece,
   FaMagic,
-  FaSearch,
   FaChevronRight,
   FaChartBar,
   FaFileAlt,
 } from "react-icons/fa";
 
 const SuperAdminDashboard = () => {
-  const [hotels, setHotels] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const navigate = useNavigate();
+  const dropdownRef = useRef(null);
+
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    const saved = localStorage.getItem("sidebarOpen");
+    return saved ? JSON.parse(saved) : true;
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
   const [dashboardDropdownOpen, setDashboardDropdownOpen] = useState(false);
-  const [staffDropdownOpen, setStaffDropdownOpen] = useState(false); // staff management dropdown
-  const [userName, setUserName] = useState("");
+  const [staffDropdownOpen, setStaffDropdownOpen] = useState(false);
+  const [hotels, setHotels] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("hotels") || "[]");
+    } catch {
+      return [];
+    }
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [organizationName, setOrganizationName] = useState("");
-  const [organizationFullName, setOrganizationFullName] = useState("");
 
-  const dropdownRef = useRef(null);
-  const navigate = useNavigate();
+  // --- Dynamically read user and org info from localStorage ---
+  const getUserName = () => {
+    const userRaw = localStorage.getItem("user");
+    const user = userRaw && userRaw !== "undefined" ? JSON.parse(userRaw) : {};
+    const superAdminFullName = localStorage.getItem("superAdminFullName");
+    return superAdminFullName || user?.name || "User";
+  };
 
-  const dashboardOptions = [
-    { path: "/superAdminDashboard", label: "Dashboard", icon: <FaHome /> },
-    { path: "/superAdminDashboard/Analytics", label: "Analytics", icon: <FaChartBar /> },
-    { path: "/superAdminDashboard/reports", label: "Reports", icon: <FaFileAlt /> },
-    { path: "/superAdminDashboard/settings", label: "Settings", icon: <FaCog /> },
-  ];
-
-  const menuOptions = [
-   //  { path: "/superAdminDashboard/menu-dashboard", label: "Menu Dashboard", icon: <FaChartBar /> },
-    { path: "/superAdminDashboard/category-form", label: "Add Category", icon: <FaFolder /> },
-    { path: "/superAdminDashboard/add-item-type", label: "Add Item", icon: <FaPlusCircle /> },
-    { path: "/superAdminDashboard/food-type", label: "Food Type", icon: <FaUtensils /> },
-    { path: "/superAdminDashboard/cuisine-type", label: "Cuisine Type", icon: <FaBars /> },
-    { path: "/superAdminDashboard/variant-form", label: "Add Variant", icon: <FaTags /> },
-    { path: "/superAdminDashboard/addon-form", label: "Add Addon", icon: <FaPuzzlePiece /> },
-    { path: "/superAdminDashboard/customization-group-form", label: "Customization Group", icon: <FaMagic /> },
-  ];
-
-  useEffect(() => {
-
-    try {
-      const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
-      setHotels(storedHotels);
-      console.log(storedHotels)
-    } catch (e) { 
-      console.error("Invalid hotels data in localStorage:", e);
-      setHotels([]);
-    }
-
-    try {
-      const storedUserRaw = localStorage.getItem("user");
-      const storedUser = storedUserRaw && storedUserRaw !== "undefined"
-        ? JSON.parse(storedUserRaw)
-        : {};
-
-      // ✅ Check for name from localStorage (saved by Profile page)
-      const profileFullName = localStorage.getItem("superAdminFullName");
-
-      setUserName(profileFullName || storedUser?.name || "User");
-    } catch (e) {
-      console.error("Invalid user data in localStorage:", e);
-      setUserName("User");
-    }
-
-
-
-    // Load organization info
-    try {
-      const storedOrgRaw = localStorage.getItem("organization");
-      const storedOrg =
-        storedOrgRaw && storedOrgRaw !== "undefined"
-          ? JSON.parse(storedOrgRaw)
-          : null;
-
-      if (storedOrg) {
-        setOrganizationName(storedOrg.name || "");
-        setOrganizationFullName(storedOrg.fullName || "");
-      }
-    } catch (e) {
-      console.error("Invalid organization data in localStorage:", e);
-      setOrganizationName("");
-      setOrganizationFullName("");
-      localStorage.removeItem("organization"); // remove bad data
-    }
-
+  const getOrganizationName = () => {
+    const orgRaw = localStorage.getItem("organization");
+    const org = orgRaw && orgRaw !== "undefined" ? JSON.parse(orgRaw) : null;
     const orgName = localStorage.getItem("organizationName");
-    const fullName = localStorage.getItem("organizationFullName");
+    return org?.name || orgName || "Organization Name";
+  };
 
-    if (orgName) setOrganizationName(orgName);
-    if (fullName) setOrganizationFullName(fullName);
+  // State only for typing animation display
+  const [displayedName, setDisplayedName] = useState(getUserName());
 
-    const handleStorageChange = (e) => {
-      if (e.key === "organizationName") setOrganizationName(e.newValue || "");
-      if (e.key === "organizationFullName") setOrganizationFullName(e.newValue || "");
+  // Typing animation whenever the username changes
+  useEffect(() => {
+    const fullName = getUserName();
+    let index = 0;
+    setDisplayedName(""); // reset animation
+    const typingInterval = setInterval(() => {
+      setDisplayedName(fullName.slice(0, index + 1));
+      index++;
+      if (index > fullName.length) clearInterval(typingInterval);
+    }, 50);
+    return () => clearInterval(typingInterval);
+  }, [getUserName()]);
+
+  // Update displayedName immediately whenever localStorage changes (login/profile switch)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const fullName = getUserName();
+      setDisplayedName(fullName); // immediately update username
     };
-
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = mobileMenuOpen ? "hidden" : "unset";
-    return () => (document.body.style.overflow = "unset");
-  }, [mobileMenuOpen]);
-
-  const handleMobileMenuClose = () => setMobileMenuOpen(false);
-
-  // Close dropdown if clicked outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Prevent back navigation for logged-in SuperAdmin
+  // Prevent back navigation
   useEffect(() => {
     const handlePopState = () => {
       const token = localStorage.getItem("token");
@@ -151,29 +100,41 @@ const SuperAdminDashboard = () => {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  //  Logout
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? "hidden" : "unset";
+    return () => (document.body.style.overflow = "unset");
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleMobileMenuClose = () => setMobileMenuOpen(false);
+
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
-
     try {
       const response = await fetch("http://localhost:8082/dine-ease/api/v1/users/logout", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       if (!response.ok) throw new Error("Logout failed");
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
+      localStorage.clear(); // clear all user/org data
+      setDisplayedName("User"); // reset username immediately
       navigate("/", { replace: true });
     } catch (error) {
       console.error("Logout error:", error);
     }
   };
 
-  //  Search functionality
+  // Search
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (searchQuery.trim() !== "") {
@@ -185,9 +146,25 @@ const SuperAdminDashboard = () => {
         setSearchResults([]);
       }
     }, 400);
-
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
+
+  const dashboardOptions = [
+    { path: "/superAdminDashboard", label: "Dashboard", icon: <FaHome /> },
+    { path: "/superAdminDashboard/Analytics", label: "Analytics", icon: <FaChartBar /> },
+    { path: "/superAdminDashboard/reports", label: "Reports", icon: <FaFileAlt /> },
+    { path: "/superAdminDashboard/settings", label: "Settings", icon: <FaCog /> },
+  ];
+
+  const menuOptions = [
+    { path: "/superAdminDashboard/category-form", label: "Add Category", icon: <FaFolder /> },
+    { path: "/superAdminDashboard/add-item-type", label: "Add Item", icon: <FaPlusCircle /> },
+    { path: "/superAdminDashboard/food-type", label: "Food Type", icon: <FaUtensils /> },
+    { path: "/superAdminDashboard/cuisine-type", label: "Cuisine Type", icon: <FaBars /> },
+    { path: "/superAdminDashboard/variant-form", label: "Add Variant", icon: <FaTags /> },
+    { path: "/superAdminDashboard/addon-form", label: "Add Addon", icon: <FaPuzzlePiece /> },
+    { path: "/superAdminDashboard/customization-group-form", label: "Customization Group", icon: <FaMagic /> },
+  ];
 
   return (
     <div className={`dashboard ${sidebarOpen ? "expanded" : "collapsed"}`}>
@@ -195,14 +172,14 @@ const SuperAdminDashboard = () => {
 
       <aside className={`sidebar ${sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed"} ${mobileMenuOpen ? "mobile-open" : ""}`}>
         <div className="sidebar-header">
-          <div className="logo-container" onClick={() => { navigate("/superAdminDashboard"); window.location.reload(); }} style={{ cursor: "pointer" }}>
+          <div className="logo-container" onClick={() => navigate("/superAdminDashboard")} style={{ cursor: "pointer" }}>
             <div className="logo-icon"><SoupIcon size={58} /></div>
             {sidebarOpen && <h2 className="logo">DINE_EASE</h2>}
           </div>
         </div>
 
         <ul className="sidebar-menu">
-          {/* Dashboard Dropdown */}
+          {/* Dashboard */}
           <li className={`menu-dropdown ${dashboardDropdownOpen ? "active" : ""}`}>
             <div className="menu-link" onClick={() => setDashboardDropdownOpen(prev => !prev)}>
               <FaHome />
@@ -215,7 +192,7 @@ const SuperAdminDashboard = () => {
               <ul className="submenu">
                 {dashboardOptions.map((option) => (
                   <li key={option.path}>
-                    <NavLink to={option.path} onClick={() => { if (window.innerWidth <= 768) handleMobileMenuClose(); }}>
+                    <NavLink to={option.path} onClick={() => window.innerWidth <= 768 && handleMobileMenuClose()}>
                       {option.icon}<span>{option.label}</span>
                     </NavLink>
                   </li>
@@ -224,7 +201,7 @@ const SuperAdminDashboard = () => {
             )}
           </li>
 
-          {/* Staff Management Dropdown */}
+          {/* Staff */}
           <li className={`menu-dropdown ${staffDropdownOpen ? "active" : ""}`}>
             <div className="menu-link" onClick={() => setStaffDropdownOpen(prev => !prev)}>
               <FaUsers />
@@ -236,12 +213,12 @@ const SuperAdminDashboard = () => {
             {staffDropdownOpen && sidebarOpen && (
               <ul className="submenu">
                 <li>
-                  <NavLink to="/superAdminDashboard/staff" onClick={() => { if (window.innerWidth <= 768) handleMobileMenuClose(); }}>
+                  <NavLink to="/superAdminDashboard/staff" onClick={() => window.innerWidth <= 768 && handleMobileMenuClose()}>
                     <FaUsers /><span>Staff</span>
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/superAdminDashboard/staffrole" onClick={() => { if (window.innerWidth <= 768) handleMobileMenuClose(); }}>
+                  <NavLink to="/superAdminDashboard/staffrole" onClick={() => window.innerWidth <= 768 && handleMobileMenuClose()}>
                     <FaIdBadge /><span>Staff Role</span>
                   </NavLink>
                 </li>
@@ -249,7 +226,7 @@ const SuperAdminDashboard = () => {
             )}
           </li>
 
-          {/* Menu Dashboard Dropdown */}
+          {/* Menu */}
           <li className={`menu-dropdown ${menuDropdownOpen ? "active" : ""}`}>
             <div className="menu-link" onClick={() => setMenuDropdownOpen(prev => !prev)}>
               <FaUtensils />
@@ -262,7 +239,7 @@ const SuperAdminDashboard = () => {
               <ul className="submenu">
                 {menuOptions.map((option) => (
                   <li key={option.path}>
-                    <NavLink to={option.path} onClick={() => { if (window.innerWidth <= 768) handleMobileMenuClose(); }}>
+                    <NavLink to={option.path} onClick={() => window.innerWidth <= 768 && handleMobileMenuClose()}>
                       {option.icon}<span>{option.label}</span>
                     </NavLink>
                   </li>
@@ -279,53 +256,39 @@ const SuperAdminDashboard = () => {
         </ul>
       </aside>
 
-      {/* Main Content */}
       <main className="main-content">
         <div className="topbar">
-          <div className={`menu-toggle ${mobileMenuOpen || !sidebarOpen ? "active" : ""}`} onClick={() => {
-            if (window.innerWidth <= 768) setMobileMenuOpen(prev => !prev);
-            else setSidebarOpen(prev => { const newState = !prev; localStorage.setItem("sidebarOpen", JSON.stringify(newState)); return newState; });
-          }}>
+          <div className={`menu-toggle ${mobileMenuOpen || !sidebarOpen ? "active" : ""}`}
+            onClick={() => {
+              if (window.innerWidth <= 768) setMobileMenuOpen(prev => !prev);
+              else setSidebarOpen(prev => { const newState = !prev; localStorage.setItem("sidebarOpen", JSON.stringify(newState)); return newState; });
+            }}>
             <span></span><span></span><span></span>
           </div>
 
-          <div className="search-bar">
-            <FaSearch className="Search-icon" />
-            <input type="text" placeholder="Search here..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-            {searchResults.length > 0 && (
-              <div className="search-results">
-                {searchResults.map((item, idx) => <div key={idx} className="search-item">{item.name || item.title}</div>)}
-              </div>
-            )}
-          </div>
+          <div className="search-bar"></div>
 
           <div className="organization-center">
-            <h2 className="organization-title">{organizationName || "Organization Name"}</h2>
+            <h2 className="organization-title">{getOrganizationName()}</h2>
           </div>
 
           <div className="topbar-actions" ref={dropdownRef}>
-            <button className="icon-btn notification-btn"></button>
-            <div className="profile-info">
-              <div className="hello-bubble" onClick={() => setDropdownOpen(prev => !prev)}>
-                <span>Hello, {organizationFullName || userName}</span>
-                <img src="https://via.placeholder.com/40" alt="profile" className="profile-avatar-curved" />
-              </div>
-              {dropdownOpen && (
-                <div className="profile-dropdown">
-                  <button onClick={() => navigate("/superAdminDashboard/profile")}><FaIdBadge /> Profile</button>
-                  <button onClick={() => navigate("/superAdminDashboard/settings")}><FaCog /> Settings</button>
-                  <button className="logout-btn" onClick={handleLogout}><FaSignOutAlt /> Logout</button>
-                </div>
-              )}
+            <div className="profile-info" onClick={() => setDropdownOpen(prev => !prev)}>
+              <span className="profile-name">{displayedName}</span>
+              <img src="https://i.pravatar.cc/150?img=3" alt="profile" className="profile-avatar" />
             </div>
+
+            {dropdownOpen && (
+              <div className="profile-dropdown">
+                <button className="dropdown-btn" onClick={() => navigate("/superAdminDashboard/profile")}><FaIdBadge /> Profile</button>
+                <button className="dropdown-btn" onClick={() => navigate("/superAdminDashboard/settings")}><FaCog /> Settings</button>
+                <button className="dropdown-btn logout-btn" onClick={handleLogout}><FaSignOutAlt /> Logout</button>
+              </div>
+            )}
           </div>
         </div>
 
         <Outlet context={{ hotels }} />
-        <p style={{ color: 'white' }}></p>
-
-
-
       </main>
     </div>
   );

@@ -11,15 +11,13 @@ import {
   Bell,
   Clock,
   AlertTriangle,
-  FlameKindling,
-  CheckCircle2,
   Menu,
   Home,
 } from "lucide-react";
 import "./ChefHome.css";
 
 export default function ChefHome() {
-  const [chefName, setChefName] = useState(localStorage.getItem("chefName") || "Chef");
+  const [chefName] = useState(localStorage.getItem("chefName") || "Chef");
   const [restaurantName] = useState("DineEase Restaurant");
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -27,58 +25,113 @@ export default function ChefHome() {
   const [notifications, setNotifications] = useState([]);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
-  const chefId = localStorage.getItem("chefId");
 
-  // Fetch notifications from backend
+  const organizationId = "5a812c7d-c96f-4929-823f-86b4a62be304";
+  const chefId = 1;
+  const token = localStorage.getItem("token");
+
+  // Convert array timestamp → JS Date
+  const parseDateArray = (arr) =>
+    arr
+      ? new Date(
+          arr[0],
+          arr[1] - 1,
+          arr[2],
+          arr[3],
+          arr[4],
+          arr[5],
+          Math.floor(arr[6] / 1_000_000)
+        )
+      : new Date();
+
+  // ===========================
+  // FETCH NOTIFICATIONS / ORDERS
+  // ===========================
   const fetchNotifications = async () => {
     try {
-      const res = await fetch(`/api/chef/${chefId}/notifications`);
-      if (!res.ok) throw new Error("Failed to fetch notifications");
-      const data = await res.json();
-      setNotifications(
-        data.map((n) => ({
-          id: n.id,
-          label: n.orderItem?.name ? `Order #${n.orderItem.id} — ${n.orderItem.quantity} item(s)` : "New Notification",
-          details: n.message,
-          status: n.status || "New",
-          timeAgo: n.sentAt ? new Date(n.sentAt).toLocaleTimeString() : "just now",
-          unread: !n.isRead,
-          priority: n.priority || "normal",
-          table: n.orderItem?.tableNumber || "Table X",
-        }))
+      if (!token) return console.error("Token missing");
+
+      const res = await fetch(
+        `http://localhost:8082/dine-ease/api/v1/chef-notifications/all/${organizationId}/${chefId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
+
+      if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+
+      const data = await res.json();
+
+      const mapped = data.map((n) => ({
+        id: n.chefNotificationId,
+        table: n.tableNumber || "Table X",
+        time: parseDateArray(n.sentAt).toLocaleTimeString(),
+        ago: `${Math.floor((Date.now() - parseDateArray(n.sentAt)) / 60000)} min ago`,
+        items: n.orderItemDetails
+          .map((item) => `${item.itemQuantity} x ${item.orderItemName}`)
+          .join(", "),
+        note: n.orderReference,
+        urgent: n.notificationType === "HIGH_PRIORITY",
+        unread: !n.isRead,
+      }));
+
+      setNotifications(mapped);
     } catch (err) {
-      console.error(err);
+      console.error("Fetch Error:", err);
     }
   };
 
   useEffect(() => {
     fetchNotifications();
+    const interval = setInterval(fetchNotifications, 5000);
+    return () => clearInterval(interval);
   }, []);
 
-  // Mark notification as read
+  // ===========================
+  // MARK SINGLE NOTIFICATION AS READ
+  // ===========================
   const markAsRead = async (id) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, unread: false } : n))
+    );
+
     try {
-      await fetch(`/api/chef/notifications/${id}/read`, { method: "PUT" });
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, unread: false } : n))
+      await fetch(
+        `http://localhost:8082/dine-ease/api/v1/chef-notifications/${id}/read`,
+        { method: "PUT", headers: { Authorization: `Bearer ${token}` } }
       );
     } catch (err) {
-      console.error(err);
+      console.error("Error marking notification read:", err);
     }
   };
 
-  // Delete notification
-  const deleteNotification = async (id) => {
+  // ===========================
+  // MARK ALL NOTIFICATIONS AS READ
+  // ===========================
+  const markAllAsRead = async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+
     try {
-      await fetch(`/api/chef/notifications/${id}`, { method: "DELETE" });
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
+      const unreadIds = notifications.filter((n) => n.unread).map((n) => n.id);
+      await Promise.all(
+        unreadIds.map((id) =>
+          fetch(`http://localhost:8082/dine-ease/api/v1/chef-notifications/${id}/read`, {
+            method: "PUT",
+            headers: { Authorization: `Bearer ${token}` },
+          })
+        )
+      );
     } catch (err) {
-      console.error(err);
+      console.error("Error marking all notifications read:", err);
     }
   };
 
-  // Close dropdowns if clicked outside
+  // ===========================
+  // OUTSIDE CLICK TO CLOSE DROPDOWN
+  // ===========================
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -99,19 +152,21 @@ export default function ChefHome() {
     navigate("/", { replace: true });
   };
 
-  // Handle window resize for responsive sidebar
+  // ===========================
+  // RESPONSIVE SIDEBAR
+  // ===========================
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) setSidebarOpen(true);
-      else setSidebarOpen(false);
-    };
+    const handleResize = () => setSidebarOpen(window.innerWidth > 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // ===========================
+  // RENDER
+  // ===========================
   return (
     <div className={`chef-layout ${sidebarOpen ? "chef-sidebar-open" : "chef-collapsed"}`}>
-      {/* Sidebar */}
+      {/* SIDEBAR */}
       <aside className="chef-sidebar">
         <div className="chef-sidebar-header">
           <div className="chef-brand">
@@ -124,29 +179,30 @@ export default function ChefHome() {
         </div>
 
         <nav className="chef-nav-links">
-          <NavLink to="" end className={({ isActive }) => isActive ? "chef-nav-link chef-active" : "chef-nav-link"}>
+          <NavLink to="" end className={({ isActive }) => (isActive ? "chef-nav-link chef-active" : "chef-nav-link")}>
             <Home size={20} /> {sidebarOpen && <span>Home</span>}
           </NavLink>
-          <NavLink to="ChefDashboard" className={({ isActive }) => isActive ? "chef-nav-link chef-active" : "chef-nav-link"}>
+          <NavLink to="ChefDashboard" className={({ isActive }) => (isActive ? "chef-nav-link chef-active" : "chef-nav-link")}>
             <LayoutDashboard size={20} /> {sidebarOpen && <span>Dashboard</span>}
           </NavLink>
-          <NavLink to="OrdersQueue" className={({ isActive }) => isActive ? "chef-nav-link chef-active" : "chef-nav-link"}>
+          <NavLink to="OrdersQueue" className={({ isActive }) => (isActive ? "chef-nav-link chef-active" : "chef-nav-link")}>
             <ClipboardList size={20} /> {sidebarOpen && <span>Order Queue</span>}
           </NavLink>
-          <NavLink to="menu" className={({ isActive }) => isActive ? "chef-nav-link chef-active" : "chef-nav-link"}>
+          <NavLink to="menu" className={({ isActive }) => (isActive ? "chef-nav-link chef-active" : "chef-nav-link")}>
             <UtensilsCrossed size={20} /> {sidebarOpen && <span>Menu Catalog</span>}
           </NavLink>
-          <NavLink to="inventory" className={({ isActive }) => isActive ? "chef-nav-link chef-active" : "chef-nav-link"}>
+          <NavLink to="inventory" className={({ isActive }) => (isActive ? "chef-nav-link chef-active" : "chef-nav-link")}>
             <Boxes size={20} /> {sidebarOpen && <span>Inventory</span>}
           </NavLink>
         </nav>
       </aside>
 
-      {/* Sidebar backdrop for mobile */}
+      {/* MOBILE BACKDROP */}
       {sidebarOpen && window.innerWidth <= 768 && (
         <div className="chef-sidebar-backdrop" onClick={() => setSidebarOpen(false)}></div>
       )}
 
+      {/* MAIN */}
       <main className="chef-main">
         <header className="chef-header">
           <div className="chef-header-left">
@@ -161,54 +217,37 @@ export default function ChefHome() {
           </div>
 
           <div className="chef-header-right" ref={dropdownRef}>
-            {/* Notification button */}
+            {/* NOTIFICATIONS */}
             <div className="chef-notification-wrapper">
               <button className="chef-notif-btn" onClick={() => setNotifOpen(!notifOpen)}>
                 <Bell size={18} />
                 {notifications.some((n) => n.unread) && (
-                  <span className="chef-notif-badge">
-                    {notifications.filter((n) => n.unread).length}
-                  </span>
+                  <span className="chef-notif-badge">{notifications.filter((n) => n.unread).length}</span>
                 )}
               </button>
 
               {notifOpen && (
                 <div className="chef-notif-dropdown">
                   <div className="chef-notif-actions">
-                    <button onClick={() => setNotifications(prev => prev.map(n => ({ ...n, unread: false })))}>
-                      Mark all read
-                    </button>
+                    <button onClick={markAllAsRead}>Mark all read</button>
                     <button onClick={() => setNotifications([])}>Clear</button>
                   </div>
+
                   <div className="chef-notif-list">
                     {notifications.length === 0 && <div className="chef-notif-empty">No notifications</div>}
-                    {notifications.map(n => (
-                      <div key={n.id} className={`chef-notif-item ${n.unread ? "chef-unread" : ""}`}>
-                        <div className="chef-notif-main" onClick={() => markAsRead(n.id)}>
-                          <div className="chef-notif-header">
-                            <div className="chef-notif-title">
-                              {n.label}
-                              {n.priority === "high" && <AlertTriangle size={14} />}
-                            </div>
-                            <div className="chef-notif-table">{n.table}</div>
-                          </div>
-                          <div className="chef-notif-details">{n.details}</div>
-                          <div className="chef-notif-meta">
-                            <span className={`chef-notif-status chef-${n.status.toLowerCase()}`}>
-                              {n.status === "New" && <AlertTriangle size={14} />}
-                              {n.status === "Preparing" && <FlameKindling size={14} />}
-                              {n.status === "Ready" && <CheckCircle2 size={14} />}
-                              {n.status}
-                            </span>
-                            <span className="chef-notif-time">
-                              <Clock size={14} /> {n.timeAgo}
-                            </span>
-                          </div>
+
+                    {notifications.map((o) => (
+                      <div
+                        key={o.id}
+                        className={`chef-notif-item ${o.urgent ? "chef-urgent" : ""} ${o.unread ? "chef-unread" : ""}`}
+                        onClick={() => markAsRead(o.id)}
+                      >
+                        <div className="chef-order-table">
+                          <span>{o.table}</span>
                         </div>
-                        <div className="chef-notif-controls">
-                          {n.unread && <span className="chef-unread-dot" />}
-                          <button onClick={() => deleteNotification(n.id)} className="chef-notif-delete-btn">×</button>
-                        </div>
+                        <div className="chef-order-items">{o.items}</div>
+                        <div className="chef-order-time">{o.time} ({o.ago})</div>
+                        <div className="chef-order-note">{o.note}</div>
                       </div>
                     ))}
                   </div>
@@ -216,7 +255,7 @@ export default function ChefHome() {
               )}
             </div>
 
-            {/* Profile dropdown */}
+            {/* PROFILE */}
             <div className="chef-profile-circle" onClick={() => setDropdownOpen(!dropdownOpen)}>
               {chefName.charAt(0).toUpperCase()}
             </div>

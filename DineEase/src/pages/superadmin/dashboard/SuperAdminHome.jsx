@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
   FaUsers,
-  FaUserPlus,
-  FaUserCheck,
-  FaUserSlash,
-  FaEdit,
-  FaUtensils,
-  FaDollarSign,
-  FaShoppingCart,
+  FaEdit
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import "./SuperAdminDashboard.css";
@@ -72,13 +66,11 @@ const DashboardHome = () => {
     setRole(userRole);
 
     if (!token) {
-      console.warn("Unauthorized access - redirecting to login");
       navigate("/");
       return;
     }
 
     if (userRole !== "SUPER_ADMIN" && userRole !== "ADMIN") {
-      console.warn("Access denied - redirecting to login");
       navigate("/");
       return;
     }
@@ -96,6 +88,7 @@ const DashboardHome = () => {
         setHotel(orgData);
         setEditData(orgData);
         setLoading(false);
+
         if (orgData?.organizationName) {
           localStorage.setItem("organizationName", orgData.organizationName);
         }
@@ -155,12 +148,10 @@ const DashboardHome = () => {
 
   return (
     <div className="dashboard-container">
+
       {/* Welcome Header */}
       <div className="welcome-header">
-        <div>
-          <h2 className="welcome-subtitle">Welcome to Dine_Ease ! ! ! ..</h2>
-        </div>
-        
+        <h2 className="welcome-subtitle">Welcome to Dine_Ease</h2>
       </div>
 
       {/* Stats Cards */}
@@ -176,9 +167,6 @@ const DashboardHome = () => {
         </div>
 
         <div className="stat-card purple">
-          <div className="stat-icon-wrapper">
-            {/* <FaFood size={28} /> */}
-          </div>
           <div className="stat-content">
             <h3>{stats.pendingStaff}</h3>
             <p>TOTAL MENU</p>
@@ -186,9 +174,6 @@ const DashboardHome = () => {
         </div>
 
         <div className="stat-card cyan">
-          <div className="stat-icon-wrapper">
-            {/* <FaShoppingCart size={28} /> */}
-          </div>
           <div className="stat-content">
             <h3>{stats.activeStaff}</h3>
             <p>ACTIVE STAFF</p>
@@ -196,57 +181,12 @@ const DashboardHome = () => {
         </div>
 
         <div className="stat-card pink">
-          <div className="stat-icon-wrapper">
-            {/* <FaUsers size={28} /> */}
-          </div>
           <div className="stat-content">
             <h3>{stats.inactiveStaff}</h3>
             <p>INACTIVE STAFF</p>
           </div>
         </div>
       </div>
-
-{/* Revenue & Customer Map Section */}
-<div className="dashboard-additional">
-  {/* Revenue Card */}
-  <div className="revenue-card">
-    <div className="revenue-header">
-      <h3>Revenue Overview</h3>
-    </div>
-    <div className="revenue-content">
-      {/* Replace with actual chart later */}
-      <div className="revenue-chart-placeholder">
-        <p>Revenue Chart Here</p>
-      </div>
-      <div className="revenue-stats">
-        <div>
-          <span>Total Revenue:</span> <strong>$12,345</strong>
-        </div>
-        <div>
-          <span>Monthly Revenue:</span> <strong>$3,210</strong>
-        </div>
-        <div>
-          <span>Weekly Revenue:</span> <strong>$780</strong>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {/* Customer Map */}
-  <div className="customer-map-card">
-    <div className="map-header">
-      <h3>Customer Map</h3>
-    </div>
-    <div className="map-content">
-      {/* Replace with actual map component later */}
-      <div className="map-placeholder">
-        <p>Map showing customer locations</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-
 
       {/* Organization Details Section */}
       <div className="content-row">
@@ -267,129 +207,44 @@ const DashboardHome = () => {
             <div className="loading-state">Loading organization...</div>
           ) : hotel ? (
             <div className="organization-grid">
-              <div className="org-item">
-                <span className="org-label">ID</span>
-                <span className="org-value">{hotel.id || "N/A"}</span>
-              </div>
-              <div className="org-item">
-                <span className="org-label">Organization Name</span>
-                <span className="org-value">{hotel.organizationName || "N/A"}</span>
-              </div>
-              <div className="org-item">
-                <span className="org-label">Business Type</span>
-                <span className="org-value">{hotel.businessType || "N/A"}</span>
-              </div>
-              <div className="org-item">
-                <span className="org-label">Address</span>
-                <span className="org-value">{hotel.organizationAddress || "N/A"}</span>
-              </div>
-              <div className="org-item">
-                <span className="org-label">Phone</span>
-                <span className="org-value">{hotel.organizationPhone || "N/A"}</span>
-              </div>
-              <div className="org-item">
-                <span className="org-label">Email</span>
-                <span className="org-value">{hotel.organizationEmail || "N/A"}</span>
-              </div>
-              <div className="org-item">
-                <span className="org-label">Website</span>
-                <span className="org-value">{hotel.organizationWebsite || "N/A"}</span>
-              </div>
-              <div className="org-item">
-                <span className="org-label">Status</span>
-                <span className="org-value status-badge">{hotel.organizationStatus || "N/A"}</span>
-              </div>
-              <div className="org-item">
-                <span className="org-label">GST Number</span>
-                <span className="org-value">{hotel.gstNumber || "N/A"}</span>
-              </div>
+              <div className="org-item"><span>ID</span><span>{hotel.id || "N/A"}</span></div>
+              <div className="org-item"><span>Name</span><span>{hotel.organizationName || "N/A"}</span></div>
+              <div className="org-item"><span>Type</span><span>{hotel.businessType || "N/A"}</span></div>
+              <div className="org-item"><span>Address</span><span>{hotel.organizationAddress || "N/A"}</span></div>
+              <div className="org-item"><span>Phone</span><span>{hotel.organizationPhone || "N/A"}</span></div>
+              <div className="org-item"><span>Email</span><span>{hotel.organizationEmail || "N/A"}</span></div>
+              <div className="org-item"><span>Website</span><span>{hotel.organizationWebsite || "N/A"}</span></div>
+              <div className="org-item"><span>Status</span><span>{hotel.organizationStatus || "N/A"}</span></div>
+              <div className="org-item"><span>GST</span><span>{hotel.gstNumber || "N/A"}</span></div>
             </div>
           ) : (
-            <div className="empty-state">No organization data available.</div>
+            <div>No organization data available</div>
           )}
         </section>
       </div>
 
-      {/* Edit Popup */}
+      {/* Edit Modal */}
       {showPopup && role === "SUPER_ADMIN" && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <div className="modal-header">
-              <h3>Edit Organization Details</h3>
-            </div>
+            <h3>Edit Organization Details</h3>
             <form onSubmit={handleUpdate}>
-              <div className="form-grid">
-                <div className="form-group">
-                  <label>Organization Name</label>
-                  <input
-                    name="organizationName"
-                    value={editData.organizationName || ""}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Business Type</label>
-                  <input
-                    name="businessType"
-                    value={editData.businessType || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Address</label>
-                  <input
-                    name="organizationAddress"
-                    value={editData.organizationAddress || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Phone</label>
-                  <input
-                    name="organizationPhone"
-                    value={editData.organizationPhone || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Email</label>
-                  <input
-                    name="organizationEmail"
-                    value={editData.organizationEmail || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Website</label>
-                  <input
-                    name="organizationWebsite"
-                    value={editData.organizationWebsite || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="form-group full-width">
-                  <label>GST Number</label>
-                  <input
-                    name="gstNumber"
-                    value={editData.gstNumber || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
+              <input name="organizationName" value={editData.organizationName || ""} onChange={handleChange} placeholder="Organization Name" />
+              <input name="businessType" value={editData.businessType || ""} onChange={handleChange} placeholder="Business Type" />
+              <input name="organizationAddress" value={editData.organizationAddress || ""} onChange={handleChange} placeholder="Address" />
+              <input name="organizationPhone" value={editData.organizationPhone || ""} onChange={handleChange} placeholder="Phone" />
+              <input name="organizationEmail" value={editData.organizationEmail || ""} onChange={handleChange} placeholder="Email" />
+              <input name="organizationWebsite" value={editData.organizationWebsite || ""} onChange={handleChange} placeholder="Website" />
+              <input name="gstNumber" value={editData.gstNumber || ""} onChange={handleChange} placeholder="GST Number" />
               <div className="modal-footer">
-                <button type="button" className="btn-secondary" onClick={() => setShowPopup(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn-primary">
-                  Save Changes
-                </button>
+                <button type="button" onClick={() => setShowPopup(false)}>Cancel</button>
+                <button type="submit">Save</button>
               </div>
             </form>
           </div>
         </div>
       )}
+
     </div>
   );
 };

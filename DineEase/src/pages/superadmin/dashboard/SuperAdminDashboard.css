@@ -427,13 +427,10 @@ body {
 .hello-bubble {
   display: flex;
   align-items: center;
-<<<<<<< HEAD
-  background-color: #2d30f5;
-  color: white;
-=======
+
   background-color: #1e33f3;
   color: rgb(255, 255, 255);
->>>>>>> d37e3b01d37cca4d6ef66d4090b5dca61ec0e7d0
+
   
   padding: -15px;
   border-radius: 25px;
@@ -1052,8 +1049,8 @@ body {
 }
 
 
-=======
->>>>>>> d37e3b01d37cca4d6ef66d4090b5dca61ec0e7d0
+
+
 
 /* ==================== CONTENT SECTIONS ==================== */
 .content-row {
@@ -1067,11 +1064,9 @@ body {
   margin-top: 5%;
   border-radius: var(--radius-xl);
   padding: 38px;
-<<<<<<< HEAD
-  box-shadow: var(--shadow-sm);
-=======
+
   box-shadow: var(--danger);
->>>>>>> d37e3b01d37cca4d6ef66d4090b5dca61ec0e7d0
+
 }
 
 .section-header {
@@ -1854,4 +1849,503 @@ body {
 .stat-content p {
   font-size: 12px;
 }
+}
+/* ================= DASHBOARD STATS GRID ================= */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+/* ================= CARD BASE ================= */
+
+.stat-card {
+  background: linear-gradient(135deg, #ffffff, #f9fafb);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+  transition: all 0.3s ease;
+  min-height: 85px;
+}
+
+/* Hover Effect */
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+}
+
+/* ================= ICON ================= */
+
+.stat-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: white;
+}
+
+/* ================= CONTENT ================= */
+
+.stat-content {
+  text-align: right;
+}
+
+.stat-content h3 {
+  font-size: 20px;
+  margin: 0;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.stat-content p {
+  margin: 2px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+
+/* ================= COLORS ================= */
+
+.stat-card.blue .stat-icon-wrapper {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.stat-card.blue {
+  border-left: 4px solid #2563eb;
+}
+
+.stat-card.purple .stat-icon-wrapper {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+}
+
+.stat-card.purple {
+  border-left: 4px solid #7c3aed;
+}
+
+.stat-card.cyan .stat-icon-wrapper {
+  background: linear-gradient(135deg, #0891b2, #06b6d4);
+}
+
+.stat-card.cyan {
+  border-left: 4px solid #0891b2;
+}
+
+.stat-card.pink .stat-icon-wrapper {
+  background: linear-gradient(135deg, #db2777, #f472b6);
+}
+
+.stat-card.pink {
+  border-left: 4px solid #db2777;
+}
+
+
+/* =================== MOBILE SCREEN =================== */
+
+@media (max-width: 768px) {
+  .stat-content h3 {
+    font-size: 17px;
+  }
+
+  .stat-card {
+    padding: 12px 14px;
+  }
+
+  .stat-icon-wrapper {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
+
+
+/* =================== SMALL MOBILE =================== */
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-card {
+    min-height: 75px;
+  }
+
+  .stat-content p {
+    font-size: 10px;
+  }
+}
+/* ===========================
+   PURPLE PROFILE THEME
+=========================== */
+
+/* Profile container */
+.profile-info {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Hello Bubble */
+.hello-bubble {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #6a11cb, #8e2de2);
+  padding: 8px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(140, 90, 255, 0.3);
+  transition: 0.3s ease;
+  color: white;
+}
+
+.hello-bubble:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 22px rgba(140, 90, 255, 0.6);
+}
+
+.hello-bubble span {
+  font-weight: 600;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+/* Avatar Style */
+.profile-avatar-curved {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+}
+
+/* Dropdown Card */
+.profile-dropdown {
+  position: absolute;
+  right: 0;
+  top: 60px;
+  width: 220px;
+  background: linear-gradient(145deg, #2d0140, #4b006e);
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 10px 30px rgba(160, 62, 255, 0.6);
+  animation: fadeUp 0.25s ease;
+  z-index: 999;
+}
+
+/* Dropdown Buttons */
+.profile-dropdown button {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 10px 12px;
+  text-align: left;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.profile-dropdown button:hover {
+  background: linear-gradient(135deg, #7b2ff7, #f107a3);
+  transform: translateX(4px);
+}
+
+/* Logout Button */
+.logout-btn {
+  background: linear-gradient(135deg, #ff416c, #ff4b2b) !important;
+  margin-top: 6px;
+  font-weight: bold;
+}
+
+.logout-btn:hover {
+  opacity: 0.9;
+}
+
+/* Animation */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===========================
+     RESPONSIVE FIXES
+=========================== */
+
+@media (max-width: 768px) {
+
+  .hello-bubble span {
+    display: none; /* Hide name to save space on phones */
+  }
+
+  .profile-dropdown {
+    right: -40px;
+    width: 200px;
+  }
+
+  .profile-avatar-curved {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-dropdown {
+    right: -80px;
+  }
+}
+
+
+
+
+
+
+
+
+
+/* ======================= Dashboard Stats Card ======================= */
+
+/* ------------------------- */
+/* Topbar Actions Wrapper */
+/* ------------------------- */
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+}
+
+/* ------------------------- */
+/* Profile Box & Bubble */
+/* ------------------------- */
+.profile-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* spread name and avatar to edges */
+  cursor: pointer;
+  background: linear-gradient(135deg, #6d28d9, #9333ea, #c084fc);
+  padding: 4px 20px; /* shorter height, wider width */
+  border-radius: 30px;
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
+  transition: all 0.3s ease;
+  width: 260px; /* fixed wider width */
+  max-width: 100%; /* responsive */
+}
+
+.profile-info:hover {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+}
+
+.profile-name {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px; /* ensures name doesn't overflow */
+}
+
+/* Avatar */
+.profile-avatar {
+  width: 36px; /* smaller height */
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #fff;
+}
+
+/* ------------------------- */
+/* Dropdown Menu */
+/* ------------------------- */
+.profile-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  background: linear-gradient(145deg, #1e1b4b, #312e81, #4c1d95);
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 12px 30px rgba(124, 58, 237, 0.6);
+  z-index: 9999;
+  animation: dropFade 0.2s ease-in-out;
+  overflow: hidden;
+}
+
+/* Dropdown Buttons */
+.profile-dropdown button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  padding: 11px 13px;
+  border-radius: 10px;
+  background: transparent;
+  color: #e9d5ff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.profile-dropdown button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Logout Button */
+.profile-dropdown .logout-btn {
+  margin-top: 6px;
+  background: linear-gradient(135deg, #7c3aed, #9333ea, #c084fc);
+  color: white;
+  font-weight: 600;
+}
+
+.profile-dropdown .logout-btn:hover {
+  background: linear-gradient(135deg, #a855f7, #c084fc);
+}
+
+/* ------------------------- */
+/* Animations */
+/* ------------------------- */
+@keyframes dropFade {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ------------------------- */
+/* Responsive Fixes */
+/* ------------------------- */
+@media (max-width: 768px) {
+  .profile-name {
+    display: none; /* hide username on small screens */
+  }
+
+  .profile-info {
+    padding: 4px;
+    border-radius: 50%;
+    width: auto;
+  }
+
+  .profile-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .profile-dropdown {
+    right: -5px;
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-dropdown {
+    right: -10px;
+    width: 90vw;
+    max-width: 260px;
+  }
+}
+/* Profile Dropdown */
+.profile-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  min-width: 220px;
+  background: linear-gradient(145deg, #1e1b4b, #312e81, #4c1d95);
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 12px 30px rgba(124, 58, 237, 0.6);
+  z-index: 9999;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateX(30px); /* start slightly to the right */
+  animation: slideInRight 0.25s forwards ease-out;
+}
+
+/* Dropdown Buttons */
+.profile-dropdown button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  padding: 11px 13px;
+  border-radius: 10px;
+  background: transparent;
+  color: #e9d5ff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.profile-dropdown button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Logout Button */
+.profile-dropdown .logout-btn {
+  margin-top: 6px;
+  background: linear-gradient(135deg, #7c3aed, #9333ea, #c084fc);
+  color: white;
+  font-weight: 600;
+}
+
+.profile-dropdown .logout-btn:hover {
+  background: linear-gradient(135deg, #a855f7, #c084fc);
+}
+
+/* Animation Keyframes */
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(30px); /* start slightly right */
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0); /* final position */
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .profile-dropdown {
+    right: -5px;
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-dropdown {
+    right: -10px;
+    width: 90vw;
+    max-width: 260px;
+  }
 }

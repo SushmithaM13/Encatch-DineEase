@@ -2,247 +2,203 @@ import React, { useState, useEffect } from "react";
 import "./OrderQueue.css";
 
 export default function ChefOrderQueue() {
-  const defaultOrders = {
+
+  const ORG_ID = "5a812c7d-c96f-4929-823f-86b4a62be304";
+
+  const FETCH_API = `http://localhost:8082/dine-ease/api/v1/chef-notifications/all/${ORG_ID}/1`;
+  const STATUS_API = `http://localhost:8082/dine-ease/api/v1/${ORG_ID}/orders/order-item/status`;
+
+  const token = localStorage.getItem("token");
+
+  const [orders, setOrders] = useState({
     newOrders: [],
     accepted: [],
     preparing: [],
     ready: [],
-  };
-  
-  const [orders, setOrders] = useState(defaultOrders);
+  });
 
-  useEffect(() => {
-    const initialData = {
-      newOrders: [
-        {
-          table: "Table 5",
-          time: "12:30 PM",
-          ago: "2 min ago",
-          items: "2x Grilled Salmon, 1x Veg Pasta",
-          note: "Extra spicy for both salmon",
-          urgent: true,
-          timer: 12,
-        },
-        {
-          table: "Table 8",
-          time: "12:32 PM",
-          ago: "1 min ago",
-          items: "1x Burger, 1x Fries, 2x Coke",
-          timer: 15,
-        },
-      ],
-      accepted: [],
-      preparing: [
-        {
-          table: "Table 3",
-          time: "12:25 PM",
-          ago: "7 min ago",
-          items: "2x Chicken Curry, 2x Rice",
-          timer: 8,
-        },
-        {
-          table: "Table 7",
-          time: "12:28 PM",
-          ago: "4 min ago",
-          items: "1x Pizza, 1x Salad",
-          note: "Gluten-free pizza base",
-          urgent: true,
-          timer: 5,
-        },
-      ],
-      ready: [
-        {
-          table: "Table 2",
-          time: "12:20 PM",
-          ago: "10 min ago",
-          items: "1x Salad, 2x Soup",
-          timer: 3,
-        },
-      ],
-    };
-    setOrders(initialData);
-  }, []);
+  // ---------- DATE FIX ----------
+  const parseDateArray = (arr) =>
+    arr
+      ? new Date(
+          arr[0], arr[1] - 1, arr[2],
+          arr[3], arr[4], arr[5],
+          Math.floor(arr[6] / 1000000)
+        )
+      : new Date();
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setOrders((prev) => {
-        const updateTimer = (arr) =>
-          (arr || []).map((o) => ({ ...o, timer: o.timer > 0 ? o.timer - 1 : 1 }));
-        return {
-          newOrders: updateTimer(prev.newOrders),
-          accepted: updateTimer(prev.accepted),
-          preparing: updateTimer(prev.preparing),
-          ready: updateTimer(prev.ready),
-        };
+  // ---------- FETCH ORDERS ----------
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch(FETCH_API, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-    }, 60000);
+
+      const data = await res.json();
+
+      const bucket = {
+        newOrders: [],
+        accepted: [],
+        preparing: [],
+        ready: [],
+      };
+
+      // ✅ EVERY item goes to NEW ORDERS
+      data.forEach((n) => {
+
+        bucket.newOrders.push({
+          id: n.orderItemId || n.chefNotificationId,
+          table: `Table ${n.tableNumber || "X"}`,
+          time: parseDateArray(n.sentAt).toLocaleTimeString(),
+          ago: `${Math.floor(
+            (Date.now() - parseDateArray(n.sentAt)) / 60000
+          )} min ago`,
+          items: (n.orderItemDetails || [])
+            .map(i => `${i.itemQuantity} x ${i.orderItemName}`)
+            .join(", "),
+          note: n.orderReference,
+          timer: 15
+        });
+      });
+
+      setOrders(bucket);
+    } catch (err) {
+      console.error("Fetch Error:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+    const interval = setInterval(fetchOrders, 30000);
     return () => clearInterval(interval);
   }, []);
 
-  const moveOrder = (from, to, index) => {
-    if (!orders[from] || !orders[to]) return;
-    const orderToMove = orders[from][index];
-    if (!orderToMove) return;
-    setOrders((prev) => {
-      const updatedFrom = (prev[from] || []).filter((_, i) => i !== index);
-      const updatedTo = [...(prev[to] || []), orderToMove];
-      return { ...prev, [from]: updatedFrom, [to]: updatedTo };
+  // ---------- UPDATE STATUS ----------
+  const updateStatus = async (id, status, column) => {
+    try {
+      await fetch(STATUS_API, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          orderItemId: id,
+          itemStatus: status,
+          notes: "Updated from UI",
+        }),
+      });
+
+      moveToColumn(id, column);
+    } catch (err) {
+      alert("Status update failed");
+    }
+  };
+
+  // ---------- MOVE UI ----------
+  const moveToColumn = (id, column) => {
+    let moved;
+
+    const removeFrom = (list) => list.filter(o => {
+      if (o.id === id) moved = o;
+      return o.id !== id;
     });
-  };
 
-  const handleAcceptOrder = (index) => {
-    const order = orders.newOrders[index];
-    if (!order) return;
-    const itemParts = order.items.split(",").map((s) => s.trim()).filter(Boolean);
-    const acceptedItems = itemParts.map((itemText, idx) => ({
-      id: `${order.table}-${Date.now()}-${idx}`,
-      table: order.table,
-      time: order.time,
-      ago: order.ago,
-      item: itemText,
-      note: order.note || "",
-      urgent: !!order.urgent,
-      timer: order.timer || 15,
-    }));
-
-    setOrders((prev) => {
-      const updatedNew = prev.newOrders.filter((_, i) => i !== index);
-      return { ...prev, newOrders: updatedNew, accepted: [...acceptedItems, ...prev.accepted] };
-    });
-  };
-
-  const handleRejectNewOrder = (index) => {
-    setOrders((prev) => ({
-      ...prev,
-      newOrders: prev.newOrders.filter((_, i) => i !== index),
+    setOrders(prev => ({
+      newOrders: removeFrom(prev.newOrders),
+      accepted: column === "accepted" ? [...prev.accepted, moved] : prev.accepted,
+      preparing: column === "preparing" ? [...prev.preparing, moved] : prev.preparing,
+      ready: column === "ready" ? [...prev.ready, moved] : prev.ready,
     }));
   };
 
-  const handleRejectAccepted = (index) => {
-    setOrders((prev) => ({
-      ...prev,
-      accepted: prev.accepted.filter((_, i) => i !== index),
-    }));
-  };
+  // ---------- HANDLERS ----------
+  const accept = o => updateStatus(o.id, "ACCEPTED", "accepted");
+  const reject = o => updateStatus(o.id, "REJECTED", "newOrders");
+  const preparing = o => updateStatus(o.id, "PREPARING", "preparing");
+  const ready = o => updateStatus(o.id, "READY", "ready");
 
-  const handleStartPreparationFromAccepted = (index) => {
-    const acceptedItem = orders.accepted[index];
-    if (!acceptedItem) return;
-    const prepObj = {
-      table: acceptedItem.table,
-      time: acceptedItem.time,
-      ago: acceptedItem.ago,
-      items: acceptedItem.item,
-      note: acceptedItem.note,
-      urgent: acceptedItem.urgent,
-      timer: acceptedItem.timer || 10,
-    };
-    setOrders((prev) => ({
-      ...prev,
-      accepted: prev.accepted.filter((_, i) => i !== index),
-      preparing: [...prev.preparing, prepObj],
-    }));
-  };
-
+  // ---------- UI ----------
   return (
     <div className="chef-order-management container">
+
       <div className="chef-header-row">
-        <h2>Order Management</h2>
-        <button className="chef-refresh-btn" onClick={() => window.location.reload()}>
-          🔄 Refresh
-        </button>
+        <h2>Order Queue</h2>
+        <button onClick={fetchOrders} className="chef-refresh-btn">🔄 Refresh</button>
       </div>
 
       <div className="chef-kanban-board">
-        {/* New Orders */}
-        <div className="chef-kanban-column">
-          <div className="chef-column-header">
-            <span>New Orders</span>
-            <span className="chef-order-count">{orders?.newOrders?.length || 0}</span>
-          </div>
-          {(orders?.newOrders || []).map((o, i) => (
-            <div key={`new-${i}`} className={`chef-order-item ${o.urgent ? "chef-urgent" : ""}`}>
-              <div className="chef-order-table">
-                <span>{o.table}</span>
-                <span className="chef-timer">{o.timer} min</span>
-              </div>
-              <div className="chef-order-time">{o.time} ({o.ago})</div>
-              <div className="chef-order-items">{o.items}</div>
-              {o.note && <div className="chef-order-note">{o.note}</div>}
-              <div className="chef-order-actions">
-                <button className="chef-btn chef-btn-primary chef-btn-sm" onClick={() => handleAcceptOrder(i)}>✅ Accept</button>
-                <button className="chef-btn chef-btn-reject chef-btn-sm" onClick={() => handleRejectNewOrder(i)}>✖ Reject</button>
-              </div>
-            </div>
-          ))}
-        </div>
 
-        {/* Accepted */}
-        <div className="chef-kanban-column chef-accepted-column">
-          <div className="chef-column-header">
-            <span>Accepted</span>
-            <span className="chef-order-count">{orders?.accepted?.length || 0}</span>
-          </div>
-          {(orders?.accepted || []).map((a, ai) => (
-            <div key={a.id || `acc-${ai}`} className={`chef-order-item ${a.urgent ? "chef-urgent" : ""}`}>
-              <div className="chef-order-table">
-                <span>{a.table}</span>
-                <span className="chef-timer">{a.timer} min</span>
-              </div>
-              <div className="chef-order-time">{a.time} ({a.ago})</div>
-              <div className="chef-order-items">{a.item}</div>
-              {a.note && <div className="chef-order-note">{a.note}</div>}
-              <div className="chef-order-actions">
-                <button className="chef-btn chef-btn-secondary chef-btn-sm" onClick={() => handleStartPreparationFromAccepted(ai)}>▶ Start Prep</button>
-                <button className="chef-btn chef-btn-reject chef-btn-sm" onClick={() => handleRejectAccepted(ai)}>✖ Reject</button>
-              </div>
-            </div>
+        {/* NEW */}
+        <Column title="New Orders" count={orders.newOrders.length}>
+          {orders.newOrders.map(o => (
+            <OrderCard key={o.id} order={o}>
+              <button className="chef-btn chef-btn-success" onClick={() => accept(o)}>✅ Accept</button>
+              <button className="chef-btn chef-btn-danger" onClick={() => reject(o)}>❌ Reject</button>
+            </OrderCard>
           ))}
-        </div>
+        </Column>
 
-        {/* Preparing */}
-        <div className="chef-kanban-column">
-          <div className="chef-column-header">
-            <span>Preparing</span>
-            <span className="chef-order-count">{orders?.preparing?.length || 0}</span>
-          </div>
-          {(orders?.preparing || []).map((o, i) => (
-            <div key={`prep-${i}`} className={`chef-order-item ${o.urgent ? "chef-urgent" : ""}`}>
-              <div className="chef-order-table">
-                <span>{o.table}</span>
-                <span className="chef-timer">{o.timer} min</span>
-              </div>
-              <div className="chef-order-time">{o.time} ({o.ago})</div>
-              <div className="chef-order-items">{o.items}</div>
-              {o.note && <div className="chef-order-note">{o.note}</div>}
-              <div className="chef-order-actions">
-                <button className="chef-btn chef-btn-secondary chef-btn-sm" onClick={() => moveOrder("preparing", "ready", i)}>🔔 Mark Ready</button>
-              </div>
-            </div>
+        {/* ACCEPTED */}
+        <Column title="Accepted" count={orders.accepted.length}>
+          {orders.accepted.map(o => (
+            <OrderCard key={o.id} order={o}>
+              <button className="chef-btn chef-btn-secondary" onClick={() => preparing(o)}>▶ Start Prep</button>
+            </OrderCard>
           ))}
-        </div>
+        </Column>
 
-        {/* Ready */}
-        <div className="chef-kanban-column">
-          <div className="chef-column-header">
-            <span>Ready to Serve</span>
-            <span className="chef-order-count">{orders?.ready?.length || 0}</span>
-          </div>
-          {(orders?.ready || []).map((o, i) => (
-            <div key={`ready-${i}`} className="chef-order-item">
-              <div className="chef-order-table">
-                <span>{o.table}</span>
-                <span className="chef-timer">{o.timer} min</span>
-              </div>
-              <div className="chef-order-time">{o.time} ({o.ago})</div>
-              <div className="chef-order-items">{o.items}</div>
-              <div className="chef-order-actions">
-                <button className="chef-btn chef-btn-outline chef-btn-sm" onClick={() => moveOrder("ready", "preparing", i)}>↩ Reopen</button>
-              </div>
-            </div>
+        {/* PREPARING */}
+        <Column title="Preparing" count={orders.preparing.length}>
+          {orders.preparing.map(o => (
+            <OrderCard key={o.id} order={o}>
+              <button className="chef-btn chef-btn-primary" onClick={() => ready(o)}>🔔 Mark Ready</button>
+            </OrderCard>
           ))}
-        </div>
+        </Column>
+
+        {/* READY */}
+        <Column title="Ready to Serve" count={orders.ready.length}>
+          {orders.ready.map(o => (
+            <OrderCard key={o.id} order={o} />
+          ))}
+        </Column>
+
       </div>
     </div>
   );
 }
+
+// ---------- COMPONENTS ----------
+
+const Column = ({ title, count, children }) => (
+  <div className="chef-kanban-column">
+    <div className="chef-column-header">
+      <span>{title}</span>
+      <span className="chef-order-count">{count}</span>
+    </div>
+    {children}
+  </div>
+);
+
+const OrderCard = ({ order, children }) => (
+  <div className="chef-order-item">
+
+    <div className="chef-order-table">
+      <span>{order.table}</span>
+      <span className="chef-timer">{order.timer} min</span>
+    </div>
+
+    <div className="chef-order-time">
+      {order.time} ({order.ago})
+    </div>
+
+    <div className="chef-order-items">{order.items}</div>
+    <div className="chef-order-note">Ref: {order.note}</div>
+
+    {children && (
+      <div className="chef-order-actions">{children}</div>
+    )}
+
+  </div>
+);
