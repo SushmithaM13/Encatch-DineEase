@@ -57,6 +57,24 @@ const deleteAddon = async (id) => {
   return safeJson(res);
 };
 
+// ----------------------------
+// 🔥 EXAMPLE PLACEHOLDERS
+// ----------------------------
+const addonExamples = {
+  SAUCE: "e.g., Ketchup, Mayo, Sriracha",
+  TOPPING: "e.g., Cheese, Bacon, Avocado",
+  SIDE: "e.g., Fries, Coleslaw, Onion Rings",
+  BEVERAGE: "e.g., Coke, Iced Tea, Lemonade",
+  EXTRA: "e.g., Extra Cheese, Extra Meat",
+  SUBSTITUTION: "e.g., Gluten-Free Bun, Vegan Cheese",
+  PROTEIN: "e.g., Chicken, Shrimp, Tofu",
+  VEGETABLE: "e.g., Lettuce, Tomato, Peppers",
+  CONDIMENT: "e.g., Pickles, Relish, Hot Sauce",
+  SPICE: "e.g., Chili Powder, Paprika, Cumin",
+  DIETARY: "e.g., Vegan Cheese, Keto Option",
+  ALLERGY_FRIENDLY: "e.g., Nut-Free, Dairy-Free Option",
+};
+
 export default function AddonForm() {
   const [addons, setAddons] = useState([]);
   const [editId, setEditId] = useState(null);
@@ -75,38 +93,35 @@ export default function AddonForm() {
   const [image, setImage] = useState(null);
 
   const loadAddons = async () => {
-  const list = await getAddons();
+    const list = await getAddons();
 
-  // Sort by addOnId ascending
-  const sortedList = Array.isArray(list)
-    ? list.sort((a, b) => a.addOnId - b.addOnId)
-    : [];
+    const sortedList = Array.isArray(list)
+      ? list.sort((a, b) => a.addOnId - b.addOnId)
+      : [];
 
-  setAddons(sortedList);
-};
-
+    setAddons(sortedList);
+  };
 
   useEffect(() => {
     loadAddons();
   }, []);
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setAddon({ ...addon, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const orgId = getOrgId();
-    
-   const formData = new FormData();
-formData.append("organizationId", orgId);
-formData.append("addOnName", addon.addOnName);
-formData.append("addOnDescription", addon.addOnDescription);
-formData.append("price", Number(addon.price));
-formData.append("isAvailable", addon.isAvailable);
-formData.append("addOnType", addon.addOnType.toUpperCase());
-if (image) formData.append("addOnImage", image);
+
+    const formData = new FormData();
+    formData.append("organizationId", orgId);
+    formData.append("addOnName", addon.addOnName);
+    formData.append("addOnDescription", addon.addOnDescription);
+    formData.append("price", Number(addon.price));
+    formData.append("isAvailable", addon.isAvailable);
+    formData.append("addOnType", addon.addOnType.toUpperCase());
+    if (image) formData.append("addOnImage", image);
 
     if (editId) {
       await updateAddon(editId, formData);
@@ -140,12 +155,12 @@ if (image) formData.append("addOnImage", image);
       addOnType: item.addOnType.toUpperCase(),
     });
 
-    setShowPopup(true); 
+    setShowPopup(true);
   };
 
   const handleDelete = async (id) => {
     await deleteAddon(id);
-    alert("Add-on delete successfully!");
+    alert("Add-on deleted successfully!");
     loadAddons();
   };
 
@@ -156,8 +171,7 @@ if (image) formData.append("addOnImage", image);
 
   return (
     <div className="admin-container">
-
-      {/* TOP BUTTONS */}
+      {/* ================= TOP BUTTONS ================= */}
       <div style={{ marginBottom: "20px" }}>
         <button
           className="add-btn"
@@ -169,15 +183,12 @@ if (image) formData.append("addOnImage", image);
           ➕ Add Add-on
         </button>
 
-        <button
-          className="view-btn"
-          onClick={() => setShowAddons(!showAddons)}
-        >
+        <button className="view-btn" onClick={() => setShowAddons(!showAddons)}>
           {showAddons ? "👁️ Hide Add-ons" : "👁️ View Add-ons"}
         </button>
       </div>
 
-      {/* TABLE ONLY WHEN showAddons = true */}
+      {/* ================= TABLE ================= */}
       {showAddons && (
         <table className="admin-table">
           <thead>
@@ -236,21 +247,25 @@ if (image) formData.append("addOnImage", image);
         </table>
       )}
 
-      {/* POPUP FORM */}
+      {/* ================= POPUP FORM ================= */}
       {showPopup && (
         <div className="popup-overlay">
           <div className="popup-card">
             <h3>{editId ? "Update Add-on" : "Add New Add-on"}</h3>
 
             <form onSubmit={handleSubmit}>
+              {/* Addon Name */}
               <input
                 name="addOnName"
-                placeholder="Addon Name"
+                placeholder={
+                  addonExamples[addon.addOnType] || "Add-on Name"
+                }
                 value={addon.addOnName}
                 onChange={handleChange}
                 required
               />
 
+              {/* Description */}
               <textarea
                 name="addOnDescription"
                 placeholder="Description"
@@ -259,6 +274,7 @@ if (image) formData.append("addOnImage", image);
                 required
               />
 
+              {/* Price */}
               <input
                 type="number"
                 name="price"
@@ -268,26 +284,21 @@ if (image) formData.append("addOnImage", image);
                 required
               />
 
+              {/* Type */}
               <select
                 name="addOnType"
                 value={addon.addOnType}
                 onChange={handleChange}
               >
-                 <option value="">Select Type</option>
-                <option value="SAUCE">Sauce</option>
-                <option value="TOPPING">Topping</option>
-                <option value="SIDE">Side</option>
-                <option value="BEVERAGE">Beverage</option>
-                <option value="EXTRA">Extra</option>
-                <option value="SUBSTITUTION">Substitution</option>
-                <option value="PROTEIN">Protein</option>
-                <option value="VEGETABLE">Vegetable</option>
-                <option value="CONDIMENT">Condiment</option>
-                <option value="SPICE">Spice</option>
-                <option value="DIETARY">Dietary</option>
-                <option value="ALLERGY_FRIENDLY">Allergy Friendly</option>
+                <option value="">Select Type</option>
+                {Object.keys(addonExamples).map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
               </select>
 
+              {/* Availability */}
               <select
                 name="isAvailable"
                 value={addon.isAvailable}
@@ -297,8 +308,10 @@ if (image) formData.append("addOnImage", image);
                 <option value="false">Not Available</option>
               </select>
 
+              {/* Image */}
               <input type="file" onChange={(e) => setImage(e.target.files[0])} />
 
+              {/* Buttons */}
               <div className="popup-buttons">
                 <button type="submit" className="save-btn">
                   {editId ? "Update" : "Save"}
@@ -316,7 +329,6 @@ if (image) formData.append("addOnImage", image);
                 </button>
               </div>
             </form>
-
           </div>
         </div>
       )}

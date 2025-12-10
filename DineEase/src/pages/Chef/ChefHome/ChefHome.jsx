@@ -23,7 +23,7 @@ export default function ChefHome() {
   const dropdownRef = useRef(null);
 
   const [chefName, setChefName] = useState(localStorage.getItem("chefName") || "Chef");
-  const [restaurantName] = useState("DineEase Restaurant");
+  const [restaurantName] = useState("");
 
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -33,19 +33,16 @@ export default function ChefHome() {
   const TOKEN = localStorage.getItem("token");
 
   // --------------------------
-  // 1️⃣ FETCH CHEF PROFILE → GET ORG ID
+  // FETCH CHEF PROFILE
   // --------------------------
   const fetchChefProfile = async () => {
     try {
-      const res = await fetch(
-        "http://localhost:8082/dine-ease/api/v1/staff/profile",
-        {
-          headers: {
-            Authorization: `Bearer ${TOKEN}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const res = await fetch("http://localhost:8082/dine-ease/api/v1/staff/profile", {
+        headers: {
+          Authorization: `Bearer ${TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       const text = await res.text();
       if (!text) return;
@@ -53,10 +50,10 @@ export default function ChefHome() {
       const data = JSON.parse(text);
 
       const orgId = data.organizationId || data.organization?.id || null;
+      const chefId = data.id;
 
-      if (orgId) {
-        localStorage.setItem("chefOrgId", orgId);
-      }
+      if (orgId) localStorage.setItem("chefOrgId", orgId);
+      if (chefId) localStorage.setItem("chefId", chefId);
 
       if (data.staffName) {
         setChefName(data.staffName);
@@ -68,19 +65,22 @@ export default function ChefHome() {
   };
 
   // --------------------------
-  // 2️⃣ FETCH NOTIFICATIONS (FIXED URL)
+  // FETCH NOTIFICATIONS
   // --------------------------
   const fetchNotifications = async () => {
     const orgId = localStorage.getItem("chefOrgId");
+    const chefId = localStorage.getItem("chefId");
 
-    if (!orgId) {
-      console.warn("⚠ No org ID yet, waiting...");
+    console.log("📌 Chef Notification Fetch → ORG:", orgId, "CHEF:", chefId);
+
+    if (!orgId || !chefId) {
+      console.warn("⚠ ORG or CHEF ID missing—notifications not fetched.");
       return;
     }
 
     try {
       const res = await fetch(
-        `http://localhost:8082/dine-ease/api/v1/chef/org/${orgId}/notifications`,
+        `http://localhost:8082/dine-ease/api/v1/chef-notifications/all/${orgId}/${chefId}`,
         {
           headers: {
             Authorization: `Bearer ${TOKEN}`,
@@ -89,22 +89,27 @@ export default function ChefHome() {
         }
       );
 
-      if (!res.ok) throw new Error("Failed to fetch notifications");
+      if (!res.ok) {
+        const msg = await res.text();
+        console.error("🔥 Backend error:", msg);
+        throw new Error("Failed to fetch notifications");
+      }
 
       const data = await res.json();
+      console.log("📨 Notifications:", data);
 
       setNotifications(
         data.map((n) => ({
           id: n.id,
           label: n.orderItem?.name
-            ? `Order #${n.orderItem.id} — ${n.orderItem.quantity} item(s)`
+            ? `Order #${n.orderItem.id} • ${n.orderItem.quantity} item(s)`
             : "New Notification",
           details: n.message,
           status: n.status || "New",
-          timeAgo: n.sentAt ? new Date(n.sentAt).toLocaleTimeString() : "just now",
+          timeAgo: n.sentAt ? new Date(n.sentAt).toLocaleTimeString() : "Just now",
           unread: !n.isRead,
           priority: n.priority || "normal",
-          table: n.orderItem?.tableNumber || "Table X",
+          table: n.orderItem?.tableNumber || "Table",
         }))
       );
     } catch (err) {
@@ -113,12 +118,12 @@ export default function ChefHome() {
   };
 
   // --------------------------
-  // 3️⃣ MARK AS READ (FIXED URL)
+  // MARK AS READ
   // --------------------------
   const markAsRead = async (id) => {
     try {
       await fetch(
-        `http://localhost:8082/dine-ease/api/v1/chef/notifications/${id}/read`,
+        `http://localhost:8082/dine-ease/api/v1/chef-notifications/read/${id}`,
         { method: "PUT" }
       );
 
@@ -131,12 +136,12 @@ export default function ChefHome() {
   };
 
   // --------------------------
-  // 4️⃣ DELETE NOTIFICATION (FIXED URL)
+  // DELETE NOTIFICATION
   // --------------------------
   const deleteNotification = async (id) => {
     try {
       await fetch(
-        `http://localhost:8082/dine-ease/api/v1/chef/notifications/${id}`,
+        `http://localhost:8082/dine-ease/api/v1/chef-notifications/delete/${id}`,
         { method: "DELETE" }
       );
 
@@ -150,18 +155,14 @@ export default function ChefHome() {
   // USE EFFECTS
   // --------------------------
   useEffect(() => {
-    if (!TOKEN) return;
-    fetchChefProfile();
-  }, [TOKEN]);
+    if (TOKEN) fetchChefProfile();
+  }, []);
 
   useEffect(() => {
-    const delayFetch = setTimeout(fetchNotifications, 500);
-    return () => clearTimeout(delayFetch);
+    const delay = setTimeout(fetchNotifications, 500);
+    return () => clearTimeout(delay);
   }, [chefName]);
 
-  // --------------------------
-  // DROPDOWN/CLICK HANDLING
-  // --------------------------
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -182,22 +183,13 @@ export default function ChefHome() {
     navigate("/", { replace: true });
   };
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 768) setSidebarOpen(true);
-      else setSidebarOpen(false);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   // --------------------------
-  // UI RETURN
+  // UI TEMPLATE
   // --------------------------
   return (
     <div className={`chef-layout ${sidebarOpen ? "chef-sidebar-open" : "chef-collapsed"}`}>
-      
-      {/* Sidebar */}
+
+      {/* SIDEBAR */}
       <aside className="chef-sidebar">
         <div className="chef-sidebar-header">
           <div className="chef-brand">
@@ -214,33 +206,33 @@ export default function ChefHome() {
             <Home size={20} /> {sidebarOpen && <span>Home</span>}
           </NavLink>
 
-          <NavLink to="ChefDashboard" className={({ isActive }) => isActive ? "chef-nav-link chef-active" : "chef-nav-link"}>
+          <NavLink to="ChefDashboard" className={({ isActive }) =>
+            isActive ? "chef-nav-link chef-active" : "chef-nav-link"
+          }>
             <LayoutDashboard size={20} /> {sidebarOpen && <span>Dashboard</span>}
           </NavLink>
 
-          <NavLink to="OrdersQueue" className={({ isActive }) => isActive ? "chef-nav-link chef-active" : "chef-nav-link"}>
+          <NavLink to="OrdersQueue" className={({ isActive }) =>
+            isActive ? "chef-nav-link chef-active" : "chef-nav-link"
+          }>
             <ClipboardList size={20} /> {sidebarOpen && <span>Order Queue</span>}
           </NavLink>
 
-          <NavLink to="menu" className={({ isActive }) => isActive ? "chef-nav-link chef-active" : "chef-nav-link"}>
+          <NavLink to="menu" className={({ isActive }) =>
+            isActive ? "chef-nav-link chef-active" : "chef-nav-link"
+          }>
             <UtensilsCrossed size={20} /> {sidebarOpen && <span>Menu Catalog</span>}
           </NavLink>
 
-          <NavLink
-            to="inventory"
-            className={({ isActive }) => (isActive ? "chef-nav-link chef-active" : "chef-nav-link")}
-          >
+          <NavLink to="inventory" className={({ isActive }) =>
+            isActive ? "chef-nav-link chef-active" : "chef-nav-link"
+          }>
             <Boxes size={20} /> {sidebarOpen && <span>Inventory</span>}
           </NavLink>
         </nav>
       </aside>
 
-      {/* Sidebar overlay for mobile */}
-      {sidebarOpen && window.innerWidth <= 768 && (
-        <div className="chef-sidebar-backdrop" onClick={() => setSidebarOpen(false)}></div>
-      )}
-
-      {/* Main Content */}
+      {/* MAIN CONTENT */}
       <main className="chef-main">
         <header className="chef-header">
           <div className="chef-header-left">
@@ -254,9 +246,8 @@ export default function ChefHome() {
             </div>
           </div>
 
+          {/* NOTIFICATIONS */}
           <div className="chef-header-right" ref={dropdownRef}>
-            
-            {/* Notifications */}
             <div className="chef-notification-wrapper">
               <button className="chef-notif-btn" onClick={() => setNotifOpen(!notifOpen)}>
                 <Bell size={18} />
@@ -270,10 +261,12 @@ export default function ChefHome() {
               {notifOpen && (
                 <div className="chef-notif-dropdown">
                   <div className="chef-notif-actions">
-                    <button onClick={() => setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })))}>
-
+                    <button onClick={() =>
+                      setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })))
+                    }>
                       Mark all read
                     </button>
+
                     <button onClick={() => setNotifications([])}>Clear</button>
                   </div>
 
@@ -311,10 +304,7 @@ export default function ChefHome() {
 
                         <div className="chef-notif-controls">
                           {n.unread && <span className="chef-unread-dot" />}
-                          <button
-                            onClick={() => deleteNotification(n.id)}
-                            className="chef-notif-delete-btn"
-                          >
+                          <button className="chef-notif-delete-btn" onClick={() => deleteNotification(n.id)}>
                             ×
                           </button>
                         </div>
@@ -325,7 +315,7 @@ export default function ChefHome() {
               )}
             </div>
 
-            {/* Profile dropdown */}
+            {/* Profile */}
             <div className="chef-profile-circle" onClick={() => setDropdownOpen(!dropdownOpen)}>
               {chefName.charAt(0).toUpperCase()}
             </div>

@@ -35,11 +35,11 @@ export default function SuperAdminStaffManagement() {
   const [popupOpen, setPopupOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("All Staff");
 
-  // ✅ Pagination states
+  // ✅ Pagination states - FIXED: Start from page 1 for display
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, _setPageSize] = useState(5);
+  const [pageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
-  const [_loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [previousActiveIds, setPreviousActiveIds] = useState(() => {
     const stored = localStorage.getItem("activeStaffIds");
@@ -65,13 +65,16 @@ export default function SuperAdminStaffManagement() {
     }
   };
 
-  // ===== Fetch All Staff with Pagination =====
-  const fetchStaff = useCallback(async (page = 0, size = pageSize) => {
+  // ===== Fetch All Staff with Pagination (API uses 0-based indexing) =====
+  const fetchStaff = useCallback(async (page = 1, size = pageSize) => {
     if (!TOKEN || !ORG_ID) return;
     setLoading(true);
     try {
+      // Convert display page (1-based) to API page (0-based)
+      const apiPage = page - 1;
+      
       const res = await fetch(
-        `${API_BASE}/all?organizationId=${ORG_ID}&page=${page}&size=${size}`,
+        `${API_BASE}/all?organizationId=${ORG_ID}&page=${apiPage}&size=${size}`,
         {
           headers: {
             Authorization: `Bearer ${TOKEN}`,
@@ -132,11 +135,6 @@ export default function SuperAdminStaffManagement() {
       setLoading(false);
     }
   }, [API_BASE, TOKEN, ORG_ID, pageSize, previousActiveIds]);
-
-  // ===== Pagination useEffect =====
-  useEffect(() => {
-    fetchStaff(currentPage, pageSize);
-  }, [fetchStaff, currentPage, pageSize]);
 
   // ===== Fetch Roles =====
   const fetchRoles = useCallback(async () => {
@@ -214,25 +212,6 @@ export default function SuperAdminStaffManagement() {
         throw new Error(errText || "Failed to save staff");
       }
 
-      const newStaff = await res.json();
-      setStaffList((prev) => [
-        ...prev,
-        {
-          id: newStaff.id,
-          staffId: newStaff.id,
-          firstName: newStaff.firstName,
-          lastName: newStaff.lastName,
-          email: newStaff.email,
-          phoneNumber: newStaff.phoneNumber || newStaff.phone || "",
-          staffRoleType: newStaff.staffRoleName || form.staffRoleType,
-          shiftTiming: newStaff.shiftTiming,
-          salary: newStaff.salary,
-          contractStartDate: formatDate(newStaff.contractStartDate),
-          contractEndDate: formatDate(newStaff.contractEndDate),
-          status: newStaff.staffStatus || "Pending",
-        },
-      ]);
-
       await fetchStaff(currentPage, pageSize);
       setForm(initialForm);
       setEditId(null);
@@ -309,12 +288,7 @@ export default function SuperAdminStaffManagement() {
                 )
                 : staffList;
 
-  // ✅ PAGINATION (local, frontend-based)
-  const startIndex = (currentPage ) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedStaff = filteredStaff.slice(startIndex, endIndex);
-
-
+  // ✅ FIXED: Pagination now properly handles the display
   const handleNext = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
@@ -328,7 +302,7 @@ export default function SuperAdminStaffManagement() {
   };
 
   useEffect(() => {
-    setCurrentPage(0); // reset to first page on tab change
+    setCurrentPage(1); // reset to first page on tab change
   }, [activeTab]);
 
   return (
@@ -369,23 +343,29 @@ export default function SuperAdminStaffManagement() {
           <thead>
             <tr>
               <th>SL.NO</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Role</th>
-              <th>Shift</th>
-              <th>Salary</th>
-              <th>Start</th>
-              <th>End</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>NAME</th>
+              <th>EMAIL</th>
+              <th>PHONE</th>
+              <th>ROLE</th>
+              <th>SHIFT</th>
+              <th>SALARY</th>
+              <th>START</th>
+              <th>END</th>
+              <th>STATUS</th>
+              <th>ACTIONS</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedStaff.length > 0 ? (
-              paginatedStaff.map((staff, index) => (
+            {loading ? (
+              <tr>
+                <td colSpan={11} style={{ textAlign: "center", padding: "20px" }}>
+                  Loading...
+                </td>
+              </tr>
+            ) : filteredStaff.length > 0 ? (
+              filteredStaff.map((staff, index) => (
                 <tr key={staff.id}>
-                  <td>{index + 1 + currentPage * pageSize}</td>
+                  <td>{index + 1 + (currentPage - 1) * pageSize}</td>
                   <td>{staff.firstName} {staff.lastName}</td>
                   <td>{staff.email}</td>
                   <td>{staff.phoneNumber}</td>
@@ -421,9 +401,15 @@ export default function SuperAdminStaffManagement() {
       </div>
 
       <div className="mobile-user-cards">
-        {paginatedStaff.length > 0 ? (
-          paginatedStaff.map((staff) => (
+        {loading ? (
+          <div className="no-users-mobile">Loading...</div>
+        ) : filteredStaff.length > 0 ? (
+          filteredStaff.map((staff, index) => (
             <div key={staff.id} className="user-card-mobile">
+              <div className="user-row user-name-cell">
+                <span className="cell-label">SL.NO</span>
+                <span className="cell-value">{index + 1 + (currentPage - 1) * pageSize}</span>
+              </div>
               <div className="user-row user-name-cell">
                 <span className="cell-label">Name</span>
                 <span className="cell-value">{staff.firstName} {staff.lastName}</span>
@@ -467,12 +453,11 @@ export default function SuperAdminStaffManagement() {
         )}
       </div>
 
-
       {/* ✅ Pagination controls */}
       <div className="pagination-container">
         <button
           onClick={handlePrevious}
-          disabled={currentPage === 1}
+          disabled={currentPage === 1 || loading}
           className="pagination-btn"
         >
           ⬅ Previous
@@ -484,7 +469,7 @@ export default function SuperAdminStaffManagement() {
 
         <button
           onClick={handleNext}
-          disabled={currentPage === totalPages}
+          disabled={currentPage === totalPages || loading}
           className="pagination-btn"
         >
           Next ➡
@@ -492,60 +477,60 @@ export default function SuperAdminStaffManagement() {
       </div>
 
       {popupOpen && (
-        <div className="popup">
+        <div className="popup" onClick={(e) => {
+          if (e.target.className === 'popup') setPopupOpen(false);
+        }}>
           <div className="popup-content wide-popup">
-             {/* Close (X) Button */}
-      <button
-        className="close-btn"
-        onClick={() => setPopupOpen(false)}
-        aria-label="Close"
-      >
-        ✕
-      </button>
-             <h3>{editId ? "Edit Staff Details" : "Add Staff Details"}</h3>
-            <form className="popup-form">
+            <button
+              className="close-btn"
+              onClick={() => setPopupOpen(false)}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+            <h3>{editId ? "Edit Staff Details" : "Add Staff Details"}</h3>
+            <form className="popup-form" onSubmit={(e) => e.preventDefault()}>
               <div className="popup-grid">
                 <div className="form-group">
-                  <label>First Name</label>
+                  <label>First Name *</label>
                   <input
                     type="text"
                     value={form.firstName || ""}
-  onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                    onChange={(e) => setForm({ ...form, firstName: e.target.value })}
                     placeholder="Enter first name"
+                    required
                   />
                 </div>
-                {/* Last Name */}
                 <div className="form-group">
-                  <label>Last Name</label>
+                  <label>Last Name *</label>
                   <input
                     type="text"
                     value={form.lastName || ""}
-  onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                    onChange={(e) => setForm({ ...form, lastName: e.target.value })}
                     placeholder="Enter last name"
+                    required
                   />
                 </div>
-                {/* Email */}
                 <div className="form-group">
-                  <label>Email ID</label>
+                  <label>Email ID *</label>
                   <input
                     type="email"
                     value={form.email || ""}
-  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
                     placeholder="Enter email ID"
+                    required
                   />
                 </div>
-                {/* Phone */}
                 <div className="form-group">
-                  <label>Phone Number</label>
+                  <label>Phone Number *</label>
                   <input
                     type="text"
                     value={form.phoneNumber || ""}
-onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+                    onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
                     placeholder="Enter phone number"
+                    required
                   />
                 </div>
-
-                {/* Role */}
                 <div className="form-group">
                   <label>Role</label>
                   <select
@@ -561,8 +546,6 @@ onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
                     ))}
                   </select>
                 </div>
-
-                {/* Existing Fields */}
                 <div className="form-group">
                   <label>Shift Timing</label>
                   <input
@@ -570,10 +553,9 @@ onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
                     name="shiftTiming"
                     value={form.shiftTiming}
                     onChange={handleChange}
-                    placeholder="Shift Timing"
+                    placeholder="e.g., 9AM to 5PM"
                   />
                 </div>
-
                 <div className="form-group">
                   <label>Salary</label>
                   <input
@@ -581,10 +563,9 @@ onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
                     name="salary"
                     value={form.salary}
                     onChange={handleChange}
-                    placeholder="Salary"
+                    placeholder="Enter salary"
                   />
                 </div>
-
                 {!editId && (
                   <div className="form-group">
                     <label>Contract Start</label>
@@ -596,7 +577,6 @@ onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
                     />
                   </div>
                 )}
-
                 <div className="form-group">
                   <label>Contract End</label>
                   <input
@@ -606,22 +586,21 @@ onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
                     onChange={handleChange}
                   />
                 </div>
-
                 {!editId && (
                   <div className="form-group">
-                    <label>Password</label>
+                    <label>Password *</label>
                     <input
                       type="password"
                       name="password"
                       value={form.password}
                       onChange={handleChange}
-                      placeholder="Password"
+                      placeholder="Enter password"
+                      required
                     />
                   </div>
                 )}
               </div>
 
-              {/* Footer Buttons */}
               <div className="form-buttons center-buttons">
                 <button
                   type="button"

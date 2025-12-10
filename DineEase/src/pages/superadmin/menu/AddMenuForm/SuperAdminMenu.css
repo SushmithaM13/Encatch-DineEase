@@ -1,630 +1,121 @@
-/* =========================
-   Admin Menu Page Styles
-   ========================= */
-
-/* Admin Menu Page */
-.Super-admin-menu-page {
-  padding: 20px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #ffffff;
+/* MAIN CONTAINER */
+.Superadmin-menu-container {
+  padding: 20px 30px;
+  font-family: "Inter", sans-serif;
 }
 
-.Super-admin-menu-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #000000;
-}
-
-.Super-admin-menu-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.Super-admin-menu-search {
-  padding: 8px 12px;
-  width: 250px;
-  border-radius: 8px;
-  border: 1px solid #000000;
-  font-size: 14px;
-}
-/* ---------- Addon Section ---------- */
-/* ---------- Addons Section ---------- */
-.Super-admin-addon-section {
-  margin-top: 10px;
-}
-
-.Super-admin-addon-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.Super-admin-addon-tag {
-  background-color: #f3f4f6;
-  border-radius: 8px;
-  padding: 6px 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  border: 1px solid #ddd;
-}
-
-.Super-admin-addon-remove-btn {
-  background: none;
-  border: none;
-  color: #ff4d4d;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.Super-admin-addon-empty {
-  color: #888;
-  font-size: 13px;
-}
-
-/* ---------- Customization Group Section ---------- */
-.Super-admin-customize-section {
-  margin-top: 10px;
-}
-
-.Super-admin-customize-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.Super-admin-customize-tag {
-  background-color: #f3f4f6; /* same as addon */
-  border-radius: 8px;
-  padding: 6px 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  border: 1px solid #ddd; /* same as addon */
-}
-
-.Super-admin-customize-remove-btn {
-  background: none;
-  border: none;
-  color: #ff4d4d; /* same red as addon */
-  cursor: pointer;
-  font-weight: bold;
-}
-
-
-
-.Super-admin-customize-empty {
-  color: #888;
-  font-size: 13px;
-}
-.Super-admin-addon-box,
-.Super-admin-customize-box {
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 10px;
-  min-height: 50px;
-  background-color: #f9f9f9;
-}
-
-.Super-admin-addon-grid,
-.Super-admin-customize-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.Super-admin-addon-tag,
-.Super-admin-customize-tag {
-  background-color: #e0f0ff;
-  padding: 4px 8px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 14px;
-}
-
-.Super-admin-addon-remove-btn,
-.Super-admin-customize-remove-btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-weight: bold;
-  color: #555;
-}
-
-
-
-.Super-admin-menu-add-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 8px 12px;
-  background-color: #000000;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.Super-admin-menu-add-btn:hover {
-  background-color: #45a049;
-}
-
-.Super-admin-menu-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
-}
-
-.Super-admin-menu-card {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
-  padding: 15px;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.Super-admin-menu-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.12);
-}
-
-.Super-admin-menu-img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 10px;
-}
-
-.no-img {
-  width: 100%;
-  height: 150px;
-  background-color: #eee;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  margin-bottom: 10px;
-  color: #999;
-  font-size: 14px;
-}
-
-.Super-admin-menu-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 5px;
-}
-
-.Super-admin-menu-type {
-  font-size: 13px;
-  color: #666;
-  margin-bottom: 5px;
-}
-
-.Super-admin-menu-desc {
-  font-size: 13px;
-  color: #555;
-  margin-bottom: 8px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3; /* For WebKit browsers */
-  line-clamp: 3; /* Standard property for compatibility */
-  box-orient: vertical; /* Standard fallback */
-}
-.Super-admin-menu-price {
-  font-size: 14px;
-  font-weight: 600;
-  color: #4caf50;
-}
-
-
-/* Controls (Search + Add Button) */
-.Super-admin-menu-controls {
+/* HEADER */
+.Superadmin-menu-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 25px;
 }
 
-.Super-admin-menu-search {
-  width: 250px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  outline: none;
-  font-size: 14px;
+.Superadmin-menu-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #222;
 }
 
-.Super-admin-menu-add-btn {
-  background-color: #2563eb;
+/* ADD BUTTON */
+.Superadmin-menu-add-menu-btn {
+  background-color: #4CAF50;
   color: white;
+  padding: 10px 18px;
   border: none;
-  padding: 8px 14px;
   border-radius: 8px;
+  font-size: 14px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background 0.3s ease;
+  transition: 0.2s ease;
 }
 
-.Super-admin-menu-add-btn:hover {
-  background-color: #1d4ed8;
+.Superadmin-menu-add-menu-btn:hover {
+  background-color: #43a047;
+  transform: scale(1.03);
 }
 
-/* =========================
-   Menu Grid
-   ========================= */
-
-.Super-admin-menu-grid {
+/* GRID */
+.Superadmin-menu-menu-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 20px;
 }
 
-.Super-admin-menu-card {
+/* CARD */
+.Superadmin-menu-menu-card {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  padding: 12px;
-  text-align: center;
-  transition: transform 0.2s;
+  padding: 15px;
+  border: 1px solid #e5e5e5;
+  cursor: pointer;
+  transition: 0.2s ease;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.05);
 }
 
-.Super-admin-menu-card:hover {
-  transform: translateY(-2px);
+.Superadmin-menu-menu-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 5px 12px rgba(0,0,0,0.1);
 }
 
-.Super-admin-menu-img {
+/* CARD IMAGE */
+.Superadmin-menu-menu-image {
   width: 100%;
-  height: 150px;
+  height: 160px;
   object-fit: cover;
   border-radius: 10px;
+  background: #f5f5f5;
 }
 
-.Super-admin-menu-name {
-  font-size: 16px;
-  margin-top: 10px;
-  font-weight: 600;
-}
-
-.Super-admin-menu-desc {
-  font-size: 13px;
-  color: #555;
-  margin: 5px 0 10px;
-}
-
-.Super-admin-menu-actions {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.Super-admin-menu-actions button {
-  background-color: #f3f4f6;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.Super-admin-menu-actions button:hover {
-  background-color: #e5e7eb;
-}
-
-/* =========================
-   Modal Styles
-   ========================= */
-
-.Super-admin-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 99;
-}
-
-.Super-admin-modal {
-  background: white;
-  border-radius: 14px;
-  width: 700px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(-15px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-select[multiple] {
-  width: 100%;
-  height: 100px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 6px;
-  font-size: 14px;
-  background-color: #fff;
-}
-
-select[multiple] option {
-  padding: 4px;
-}
-
-.Super-admin-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid #eee;
-  background-color: #f9fafb;
-}
-
-.Super-admin-modal-header h3 {
-  margin: 0;
+/* TEXT */
+.Superadmin-menu-menu-card h3 {
+  margin-top: 12px;
   font-size: 18px;
+  color: #222;
+}
+
+.Superadmin-menu-menu-card p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+/* VIEW MORE */
+.Superadmin-menu-view-more {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 13px;
   font-weight: 600;
+  color: #4CAF50;
+  transition: 0.2s ease;
 }
 
-.Super-admin-modal-header button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
+.Superadmin-menu-menu-card:hover .admin-menu-view-more {
+  color: #2e7d32;
 }
 
-/* Modal Body */
-.Super-admin-modal-body {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .Superadmin-menu-header h2 {
+    font-size: 20px;
+  }
+
+  .Superadmin-menu-add-menu-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .Superadmin-menu-menu-image {
+    height: 140px;
+  }
 }
 
-.Super-admin-modal-body label {
-  font-weight: 500;
-  font-size: 14px;
+@media (max-width: 480px) {
+  .Superadmin-menu-container {
+    padding: 15px;
+  }
+
+  .Superadmin-menu-menu-grid {
+    grid-template-columns: 1fr;
+  }
 }
-
-.Super-admin-modal-body input,
-.Super-admin-modal-body textarea,
-.Super-admin-modal-body select {
-  width: 100%;
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  outline: none;
-  font-size: 14px;
-}
-
-.Super-admin-modal-body textarea {
-  min-height: 70px;
-}
-
-/* Image Preview */
-.Super-admin-menu-preview {
-  width: 100%;
-  max-height: 160px;
-  border-radius: 10px;
-  object-fit: cover;
-  margin-top: 8px;
-}
-
-/* Two-column grid inside modal */
-.Super-admin-grid-2 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 15px;
-}
-
-/* =========================
-   Variants Section
-   ========================= */
-
-.Super-admin-menu-variant-row {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  background: #f9fafb;
-  padding: 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  margin-bottom: 15px;
-}
-
-.Super-admin-menu-variant-row input[type="text"],
-.Super-admin-menu-variant-row input[type="number"] {
-  width: 100%;
-  padding: 7px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  outline: none;
-}
-
-.Super-admin-menu-variant-row label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-}
-
-.Super-admin-menu-add-variant-btn {
-  background-color: #22c55e;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  transition: background 0.3s;
-}
-
-.Super-admin-menu-add-variant-btn:hover {
-  background-color: #16a34a;
-}
-
-
-
-
-/* =========================
-   Checkboxes Grid
-   ========================= */
-
-.Super-admin-menu-checkbox-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 10px;
-}
-
-.Super-admin-menu-checkbox-item {
-  background: #f3f4f6;
-  padding: 8px 10px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-}
-
-.Super-admin-menu-muted {
-  font-size: 13px;
-  color: #666;
-}
-
-/* =========================
-   Modal Buttons
-   ========================= */
-
-.Super-admin-menu-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 15px;
-}
-
-.Super-admin-menu-save-btn {
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.Super-admin-menu-cancel-btn {
-  background-color: #e5e7eb;
-  color: #333;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.Super-admin-menu-save-btn:hover {
-  background-color: #1d4ed8;
-}
-
-.Super-admin-menu-cancel-btn:hover {
-  background-color: #d1d5db;
-}
-/* -------------- */
-
-.menu-detail-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.45);
-  display: flex;
-  justify-content: flex-end;
-  z-index: 1000;
-}
-
-.menu-detail-panel {
-  width: 70%;
-  height: 100%;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  animation: slideIn 0.3s ease forwards;
-  overflow-y: auto;
-  border-left: 2px solid #ddd;
-}
-
-.menu-detail-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.menu-detail-content {
-  display: flex;
-  gap: 2rem;
-  padding: 2rem;
-}
-
-.menu-detail-left img {
-  width: 100%;
-  max-width: 400px;
-  border-radius: 10px;
-  object-fit: cover;
-}
-
-.menu-detail-right {
-  flex: 1;
-}
-
-.menu-detail-info p {
-  margin: 0.25rem 0;
-}
-
-@keyframes slideIn {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-

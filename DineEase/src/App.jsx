@@ -27,7 +27,9 @@ import MenuDashboard from "./pages/superadmin/menu/MenuDashboard/MenuDashboard";
 
 //ADD menu Iteams 
 import AddMenuForm from "./pages/superadmin/menu/AddMenuForm/SuperAdminMenu";
-import SuperAdminMenuDetail from "./pages/superadmin/menu/AddMenuForm/SuperAdminMenuDetail";
+import SuperAdminMenu from "./pages/superadmin/menu/AddMenuForm/SuperAdminMenu";
+import SuperAdminMenuDetails from './pages/superadmin/menu/AddMenuForm/SuperAdminMenuDetails';
+import SuperAdminAddEditMenu from './pages/superadmin/menu/AddMenuForm/SuperAdminAddEditMenu';
 
 //Menu Categoryes
 import CategoryForm from "./pages/superadmin/menu/CategoryForm/CategoryForm";
@@ -116,7 +118,7 @@ function App() {
         <Route path="/SuperAdminRegistration" element={<SuperAdminRegistration />} />
 
         {/* SUPER ADMIN */}
-        <Route path="/superAdminDashboard/*"
+        <Route path="/SuperAdminDashboard/*"
           element={
             <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
               <SuperAdminDashboard />
@@ -132,8 +134,15 @@ function App() {
 
 
           <Route path="menu-dashboard" element={<MenuDashboard />} />
+
+
           <Route path="AddMenu-form" element={<AddMenuForm />} />
-          <Route path="menu/:id" element={<SuperAdminMenuDetail />} />
+          <Route path="menu/details/:menuId" element={<SuperAdminMenuDetails />} /> 
+          <Route path="menu/list" element={<SuperAdminMenu />} />
+          <Route path="menu/add" element={<SuperAdminAddEditMenu />}/>
+          <Route path="menu/edit/:menuId" element={<SuperAdminAddEditMenu />} />
+
+
           <Route path="category-form" element={<CategoryForm />} />
           <Route path="add-item-type" element={<AddItemtype />} />
           <Route path="food-type" element={<Foodtype />} />
