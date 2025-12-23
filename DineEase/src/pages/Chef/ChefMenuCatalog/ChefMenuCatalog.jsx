@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import "./ChefMenuCatalog.css";
 
 export default function ChefMenuCatalog() {
-  const API_PROFILE = "http://localhost:8082/dine-ease/api/v1/staff/profile";
-  const API_MENU = "http://localhost:8082/dine-ease/api/v1/menu/getAll";
-  const API_UPDATE = "http://localhost:8082/dine-ease/api/v1/menu/update";
+  const API_PROFILE =
+    "http://localhost:8082/dine-ease/api/v1/staff/profile";
+  const API_MENU =
+    "http://localhost:8082/dine-ease/api/v1/menu/getAll";
+  const API_AVAILABILITY =
+    "http://localhost:8082/dine-ease/api/v1/menu";
 
   const categories = [
     "All Items",
@@ -16,11 +19,9 @@ export default function ChefMenuCatalog() {
     "Desserts",
   ];
 
-  const [token] = useState(localStorage.getItem("Token"));
-  const [organizationId, setOrganizationId] = useState(
-    localStorage.getItem("chefOrgId")
-  );
+  const token = localStorage.getItem("token");
 
+  const [orgId, setOrgId] = useState(null);
   const [menuItems, setMenuItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [activeCategory, setActiveCategory] = useState("All Items");
@@ -28,8 +29,8 @@ export default function ChefMenuCatalog() {
 
   const normalize = (str) => str?.toLowerCase().trim();
 
-  // Fetch Profile
-  const fetchStaffProfile = async () => {
+  /* -------------------- FETCH PROFILE (ORG ID) -------------------- */
+  const fetchProfile = async () => {
     try {
       const res = await fetch(API_PROFILE, {
         headers: { Authorization: `Bearer ${token}` },
@@ -39,22 +40,23 @@ export default function ChefMenuCatalog() {
 
       const data = await res.json();
       if (data.organizationId) {
-        localStorage.setItem("chefOrgId", data.organizationId);
-        setOrganizationId(data.organizationId);
+        setOrgId(data.organizationId);
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error("Profile fetch error:", error);
     }
   };
 
-  // Fetch Menu Items
-  const fetchMenuItems = async (orgId) => {
+  /* -------------------- FETCH MENU ITEMS -------------------- */
+  const fetchMenuItems = async (organizationId) => {
     try {
-      const url = `${API_MENU}?organizationId=${orgId}&page=0&size=200`;
-
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      setLoading(true);
+      const res = await fetch(
+        `${API_MENU}?organizationId=${organizationId}&page=0&size=200`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (!res.ok) return;
 
@@ -66,139 +68,89 @@ export default function ChefMenuCatalog() {
         name: i.itemName,
         desc: i.description,
         price: i.price || 0,
-        img: i.imageData ? `data:image/jpeg;base64,${i.imageData}` : "",
+        img: i.imageData
+          ? `data:image/jpeg;base64,${i.imageData}`
+          : "",
         category: i.categoryName,
         isVeg: i.itemTypeName?.toLowerCase() === "veg",
         inStock: i.isAvailable,
-
-        // Safe defaults for update API
-        itemTypeName: i.itemTypeName || "",
-        foodTypeName: i.foodTypeName || "",
-        cuisineTypeName: i.cuisineTypeName || "",
-        spiceLevel: i.spiceLevel || 1,
-        preparationTime: i.preparationTime || 1,
-        isBestseller: i.isBestseller || false,
-        isRecommended: i.isRecommended || false,
-        chefSpecial: i.chefSpecial || false,
-        allergenInfo: i.allergenInfo || "",
-
-        variants: i.variants || [],
-        addons: i.addons || [],
-        customizationGroupNames: i.customizationGroupNames || [],
-
-        organizationId: i.organizationId || orgId
       }));
 
       setMenuItems(formatted);
-      setFilteredItems(formatted);
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error("Menu fetch error:", error);
+    } finally {
       setLoading(false);
     }
   };
 
-  // Update Availability Only
- 
-const toggleStock = async (item) => {
-  try {
-    const form = new FormData();
+  /* -------------------- TOGGLE AVAILABILITY -------------------- */
+  const toggleStock = async (itemId) => {
+    const currentItem = menuItems.find((i) => i.id === itemId);
+    if (!currentItem) return;
 
-    form.append("menuItemId", item.id);
-    form.append("organizationId", item.organizationId);
-    form.append("itemName", item.name);
-    form.append("description", item.desc);
-    form.append("categoryName", item.category);
-    form.append("itemTypeName", item.itemTypeName);
-form.append("foodTypeName", item.foodTypeName);
-form.append("cuisineTypeName", item.cuisineTypeName);
+    try {
+      const res = await fetch(
+        `${API_AVAILABILITY}/${itemId}/availability`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            isAvailable: !currentItem.inStock,
+            reason: !currentItem.inStock
+              ? "Item back in stock"
+              : "Item temporarily unavailable",
+          }),
+        }
+      );
 
-    form.append("spiceLevel", item.spiceLevel);
-    form.append("preparationTime", item.preparationTime);
-    form.append("isRecommended", item.isRecommended);
-    form.append("isBestseller", item.isBestseller);
-    form.append("chefSpecial", item.chefSpecial);
-    form.append("allergenInfo", item.allergenInfo);
-    form.append("isAvailable", (!item.inStock).toString());
+      if (!res.ok) {
+        console.error(await res.text());
+        return;
+      }
 
-
-    // --- image ---
-    if (item.image) {
-      form.append("image", item.image);
-    } 
-
-    // --- variants (backend expects multi-part array) ---
-    item.variants.forEach((v, index) => {
-      form.append(`variants[${index}].variantId`, v.variantId);
-      form.append(`variants[${index}].discountPrice`, v.discountPrice);
-      form.append(`variants[${index}].price`, v.price);
-      form.append(`variants[${index}].displayOrder`, v.displayOrder);
-      form.append(`variants[${index}].quantityUnit`, v.quantityUnit);
-      form.append(`variants[${index}].variantName`, v.variantName);
-      form.append(`variants[${index}].isDefault`, v.isDefault);
-      form.append(`variants[${index}].isAvailable`, v.isAvailable);
-      form.append(`variants[${index}].variantType`, v.variantType);
-    });
-
-    // --- addons ---
-    item.addons.forEach((a, index) => {
-      form.append(`addons[${index}].addonName`, a.addonName);
-      form.append(`addons[${index}].isDefault`, a.isDefault);
-      form.append(`addons[${index}].maxQuantity`, a.maxQuantity);
-    });
-
-    // --- customizationGroupNames ---
-    item.customizationGroupNames.forEach((g) => {
-      form.append("customizationGroupNames", g);
-    });
-
-    const res = await fetch(API_UPDATE, {
-      method: "PUT",
-      headers: { Authorization: `Bearer ${token}` },
-      body: form,
-    });
-
-    if (!res.ok) {
-      alert("Update failed!");
-      return;
+      setMenuItems((prev) =>
+        prev.map((m) =>
+          m.id === itemId
+            ? { ...m, inStock: !m.inStock }
+            : m
+        )
+      );
+    } catch (error) {
+      console.error("Availability update error:", error);
     }
-
-    const updated = menuItems.map((m) =>
-      m.id === item.id ? { ...m, inStock: !m.inStock } : m
-    );
-
-    setMenuItems(updated);
-    handleFilter(activeCategory);
-
-  } catch (err) {
-    console.error("UPDATE ERROR", err);
-  }
-};
-
-
-  // Filter Logic
-  const handleFilter = (cat) => {
-    setActiveCategory(cat);
-
-    if (cat === "All Items") return setFilteredItems(menuItems);
-    if (cat === "Vegetarian")
-      return setFilteredItems(menuItems.filter((i) => i.isVeg));
-    if (cat === "Non-Vegetarian")
-      return setFilteredItems(menuItems.filter((i) => !i.isVeg));
-
-    setFilteredItems(
-      menuItems.filter((i) => normalize(i.category) === normalize(cat))
-    );
   };
 
+  /* -------------------- FILTER DERIVED STATE -------------------- */
   useEffect(() => {
-    if (token) fetchStaffProfile();
+    let result = menuItems;
+
+    if (activeCategory === "Vegetarian") {
+      result = menuItems.filter((i) => i.isVeg);
+    } else if (activeCategory === "Non-Vegetarian") {
+      result = menuItems.filter((i) => !i.isVeg);
+    } else if (activeCategory !== "All Items") {
+      result = menuItems.filter(
+        (i) => normalize(i.category) === normalize(activeCategory)
+      );
+    }
+
+    setFilteredItems(result);
+  }, [menuItems, activeCategory]);
+
+  /* -------------------- EFFECTS -------------------- */
+  useEffect(() => {
+    if (token) fetchProfile();
   }, [token]);
 
   useEffect(() => {
-    if (organizationId) fetchMenuItems(organizationId);
-  }, [organizationId]);
+    if (orgId) fetchMenuItems(orgId);
+  }, [orgId]);
 
+  /* -------------------- UI -------------------- */
   return (
     <div className="chef-menu-catalog chef-container">
       <h2>🍽 Menu Catalog</h2>
@@ -210,7 +162,7 @@ form.append("cuisineTypeName", item.cuisineTypeName);
             className={`chef-category-btn ${
               activeCategory === cat ? "active" : ""
             }`}
-            onClick={() => handleFilter(cat)}
+            onClick={() => setActiveCategory(cat)}
           >
             {cat}
           </button>
@@ -228,7 +180,7 @@ form.append("cuisineTypeName", item.cuisineTypeName);
               <div
                 className="chef-menu-img"
                 style={{ backgroundImage: `url(${item.img})` }}
-              ></div>
+              />
 
               <div className="chef-menu-body">
                 <div className="chef-menu-title">
@@ -240,9 +192,11 @@ form.append("cuisineTypeName", item.cuisineTypeName);
 
                 <button
                   className={`chef-badge ${
-                    item.inStock ? "chef-badge-success" : "chef-badge-error"
+                    item.inStock
+                      ? "chef-badge-success"
+                      : "chef-badge-error"
                   }`}
-                  onClick={() => toggleStock(item)}
+                  onClick={() => toggleStock(item.id)}
                 >
                   {item.inStock ? "✔ In Stock" : "✘ Out of Stock"}
                 </button>

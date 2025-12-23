@@ -11,30 +11,28 @@ export default function ChefProfile() {
     organizationId: "",
     organizationName: "",
     fullName: "",
-    phoneNumber: "",
-    email: "",
     staffRoleName: "",
+    phoneNumber: "",
     shiftTiming: "",
     contractStartDate: "",
     contractEndDate: "",
+    email: "",
     profileImage: "",
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-
   const [otpSent, setOtpSent] = useState(false);
   const [generatedOtp, setGeneratedOtp] = useState("");
   const [otp, setOtp] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState(false);
-
   const [passwordForm, setPasswordForm] = useState({
     current: "",
     newPass: "",
     confirm: "",
   });
 
-  // FETCH PROFILE
+  // ===== Fetch Chef Profile =====
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -47,6 +45,11 @@ export default function ChefProfile() {
           credentials: "include",
         });
 
+        if (!res.ok) {
+          console.error(`Profile fetch failed: ${res.status}`);
+          return;
+        }
+
         const text = await res.text();
         if (!text) return;
 
@@ -58,31 +61,29 @@ export default function ChefProfile() {
           phoneNumber: data.phoneNumber || "",
           email: data.email || "",
           staffRoleName: data.staffRoleName || data.staffRole?.name || "",
-          organizationId:
-            data.organizationId || data.organization?.id || "",
-          organizationName:
-            data.organizationName || data.organization?.name || "",
+          organizationId: data.organizationId || data.organization?.id || "",
+          organizationName: data.organizationName || data.organization?.name || "",
           shiftTiming: data.shiftTiming || "",
           contractStartDate: data.contractStartDate || "",
           contractEndDate: data.contractEndDate || "",
           profileImage: data.profileImage || "",
         });
 
-// ✅ Save dynamic org ID to localStorage
-localStorage.setItem(
-  "chefOrgId",
-  data.organizationId || data.organization?.id || ""
-);
-
+        // ✅ Save generic org ID to localStorage
+        localStorage.setItem(
+          "orgId",
+          data.organizationId || data.organization?.id || ""
+        );
       } catch (err) {
         console.error("Chef profile fetch error:", err);
       }
     };
 
     if (TOKEN) fetchProfile();
+    else console.warn("⚠️ No token found — please log in first.");
   }, [TOKEN]);
 
-  // SAVE PROFILE
+  // ===== Save Profile =====
   const handleSave = async () => {
     try {
       const res = await fetch(API_URL, {
@@ -98,54 +99,58 @@ localStorage.setItem(
         alert("Profile updated successfully!");
         setIsEditing(false);
       } else {
-        alert("Update failed!");
+        alert(`Failed to update profile (${res.status})`);
       }
-    } catch (error) {
-      console.error("Update error:", error);
+    } catch (err) {
+      console.error("Profile update error:", err);
     }
   };
 
-  // IMAGE UPLOAD
-  const handleImageChange = (e) => {
+  // ===== Handle Image Upload =====
+  const handleImageChange = async (e) => {
     if (!e.target.files?.length) return;
 
     const reader = new FileReader();
     reader.onload = async (event) => {
       const base64Image = event.target.result;
-
       setProfile((prev) => ({ ...prev, profileImage: base64Image }));
 
+      try {
+        await fetch(`${API_URL}/image`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${TOKEN}`,
+          },
+          body: JSON.stringify({ profileImage: base64Image }),
+        });
+      } catch (err) {
+        console.error("Image upload error:", err);
+      }
+    };
+    reader.readAsDataURL(e.target.files[0]);
+    setShowMenu(false);
+  };
+
+  // ===== Remove Profile Image =====
+  const handleRemoveImage = async () => {
+    try {
+      setProfile((prev) => ({ ...prev, profileImage: "" }));
       await fetch(`${API_URL}/image`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${TOKEN}`,
         },
-        body: JSON.stringify({ profileImage: base64Image }),
+        body: JSON.stringify({ profileImage: "" }),
       });
-    };
-
-    reader.readAsDataURL(e.target.files[0]);
+    } catch (err) {
+      console.error("Image remove error:", err);
+    }
     setShowMenu(false);
   };
 
-  // REMOVE IMAGE
-  const handleRemoveImage = async () => {
-    setProfile((prev) => ({ ...prev, profileImage: "" }));
-
-    await fetch(`${API_URL}/image`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${TOKEN}`,
-      },
-      body: JSON.stringify({ profileImage: "" }),
-    });
-
-    setShowMenu(false);
-  };
-
-  // OTP & PASSWORD CHANGE
+  // ===== OTP & Password Change =====
   const sendOtp = () => {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     setGeneratedOtp(code);
@@ -158,25 +163,33 @@ localStorage.setItem(
       alert("Passwords do not match!");
       return;
     }
-
     if (otp !== generatedOtp) {
       alert("Invalid OTP!");
       return;
     }
 
-    await fetch(`${API_URL}/password`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${TOKEN}`,
-      },
-      body: JSON.stringify({ password: passwordForm.newPass }),
-    });
+    try {
+      const res = await fetch(`${API_URL}/password`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${TOKEN}`,
+        },
+        body: JSON.stringify({ password: passwordForm.newPass }),
+      });
 
-    setPasswordSuccess(true);
-    setOtpSent(false);
-    setPasswordForm({ current: "", newPass: "", confirm: "" });
-    setOtp("");
+      if (res.ok) {
+        setPasswordSuccess(true);
+        setOtpSent(false);
+        setPasswordForm({ current: "", newPass: "", confirm: "" });
+        setOtp("");
+        alert("Password updated successfully!");
+      } else {
+        alert("Failed to update password!");
+      }
+    } catch (err) {
+      console.error("Password change error:", err);
+    }
   };
 
   return (
@@ -190,12 +203,11 @@ localStorage.setItem(
         <div className="chef-profile-details">
           <section>
             <h3>Basic Info</h3>
-
             <label>
               Full Name:
               <input
                 type="text"
-                value={profile.fullName}
+                value={profile.fullName || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
                   setProfile({ ...profile, fullName: e.target.value })
@@ -205,14 +217,14 @@ localStorage.setItem(
 
             <label>
               Email:
-              <input type="email" value={profile.email} disabled />
+              <input type="email" value={profile.email || ""} disabled />
             </label>
 
             <label>
               Phone:
               <input
                 type="text"
-                value={profile.phoneNumber}
+                value={profile.phoneNumber || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
                   setProfile({ ...profile, phoneNumber: e.target.value })
@@ -222,29 +234,25 @@ localStorage.setItem(
 
             <label>
               Role:
-              <input type="text" value={profile.staffRoleName} disabled />
+              <input type="text" value={profile.staffRoleName || ""} disabled />
             </label>
           </section>
 
           <section>
             <h3>Organization Info</h3>
-
             <label>
               Organization ID:
-              <input type="text" value={profile.organizationId} disabled />
+              <input type="text" value={profile.organizationId || ""} disabled />
             </label>
 
             <label>
               Organization:
               <input
                 type="text"
-                value={profile.organizationName}
+                value={profile.organizationName || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
-                  setProfile({
-                    ...profile,
-                    organizationName: e.target.value,
-                  })
+                  setProfile({ ...profile, organizationName: e.target.value })
                 }
               />
             </label>
@@ -253,7 +261,7 @@ localStorage.setItem(
               Shift Timing:
               <input
                 type="text"
-                value={profile.shiftTiming}
+                value={profile.shiftTiming || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
                   setProfile({ ...profile, shiftTiming: e.target.value })
@@ -265,13 +273,10 @@ localStorage.setItem(
               Contract Start:
               <input
                 type="date"
-                value={profile.contractStartDate?.substring(0, 10)}
+                value={profile.contractStartDate?.substring(0, 10) || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
-                  setProfile({
-                    ...profile,
-                    contractStartDate: e.target.value,
-                  })
+                  setProfile({ ...profile, contractStartDate: e.target.value })
                 }
               />
             </label>
@@ -280,13 +285,10 @@ localStorage.setItem(
               Contract End:
               <input
                 type="date"
-                value={profile.contractEndDate?.substring(0, 10)}
+                value={profile.contractEndDate?.substring(0, 10) || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
-                  setProfile({
-                    ...profile,
-                    contractEndDate: e.target.value,
-                  })
+                  setProfile({ ...profile, contractEndDate: e.target.value })
                 }
               />
             </label>
@@ -295,33 +297,26 @@ localStorage.setItem(
           {/* PASSWORD SECTION */}
           <section>
             <h3>Account Settings</h3>
-
             <div className="chef-password-box">
               <h4>Change Password</h4>
 
               <input
                 type="password"
                 placeholder="New Password"
-                disabled={!isEditing}
                 value={passwordForm.newPass}
+                disabled={!isEditing}
                 onChange={(e) =>
-                  setPasswordForm({
-                    ...passwordForm,
-                    newPass: e.target.value,
-                  })
+                  setPasswordForm({ ...passwordForm, newPass: e.target.value })
                 }
               />
 
               <input
                 type="password"
                 placeholder="Confirm Password"
-                disabled={!isEditing}
                 value={passwordForm.confirm}
+                disabled={!isEditing}
                 onChange={(e) =>
-                  setPasswordForm({
-                    ...passwordForm,
-                    confirm: e.target.value,
-                  })
+                  setPasswordForm({ ...passwordForm, confirm: e.target.value })
                 }
               />
 
@@ -334,23 +329,15 @@ localStorage.setItem(
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                     />
-
-                    <button onClick={handlePasswordChange}>
-                      Save Password
-                    </button>
-
-                    <button onClick={() => setOtpSent(false)}>
-                      Cancel
-                    </button>
+                    <button onClick={handlePasswordChange}>Save Password</button>
+                    <button onClick={() => setOtpSent(false)}>Cancel</button>
                   </>
                 ) : (
                   <button onClick={sendOtp}>Send OTP</button>
                 ))}
 
               {passwordSuccess && (
-                <p style={{ color: "green" }}>
-                  ✓ Password updated successfully!
-                </p>
+                <p style={{ color: "green" }}>✅ Password changed successfully!</p>
               )}
             </div>
           </section>
@@ -359,13 +346,11 @@ localStorage.setItem(
           <div className="chef-action-buttons">
             {isEditing ? (
               <>
-                <button onClick={handleSave}>Save</button>
+                <button onClick={handleSave}>Save Changes</button>
                 <button onClick={() => setIsEditing(false)}>Cancel</button>
               </>
             ) : (
-              <button onClick={() => setIsEditing(true)}>
-                Edit Profile
-              </button>
+              <button onClick={() => setIsEditing(true)}>Edit Profile</button>
             )}
           </div>
         </div>
@@ -376,21 +361,19 @@ localStorage.setItem(
             {profile.profileImage ? (
               <img
                 src={profile.profileImage}
+                alt="Profile"
                 className="chef-circle-img"
-                alt="profile"
               />
             ) : (
-              <div className="chef-circle-img">
-                {profile.fullName
-                  ? profile.fullName[0].toUpperCase()
-                  : "C"}
+              <div className="chef-circle-img placeholder">
+                {profile.fullName ? profile.fullName[0].toUpperCase() : "C"}
               </div>
             )}
 
             <div className="chef-menu-container">
               <button
                 className="chef-menu-button"
-                onClick={() => setShowMenu(!showMenu)}
+                onClick={() => setShowMenu((prev) => !prev)}
               >
                 <MoreVertical size={20} />
               </button>
@@ -401,12 +384,11 @@ localStorage.setItem(
                     <Pencil size={16} /> Edit Photo
                     <input
                       type="file"
-                      hidden
                       accept="image/*"
                       onChange={handleImageChange}
+                      hidden
                     />
                   </label>
-
                   {profile.profileImage && (
                     <button
                       className="chef-dropdown-item"

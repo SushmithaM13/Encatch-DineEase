@@ -5,11 +5,13 @@
 .user-management {
   padding: 20px;
   background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
-  min-height: 100vh;
+  height: 100vh;
   /* width: 100%; */
   font-family: 'Inter', 'Segoe UI', sans-serif;
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .user-management::before {
@@ -36,6 +38,9 @@
    ============================ */
 
 .user-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -51,6 +56,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   flex-wrap: wrap;
   gap: 15px;
+  flex-shrink: 0;
 }
 
 .user-header h2 {
@@ -123,6 +129,7 @@
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .pagination-btn {
@@ -167,6 +174,9 @@
    ============================ */
 
 .tab-navigation {
+  position: sticky;
+  top: 100px; /* height of header */
+  z-index: 90;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -180,6 +190,7 @@
     0 8px 32px rgba(0, 0, 0, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
 }
 
 .tab {
@@ -221,8 +232,10 @@
    ============================ */
 
 .table-container {
+  flex: 1;
   width: 100%;
   overflow-x: auto;
+  overflow-y: auto;
   background: #ffffff;
   backdrop-filter: blur(30px);
   border-radius: 20px;
@@ -230,6 +243,8 @@
     0 10px 40px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
   border: 1px solid rgba(0, 0, 0, 0.08);
+  display: block;
+  max-width: 100%;
 }
 
 /* ============================
@@ -238,13 +253,12 @@
 
 .user-management table {
   width: 100%;
-  min-width: 1200px;
+  min-width: unset !important;
   border-collapse: separate;
   border-spacing: 0;
   background: transparent;
-  table-layout: fixed; /* ✅ FIXED: Ensures columns stay consistent */
+  table-layout: auto !important;
 }
-
 .user-management table th,
 .user-management table td {
   padding: 16px 12px;
@@ -853,6 +867,7 @@
 
 .table-container::-webkit-scrollbar {
   height: 10px;
+  width: 10px;
 }
 
 .table-container::-webkit-scrollbar-track {

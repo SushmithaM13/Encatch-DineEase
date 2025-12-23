@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import "./customerDashboardNav.css";
 
-const CustomerNavbar = ({ onCartClick, onSearch, allMenuItems = [] }) => {
+const CustomerNavbar = ({ onSearch, allMenuItems = null }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -12,31 +13,39 @@ const CustomerNavbar = ({ onCartClick, onSearch, allMenuItems = [] }) => {
     return JSON.parse(localStorage.getItem("recentSearches") || "[]");
   });
 
+  const navigate = useNavigate();
   const suggestionBoxRef = useRef(null);
   const { customer, isGuest, logout } = useContext(AuthContext);
 
-  const getInitial = (name) => (name && name.length > 0 ? name[0].toUpperCase() : "G");
+  const getInitial = (name) =>
+    name && name.length > 0 ? name[0].toUpperCase() : "G";
+
   const profileName = isGuest ? "Guest User" : customer?.name || "User";
   const profileEmail = isGuest ? "—" : customer?.email || "";
 
-  //  Filter suggestions when user types
+  /* ✅ SAFE FILTER EFFECT (NO RE-RENDER LOOP) */
   useEffect(() => {
-    if (!query.trim()) {
+    if (!query.trim() || !Array.isArray(allMenuItems)) {
       setSuggestions([]);
       return;
     }
 
     const filtered = allMenuItems
-      .filter((item) => item.itemName.toLowerCase().includes(query.toLowerCase()))
+      .filter((item) =>
+        item.itemName.toLowerCase().includes(query.toLowerCase())
+      )
       .slice(0, 6);
 
     setSuggestions(filtered);
   }, [query, allMenuItems]);
 
-  //  Handle outside click
+  /* Outside click */
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (suggestionBoxRef.current && !suggestionBoxRef.current.contains(e.target)) {
+      if (
+        suggestionBoxRef.current &&
+        !suggestionBoxRef.current.contains(e.target)
+      ) {
         setShowSuggestions(false);
       }
     };
@@ -47,50 +56,44 @@ const CustomerNavbar = ({ onCartClick, onSearch, allMenuItems = [] }) => {
   const handleSuggestionClick = (name) => {
     setQuery(name);
     setShowSuggestions(false);
-    if (onSearch) onSearch(name);
+    onSearch?.(name);
 
-    //  Store recent searches (max 5)
-    const updated = [name, ...recentSearches.filter((r) => r !== name)].slice(0, 5);
+    const updated = [name, ...recentSearches.filter((r) => r !== name)].slice(
+      0,
+      5
+    );
     setRecentSearches(updated);
     localStorage.setItem("recentSearches", JSON.stringify(updated));
   };
 
-  // Keyboard Navigation
   const handleKeyDown = (e) => {
     if (!showSuggestions || suggestions.length === 0) return;
 
-    switch (e.key) {
-      case "ArrowDown":
-        e.preventDefault();
-        setHighlightIndex((prev) => (prev + 1) % suggestions.length);
-        break;
-
-      case "ArrowUp":
-        e.preventDefault();
-        setHighlightIndex((prev) => (prev - 1 + suggestions.length) % suggestions.length);
-        break;
-
-      case "Enter":
-        e.preventDefault();
-        if (highlightIndex >= 0) {
-          const selected = suggestions[highlightIndex];
-          handleSuggestionClick(selected.itemName);
-        }
-        break;
-
-      case "Escape":
-        setShowSuggestions(false);
-        break;
-
-      default:
-        break;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlightIndex((prev) => (prev + 1) % suggestions.length);
     }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlightIndex(
+        (prev) => (prev - 1 + suggestions.length) % suggestions.length
+      );
+    }
+
+    if (e.key === "Enter" && highlightIndex >= 0) {
+      e.preventDefault();
+      handleSuggestionClick(suggestions[highlightIndex].itemName);
+    }
+
+    if (e.key === "Escape") setShowSuggestions(false);
   };
 
   const handleFocus = () => {
-    if (!query.trim() && recentSearches.length > 0) {
-      setShowSuggestions(true);
-    } else if (query.trim() && suggestions.length > 0) {
+    if (
+      (!query.trim() && recentSearches.length > 0) ||
+      (query.trim() && suggestions.length > 0)
+    ) {
       setShowSuggestions(true);
     }
   };
@@ -103,27 +106,11 @@ const CustomerNavbar = ({ onCartClick, onSearch, allMenuItems = [] }) => {
   return (
     <nav className="customer-navbar-container">
       <div className="customer-navbar-brand">
-        <img src="/logo.png" alt="DineEase" className="customer-navbar-logo" />
         <span className="customer-navbar-title">DineEase</span>
       </div>
 
-      {/* 🔍 Search Section */}
+      {/* Search */}
       <div className="customer-navbar-search" ref={suggestionBoxRef}>
-        <span className="customer-navbar-search-icon">
-          <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
-            <circle cx="9" cy="9" r="7" stroke="#FF914D" strokeWidth="2" />
-            <line
-              x1="15.2"
-              y1="15.2"
-              x2="19"
-              y2="19"
-              stroke="#FF914D"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-        </span>
-
         <input
           type="text"
           className="customer-navbar-search-input"
@@ -131,22 +118,21 @@ const CustomerNavbar = ({ onCartClick, onSearch, allMenuItems = [] }) => {
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
-            if (onSearch) onSearch(e.target.value);
+            onSearch?.(e.target.value);
             setShowSuggestions(true);
           }}
           onFocus={handleFocus}
           onKeyDown={handleKeyDown}
         />
 
-        {/* 💡 Suggestions / Recent Searches */}
         {showSuggestions && (
           <ul className="customer-search-suggestion-list">
-            {/* 🔸 If typing but no match */}
             {query.trim() && suggestions.length === 0 && (
-              <li className="customer-search-no-results">No results found for “{query}”</li>
+              <li className="customer-search-no-results">
+                No results found for “{query}”
+              </li>
             )}
 
-            {/* 🔹 If typing and results found */}
             {suggestions.map((item, index) => (
               <li
                 key={item.id}
@@ -164,22 +150,24 @@ const CustomerNavbar = ({ onCartClick, onSearch, allMenuItems = [] }) => {
               </li>
             ))}
 
-            {/* 🕒 Recent Searches */}
             {!query.trim() && recentSearches.length > 0 && (
               <>
                 <li className="customer-search-recent-header">
                   Recent Searches
-                  <button onClick={handleClearRecent} className="clear-recent-btn">
+                  <button
+                    onClick={handleClearRecent}
+                    className="clear-recent-btn"
+                  >
                     Clear
                   </button>
                 </li>
-                {recentSearches.map((item, index) => (
+                {recentSearches.map((item, i) => (
                   <li
-                    key={index}
+                    key={i}
                     className="customer-search-recent-item"
                     onClick={() => handleSuggestionClick(item)}
                   >
-                    <span>🔍 {item}</span>
+                    🔍 {item}
                   </li>
                 ))}
               </>
@@ -188,13 +176,22 @@ const CustomerNavbar = ({ onCartClick, onSearch, allMenuItems = [] }) => {
         )}
       </div>
 
-      {/* Profile / Cart */}
+      {/* Cart + Profile */}
       <div className="customer-navbar-actions">
-        <button className="customer-navbar-icon" onClick={onCartClick}>
+        <button
+          className="customer-navbar-icon"
+          onClick={() => navigate("/cart")}
+        >
           🛒
         </button>
-        <button className="customer-navbar-icon" onClick={() => setMenuOpen(!menuOpen)}>
-          <span className="customer-nav-avatar">{getInitial(profileName)}</span>
+
+        <button
+          className="customer-navbar-icon"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <span className="customer-nav-avatar">
+            {getInitial(profileName)}
+          </span>
         </button>
 
         {menuOpen && (

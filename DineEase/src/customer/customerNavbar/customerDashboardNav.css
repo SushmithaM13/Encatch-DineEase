@@ -8,9 +8,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ff914d;
+  background: #da06ff;
   padding: 10px 26px;
-  box-shadow: 0 2px 16px #ff914d23;
+  box-shadow: 0 2px 16px #ffffff00;
   position: sticky;
   top: 0;
   z-index: 101;
@@ -61,7 +61,7 @@
   font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .customer-navbar-search-input::placeholder {
-  color: #b97c44;
+  color: #000000;
   font-style: italic;
   letter-spacing: .04em;
 }
@@ -79,7 +79,7 @@
   position: relative;
 }
 .customer-navbar-icon {
-  background: #fff;
+  background: #ffffff;
   border: none;
   border-radius: 50%;
   font-size: 1.3rem;
@@ -107,7 +107,7 @@
   position: absolute;
   top: 44px;
   right: 2px;
-  background: #fff9f0;
+  background: #ffffff;
   box-shadow: 0 6px 32px #3aafa900;
   border-radius: 18px;
   min-width: 180px;

@@ -210,3 +210,56 @@
   from { transform: translateY(40px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+
+.customizations-section {
+  margin-top: 16px;
+}
+
+.customization-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.customization-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.customization-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.customization-option input {
+  margin-right: 10px;
+}
+
+.customization-option:hover {
+  border-color: #6c5ce7;
+}
+
+.customization-option.selected {
+  border-color: #6c5ce7;
+  background: #f4f2ff;
+}
+
+.option-name {
+  flex: 1;
+  font-size: 14px;
+}
+
+.option-price {
+  font-size: 13px;
+  color: #2d3436;
+  font-weight: 500;
+}

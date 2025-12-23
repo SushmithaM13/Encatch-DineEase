@@ -197,7 +197,7 @@ export default function SuperAdminStaffManagement() {
         ? `${API_BASE}/update-staff/${editId}?organizationId=${ORG_ID}`
         : `${API_BASE}/add?organizationId=${ORG_ID}`;
       const method = editId ? "PUT" : "POST";
-
+      
       const res = await fetch(url, {
         method,
         headers: {

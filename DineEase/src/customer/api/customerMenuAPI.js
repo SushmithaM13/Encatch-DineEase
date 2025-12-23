@@ -7,7 +7,6 @@ export const fetchMenuItems = async (organizationId) => {
   return await response.json();
 };
 
-
 // Individual menu item details by ID
 export const fetchMenuItemById = async (itemId) => {
   try {

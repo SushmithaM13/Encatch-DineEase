@@ -67,7 +67,7 @@ import WaiterSettings from "./pages/Admin/Settings/AdminSettings";
 import WaiterProfile from "./pages/Waiter/Profile/WaiterProfile";
 
 // ===== Chef Pages =====
-import ChefHome from "./pages/Chef/ChefHome/ChefHome";
+//import ChefHome from "./pages/Chef/ChefHome/ChefHome";
 import ChefHomePage from "./pages/Chef/ChefHomepage/ChefHomepage";
 import ChefDashboard from "./pages/Chef/ChefDashboard/ChefDashboard";
 import ChefMenuCatalog from './pages/Chef/ChefMenuCatalog/ChefMenuCatalog';
@@ -80,8 +80,11 @@ import Footer from './components/footer/Footer';
 // ===== Customer pages =====
 import CustomerLogin from './customer/customerLogin/customerLogin';
 import OTPVerification from './customer/customerLogin/otpVerification';
-import CustomerDashboard from './customer/customerDashboard/CustomerDashboard';
+import CustomerDashboard from './customer/customerDashboard/customerDashboard';
+
 import EnterSessionId from './customer/customerLogin/EnterSessionId';
+import CustomerCart from "./customer/customercart/CustomerCart";
+
 
 function App() {
 
@@ -202,12 +205,12 @@ function App() {
         <Route path="/chefDashboard"
           element={
             <ProtectedRoute allowedRoles={["CHEF"]}>
-              <ChefHome />
+              <ChefDashboard />
             </ProtectedRoute>
           }
         >
           <Route index element={<ChefHomePage />} />
-          <Route path="home" element={<ChefHomePage />} />
+          <Route path="homepage" element={<ChefHomePage />} />
           <Route path="chefDashboard" element={<ChefDashboard />} />
           <Route path="menu" element={<ChefMenuCatalog />} />
           <Route path="OrdersQueue" element={<OrderQueue />} />
@@ -221,7 +224,7 @@ function App() {
         <Route path='/enterSessionId' element={<EnterSessionId/>}/>
         <Route path='/otpVerification' element={<OTPVerification />} />
         <Route path='/customerDashboard' element={<CustomerDashboard />} />
-
+        <Route path="/cart" element={<CustomerCart />} />
 
         {/* ===== Catch-all 404 ===== */}
         <Route path="*" element={<h2 className="text-center mt-10">404 - Page Not Found</h2>} />

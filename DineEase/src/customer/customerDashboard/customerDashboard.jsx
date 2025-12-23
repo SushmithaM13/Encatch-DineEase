@@ -6,6 +6,8 @@ import CustomerMenuCategories from "../customerMenuCategory/customerMenuCategori
 // import { useCustomer } from "../../context/CustomerContext";
 import Footer from "../../components/footer/Footer";
 import { useSession } from "../../context/SessionContext";
+import { Outlet } from "react-router-dom";
+
 
 const CustomerDashboard = () => {
   const [tab, setTab] = useState("menu");
