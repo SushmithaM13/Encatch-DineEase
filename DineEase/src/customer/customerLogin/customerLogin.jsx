@@ -1,94 +1,151 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AuthContext } from "../../context/AuthContext";
 import "./customerLogin.css";
-import { useCustomer } from "../../context/CustomerContext";
+import { createCustomer } from "../api/customerLoginAPI";
+import { useSession } from "../../context/SessionContext";
+import { checkTableStatus, reserveTable } from "../api/customerTableAPI";
+import { updateCustomerDetails } from "../api/customerProfileAPI";
 
 const CustomerLogin = () => {
   const [name, setName] = useState("");
   const [identifier, setIdentifier] = useState("");
+  const [loading, setLoading] = useState(true);        // checking + reserving table
+  const [isLoading, setIsLoading] = useState(false);   // continue button loading
+
+  const effectRan = useRef(false); // prevent double effects from StrictMode
+
   const navigate = useNavigate();
   const location = useLocation();
-  const { setOrgId, setTableId }= useCustomer();
+
   const { login, loginAsGuest } = useContext(AuthContext);
+  const { setOrgId, setTableId, setSessionId, sessionId } = useSession();
 
-  // 🧠 Extract params
+  // Extract URL params
+  const params = new URLSearchParams(location.search);
+  const org = params.get("organization");
+  const table = params.get("table");
+
+  /* -----------------------------------------------------
+     CHECK TABLE STATUS + AUTO RESERVE
+  ----------------------------------------------------- */
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const org = params.get("organization");
-    const table = params.get("table");
+    if (effectRan.current) return;
+    effectRan.current = true;
 
-    if (org && table) {
-      setOrgId(org);
-      setTableId(table);
-      console.log("✅ Stored in Context:", { org, table });
-    } else {
-      console.warn("⚠️ Missing organization or table info in URL");
+    if (!org || !table) {
+      toast.error("Invalid table QR");
+      return;
     }
-  }, [location.search, setOrgId, setTableId]);
 
-  // 🚫 Prevent forward navigation from login page
+    setOrgId(org);
+    setTableId(table);
+
+    const verifyTable = async () => {
+      try {
+        const isAvailable = await checkTableStatus(org, table);
+
+        if (isAvailable) {
+          // Reserve table → backend creates row
+          const reserveRes = await reserveTable(org, table);
+          setSessionId(reserveRes.sessionId);
+        } else {
+          // Table already in use → ask for sessionId
+          navigate("/enterSessionId", {
+            state: { orgId: org, tableId: table }
+          });
+        }
+
+        setLoading(false);
+      } catch (err) {
+        toast.error("Server error while checking table", err);
+        setLoading(false);
+      }
+    };
+
+    verifyTable();
+  }, []);
+
+  /* -----------------------------------------------------
+     PREVENT BACK BUTTON NAVIGATION
+  ----------------------------------------------------- */
   useEffect(() => {
     window.history.pushState(null, null, window.location.pathname);
-    const handlePop = () => {
+
+    const handleBack = () => {
       if (window.location.pathname !== "/customerLogin") {
         window.location.replace("/customerLogin");
       }
     };
-    window.addEventListener("popstate", handlePop);
-    return () => window.removeEventListener("popstate", handlePop);
+
+    window.addEventListener("popstate", handleBack);
+    return () => window.removeEventListener("popstate", handleBack);
   }, []);
 
-  const BASE_URL = "http://localhost:8082/dine-ease/api/v1/customers";
-
+  /* -----------------------------------------------------
+     CUSTOMER LOGIN → OTP PAGE
+  ----------------------------------------------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim() || !identifier.trim()) {
-      toast.error("Please enter your name and contact.");
-      return;
+    setIsLoading(true);
+
+    const payload = {
+      name,
+      email: identifier.includes("@") ? identifier : null,
+      phoneNumber: !identifier.includes("@") ? identifier : null,
+      organizationId: org,
+      tableNumber: table
+    };
+
+    const { ok, data } = await createCustomer(payload);
+
+    if (ok) {
+      login(data); // store user in AuthContext
+
+      navigate("/otpVerification", {
+        state: { identifier, orgId: org, tableId: table }
+      });
+    } else {
+      toast.error(data?.message || "Failed to create customer");
     }
+
+    setIsLoading(false);
+  };
+
+  /* -----------------------------------------------------
+     GUEST LOGIN (no OTP)
+  ----------------------------------------------------- */
+  const handleSkipLogin = async () => {
+    loginAsGuest();
 
     try {
-      const response = await fetch(`${BASE_URL}/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email: identifier.includes("@") ? identifier : null,
-          phoneNumber: identifier.includes("@") ? null : identifier,
-          tableNumber: localStorage.getItem("tableId"),
-          organizationId: localStorage.getItem("orgId"),
-        }),
+      await updateCustomerDetails({
+        sessionId,
+        organizationId: org,
+        tableNumber: table,
+        customerId: null,
+        reservedTableSource: "GUEST"
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        toast.success("OTP sent! Please verify.");
-        login({
-          name,
-          email: identifier.includes("@") ? identifier : "",
-          phone: !identifier.includes("@") ? identifier : "",
-        });
-
-        // ✅ Navigate with query params
-        // navigate(`/otpVerification?table=${tableId}&organization=${orgId}`, {
-        //   state: { identifier, tableId, orgId },
-        // });
-        navigate("/otpVerification");
-      } else {
-        toast.error(data.message || "Login failed. Try again.");
-      }
-    } catch {
-      toast.error("Server error. Please try later.");
+      console.log("Guest details updated");
+    } catch (err) {
+      console.error("Guest update failed", err);
     }
+
+    navigate("/customerDashboard");
   };
 
-  const handleSkipLogin = () => {
-    loginAsGuest();
-    navigate("/customerDashboard");
-    // navigate(`/customerDashboard?table=${tableId}&organization=${orgId}`);
-  };
+  /* -----------------------------------------------------
+     SHOW LOADING WHILE RESERVING TABLE
+  ----------------------------------------------------- */
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "60px", fontSize: "22px" }}>
+        Checking table availability...
+      </div>
+    );
+  }
 
   return (
     <div className="restaurant-auth-bg">
@@ -139,8 +196,8 @@ const CustomerLogin = () => {
               />
             </div>
 
-            <button type="submit" className="login-btn">
-              Continue →
+            <button type="submit" className="login-btn" disabled={isLoading}>
+              {isLoading ? "Sending OTP…" : "Continue →" }
             </button>
 
             <div className="alt-login">

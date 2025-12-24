@@ -3,12 +3,15 @@ import "./customerDashboard.css";
 import CustomerDashboardNav from "../customerNavbar/customerDashboardNav";
 import CustomerMenuSection from "../customerMenu/customerMenuSection";
 import CustomerMenuCategories from "../customerMenuCategory/customerMenuCategories";
-import { useCustomer } from "../../context/CustomerContext";
+// import { useCustomer } from "../../context/CustomerContext";
 import Footer from "../../components/footer/Footer";
+import { useSession } from "../../context/SessionContext";
+import { Outlet } from "react-router-dom";
+
 
 const CustomerDashboard = () => {
   const [tab, setTab] = useState("menu");
-  const { orgId, tableId } = useCustomer();
+  const { orgId, tableId } = useSession();;
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState("");
   const menuSectionRef = useRef(null);

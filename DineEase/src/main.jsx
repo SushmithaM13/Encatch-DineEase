@@ -6,15 +6,16 @@ import './index.css';
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import AuthProvider from './context/AuthContext.jsx';
-import { CustomerProvider } from './context/CustomerContext.jsx';
+// import { CustomerProvider } from './context/CustomerContext.jsx';
+import { SessionProvider } from "./context/SessionContext.jsx";
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <CustomerProvider>
-          <App/>
-        </CustomerProvider>
+          <SessionProvider>
+            <App/>
+          </SessionProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,

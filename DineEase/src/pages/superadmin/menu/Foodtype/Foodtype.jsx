@@ -7,12 +7,13 @@ export default function FoodType() {
   const [sortOrder, setSortOrder] = useState(0);
   const [editId, setEditId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+
   const itemsPerPage = 5;
 
   const organizationId = localStorage.getItem("organizationId");
   const token = localStorage.getItem("token");
 
-  // === GET Food Types ===
+  // ============= GET FOOD TYPES =============
   const fetchFoodTypes = useCallback(async () => {
     try {
       const res = await fetch(
@@ -24,6 +25,7 @@ export default function FoodType() {
           },
         }
       );
+
       if (!res.ok) throw new Error("Failed to fetch food types");
       const data = await res.json();
       setFoodTypes(data);
@@ -36,7 +38,7 @@ export default function FoodType() {
     fetchFoodTypes();
   }, [fetchFoodTypes]);
 
-  // === POST / PUT Food Type ===
+  // ============= ADD / UPDATE FOOD TYPE =============
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -47,7 +49,7 @@ export default function FoodType() {
 
     const apiUrl = editId
       ? `http://localhost:8082/dine-ease/api/v1/menu/food-types/${editId}`
-      : "http://localhost:8082/dine-ease/api/v1/menu/food-types/add";
+      : "http://localhost:8082/dine-ease/api/v1/menu/food-types";
 
     const method = editId ? "PUT" : "POST";
 
@@ -73,14 +75,14 @@ export default function FoodType() {
         fetchFoodTypes();
         alert(editId ? "Food Type updated!" : "Food Type added!");
       } else {
-        alert("Operation failed! Check details or server connection.");
+        alert("Failed! Server rejected the request.");
       }
     } catch (err) {
-      console.error("Error submitting food type:", err);
+      console.error("Submit error:", err);
     }
   };
 
-  // === DELETE Food Type ===
+  // ============= DELETE FOOD TYPE =============
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this food type?")) return;
 
@@ -89,31 +91,29 @@ export default function FoodType() {
         `http://localhost:8082/dine-ease/api/v1/menu/food-types/${id}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
       if (res.ok) {
         fetchFoodTypes();
-        alert("Food Type deleted successfully!");
+        alert("Food Type deleted!");
       } else {
-        alert("Failed to delete food type.");
+        alert("Delete failed.");
       }
     } catch (err) {
-      console.error("Error deleting food type:", err);
+      console.error("Delete error:", err);
     }
   };
 
-  // === Edit Mode ===
+  // ============= EDIT MODE =============
   const handleEdit = (item) => {
     setName(item.name);
     setSortOrder(item.sortOrder);
     setEditId(item.id);
   };
 
-  // === Pagination ===
+  // ============= PAGINATION =============
   const totalPages = Math.ceil(foodTypes.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = foodTypes.slice(startIndex, startIndex + itemsPerPage);
@@ -137,6 +137,7 @@ export default function FoodType() {
           onChange={(e) => setSortOrder(e.target.value)}
         />
         <button type="submit">{editId ? "Update Food Type" : "Add Food Type"}</button>
+
         {editId && (
           <button
             type="button"
@@ -152,23 +153,24 @@ export default function FoodType() {
         )}
       </form>
 
-      {/* Web View Table */}
+      {/* ======= TABLE VIEW ======= */}
       <div className="foodtype-table web-view">
         <table>
           <thead>
             <tr>
-              <th>ID</th>
+              <th>SL.No</th>
               <th>Food Type Name</th>
               <th>Active</th>
               <th>Sort Order</th>
               <th>Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {currentItems.length > 0 ? (
-              currentItems.map((item) => (
+              currentItems.map((item, index) => (
                 <tr key={item.id}>
-                  <td>{item.id}</td>
+                  <td>{startIndex + index + 1}</td>
                   <td>{item.name}</td>
                   <td>{item.active ? "Yes" : "No"}</td>
                   <td>{item.sortOrder}</td>
@@ -193,13 +195,13 @@ export default function FoodType() {
         </table>
       </div>
 
-      {/* Mobile View Cards */}
+      {/* ======= MOBILE VIEW CARDS ======= */}
       <div className="mobile-view">
         {currentItems.length > 0 ? (
-          currentItems.map((item) => (
+          currentItems.map((item, index) => (
             <div className="foodtype-card" key={item.id}>
               <h4>{item.name}</h4>
-              <p><strong>ID:</strong> {item.id}</p>
+              <p><strong>SL.No:</strong> {startIndex + index + 1}</p>
               <p><strong>Active:</strong> {item.active ? "Yes" : "No"}</p>
               <p><strong>Sort Order:</strong> {item.sortOrder}</p>
               <div className="card-actions">
@@ -213,7 +215,7 @@ export default function FoodType() {
         )}
       </div>
 
-      {/* Pagination */}
+      {/* ======= PAGINATION ======= */}
       <div className="pagination">
         {Array.from({ length: totalPages }).map((_, i) => (
           <button

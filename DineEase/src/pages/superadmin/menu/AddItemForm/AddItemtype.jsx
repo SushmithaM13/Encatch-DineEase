@@ -10,7 +10,7 @@ export default function ItemType() {
   const itemsPerPage = 5;
 
   const organizationId = localStorage.getItem("organizationId");
-  console.log("orgsnizationid for additemstype:", organizationId)
+  //console.log("orgsnizationid for additemstype:", organizationId)
   const token = localStorage.getItem("token");
 
   // === Fetch Item Types (GET) ===
@@ -27,7 +27,7 @@ export default function ItemType() {
       );
       if (!res.ok) throw new Error("Failed to fetch item types");
       const data = await res.json();
-      console.log("data for additemtype",data);
+     //("data for additemtype",data);
       setItemTypes(data);
     } catch (err) {
       console.error("Error fetching item types:", err);
@@ -49,7 +49,7 @@ export default function ItemType() {
 
     const apiUrl = editId
       ? `http://localhost:8082/dine-ease/api/v1/menu/item-types/${editId}`
-      : "http://localhost:8082/dine-ease/api/v1/menu/item-types/add";
+      : "http://localhost:8082/dine-ease/api/v1/menu/item-types";
 
     const method = editId ? "PUT" : "POST";
 
@@ -159,7 +159,7 @@ export default function ItemType() {
         <table>
           <thead>
             <tr>
-              <th>ID</th>
+              <th>SL.No</th>
               <th>Item Type Name</th>
               <th>Active</th>
               <th>Sort Order</th>

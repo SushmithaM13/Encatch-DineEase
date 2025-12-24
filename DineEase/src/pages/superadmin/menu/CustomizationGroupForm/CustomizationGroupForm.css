@@ -1,82 +1,279 @@
-.menu-card {
-  background: #fff;
+/* ============================================================
+   MAIN CONTAINER
+============================================================ */
+.cg-container {
   padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
-  margin: 20px auto;
+  background: #f4f5ff;
+  min-height: 100vh;
 }
 
-.menu-card h3 {
-  font-size: 1.4rem;
-  color: #333;
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.menu-card form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.menu-card input {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  outline: none;
-  width: 100%;
-}
-
-.menu-card input:focus {
-  border-color: #ff8800;
-}
-
-.option-row {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.secondary-btn,
-.primary-btn {
-  border: none;
-  border-radius: 8px;
-  padding: 10px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.secondary-btn {
-  background: #eee;
+h2 {
+  margin-bottom: 20px;
   color: #333;
 }
 
-.primary-btn {
-  background: #ff8800;
+/* ============================================================
+   TOOLBAR
+============================================================ */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.toolbar button {
+  background: #5f63f2;
   color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
 }
 
-.secondary-btn:hover {
-  background: #ddd;
+.toolbar button:hover {
+  background: #464ade;
 }
 
-.primary-btn:hover {
-  background: #ff6600;
+/* ============================================================
+   TABLE
+============================================================ */
+.cg-table {
+  width: 100%;
+  background: white;
+  border-radius: 10px;
+  border-collapse: collapse;
+  overflow: hidden;
 }
 
+.cg-table th {
+  background: #ececff;
+  padding: 14px;
+  font-size: 14px;
+  color: #333;
+  text-align: left;
+}
+
+.cg-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+/* Expand Button */
+.opt-btn {
+  border: none;
+  background: none;
+  color: #5f63f2;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Buttons */
+.edit-btn {
+  background: #ffa646;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-right: 5px;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  background: #e08f35;
+}
+
+.delete-btn {
+  background: #ff3b5b;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #d63047;
+}
+
+/* ============================================================
+   OPTIONS DROPDOWN INSIDE TABLE
+============================================================ */
+.opt-dropdown {
+  background: #fafaff;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #eee;
+  margin-top: 10px;
+}
+
+/* ============================================================
+   POPUP OVERLAY
+============================================================ */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* Popup Box */
+.popup-container {
+  width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0px 8px 30px rgba(0,0,0,0.2);
+  animation: popupScale 0.3s ease;
+}
+
+@keyframes popupScale {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.popup-close-btn {
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* ============================================================
+   FORM ELEMENTS
+============================================================ */
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* ============================================================
+   OPTIONS ROWS INSIDE POPUP
+============================================================ */
+.option-row {
+  display: grid;
+  grid-template-columns: 1fr 120px 90px 90px 40px;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px;
+  background: #f0f0ff;
+  border-radius: 8px;
+}
+
+.option-row input[type="text"],
+.option-row input[type="number"] {
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.opt-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+/* Remove Option Button */
+.delete-option-btn {
+  background: #ff3b5b;
+  border: none;
+  color: white;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete-option-btn:hover {
+  background: #d63047;
+}
+
+/* Add Option Button */
+.add-option-btn {
+  padding: 10px 14px;
+  background: #5f63f2;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.add-option-btn:hover {
+  background: #3e42c4;
+}
+
+/* ============================================================
+   POPUP BUTTONS
+============================================================ */
+.popup-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.save-btn {
+  padding: 10px 16px;
+  background: #00c46f;
+  border: none;
+  color: white;
+  border-radius: 6px;
+}
+
+.cancel-btn {
+  padding: 10px 16px;
+  background: #ccc;
+  border: none;
+  border-radius: 6px;
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN
+============================================================ */
+
+/* Small screens: convert option-row to vertical */
 @media (max-width: 768px) {
-  .option-row {
-    flex-direction: column;
-  }
-  .menu-card {
+  .popup-container {
     width: 95%;
-    padding: 15px;
+  }
+
+  .option-row {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+  }
+
+  .opt-check {
+    font-size: 12px;
   }
 }
-@media (max-width: 480px) {
-  .menu-card h3 {
-    font-size: 1.2rem;
-  }
-}
+

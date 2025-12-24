@@ -146,7 +146,7 @@ export default function CuisineType() {
         <table>
           <thead>
             <tr>
-              <th>ID</th>
+              <th>SL.No</th>
               <th>Cuisine Name</th>
               <th>Active</th>
               <th>Sort Order</th>

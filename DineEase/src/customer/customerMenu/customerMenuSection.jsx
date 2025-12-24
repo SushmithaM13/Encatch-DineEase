@@ -1,19 +1,27 @@
 import { useEffect, useState } from "react";
 import "./customerMenuSection.css";
 import { fetchMenuItems, searchMenuItems } from "../api/customerMenuAPI"; // import API function
-import { useCustomer } from "../../context/CustomerContext";
 import CustomerMenuItemDetails from "./customerMenuItemDetails";
 import CustomerBestsellerCarousel from "./CustomerBestsellerCarousel";
+import { useSession } from "../../context/SessionContext";
+import { useNavigate } from "react-router-dom";
 
 const CustomerMenuSection = ({selectedCategory,searchKeyword, ref, onMenuLoad}) => {
-  const { orgId } = useCustomer();
   const [menuItems, setMenuItems] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [itemTypeFilter, setItemTypeFilter] = useState("ALL");
+  const { tableId, orgId, sessionId } = useSession();
+  const navigate = useNavigate();
 
+  // If session missing → send back to login
+  useEffect(() => {
+    if (!sessionId || !tableId || !orgId) {
+      navigate("/customerLogin");
+    }
+  }, [sessionId, tableId, orgId, navigate]);
 
   useEffect(() => {
     if (!orgId) {
@@ -43,25 +51,24 @@ const CustomerMenuSection = ({selectedCategory,searchKeyword, ref, onMenuLoad}) 
   }, [orgId, onMenuLoad]);
 
   useEffect(() => {
-    if(!orgId) return;
-    if (!searchKeyword || searchKeyword.trim() === "") {
-      setFilteredItems(menuItems);
-      return;
-    }
+  if (!orgId) return;
 
-    const delayDebounce = setTimeout(async () => {
-      try {
-        setLoading(true);
-        const results = await searchMenuItems(orgId, searchKeyword);
-        setFilteredItems(results);
-      } catch (err) {
-        console.error("Search error:", err);
-      } finally {
-        setLoading(false);
-      }
-    },400); // debounce 400ms
-    return () => clearTimeout(delayDebounce);
-  },[searchKeyword, orgId, menuItems]);
+  if (!searchKeyword || searchKeyword.trim() === "") {
+    setFilteredItems(menuItems);
+    return;
+  }
+
+  const delayDebounce = setTimeout(async () => {
+    try {
+      const results = await searchMenuItems(orgId, searchKeyword);
+      setFilteredItems(results);
+    } catch (err) {
+      console.error("Search error:", err);
+    }
+  }, 400);
+
+  return () => clearTimeout(delayDebounce);
+}, [searchKeyword, orgId]); // menuItems removed
 
   // Helper to get correct variant price
   const getDefaultVariantPrice = (item) => {
@@ -77,23 +84,26 @@ const CustomerMenuSection = ({selectedCategory,searchKeyword, ref, onMenuLoad}) 
   };
 
  //  Apply category + itemType filters
-  useEffect(() => {
-    let items = menuItems;
+useEffect(() => {
+  // ❗ If searching, DO NOT apply category filter
+  if (searchKeyword && searchKeyword.trim() !== "") return;
 
-    if (selectedCategory) {
-      items = items.filter(
-        (item) =>
-          item.categoryName?.toLowerCase() ===
-          selectedCategory.name?.toLowerCase()
-      );
-    }
+  let items = menuItems;
 
-    if (itemTypeFilter !== "ALL") {
-      items = items.filter((item) => item.itemType === itemTypeFilter);
-    }
+  if (selectedCategory) {
+    items = items.filter(
+      (item) =>
+        item.categoryName?.toLowerCase() ===
+        selectedCategory.name?.toLowerCase()
+    );
+  }
 
-    setFilteredItems(items);
-  }, [selectedCategory, menuItems, itemTypeFilter]);
+  if (itemTypeFilter !== "ALL") {
+    items = items.filter((item) => item.itemType === itemTypeFilter);
+  }
+
+  setFilteredItems(items);
+}, [selectedCategory, menuItems, itemTypeFilter, searchKeyword]);
 
 
   if (loading) return <p className="loading-text">🍽️ Loading menu...</p>;
@@ -101,6 +111,10 @@ const CustomerMenuSection = ({selectedCategory,searchKeyword, ref, onMenuLoad}) 
 
  return (
     <main className="customer-menu-main-container" ref={ref}>
+      <p>
+        Table: <b>{tableId}</b> <br />
+        Session: <b>{sessionId}</b>
+      </p>
       {/* Bestseller */}
       {!searchKeyword && (
         <section className="customer-bestseller-section">
@@ -120,7 +134,7 @@ const CustomerMenuSection = ({selectedCategory,searchKeyword, ref, onMenuLoad}) 
         {/* Filter Bar */}
         {!searchKeyword && (
           <div className="customer-menu-filter-bar">
-            {["ALL", "VEG", "NON-VEG"].map((type) => (
+            {["ALL", "VEG", "NON VEG"].map((type) => (
               <button
                 key={type}
                 className={`customer-menu-filter-btn ${

@@ -350,3 +350,23 @@
   background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
   background-size: 1000px 100%;
 }
+.chef-category-filter {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.chef-category-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.chef-category-btn.active {
+  background: #5f63f2;
+  color: white;
+}

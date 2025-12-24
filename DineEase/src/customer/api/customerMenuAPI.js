@@ -1,15 +1,11 @@
 // All menu items for an organization
-import axios from "axios";
-
 export const fetchMenuItems = async (organizationId) => {
-  if (!organizationId) return [];
+  const url = `http://localhost:8082/dine-ease/api/v1/menu/getAll?organizationId=${organizationId}`;
   
-  const url = `http://localhost:8082/dine-ease/api/v1/menu/organization/${organizationId}?page=0&size=10`; // ✅ FIXED URL
-  
-  const response = await axios.get(url);
-  return response.data.content; // Adjust if backend uses .data.data or .content etc.
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Failed to fetch menu items");
+  return await response.json();
 };
-
 
 // Individual menu item details by ID
 export const fetchMenuItemById = async (itemId) => {
