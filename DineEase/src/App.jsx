@@ -50,8 +50,9 @@ import AdminSettings from "./pages/Admin/Settings/AdminSettings";
 import AdminRevenueManagement from "./pages/Admin/Revenue/AdminRevenueManagement";
 
 // ===== Admin Menu Management Pages =====
-import AdminMenu from "./pages/Admin/Menu/Manage Menus/AdminMenu";
-import AdminMenuDetail from "./pages/Admin/Menu/Manage Menus/AdminMenuDetail";
+import AdminMenu from "./pages/Admin/Menu/Menu Mange/AdminMenu";
+import AdminMenuDetails from "./pages/Admin/Menu/Menu Mange/AdminMenuDetails";
+import AdminAddEditMenu from "./pages/Admin/Menu/Menu Mange/AdminAddEditMenu";
 import AdminMenuCategory from "./pages/Admin/Menu/MenuCategory/AdminMenuCategory";
 import AdminFoodType from "./pages/Admin/Menu/FoodType/AdminFoodType";
 import AdminItemType from "./pages/Admin/Menu/ItemType/AdminItemType";
@@ -59,10 +60,17 @@ import AdminCustomizationGroups from "./pages/Admin/Menu/CustomizationGroups/Adm
 import AdminAddon from "./pages/Admin/Menu/AddOn/AdminAddon";
 import AdminCusineType from "./pages/Admin/Menu/CuisineType/AdminCusineType";
 
+
 // ===== Waiter Pages =====
 import WaiterDashboard from "./pages/Waiter/WaiterDashboard/WaiterDashboard";
 import WaiterHome from "./pages/Waiter/Home/WaiterHome";
-import WaiterReservation from "./pages/Waiter/WaiterReservation/WaiterReservation";
+import WaiterMenu from "./pages/Waiter/Menu/WaiterMenu";
+import WaiterCart from "./pages/Waiter/Cart/WaiterCart";
+import WaiterNotification from "./pages/Waiter/Notifications/WaiterNotification";
+import WaiterOrders from "./pages/Waiter/Orders/WaiterOrders";
+import WaiterAllOrders from "./pages/Waiter/Orders/WaiterAllOrders";
+import WaiterPayments from "./pages/Waiter/Payments/WaiterPayments";
+import WaiterTables from "./pages/Waiter/WaiterTables/WaiterTables";
 import WaiterSettings from "./pages/Admin/Settings/AdminSettings";
 import WaiterProfile from "./pages/Waiter/Profile/WaiterProfile";
 
@@ -172,7 +180,10 @@ function App() {
           <Route path="dashboard" element={<AdminHome />} />
           <Route path="profile" element={<AdminProfile />} />
           <Route path="menu" element={<AdminMenu />} />
-          <Route path="menu/:id" element={<AdminMenuDetail />} />
+          <Route path="menu/details/:menuId" element={<AdminMenuDetails />} />          
+          <Route path="menu/add" element={<AdminAddEditMenu />} />
+          <Route path="menu/edit/:menuId" element={<AdminAddEditMenu />} />
+
           <Route path="menu-category" element={<AdminMenuCategory />} />
           <Route path="cuisine-type" element={<AdminCusineType />} />
           <Route path="food-type" element={<AdminFoodType />} />
@@ -197,7 +208,14 @@ function App() {
         >
           <Route index element={<WaiterHome />} />
           <Route path="home" element={<WaiterHome />} />
-          <Route path="reservations" element={<WaiterReservation />} />
+          <Route path="tables" element={<WaiterTables />} />
+          <Route path="menu" element={<WaiterMenu />} />
+          <Route path="cart" element={<WaiterCart />} />
+          <Route path="notifications" element={<WaiterNotification />} />
+          <Route path="orders" element={<WaiterOrders />} />
+          <Route path="orders/all" element={<WaiterAllOrders />} />
+          <Route path="payments" element={<WaiterPayments />} />
+
           <Route path="settings" element={<WaiterSettings />} />
           <Route path="profile" element={<WaiterProfile />} />
         </Route>

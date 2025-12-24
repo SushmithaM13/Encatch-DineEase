@@ -6,19 +6,19 @@ import "react-toastify/dist/ReactToastify.css";
 import "./AdminMenuCategory.css";
 
 export default function AdminMenuCategory() {
+  const PROFILE_API = "http://localhost:8082/dine-ease/api/v1/staff/profile";
   const CATEGORY_API = "http://localhost:8082/dine-ease/api/v1/menu-category";
   const TOKEN = localStorage.getItem("token");
-  const organizationId = localStorage.getItem("organizationId");
+  // const organizationId = localStorage.getItem("organizationId");
 
+  const [organizationId, setOrganizationId] = useState(null);
   const [categories, setCategories] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState(null);
-  const [deleteStep, setDeleteStep] = useState(1); // step 1, 2, 3
 
   const [isSubMode, setIsSubMode] = useState(false);
+
 
   const [newCategory, setNewCategory] = useState({
     menuCategoryName: "",
@@ -27,7 +27,22 @@ export default function AdminMenuCategory() {
     displayOrder: 0,
     isActive: true,
     image: null,
+    existingImage: null,
   });
+
+  const [deletePopup, setDeletePopup] = useState({
+    show: false,
+    categoryId: null,
+    categoryName: "",
+    error: false,
+    backendMessage: "",
+  });
+  const [stopDeletePopup, setStopDeletePopup] = useState({
+    show: false,
+    message: "",
+  });
+
+
 
   const [expandedParents, setExpandedParents] = useState([]);
   const toggleExpand = (parentId) => {
@@ -44,44 +59,70 @@ export default function AdminMenuCategory() {
   const [size] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
 
+  // Fetch organizationId
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return toast.error("No token found. Please login.");
+
+        const res = await fetch(PROFILE_API, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("Profile fetch failed");
+        const data = await res.json();
+
+        setOrganizationId(data.organizationId); // set in state
+      } catch (err) {
+        console.error(err);
+        toast.error("Profile fetch failed!");
+      }
+    };
+    fetchProfile();
+  }, []);
+
+
   /* --------------------- FETCH ALL CATEGORIES --------------------- */
-  /* --------------------- FETCH ALL CATEGORIES --------------------- */
-  const fetchCategories = async () => {
+  const fetchCategories = async (orgId) => {
+    if (!orgId) {
+      console.error("Organization ID not found in localStorage");
+      toast.error("Organization not set. Please login again.");
+      return;
+    }
+
     try {
       const res = await fetch(
-        `${CATEGORY_API}/${organizationId}?page=${page}&size=${size}`,
-        {
-          headers: { Authorization: `Bearer ${TOKEN}` },
-        }
+        `${CATEGORY_API}/${orgId}?page=${page}&size=${size}`,
+        { headers: { Authorization: `Bearer ${TOKEN}` } }
       );
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Error ${res.status}: ${errText}`);
+      }
 
       const data = await res.json();
       const list = data.content || [];
 
-      let formatted = list.map(cat => ({
+      const formatted = list.map(cat => ({
         ...cat,
         menuCategoryName: cat.menuCategoryName || cat.name,
+        parentCategoryName: list.find(p => p.id === cat.parentCategoryId)?.menuCategoryName || null,
       }));
-
-      formatted = formatted.map(cat => {
-        const parent = formatted.find(p => p.id === cat.parentCategoryId);
-        return {
-          ...cat,
-          parentCategoryName: parent ? parent.menuCategoryName : null,
-        };
-      });
 
       setCategories(formatted);
       setTotalPages(data.totalPages || 0);
 
     } catch (err) {
-      console.error(err);
+      console.error("Failed to load categories:", err);
       toast.error("Failed to load categories");
     }
   };
+
   useEffect(() => {
-    fetchCategories();
-  }, [page]);
+    if (!organizationId) return;
+    fetchCategories(organizationId);
+  }, [page, organizationId]);
 
   /* ---------------------- RESET FORM ---------------------- */
   const resetForm = () => {
@@ -132,44 +173,88 @@ export default function AdminMenuCategory() {
       displayOrder: item.displayOrder,
       isActive: item.isActive,
       image: null,
+      existingImage: item.imageData || null, // ✅ keep reference
     });
+
 
     setShowModal(true);
   };
 
 
-  const handleDeleteStep = async () => {
-    if (deleteStep < 3) {
-      setDeleteStep(deleteStep + 1); // go to next warning
-      return;
-    }
-
-    // Step 3: actually delete
+  const handleDelete = async () => {
     try {
-      const res = await fetch(`${CATEGORY_API}/delete/${categoryToDelete.id}`, {
+      const res = await fetch(`${CATEGORY_API}/delete/${deletePopup.categoryId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${TOKEN}` },
       });
 
-      if (!res.ok) throw new Error();
-      setShowDeleteModal(false);
-      setCategoryToDelete(null);
-      setDeleteStep(1);
-      fetchCategories();
+      // Case 1: Linked with menu items (backend sends 409)
+      if (res.status === 409) {
+        const errData = await res.json();
+
+        setStopDeletePopup({
+          show: true,
+          message: errData.message || "This category is linked with menu items. Unable to delete.",
+        });
+
+        setDeletePopup({ show: false, categoryId: null, error: false, backendMessage: "" });
+        return;
+      }
+
+      // Case 2: Deleted successfully
+      if (res.status === 200 || res.status === 204) {
+        setDeletePopup(prev => ({
+          ...prev,
+          backendMessage: "Category deleted successfully.",
+        }));
+        fetchCategories(organizationId);
+        return;
+      }
+
+      throw new Error();
+
     } catch {
-      toast.error("Error deleting category");
+      setStopDeletePopup({
+        show: true,
+        message: "Server error while deleting category.",
+      });
     }
   };
 
-  const confirmDelete = (item) => {
-    setCategoryToDelete(item);
-    setDeleteStep(1); // start from step 1
-    setShowDeleteModal(true);
-  };
 
+
+  const confirmDelete = (item) => {
+
+    // Check if category has subcategories
+    const hasSubcategories = categories.some(c => c.parentCategoryId === item.id);
+
+    // Check if it's parent & has subcategories
+    if (hasSubcategories) {
+      // Show STOP popup
+      setStopDeletePopup({
+        show: true,
+        message: `Cannot delete parent category "${item.menuCategoryName}". Please delete its subcategories first.`,
+      });
+      return;
+    }
+
+    // Otherwise, open normal delete popup
+    setDeletePopup({
+      show: true,
+      categoryId: item.id,
+      categoryName: item.menuCategoryName,
+      error: false,
+      backendMessage: "",
+    });
+  };
 
   /* ----------------------- SAVE ----------------------- */
   const handleSave = async () => {
+    if (!organizationId) {
+      toast.error("Organization not set. Please login again.");
+      return;
+    }
+
     if (!newCategory.menuCategoryName.trim()) {
       toast.error("Category name is required");
       return;
@@ -194,8 +279,19 @@ export default function AdminMenuCategory() {
       }
 
       if (newCategory.image) {
+        // User selected new image
         formData.append("image", newCategory.image);
+      } else if (editingItem?.imageData) {
+        // User did NOT select image → resend old image
+        const blob = await fetch(
+          `data:image/jpeg;base64,${editingItem.imageData}`
+        ).then(res => res.blob());
+
+        formData.append("image", blob, "existing-image.jpg");
       }
+
+
+
 
       let url = `${CATEGORY_API}/create`;
       let method = "POST";
@@ -217,7 +313,7 @@ export default function AdminMenuCategory() {
 
       setShowModal(false);
       resetForm();
-      fetchCategories();
+      fetchCategories(organizationId);
     } catch (err) {
       console.error(err);
       toast.error("Error saving category");
@@ -231,7 +327,11 @@ export default function AdminMenuCategory() {
 
       <div className="admin-menucategory-header">
         <h1>Menu Categories</h1>
-        <button className="admin-menucategory-addBtn" onClick={handleAddCategory}>
+        <button
+          className="admin-menucategory-addBtn"
+          onClick={handleAddCategory}
+          disabled={!organizationId} // disable until org ID is ready
+        >
           <PlusSquare size={20} /> Add Category
         </button>
       </div>
@@ -258,9 +358,9 @@ export default function AdminMenuCategory() {
                     <button
                       onClick={() => toggleExpand(parent.id)}
                       className="expand-btn"
-                      style={{ marginRight: "8px", cursor: "pointer", background: "none", border: "none" }}
+                      style={{ marginRight: "8px", cursor: "pointer", fontWeight: "bold", background: "none", border: "none" }}
                     >
-                      <span style={{ marginRight: "8px", fontWeight: "bold", color: "#000" }}>
+                      <span style={{ marginRight: "16px", fontWeight: "bold", color: "#000" }}>
                         {expandedParents.includes(parent.id) ? "v" : ">"}
                       </span>
                       {parent.menuCategoryName}
@@ -289,6 +389,7 @@ export default function AdminMenuCategory() {
                       <div className="no-img">No Image</div>
                     )}
                   </td>
+
                   <td>{parent.description || "—"}</td>
                   <td>{parent.displayOrder}</td>
                   <td>
@@ -368,43 +469,80 @@ export default function AdminMenuCategory() {
           Next
         </button>
       </div>
-      {showDeleteModal && categoryToDelete && (
+      {deletePopup.show && (
         <div className="admin-menucategory-modalOverlay">
           <div className="admin-menucategory-modalContent">
+
             <div className="admin-menucategory-modalHeader">
               <h2>Delete Category</h2>
             </div>
+
             <div className="admin-menucategory-modalBody">
-              {deleteStep === 1 && (
-                <p>Are you sure you want to delete "{categoryToDelete.menuCategoryName}"?</p>
-              )}
-              {deleteStep === 2 && (
-                <p>Deleting this category will also delete all associated menu items. Do you want to continue?</p>
-              )}
-              {deleteStep === 3 && (
-                <p>This action is irreversible. Are you absolutely sure?</p>
+              {deletePopup.backendMessage ? (
+                <p style={{ color: "green", fontWeight: "bold" }}>
+                  {deletePopup.backendMessage}
+                </p>
+              ) : (
+                <p>
+                  Are you sure you want to delete <b>{deletePopup.categoryName}</b>?
+                </p>
               )}
             </div>
+
             <div className="admin-menucategory-modalActions">
+
+              {/* CANCEL / OK */}
               <button
                 className="admin-menucategory-cancelBtn"
-                onClick={() => {
-                  setShowDeleteModal(false);
-                  setCategoryToDelete(null);
-                  setDeleteStep(1);
-                }}
+                onClick={() =>
+                  setDeletePopup({
+                    show: false,
+                    categoryId: null,
+                    categoryName: "",
+                    error: false,
+                    backendMessage: "",
+                  })
+                }
               >
-                Cancel
+                {deletePopup.backendMessage ? "OK" : "Cancel"}
               </button>
-              <button className="admin-menucategory-saveBtn" onClick={handleDeleteStep}>
-                {deleteStep < 3 ? "Next" : "Delete"}
-              </button>
+
+              {/* DELETE Button – show only when no backend message */}
+              {!deletePopup.backendMessage && (
+                <button className="admin-menucategory-saveBtn" onClick={handleDelete}>
+                  Delete
+                </button>
+              )}
             </div>
           </div>
         </div>
       )}
+      {stopDeletePopup.show && (
+        <div className="admin-menucategory-modalOverlay">
+          <div className="admin-menucategory-modalContent">
 
+            <div className="admin-menucategory-modalHeader">
+              <h2>Cannot Delete</h2>
+            </div>
 
+            <div className="admin-menucategory-modalBody">
+              <p style={{ color: "red", fontWeight: "bold" }}>
+                {stopDeletePopup.message}
+              </p>
+            </div>
+
+            <div className="admin-menucategory-modalActions">
+              <button
+                className="admin-menucategory-cancelBtn"
+                onClick={() => setStopDeletePopup({ show: false, message: "" })}
+              >
+                OK
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
       {/* MODAL */}
       {showModal && (
         <div className="admin-menucategory-modalOverlay">
@@ -449,6 +587,7 @@ export default function AdminMenuCategory() {
 
               <div className="admin-menucategory-formGroup">
                 <label>Image</label>
+               
                 <input
                   type="file"
                   accept="image/*"

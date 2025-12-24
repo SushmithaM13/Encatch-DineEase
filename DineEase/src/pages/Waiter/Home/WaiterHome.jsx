@@ -1,208 +1,281 @@
 import { useEffect, useState } from "react";
+import {
+  ClipboardList,
+  ChefHat,
+  CheckCircle,
+  Plus,
+  Sofa,
+} from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./WaiterHome.css";
+import { useNavigate } from "react-router-dom";
 
 export default function WaiterHome() {
-  const [assignedTables, setAssignedTables] = useState([]);
-  const [filterStatus, setFilterStatus] = useState("All");
+  const navigate = useNavigate();
 
+  const TOKEN =
+    localStorage.getItem("token") || localStorage.getItem("staffToken");
+  const PROFILE_API = "http://localhost:8082/dine-ease/api/v1/staff/profile";
+  const MENU_API = "http://localhost:8082/dine-ease/api/v1/menu/getAll";
+
+  const [waiterName, setWaiterName] = useState("");
+  const [restaurantName, setRestaurantName] = useState("");
+  // const [profilePic, setProfilePic] = useState(null);
+  const [organizationId, setOrganizationId] = useState(null);
+
+  const [menu, setMenu] = useState([]);
+  const [loadingMenu, setLoadingMenu] = useState(false);
+
+  const [orders, setOrders] = useState([]);
+  const [payments, setPayments] = useState([]);
+
+  // Fetch profile (get organizationId)
   useEffect(() => {
-    let tables = JSON.parse(localStorage.getItem("assignedTables") || "[]");
+    const fetchProfile = async () => {
+      if (!TOKEN) return;
+      try {
+        const res = await fetch(PROFILE_API, {
+          headers: { Authorization: `Bearer ${TOKEN}` },
+        });
+        if (!res.ok) throw new Error("Failed to fetch profile");
+        const data = await res.json();
 
-    if (!tables.length || !tables[0].name) {
-      tables = [
-        {
-          id: 1,
-          name: "Theresa Webb",
-          phone: "(808) 555-0111",
-          email: "theresa@example.com",
-          table: "A-1",
-          persons: 4,
-          time: "18:30",
-          status: "Incoming",
-          shape: "rect",
-        },
-        {
-          id: 2,
-          name: "Eleanor Pena",
-          phone: "(307) 555-0133",
-          email: "eleonor@example.com",
-          table: "A-2",
-          persons: 4,
-          time: "18:00",
-          status: "Incoming",
-          shape: "rect",
-        },
-        {
-          id: 3,
-          name: "Annette Black",
-          phone: "(205) 555-0100",
-          email: "black@example.com",
-          table: "A-3",
-          persons: 4,
-          time: "17:30",
-          status: "Incoming",
-          shape: "round",
-        },
-        {
-          id: 4,
-          name: "Jerome Bell",
-          phone: "(702) 555-0122",
-          email: "jerome@example.com",
-          table: "A-4",
-          persons: 5,
-          time: "17:00",
-          status: "Confirmed",
-          shape: "round",
-        },
-        {
-          id: 5,
-          name: "Brooklyn Simmons",
-          phone: "(684) 555-0102",
-          email: "brooklyn@example.com",
-          table: "A-5",
-          persons: 6,
-          time: "16:30",
-          status: "Completed",
-          shape: "rect",
-        },
-      ];
-      localStorage.setItem("assignedTables", JSON.stringify(tables));
-    }
+        setWaiterName(data.firstName || "Waiter");
+        setRestaurantName(data.organizationName || "Restaurant");
+        // if (data.profileImage) setProfilePic(`data:image/jpeg;base64,${data.profileImage}`);
+        if (data.organizationId) setOrganizationId(data.organizationId);
+      } catch (err) {
+        console.error("Profile fetch error:", err);
+        toast.error("Failed to load profile");
+      }
+    };
 
-    setAssignedTables(tables);
-  }, []);
+    fetchProfile();
 
-  const filteredTables =
-    filterStatus === "All"
-      ? assignedTables
-      : assignedTables.filter((t) => t.status === filterStatus);
+    // Demo orders & payments for UI while backend pages are building
+    setOrders([
+      { orderId: 101, tableNumber: 3, orderStatus: "NEW" },
+      { orderId: 102, tableNumber: 1, orderStatus: "IN_PROGRESS" },
+      { orderId: 103, tableNumber: 5, orderStatus: "SERVING" },
+      { orderId: 104, tableNumber: 2, orderStatus: "COMPLETED" },
+    ]);
 
-  const getStatusClass = (status) => {
-    switch (status) {
-      case "Incoming":
-        return "status incoming";
-      case "Confirmed":
-        return "status confirmed";
-      case "Completed":
-        return "status completed";
-      default:
-        return "status";
-    }
+    setPayments([
+      { id: 1, tableNumber: 2, customerId: "C-9821", amount: 450, status: "PENDING" },
+      { id: 2, tableNumber: 5, customerId: "C-7724", amount: 920, status: "PENDING" },
+      { id: 3, tableNumber: 1, customerId: "C-6611", amount: 180, status: "PENDING" },
+    ]);
+  }, [TOKEN]);
+
+  // Fetch menu once we have organizationId
+  useEffect(() => {
+    if (!organizationId) return;
+
+    const fetchMenu = async () => {
+      setLoadingMenu(true);
+      try {
+        const res = await fetch(`${MENU_API}?organizationId=${organizationId}`, {
+          headers: { Authorization: `Bearer ${TOKEN}` },
+        });
+
+        if (!res.ok) {
+          console.error("Menu fetch failed:", res.status);
+          toast.error("Failed to fetch menu");
+          setMenu([]);
+          setLoadingMenu(false);
+          return;
+        }
+
+        const data = await res.json();
+        const list = Array.isArray(data.content) ? data.content : Array.isArray(data) ? data : [];
+        setMenu(list);
+      } catch (err) {
+        console.error("Menu fetch error:", err);
+        toast.error("Failed to fetch menu");
+        setMenu([]);
+      } finally {
+        setLoadingMenu(false);
+      }
+    };
+
+    fetchMenu();
+  }, [organizationId, TOKEN]);
+
+  // Navigation helpers — cart lives in WaiterDashboard
+  // const goToCart = () => {
+  //   // Open dashboard's cart view / menu page — adjust route to your routing
+  //   navigate("/WaiterDashboard");
+  //   // if you have a dedicated cart route, use that instead:
+  //   // navigate("/WaiterDashboard/cart");
+  // };
+
+  const openMenuItem = (item) => {
+    // navigate to menu item details page in Dashboard (change route if needed)
+    navigate("/WaiterDashboard/menu/item", { state: { item } });
   };
 
-  const renderTableShape = (shape) => {
-    if (shape === "round") {
-      return (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="table-shape"
-          viewBox="0 0 100 100"
-        >
-          <circle cx="50" cy="50" r="20" stroke="#2c7a7b" strokeWidth="3" fill="none" />
-          <circle cx="50" cy="10" r="5" fill="#2c7a7b" />
-          <circle cx="90" cy="50" r="5" fill="#2c7a7b" />
-          <circle cx="50" cy="90" r="5" fill="#2c7a7b" />
-          <circle cx="10" cy="50" r="5" fill="#2c7a7b" />
-        </svg>
-      );
-    }
-    return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="table-shape"
-        viewBox="0 0 100 100"
-      >
-        <rect
-          x="25"
-          y="30"
-          width="50"
-          height="40"
-          rx="5"
-          ry="5"
-          stroke="#2c7a7b"
-          strokeWidth="3"
-          fill="none"
-        />
-        <circle cx="50" cy="15" r="5" fill="#2c7a7b" />
-        <circle cx="50" cy="85" r="5" fill="#2c7a7b" />
-        <circle cx="25" cy="50" r="5" fill="#2c7a7b" />
-        <circle cx="75" cy="50" r="5" fill="#2c7a7b" />
-      </svg>
-    );
+  const handleAddFromHome = (item) => {
+    // since cart is in dashboard, redirect user where they can add
+    navigate("/WaiterDashboard/menu", { state: { highlightItem: item } });
   };
 
   return (
-    <div className="reservation-container">
-      <div className="header">
-        <h2>Reservation</h2>
-        <div className="sort-dropdown">
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
-            <option value="All">Sort by</option>
-            <option value="Incoming">New</option>
-            <option value="Confirmed">In progress</option>
-            <option value="Completed">Completed</option>
-          </select>
+    <div className="waiter-home-dashboard-page">
+      <ToastContainer position="top-right" autoClose={1600} />
+
+      <header className="waiter-home-top">
+        <div>
+          <h2 className="waiter-home-welcome">Welcome, {waiterName}</h2>
+          <h4 className="waiter-home-restaurant">{restaurantName}</h4>
+        </div>
+
+        
+      </header>
+
+      {/* Stats */}
+      <div className="waiter-home-stats-cards">
+        <div className="waiter-home-card">
+          <ClipboardList size={28} className="waiter-home-card-icon" />
+          <h4>{orders.filter((o) => o.orderStatus === "NEW").length}</h4>
+          <p>New Orders</p>
+        </div>
+
+        <div className="waiter-home-card">
+          <ChefHat size={28} className="waiter-home-card-icon" />
+          <h4>{orders.filter((o) => ["IN_PROGRESS", "SERVING"].includes(o.orderStatus)).length}</h4>
+          <p>Ongoing</p>
+        </div>
+
+        <div className="waiter-home-card">
+          <CheckCircle size={28} className="waiter-home-card-icon" />
+          <h4>{orders.filter((o) => o.orderStatus === "COMPLETED").length}</h4>
+          <p>Completed</p>
+        </div>
+
+        <div className="waiter-home-card">
+          <Sofa size={28} className="waiter-home-card-icon" />
+          <h4>{orders.filter((o) => o.orderStatus === "COMPLETED").length}</h4>
+          <p>Tables</p>
         </div>
       </div>
 
-      <div className="create-card">
-        <button className="create-btn">Create reservation +</button>
+      {/* Side-by-side Orders + Payments */}
+      <div className="waiter-home-row">
+        <div className="waiter-home-box">
+          <div className="waiter-home-section-header">
+            <span>Recent Orders</span>
+            <button className="small-link" onClick={() => navigate("/WaiterDashboard/orders")}>View all</button>
+          </div>
+
+          <div className="waiter-home-preview-list">
+            {orders.slice(0, 6).map((o) => (
+              <div key={o.orderId} className="waiter-home-preview-card order-card">
+                <ClipboardList size={20} color="#0056d2" />
+                <div className="order-meta">
+                  <strong>Order #{o.orderId}</strong>
+                  <p>Table {o.tableNumber}</p>
+                </div>
+                <span className={`status-tag ${o.orderStatus.toLowerCase()}`}>{o.orderStatus}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="waiter-home-box">
+          <div className="waiter-home-section-header">
+            <span>Payments</span>
+            <button className="small-link" onClick={() => navigate("/WaiterDashboard/payments")}>View all</button>
+          </div>
+
+          <div className="payment-table">
+            {payments.map((p) => (
+              <div key={p.id} className="payment-row">
+                <div className="payment-left">
+                  <div><strong>Table:</strong> {p.tableNumber}</div>
+                  <div className="muted"><strong>Customer:</strong> {p.customerId}</div>
+                </div>
+
+                <div className="payment-right">
+                  <div className="amount">₹{p.amount}</div>
+                  <button
+                    className="pay-btn"
+                    onClick={() => {
+                      toast.success(`Payment processed ₹${p.amount}`);
+                      setPayments((prev) => prev.map((x) => (x.id === p.id ? { ...x, status: "PAID" } : x)));
+                    }}
+                  >
+                    Pay Now
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      <div className="reservation-grid">
-        {filteredTables.map((table) => (
-          <div key={table.id} className="reservation-card">
-            <div className="top-row">
-              <span className={getStatusClass(table.status)}>
-                {table.status}
-              </span>
-              <select className="table-select" defaultValue={table.table}>
-                <option>{table.table}</option>
-              </select>
-            </div>
+      {/* Menu Grid */}
+      <div className="waiter-menu-section">
+        <div className="waiter-home-section-header">
+          <span>Menu</span>
+          <button className="small-link" onClick={() => navigate("/WaiterDashboard/menu")}>View all</button>
+        </div>
 
-            <div className="guest-info">
-              <div className="avatar">
-                {table.name ? table.name.charAt(0) : "?"}
+        {loadingMenu ? (
+          <p>Loading menu...</p>
+        ) : menu.length === 0 ? (
+          <div className="waiter-menu-grid">
+            {/* fallback demo items */}
+            {[
+              { itemName: "Paneer Butter Masala", itemType: "VEG", basePrice: 240, imageData: "" },
+              { itemName: "Chicken Biryani", itemType: "NON-VEG", basePrice: 320, imageData: "" },
+              { itemName: "Spring Roll", itemType: "VEG", basePrice: 120, imageData: "" },
+            ].map((it, idx) => (
+              <div key={idx} className="menu-card">
+                <img src="/placeholder-food.jpg" alt={it.itemName} className="menu-img" />
+                <h4>{it.itemName}</h4>
+                <p className="menu-category">{it.itemType}</p>
+                <div className="menu-bottom">
+                  <span className="price">₹{it.basePrice}</span>
+                  <button className="add-btn" onClick={() => handleAddFromHome(it)}>
+                    <Plus size={14} />
+                    <span className="btn-label">Add</span>
+                  </button>
+                </div>
               </div>
-              <div>
-                <h4>{table.name}</h4>
-                <p className="contact">
-                  <span>📞 {table.phone}</span>
-                  <br />
-                  <span>✉️ {table.email}</span>
-                </p>
-              </div>
-            </div>
-
-            <div className="table-grid">
-              {renderTableShape(table.shape)}
-            </div>
-
-            <div className="details">
-              <p>👥 {table.persons} persons</p>
-              <p>🕒 {table.time}</p>
-            </div>
-
-            <div className="actions">
-              {table.status === "Incoming" && (
-                <>
-                  <button className="confirm-btn">Confirm</button>
-                  <button className="cancel-btn">Cancel</button>
-                </>
-              )}
-              {table.status === "Confirmed" && (
-                <button className="create-order-btn">Create Order</button>
-              )}
-              {table.status === "Completed" && (
-                <button className="paid-btn">Paid</button>
-              )}
-            </div>
+            ))}
           </div>
-        ))}
+        ) : (
+          <div className="waiter-menu-grid">
+            {menu.map((item) => (
+              <div key={item.id ?? item.itemName} className="menu-card">
+                <img
+                  src={item.imageData ? `data:image/jpeg;base64,${item.imageData}` : "/placeholder-food.jpg"}
+                  alt={item.itemName}
+                  className="menu-img"
+                  onClick={() => openMenuItem(item)}
+                />
+                <h4>{item.itemName}</h4>
+                <p className="menu-category">{item.categoryName || "Uncategorized"}</p>
+
+                <div className={`tag ${item.itemType === "VEG" ? "veg" : "nonveg"}`}>{item.itemType}</div>
+
+                <div className="menu-bottom">
+                  <span className="price">₹{item.basePrice ?? item.price ?? 0}</span>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button className="add-btn" onClick={() => handleAddFromHome(item)}>
+                      <Plus size={14} />
+                      <span className="btn-label">Add</span>
+                    </button>
+                    <button className="details-btn" onClick={() => openMenuItem(item)}>
+                      Details
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

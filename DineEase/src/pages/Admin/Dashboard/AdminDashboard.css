@@ -1,16 +1,26 @@
 /* ---------------- Root Variables ---------------- */
 :root {
-  --primary: #4f46e5;
-  --primary-light: #eef2ff;
-  --primary-dark: #3730a3;
+  /* Primary Purple Shades */
+  --primary: #6d28d9!important;        /* deep purple */
+  --primary-light: #f3e8ff;  /* very light lavender */
+  --primary-dark: #4c1d95!important;   /* dark purple */
+
+  /* Backgrounds */
   --bg-white: #ffffff;
-  --bg-light: #f9fafb;
-  --text-dark: #111827;
-  --text-light: #6b7280;
-  --border: #e5e7eb;
+  --bg-light: #faf5ff;       /* soft purple-tinted white */
+
+  /* Text Colors */
+  --text-dark: #1f1b2e;      /* dark plum (better contrast than pure black) */
+  --text-light: #7c6f92;     /* soft lavender-gray */
+
+  /* Border & Radius */
+  --border: #e9d5ff;         /* subtle lavender border */
   --radius: 10px;
-  --shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+  /* Soft Shadow */
+  --shadow: 0 4px 10px rgba(109, 40, 217, 0.1);
 }
+
 
 /* ---------------- Layout ---------------- */
 .admin-layout-container {

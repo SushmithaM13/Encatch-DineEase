@@ -1,8 +1,29 @@
+:root {
+  /* Primary Purple Shades */
+  --primary: #6d28d9;        /* deep purple */
+  --primary-light: #f3e8ff;  /* very light lavender */
+  --primary-dark: #4c1d95;   /* dark purple */
+
+  /* Backgrounds */
+  --bg-white: #ffffff;
+  --bg-light: #faf5ff;       /* soft purple white */
+
+  /* Text Colors */
+  --text-dark: #1f1b2e;      /* dark plum */
+  --text-light: #7c6f92;     /* lavender gray */
+
+  /* Border & Radius */
+  --border: #e9d5ff;         /* lavender border */
+  --radius: 10px;
+
+  /* Soft Shadow */
+  --shadow: 0 4px 10px rgba(109, 40, 217, 0.1);
+}
 /* ====== MAIN DASHBOARD PAGE ====== */
 .admin-home-dashboard-page {
   padding: 30px;
-  background: #f8fafc;
-  color: #1e293b;
+  background: var(--bg-light);
+  color: var(--text-dark);
   font-family: "Inter", sans-serif;
   min-height: 100vh;
 }
@@ -11,13 +32,13 @@
   font-size: 26px;
   font-weight: 700;
   margin-bottom: 6px;
-  color: #0f172a;
+  color: var(--text-dark);
 }
 
 .admin-home-restaurant {
   font-size: 18px;
   font-weight: 500;
-  color: #475569;
+  color: var(--text-light);
   margin-bottom: 28px;
 }
 
@@ -30,10 +51,10 @@
 }
 
 .admin-home-card {
-  background: #ffffff;
+  background: var(--bg-white);
   border-radius: 16px;
   padding: 24px 18px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -44,11 +65,11 @@
 
 .admin-home-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 16px rgba(109, 40, 217, 0.18);
 }
 
 .admin-home-card-icon {
-  color: #2563eb;
+  color: var(--primary);
   margin-bottom: 8px;
 }
 
@@ -56,21 +77,21 @@
   font-size: 22px;
   font-weight: 700;
   margin: 4px 0;
-  color: #0f172a;
+  color: var(--text-dark);
 }
 
 .admin-home-card p {
   font-size: 15px;
-  color: #475569;
+  color: var(--text-light);
 }
 
 /* ====== PREVIEW SECTION ====== */
 .admin-home-preview-section {
   margin-bottom: 40px;
-  background: #fff;
+  background: var(--bg-white);
   padding: 22px 26px;
   border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow);
 }
 
 .admin-home-section-header {
@@ -83,13 +104,13 @@
 .admin-home-section-header span {
   font-size: 18px;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--text-dark);
 }
 
 .admin-home-section-header button {
   background: none;
   border: none;
-  color: #2563eb;
+  color: var(--primary);
   font-weight: 600;
   cursor: pointer;
   font-size: 15px;
@@ -97,7 +118,7 @@
 }
 
 .admin-home-section-header button:hover {
-  color: #1e40af;
+  color: var(--primary-dark);
 }
 
 /* ====== PREVIEW LISTS ====== */
@@ -113,25 +134,25 @@
   align-items: center;
   gap: 12px;
   padding: 14px 18px;
-  background: #f9fafb;
+  background: var(--bg-light);
   border-radius: 12px;
   transition: all 0.3s ease;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
 }
 
 .admin-home-preview-card:hover {
-  background: #f1f5f9;
+  background: var(--primary-light);
   transform: translateY(-3px);
 }
 
 .admin-home-preview-card strong {
   font-size: 16px;
-  color: #0f172a;
+  color: var(--text-dark);
 }
 
 .admin-home-preview-card .role {
   font-size: 14px;
-  color: #475569;
+  color: var(--text-light);
 }
 
 /* ====== MENU CARDS ====== */
@@ -142,16 +163,16 @@
 }
 
 .admin-home-menu-card {
-  background: #ffffff;
+  background: var(--bg-white);
   border-radius: 16px;
   overflow: hidden;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   transition: all 0.3s ease;
 }
 
 .admin-home-menu-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow);
 }
 
 /* ====== MENU IMAGE CONTAINER ====== */
@@ -197,19 +218,19 @@
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 6px;
-  color: #0f172a;
+  color: var(--text-dark);
 }
 
 .admin-home-desc {
   font-size: 14px;
-  color: #475569;
+  color: var(--text-light);
   line-height: 1.4;
   margin-bottom: 8px;
 }
 
 .admin-home-category {
   font-size: 13px;
-  color: #2563eb;
+  color: var(--primary);
   font-weight: 500;
 }
 
@@ -241,7 +262,7 @@
 
 .bounce-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 14px rgba(109, 40, 217, 0.15);
 }
 
 /* ====== RESPONSIVE ====== */
@@ -263,88 +284,3 @@
     padding: 14px 18px;
   }
 }
-
-@media (max-width: 480px) {
-  .admin-dashboard-page {
-    padding: 12px;
-  }
-
-  .admin-welcome {
-    font-size: 22px;
-  }
-
-  .admin-restaurant {
-    font-size: 14px;
-  }
-
-  .admin-card {
-    padding: 20px;
-  }
-
-  .admin-table-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .admin-analytics-controls {
-    width: 100%;
-  }
-
-  .admin-analytics-select {
-    width: 100%;
-  }
-}
-
-/* ---------------- Custom Scrollbar ---------------- */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #764ba2, #667eea);
-}
-
-/* ---------------- Loading Animation ---------------- */
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-/* ---------------- Print Styles ---------------- */
-@media print {
-  .admin-dashboard-page {
-    background: white;
-    padding: 20px;
-  }
-
-  .admin-welcome,
-  .admin-restaurant {
-    color: #1e293b;
-  }
-
-  .admin-card,
-  .admin-analytics-section,
-  .admin-revenue-card,
-  .admin-menu-card,
-  .admin-table-box {
-    box-shadow: none;
-    border: 1px solid #e2e8f0;
-  }
-  .admin-section-header {
-    background: #1e293b;
-    color: white;
-  }}

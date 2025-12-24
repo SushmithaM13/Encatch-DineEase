@@ -17,8 +17,9 @@ export default function AdminRevenueManagement() {
   const [revenueFilter, setRevenueFilter] = useState("Weekly");
   const [customStart, setCustomStart] = useState(null);
   const [customEnd, setCustomEnd] = useState(null);
+  const [expandedTable, setExpandedTable] = useState(null);
 
-  // ===== Dummy Revenue Data =====
+  // ================= GRAPH DATA =================
   const revenueDataWeekly = [
     { day: "Mon", revenue: 2000 },
     { day: "Tue", revenue: 3000 },
@@ -59,7 +60,7 @@ export default function AdminRevenueManagement() {
       case "Yearly":
         return revenueDataYearly;
       case "Custom":
-        return revenueDataWeekly.filter((_, i) => i % 2 === 0); // dummy
+        return revenueDataWeekly.filter((_, i) => i % 2 === 0);
       default:
         return revenueDataWeekly;
     }
@@ -67,111 +68,115 @@ export default function AdminRevenueManagement() {
 
   const revenueData = getRevenueData();
 
-  // Totals (dummy values)
+  // ================= SUMMARY TOTALS =================
   const todayRevenue = 0;
   const weekRevenue = 24500;
   const monthRevenue = 185000;
   const yearRevenue = 530000;
 
-  // Dynamic minWidth for scroll
+  // ================= TABLE DATA =================
+  const tableRevenueData = [
+    {
+      tableNumber: "T-1",
+      totalOrders: 5,
+      totalRevenue: 3200,
+      paymentStatus: "Paid",
+      paymentMode: "UPI",
+      orders: [
+        { source: "Waiter", amount: 1200, status: "Completed" },
+        { source: "Customer", amount: 800, status: "Completed" },
+        { source: "Guest", amount: 1200, status: "Completed" },
+      ],
+    },
+    {
+      tableNumber: "T-2",
+      totalOrders: 3,
+      totalRevenue: 2100,
+      paymentStatus: "Pending",
+      paymentMode: "Cash",
+      orders: [
+        { source: "Waiter", amount: 700, status: "Preparing" },
+        { source: "Customer", amount: 1400, status: "Served" },
+      ],
+    },
+    {
+      tableNumber: "T-3",
+      totalOrders: 6,
+      totalRevenue: 4800,
+      paymentStatus: "Paid",
+      paymentMode: "Card",
+      orders: [
+        { source: "Guest", amount: 1800, status: "Completed" },
+        { source: "Waiter", amount: 3000, status: "Completed" },
+      ],
+    },
+  ];
+
+
+  const toggleTable = (tableNo) => {
+    setExpandedTable(expandedTable === tableNo ? null : tableNo);
+  };
+
   const minChartWidth =
     revenueFilter === "Weekly" ? 700 : revenueFilter === "Monthly" ? 1200 : 900;
 
   return (
     <div className="admin-revenue-page">
       <h2 className="admin-page-title">
-        <IndianRupee size={25} /> Revenue Management
+        <IndianRupee size={24} /> Revenue Management
       </h2>
 
-      {/* Revenue Summary Cards */}
+      {/* ================= SUMMARY CARDS ================= */}
       <div className="admin-revenue-cards">
         <div className="admin-card">
-          <h4>₹{todayRevenue.toLocaleString()}</h4>
+          <h4>₹{todayRevenue}</h4>
           <p>Daily Revenue</p>
         </div>
         <div className="admin-card">
-          <h4>₹{weekRevenue.toLocaleString()}</h4>
+          <h4>₹{weekRevenue}</h4>
           <p>Weekly Revenue</p>
         </div>
         <div className="admin-card">
-          <h4>₹{monthRevenue.toLocaleString()}</h4>
+          <h4>₹{monthRevenue}</h4>
           <p>Monthly Revenue</p>
         </div>
         <div className="admin-card">
-          <h4>₹{yearRevenue.toLocaleString()}</h4>
+          <h4>₹{yearRevenue}</h4>
           <p>Yearly Revenue</p>
         </div>
       </div>
 
-      {/* Graph Box */}
-      <div
-        className="admin-revenue-graph-box"
-        style={{
-          width: "100%",
-          overflowX: "auto",
-          marginTop: 20,
-          border: "1px solid #ddd",
-          borderRadius: 8,
-          padding: 10,
-          background: "#fff",
-        }}
-      >
-        <div
-          className="admin-revenue-graph-header"
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 10,
-          }}
-        >
-          <h3 style={{ margin: 0 }}>Revenue Chart</h3>
+      {/* ================= GRAPH ================= */}
+      <div className="admin-revenue-graph-box">
+        <div className="admin-revenue-graph-header">
+          <h3>Revenue Chart</h3>
           <select
             value={revenueFilter}
             onChange={(e) => setRevenueFilter(e.target.value)}
-            className="admin-revenue-filter"
-            style={{
-              padding: "6px 12px",
-              borderRadius: 6,
-              border: "1px solid #ccc",
-            }}
           >
-            <option value="Weekly">Weekly</option>
-            <option value="Monthly">Monthly</option>
-            <option value="Yearly">Yearly</option>
-            <option value="Custom">Custom</option>
+            <option>Weekly</option>
+            <option>Monthly</option>
+            <option>Yearly</option>
+            <option>Custom</option>
           </select>
         </div>
 
         {revenueFilter === "Custom" && (
-          <div
-            className="admin-revenue-custom-dates"
-            style={{ display: "flex", gap: 10, marginBottom: 10 }}
-          >
+          <div className="admin-revenue-custom-dates">
             <DatePicker
               selected={customStart}
               onChange={(date) => setCustomStart(date)}
-              selectsStart
-              startDate={customStart}
-              endDate={customEnd}
               placeholderText="Start Date"
-              dateFormat="dd/MM/yyyy"
             />
             <DatePicker
               selected={customEnd}
               onChange={(date) => setCustomEnd(date)}
-              selectsEnd
-              startDate={customStart}
-              endDate={customEnd}
               placeholderText="End Date"
-              dateFormat="dd/MM/yyyy"
-              minDate={customStart || undefined}
             />
           </div>
         )}
 
-        {/* Scrollable Chart */}
-        <div className="admin-revenue-chart-container" style={{ minWidth: minChartWidth, height: 300 }}>
+        <div style={{ minWidth: minChartWidth }}>
           <LineChart width={minChartWidth} height={300} data={revenueData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
@@ -179,16 +184,80 @@ export default function AdminRevenueManagement() {
                 revenueFilter === "Weekly"
                   ? "day"
                   : revenueFilter === "Monthly"
-                  ? "month"
-                  : "year"
+                    ? "month"
+                    : "year"
               }
             />
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="revenue" stroke="#4caf50" strokeWidth={2} />
+            <Line dataKey="revenue" stroke="#4caf50" strokeWidth={2} />
           </LineChart>
         </div>
+      </div>
+
+      {/* ================= TABLE ANALYTICS ================= */}
+      <div className="admin-revenue-table-section">
+        <h3>Table-wise Revenue & Orders</h3>
+
+        <table className="admin-revenue-table">
+          <thead>
+            <tr>
+              <th>Table</th>
+              <th>Orders</th>
+              <th>Revenue (₹)</th>
+              <th>Payment</th>
+              <th>Mode</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tableRevenueData.map((table) => (
+              <>
+                <tr key={table.tableNumber}>
+                  <td>{table.tableNumber}</td>
+                  <td>{table.totalOrders}</td>
+                  <td>₹{table.totalRevenue}</td>
+                  <td>{table.paymentStatus}</td>
+                  <td>{table.paymentMode}</td>
+                  <td>
+                    <button onClick={() => toggleTable(table.tableNumber)}>
+                      {expandedTable === table.tableNumber
+                        ? "Hide"
+                        : "View"}
+                    </button>
+                  </td>
+                </tr>
+
+                {expandedTable === table.tableNumber && (
+                  <tr>
+                    <td colSpan="6">
+                      <table className="nested-orders-table">
+                        <thead>
+                          <tr>
+                            <th>Order Source</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {table.orders.map((order) => (
+                            <tr key={`${order.source}-${order.amount}`}>
+                              <td>{order.source}</td>
+                              <td>₹{order.amount}</td>
+                              <td>{order.status}</td>
+                            </tr>
+
+                          ))}
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                )}
+              </>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

@@ -63,7 +63,7 @@ export default function AdminCustomizationGroups() {
         setOrganizationId(data.organizationId);
 
         fetchGroups(data.organizationId);
-      } catch  {
+      } catch {
         toast.error("Error loading profile");
       }
     };
@@ -86,11 +86,11 @@ export default function AdminCustomizationGroups() {
       const groupsData = Array.isArray(data) ? data : data.content || [];
 
       setGroups(groupsData);
-    } catch  {
+    } catch {
       toast.error("Error fetching groups");
     }
   };
-   const toggleGroupOptions = (groupId) => {
+  const toggleGroupOptions = (groupId) => {
     setExpandedGroupIds((prev) =>
       prev.includes(groupId)
         ? prev.filter((id) => id !== groupId)
@@ -190,35 +190,35 @@ export default function AdminCustomizationGroups() {
       setEditingGroupId(null);
 
       fetchGroups(organizationId);
-    } catch  {
+    } catch {
       toast.error("Error saving group");
     }
   };
 
   // Edit
- const openEditPopup = (group) => {
-  setIsEditing(true);
-  setEditingGroupId(group.id);
+  const openEditPopup = (group) => {
+    setIsEditing(true);
+    setEditingGroupId(group.id);
 
-  setFormData({
-    name: group.name || "",
-    description: group.description || "",
-    isRequired: group.isRequired,
-    selectionType: group.selectionType,
-    maxSelections: group.maxSelections,
-    isActive: group.isActive,
-    displayOrder: group.displayOrder || 0,
-    options: group.options.map((opt) => ({
-      optionName: opt.optionName || "",
-      additionalPrice: opt.additionalPrice ,
-      isDefault: opt.isDefault,
-      isActive: opt.isActive,
-      displayOrder: opt.displayOrder || 0,
-    })),
-  });
+    setFormData({
+      name: group.name || "",
+      description: group.description || "",
+      isRequired: group.isRequired,
+      selectionType: group.selectionType,
+      maxSelections: group.maxSelections,
+      isActive: group.isActive,
+      displayOrder: group.displayOrder || 0,
+      options: group.options.map((opt) => ({
+        optionName: opt.optionName || "",
+        additionalPrice: opt.additionalPrice,
+        isDefault: opt.isDefault,
+        isActive: opt.isActive,
+        displayOrder: opt.displayOrder || 0,
+      })),
+    });
 
-  setShowFormPopup(true);
-};
+    setShowFormPopup(true);
+  };
 
 
   // Delete
@@ -258,7 +258,7 @@ export default function AdminCustomizationGroups() {
       }
 
       throw new Error("Delete failed");
-    } catch  {
+    } catch {
       setDeletePopup({
         ...deletePopup,
         error: true,
@@ -266,8 +266,8 @@ export default function AdminCustomizationGroups() {
       });
     }
   };
-return (
-  <div className="admin-customization-page">
+  return (
+    <div className="admin-customization-page">
       <div className="admin-customization-header-row">
         <h2>Customization Groups</h2>
         <button
@@ -282,358 +282,365 @@ return (
         </button>
       </div>
 
-     <table className="admin-customization-table">
-  <thead>
-    <tr>
-      <th>Group Name</th>
-      <th>Type</th>
-      <th>Required</th>
-      <th>Status</th>
-      <th>Options Count</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {groups.length === 0 ? (
-      <tr>
-        <td colSpan="6" style={{ textAlign: "center" }}>
-          No groups found
-        </td>
-      </tr>
-    ) : (
-      groups.map((g) => (
-        <React.Fragment key={g.id}>
+      <table className="admin-customization-table">
+        <thead>
           <tr>
-            <td
-              style={{ cursor: "pointer", color: "blue" }}
-              onClick={() => toggleGroupOptions(g.id)}
-            >
-              {g.name} {expandedGroupIds.includes(g.id) ? "▲" : "▼"}
-            </td>
-            <td>{g.selectionType}</td>
-            <td>{g.isRequired ? "Yes" : "No"}</td>
-            <td>{g.isActive ? "Active" : "Inactive"}</td>
-            <td>{g.options?.length || 0}</td>
-            <td className="admin-customization-action-col">
-              <button
-                className="admin-customization-edit-btn"
-                onClick={() => openEditPopup(g)}
+            
+            <th>Group Name</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Status</th>
+            <th>Options Count</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {groups.length === 0 ? (
+            <tr>
+              <td colSpan="6" style={{ textAlign: "center" }}>
+                No groups found
+              </td>
+            </tr>
+          ) : (
+            groups.map((g) => (
+              <React.Fragment key={g.id}>
+                <tr>
+                  <td
+                    style={{
+                      cursor: "pointer",
+                      color: "black",
+                      fontWeight: "bold",
+                      fontSize: "16px"
+                    }}
+                    onClick={() => toggleGroupOptions(g.id)}
+                  >
+
+                    {expandedGroupIds.includes(g.id) ? "v" : ">"} {g.name}
+                  </td>
+                  <td>{g.selectionType}</td>
+                  <td>{g.isRequired ? "Yes" : "No"}</td>
+                  <td>{g.isActive ? "Active" : "Inactive"}</td>
+                  <td>{g.options?.length || 0}</td>
+                  <td className="admin-customization-action-col">
+                    <button
+                      className="admin-customization-edit-btn"
+                      onClick={() => openEditPopup(g)}
+                    >
+                      <Edit3 size={16} />
+                    </button>
+                    <button
+                      className="admin-customization-delete-btn"
+                      onClick={() =>
+                        setDeletePopup({
+                          show: true,
+                          groupId: g.id,
+                          groupName: g.name,
+                          error: false,
+                          backendMessage: "",
+                        })
+                      }
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+
+                {/* Expanded Options Table */}
+                {expandedGroupIds.includes(g.id) && (
+                  <tr>
+                    <td colSpan="6" className="admin-customization-options-dropdown">
+                      <table className="admin-customization-option-table">
+                        <thead>
+                          <tr>
+                            <th>Option Name</th>
+                            <th>Price</th>
+                            <th>Default</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {g.options.map((opt) => (
+                            <tr key={opt.id}>
+                              <td>{opt.optionName}</td>
+                              <td>{opt.priceDisplay || "Free"}</td>
+                              <td>{opt.isDefault ? "Yes" : "No"}</td>
+                              <td className="admin-customization-action-col">
+                                {/* Edit Option */}
+                                <button
+                                  className="admin-customization-edit-btn"
+                                  onClick={() => {
+                                    setIsEditing(true);
+                                    setEditingGroupId(g.id);
+                                    setFormData({
+                                      name: g.name,
+                                      description: g.description,
+                                      isRequired: g.isRequired,
+                                      selectionType: g.selectionType,
+                                      maxSelections: g.maxSelections,
+                                      isActive: g.isActive,
+                                      displayOrder: g.displayOrder || 0,
+                                      options: g.options.map((o) => ({ ...o })),
+                                    });
+                                    setShowFormPopup(true);
+                                  }}
+                                >
+                                  <Edit3 size={16} />
+                                </button>
+
+                                {/* Delete Option */}
+                                <button
+                                  className="admin-customization-delete-btn"
+                                  onClick={async () => {
+                                    try {
+                                      const token = localStorage.getItem("token");
+                                      const res = await fetch(
+                                        `${BASE_URL}/${g.id}/options/${opt.id}`,
+                                        {
+                                          method: "DELETE",
+                                          headers: { Authorization: `Bearer ${token}` },
+                                        }
+                                      );
+                                      if (!res.ok) throw new Error("Delete failed");
+                                      toast.success(
+                                        `Deleted option: ${opt.optionName}`
+                                      );
+                                      fetchGroups(organizationId);
+                                    } catch {
+                                      toast.error("Error deleting option");
+                                    }
+                                  }}
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))
+          )}
+        </tbody>
+      </table>
+
+
+
+      {/* FORM POPUP */}
+      {showFormPopup && (
+        <div className="admin-customization-popup-overlay">
+          <div className="admin-customization-popup-box admin-customization-large">
+            <h3>{isEditing ? "Edit Group" : "Create Group"}</h3>
+
+            <form onSubmit={handleSubmit}>
+              <input
+                type="text"
+                placeholder="Group Name"
+                className="admin-customization-input"
+                value={formData.name}
+                required
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+              />
+
+              <textarea
+                placeholder="Description"
+                className="admin-customization-textarea"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+              ></textarea>
+
+              <div className="admin-customization-row">
+                <label>
+                  Required{" "}
+                  <input
+                    type="checkbox"
+                    checked={formData.isRequired}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        isRequired: e.target.checked,
+                      })
+                    }
+                  />
+                </label>
+
+                <label>
+                  Active{" "}
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        isActive: e.target.checked,
+                      })
+                    }
+                  />
+                </label>
+              </div>
+
+              <select
+                className="admin-customization-select"
+                value={formData.selectionType}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    selectionType: e.target.value,
+                  })
+                }
               >
-                <Edit3 size={16} />
-              </button>
+                <option value="SINGLE">Single Selection</option>
+                <option value="MULTIPLE">Multiple Selection</option>
+              </select>
+
+              {formData.selectionType === "MULTIPLE" && (
+                <input
+                  type="number"
+                  className="admin-customization-input-number"
+                  placeholder="Max Selections"
+                  value={formData.maxSelections}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      maxSelections: e.target.value,
+                    })
+                  }
+                />
+              )}
+
+              {/* OPTIONS */}
+              <h4 className="admin-customization-options-title">Options</h4>
+
+              {formData.options.map((opt, index) => (
+                <div key={index} className="admin-customization-option-row">
+                  <input
+                    type="text"
+                    className="admin-customization-option-input"
+                    placeholder="Option Name"
+                    value={opt.optionName}
+                    onChange={(e) =>
+                      handleOptionChange(index, "optionName", e.target.value)
+                    }
+                  />
+
+                  <input
+                    type="number"
+                    placeholder="Price"
+                    className="admin-customization-option-input"
+                    value={opt.additionalPrice}
+                    onChange={(e) =>
+                      handleOptionChange(index, "additionalPrice", e.target.value)
+                    }
+                  />
+
+                  <label className="admin-customization-option-label">
+                    Default{" "}
+                    <input
+                      type="checkbox"
+                      checked={opt.isDefault}
+                      onChange={(e) =>
+                        handleOptionChange(index, "isDefault", e.target.checked)
+                      }
+                    />
+                  </label>
+
+                  <button
+                    type="button"
+                    className="admin-customization-option-remove-btn"
+                    onClick={() => removeOption(index)}
+                  >
+                    ❌
+                  </button>
+                </div>
+              ))}
+
               <button
-                className="admin-customization-delete-btn"
+                type="button"
+                className="admin-customization-add-option-btn"
+                onClick={addOption}
+              >
+                + Add Option
+              </button>
+
+              <div className="admin-customization-btn-row">
+                <button type="submit" className="admin-customization-save-btn">
+                  {isEditing ? "Update" : "Save"}
+                </button>
+
+                <button
+                  type="button"
+                  className="admin-customization-cancel-btn"
+                  onClick={() => {
+                    setShowFormPopup(false);
+                    setIsEditing(false);
+                    setFormData(defaultForm);
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE POPUP */}
+      {deletePopup.show && (
+        <div className="admin-customization-popup-overlay">
+          <div className="admin-customization-popup-box">
+            <h3>
+              {deletePopup.error
+                ? "Cannot Delete Group"
+                : "Delete Group"}
+            </h3>
+
+            {deletePopup.error ? (
+              <p className="admin-customization-error-text">
+                {deletePopup.backendMessage}
+              </p>
+            ) : (
+              <p>
+                Are you sure you want to delete{" "}
+                <b>{deletePopup.groupName}</b>?
+              </p>
+            )}
+
+            <div className="admin-customization-btn-row">
+              {!deletePopup.error && (
+                <button
+                  className="admin-customization-delete-confirm-btn"
+                  onClick={handleDelete}
+                >
+                  Delete
+                </button>
+              )}
+
+              <button
+                className="admin-customization-cancel-btn"
                 onClick={() =>
                   setDeletePopup({
-                    show: true,
-                    groupId: g.id,
-                    groupName: g.name,
+                    show: false,
+                    groupId: null,
+                    groupName: "",
                     error: false,
                     backendMessage: "",
                   })
                 }
               >
-                <Trash2 size={16} />
-              </button>
-            </td>
-          </tr>
-
-          {/* Expanded Options Table */}
-          {expandedGroupIds.includes(g.id) && (
-            <tr>
-              <td colSpan="6" className="admin-customization-options-dropdown">
-                <table className="admin-customization-option-table">
-                  <thead>
-                    <tr>
-                      <th>Option Name</th>
-                      <th>Price</th>
-                      <th>Default</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {g.options.map((opt) => (
-                      <tr key={opt.id}>
-                        <td>{opt.optionName}</td>
-                        <td>{opt.priceDisplay || "Free"}</td>
-                        <td>{opt.isDefault ? "Yes" : "No"}</td>
-                        <td className="admin-customization-action-col">
-                          {/* Edit Option */}
-                          <button
-                            className="admin-customization-edit-btn"
-                            onClick={() => {
-                              setIsEditing(true);
-                              setEditingGroupId(g.id);
-                              setFormData({
-                                name: g.name,
-                                description: g.description,
-                                isRequired: g.isRequired,
-                                selectionType: g.selectionType,
-                                maxSelections: g.maxSelections,
-                                isActive: g.isActive,
-                                displayOrder: g.displayOrder || 0,
-                                options: g.options.map((o) => ({ ...o })),
-                              });
-                              setShowFormPopup(true);
-                            }}
-                          >
-                            <Edit3 size={16} />
-                          </button>
-
-                          {/* Delete Option */}
-                          <button
-                            className="admin-customization-delete-btn"
-                            onClick={async () => {
-                              try {
-                                const token = localStorage.getItem("token");
-                                const res = await fetch(
-                                  `${BASE_URL}/${g.id}/options/${opt.id}`,
-                                  {
-                                    method: "DELETE",
-                                    headers: { Authorization: `Bearer ${token}` },
-                                  }
-                                );
-                                if (!res.ok) throw new Error("Delete failed");
-                                toast.success(
-                                  `Deleted option: ${opt.optionName}`
-                                );
-                                fetchGroups(organizationId);
-                              } catch {
-                                toast.error("Error deleting option");
-                              }
-                            }}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </td>
-            </tr>
-          )}
-        </React.Fragment>
-      ))
-    )}
-  </tbody>
-</table>
-
-      
-
-    {/* FORM POPUP */}
-    {showFormPopup && (
-      <div className="admin-customization-popup-overlay">
-        <div className="admin-customization-popup-box admin-customization-large">
-          <h3>{isEditing ? "Edit Group" : "Create Group"}</h3>
-
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              placeholder="Group Name"
-              className="admin-customization-input"
-              value={formData.name}
-              required
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-            />
-
-            <textarea
-              placeholder="Description"
-              className="admin-customization-textarea"
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-            ></textarea>
-
-            <div className="admin-customization-row">
-              <label>
-                Required{" "}
-                <input
-                  type="checkbox"
-                  checked={formData.isRequired}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      isRequired: e.target.checked,
-                    })
-                  }
-                />
-              </label>
-
-              <label>
-                Active{" "}
-                <input
-                  type="checkbox"
-                  checked={formData.isActive}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      isActive: e.target.checked,
-                    })
-                  }
-                />
-              </label>
-            </div>
-
-            <select
-              className="admin-customization-select"
-              value={formData.selectionType}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  selectionType: e.target.value,
-                })
-              }
-            >
-              <option value="SINGLE">Single Selection</option>
-              <option value="MULTIPLE">Multiple Selection</option>
-            </select>
-
-            {formData.selectionType === "MULTIPLE" && (
-              <input
-                type="number"
-                className="admin-customization-input-number"
-                placeholder="Max Selections"
-                value={formData.maxSelections}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    maxSelections: e.target.value,
-                  })
-                }
-              />
-            )}
-
-            {/* OPTIONS */}
-            <h4 className="admin-customization-options-title">Options</h4>
-
-            {formData.options.map((opt, index) => (
-              <div key={index} className="admin-customization-option-row">
-                <input
-                  type="text"
-                  className="admin-customization-option-input"
-                  placeholder="Option Name"
-                  value={opt.optionName}
-                  onChange={(e) =>
-                    handleOptionChange(index, "optionName", e.target.value)
-                  }
-                />
-
-                <input
-                  type="number"
-                  placeholder="Price"
-                  className="admin-customization-option-input"
-                  value={opt.additionalPrice}
-                  onChange={(e) =>
-                    handleOptionChange(index, "additionalPrice", e.target.value)
-                  }
-                />
-
-                <label className="admin-customization-option-label">
-                  Default{" "}
-                  <input
-                    type="checkbox"
-                    checked={opt.isDefault}
-                    onChange={(e) =>
-                      handleOptionChange(index, "isDefault", e.target.checked)
-                    }
-                  />
-                </label>
-
-                <button
-                  type="button"
-                  className="admin-customization-option-remove-btn"
-                  onClick={() => removeOption(index)}
-                >
-                  ❌
-                </button>
-              </div>
-            ))}
-
-            <button
-              type="button"
-              className="admin-customization-add-option-btn"
-              onClick={addOption}
-            >
-              + Add Option
-            </button>
-
-            <div className="admin-customization-btn-row">
-              <button type="submit" className="admin-customization-save-btn">
-                {isEditing ? "Update" : "Save"}
-              </button>
-
-              <button
-                type="button"
-                className="admin-customization-cancel-btn"
-                onClick={() => {
-                  setShowFormPopup(false);
-                  setIsEditing(false);
-                  setFormData(defaultForm);
-                }}
-              >
-                Cancel
+                {deletePopup.error ? "Close" : "Cancel"}
               </button>
             </div>
-          </form>
-        </div>
-      </div>
-    )}
-
-    {/* DELETE POPUP */}
-    {deletePopup.show && (
-      <div className="admin-customization-popup-overlay">
-        <div className="admin-customization-popup-box">
-          <h3>
-            {deletePopup.error
-              ? "Cannot Delete Group"
-              : "Delete Group"}
-          </h3>
-
-          {deletePopup.error ? (
-            <p className="admin-customization-error-text">
-              {deletePopup.backendMessage}
-            </p>
-          ) : (
-            <p>
-              Are you sure you want to delete{" "}
-              <b>{deletePopup.groupName}</b>?
-            </p>
-          )}
-
-          <div className="admin-customization-btn-row">
-            {!deletePopup.error && (
-              <button
-                className="admin-customization-delete-confirm-btn"
-                onClick={handleDelete}
-              >
-                Delete
-              </button>
-            )}
-
-            <button
-              className="admin-customization-cancel-btn"
-              onClick={() =>
-                setDeletePopup({
-                  show: false,
-                  groupId: null,
-                  groupName: "",
-                  error: false,
-                  backendMessage: "",
-                })
-              }
-            >
-              {deletePopup.error ? "Close" : "Cancel"}
-            </button>
           </div>
         </div>
-      </div>
-    )}
+      )}
 
-    <ToastContainer position="top-center" />
-  </div>
-);
+      <ToastContainer position="top-center" />
+    </div>
+  );
 }
