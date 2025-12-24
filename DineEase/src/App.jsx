@@ -27,7 +27,9 @@ import MenuDashboard from "./pages/superadmin/menu/MenuDashboard/MenuDashboard";
 
 //ADD menu Iteams 
 import AddMenuForm from "./pages/superadmin/menu/AddMenuForm/SuperAdminMenu";
-import SuperAdminMenuDetail from "./pages/superadmin/menu/AddMenuForm/SuperAdminMenuDetail";
+import SuperAdminMenu from "./pages/superadmin/menu/AddMenuForm/SuperAdminMenu";
+import SuperAdminMenuDetails from './pages/superadmin/menu/AddMenuForm/SuperAdminMenuDetails';
+import SuperAdminAddEditMenu from './pages/superadmin/menu/AddMenuForm/SuperAdminAddEditMenu';
 
 //Menu Categoryes
 import CategoryForm from "./pages/superadmin/menu/CategoryForm/CategoryForm";
@@ -65,7 +67,7 @@ import WaiterSettings from "./pages/Admin/Settings/AdminSettings";
 import WaiterProfile from "./pages/Waiter/Profile/WaiterProfile";
 
 // ===== Chef Pages =====
-import ChefHome from "./pages/Chef/ChefHome/ChefHome";
+//import ChefHome from "./pages/Chef/ChefHome/ChefHome";
 import ChefHomePage from "./pages/Chef/ChefHomepage/ChefHomepage";
 import ChefDashboard from "./pages/Chef/ChefDashboard/ChefDashboard";
 import ChefMenuCatalog from './pages/Chef/ChefMenuCatalog/ChefMenuCatalog';
@@ -78,8 +80,12 @@ import Footer from './components/footer/Footer';
 // ===== Customer pages =====
 import CustomerLogin from './customer/customerLogin/customerLogin';
 import OTPVerification from './customer/customerLogin/otpVerification';
-import CustomerDashboard from './customer/customerDashboard/CustomerDashboard';
+import CustomerDashboard from './customer/customerDashboard/customerDashboard';
+
 import EnterSessionId from './customer/customerLogin/EnterSessionId';
+import CustomerCart from "./customer/customercart/CustomerCart";
+import CustomerOrders from './customer/order/CustomerOrder';
+
 
 function App() {
 
@@ -116,7 +122,7 @@ function App() {
         <Route path="/SuperAdminRegistration" element={<SuperAdminRegistration />} />
 
         {/* SUPER ADMIN */}
-        <Route path="/superAdminDashboard/*"
+        <Route path="/SuperAdminDashboard/*"
           element={
             <ProtectedRoute allowedRoles={["SUPER_ADMIN"]}>
               <SuperAdminDashboard />
@@ -132,8 +138,15 @@ function App() {
 
 
           <Route path="menu-dashboard" element={<MenuDashboard />} />
+
+
           <Route path="AddMenu-form" element={<AddMenuForm />} />
-          <Route path="menu/:id" element={<SuperAdminMenuDetail />} />
+          <Route path="menu/details/:menuId" element={<SuperAdminMenuDetails />} /> 
+          <Route path="menu/list" element={<SuperAdminMenu />} />
+          <Route path="menu/add" element={<SuperAdminAddEditMenu />}/>
+          <Route path="menu/edit/:menuId" element={<SuperAdminAddEditMenu />} />
+
+
           <Route path="category-form" element={<CategoryForm />} />
           <Route path="add-item-type" element={<AddItemtype />} />
           <Route path="food-type" element={<Foodtype />} />
@@ -193,12 +206,12 @@ function App() {
         <Route path="/chefDashboard"
           element={
             <ProtectedRoute allowedRoles={["CHEF"]}>
-              <ChefHome />
+              <ChefDashboard />
             </ProtectedRoute>
           }
         >
           <Route index element={<ChefHomePage />} />
-          <Route path="home" element={<ChefHomePage />} />
+          <Route path="homepage" element={<ChefHomePage />} />
           <Route path="chefDashboard" element={<ChefDashboard />} />
           <Route path="menu" element={<ChefMenuCatalog />} />
           <Route path="OrdersQueue" element={<OrderQueue />} />
@@ -212,6 +225,8 @@ function App() {
         <Route path='/enterSessionId' element={<EnterSessionId/>}/>
         <Route path='/otpVerification' element={<OTPVerification />} />
         <Route path='/customerDashboard' element={<CustomerDashboard />} />
+        <Route path="/cart" element={<CustomerCart />} />
+        <Route path="/orders" element={<CustomerOrders />} />
 
 
         {/* ===== Catch-all 404 ===== */}
