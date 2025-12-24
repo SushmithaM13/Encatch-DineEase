@@ -84,6 +84,7 @@ import CustomerDashboard from './customer/customerDashboard/customerDashboard';
 
 import EnterSessionId from './customer/customerLogin/EnterSessionId';
 import CustomerCart from "./customer/customercart/CustomerCart";
+import CustomerOrders from './customer/order/CustomerOrder';
 
 
 function App() {
@@ -225,6 +226,8 @@ function App() {
         <Route path='/otpVerification' element={<OTPVerification />} />
         <Route path='/customerDashboard' element={<CustomerDashboard />} />
         <Route path="/cart" element={<CustomerCart />} />
+        <Route path="/orders" element={<CustomerOrders />} />
+
 
         {/* ===== Catch-all 404 ===== */}
         <Route path="*" element={<h2 className="text-center mt-10">404 - Page Not Found</h2>} />

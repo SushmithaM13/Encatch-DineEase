@@ -23,7 +23,7 @@ const CustomerNavbar = ({ onSearch, allMenuItems = null }) => {
   const profileName = isGuest ? "Guest User" : customer?.name || "User";
   const profileEmail = isGuest ? "—" : customer?.email || "";
 
-  /* ✅ SAFE FILTER EFFECT (NO RE-RENDER LOOP) */
+  /* ===== SEARCH FILTER ===== */
   useEffect(() => {
     if (!query.trim() || !Array.isArray(allMenuItems)) {
       setSuggestions([]);
@@ -39,7 +39,7 @@ const CustomerNavbar = ({ onSearch, allMenuItems = null }) => {
     setSuggestions(filtered);
   }, [query, allMenuItems]);
 
-  /* Outside click */
+  /* ===== OUTSIDE CLICK ===== */
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (
@@ -105,11 +105,17 @@ const CustomerNavbar = ({ onSearch, allMenuItems = null }) => {
 
   return (
     <nav className="customer-navbar-container">
+      {/* BRAND */}
       <div className="customer-navbar-brand">
-        <span className="customer-navbar-title">DineEase</span>
+        <span
+          className="customer-navbar-title"
+          onClick={() => navigate("/menu")}
+        >
+          DineEase
+        </span>
       </div>
 
-      {/* Search */}
+      {/* SEARCH */}
       <div className="customer-navbar-search" ref={suggestionBoxRef}>
         <input
           type="text"
@@ -176,15 +182,36 @@ const CustomerNavbar = ({ onSearch, allMenuItems = null }) => {
         )}
       </div>
 
-      {/* Cart + Profile */}
+      {/* ACTION ICONS */}
       <div className="customer-navbar-actions">
+        {/* ALL ITEMS */}
         <button
           className="customer-navbar-icon"
+          title="All Items"
+          onClick={() => navigate("/menu")}
+        >
+          🍽️
+        </button>
+
+        {/* ORDERS */}
+        <button
+          className="customer-navbar-icon"
+          title="My Orders"
+          onClick={() => navigate("/orders")}
+        >
+          📦
+        </button>
+
+        {/* CART */}
+        <button
+          className="customer-navbar-icon"
+          title="Cart"
           onClick={() => navigate("/cart")}
         >
           🛒
         </button>
 
+        {/* PROFILE */}
         <button
           className="customer-navbar-icon"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -201,8 +228,8 @@ const CustomerNavbar = ({ onSearch, allMenuItems = null }) => {
               <div>{profileEmail}</div>
             </div>
             <ul>
-              <li>👤 Profile</li>
-              <li>📄 Order History</li>
+              <li onClick={() => navigate("/profile")}>👤 Profile</li>
+              <li onClick={() => navigate("/orders")}>📄 Order History</li>
               <li>🔔 Notifications</li>
               <li>💬 Help & Support</li>
               <li onClick={logout}>🔓 Logout</li>

@@ -5,15 +5,17 @@ const API_BASE_URL = "http://localhost:8082/dine-ease/api/v1";
 
 /* ===================== ADD ITEM TO CART ===================== */
 export const addItemToCart = async ({
-  orgId, // still validated if backend uses it internally
+  orgId,                 // ✅ MUST be UUID
   menuItemVariantId,
   quantity,
   addons = [],
   customizations = [],
-  sessionId,
+  sessionId,             // ✅ REQUIRED in body
   tableNumber,
   specialInstructions = "",
 }) => {
+
+  // 🔒 Basic validation
   if (!orgId || !menuItemVariantId || !quantity || !sessionId || !tableNumber) {
     throw new Error("Missing required parameters for addItemToCart");
   }
@@ -21,25 +23,34 @@ export const addItemToCart = async ({
   const payload = {
     menuItemVariantId: Number(menuItemVariantId),
     quantity: Number(quantity),
+
     addons: addons.map(a => ({
       addonId: Number(a.addonId),
       additionalCharge: Number(a.additionalCharge || 0),
     })),
+
     customizations: customizations.map(c => ({
       customizationOptionId: Number(c.customizationOptionId),
       customizationOptionName: c.customizationOptionName || "",
       additionalCharge: Number(c.additionalCharge || 0),
     })),
+
     specialInstructions,
-    tableNumber, // ✅ keep
+    sessionId,           // ✅ FIXED (was missing)
+    tableNumber,         // ✅ "T-3"
   };
 
-  console.log("🟢 Add to Cart Payload:", payload);
+  console.log("🟢 FINAL ADD TO CART PAYLOAD:", payload);
+  console.log("🟢 ORG ID (UUID):", orgId);
 
   const response = await axios.post(
-    `${API_BASE_URL}/cart/add-items/${sessionId}`, // ✅ FIXED
+    `${API_BASE_URL}/cart/add-items/${orgId}`, // ✅ FIXED
     payload,
-    { headers: { "Content-Type": "application/json" } }
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
   );
 
   return response.data;
@@ -54,12 +65,6 @@ export const getCart = async ({
   if (!organizationId || !sessionId) {
     throw new Error("Missing organizationId or sessionId for getCart");
   }
-
-  console.log("🟢 Fetching cart:", {
-    organizationId,
-    sessionId,
-    tableNumber,
-  });
 
   const response = await axios.get(
     `${API_BASE_URL}/cart/get`,
