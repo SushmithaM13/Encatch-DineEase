@@ -1,0 +1,129 @@
+/* BACKDROP */
+.waiter-drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  z-index: 998;
+}
+
+/* RIGHT SLIDING DRAWER */
+.waiter-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 380px;
+  height: 100vh;
+  background: #fff;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -3px 0 12px rgba(0,0,0,0.25);
+  animation: drawerSlideIn 0.3s ease forwards;
+}
+
+@keyframes drawerSlideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* HEADER */
+.waiter-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px;
+  border-bottom: 1px solid #ededed;
+}
+
+.waiter-drawer-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.waiter-drawer-header button {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* CONTENT AREA */
+.waiter-drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.drawer-section {
+  margin-bottom: 16px;
+}
+
+.drawer-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.drawer-option {
+  display: flex;
+  gap: 10px;
+  padding: 8px 4px;
+  border-radius: 6px;
+}
+
+.drawer-option:hover {
+  background: #f4f4f4;
+}
+
+.drawer-custom-group {
+  margin-bottom: 12px;
+  border-left: 4px solid #ececec;
+  padding-left: 10px;
+}
+
+.drawer-custom-group h5 {
+  font-size: 14px;
+  margin: 6px 0;
+}
+
+/* ACTION BUTTONS */
+.drawer-actions {
+  padding: 14px;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  gap: 10px;
+}
+
+.cancel-btn,
+.add-btn {
+  flex: 1;
+  padding: 12px 0;
+  font-size: 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cancel-btn {
+  background: #e7e7e7;
+}
+
+.add-btn {
+  background: #1e88e5;
+  color: white;
+}
+.waiter-drawer-backdrop {
+  z-index: 3000;
+}
+
+.waiter-drawer {
+  z-index: 3001;
+}

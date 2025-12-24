@@ -142,7 +142,7 @@ export default function AdminDashboard() {
       >
         <div className="admin-sidebar-header">
           <div className="admin-sidebar-title">
-            <Utensils size={22} />
+            <Utensils size={28} />
             {sidebarOpen && <span style={{ marginLeft: 8 }}>Dineease</span>}
           </div>
         </div>
@@ -155,7 +155,7 @@ export default function AdminDashboard() {
             }`}
             onClick={() => isMobile && setSidebarOpen(false)}
           >
-            <LayoutDashboard size={20} />
+            <LayoutDashboard size={28} />
             {sidebarOpen && <span>Dashboard</span>}
           </Link>
 
@@ -166,7 +166,7 @@ export default function AdminDashboard() {
             }`}
             onClick={() => setShowStaffDropdown((prev) => !prev)}
           >
-            <Users size={18} />
+            <Users size={28} />
             {sidebarOpen && (
               <>
                 <span>Staff</span>
@@ -195,7 +195,7 @@ export default function AdminDashboard() {
             className={`admin-sidebar-link ${menuExpanded ? "active" : ""}`}
             onClick={() => setMenuExpanded((prev) => !prev)}
           >
-            <Newspaper size={18} />
+            <Newspaper size={28} />
             {sidebarOpen && (
               <>
                 <span>Menu</span>
@@ -210,6 +210,9 @@ export default function AdminDashboard() {
 
           {menuExpanded && (
             <div className="admin-submenu">
+              <Link to="/AdminDashboard/menu/add" className="admin-submenu-link">
+                Add Menus
+              </Link>
               <Link to="/AdminDashboard/menu" className="admin-submenu-link">
                 Manage Menus
               </Link>
@@ -257,7 +260,7 @@ export default function AdminDashboard() {
             }`}
             onClick={() => isMobile && setSidebarOpen(false)}
           >
-            <Sofa size={20} />
+            <Sofa size={28} />
             {sidebarOpen && <span>Table</span>}
           </Link>
 
@@ -268,7 +271,7 @@ export default function AdminDashboard() {
             }`}
             onClick={() => isMobile && setSidebarOpen(false)}
           >
-            <IndianRupee size={20} />
+            <IndianRupee size={28} />
             {sidebarOpen && <span>Revenue</span>}
           </Link>
         </nav>

@@ -180,7 +180,7 @@ export default function WaiterProfile() {
   return (
     <div className="waiter-profile-page">
       <h2 className="waiter-profile-heading">
-        <User size={28} className="waiter-user-icon" /> Waiter Profile
+        <User size={28} className="waiter-profile-user-icon" /> Waiter Profile
       </h2>
 
       <div className="waiter-profile-container">
@@ -273,7 +273,7 @@ export default function WaiterProfile() {
           {/* ===== Password Change ===== */}
           <section>
             <h3>Account Settings</h3>
-            <div className="waiter-password-box">
+            <div className="waiter-profile-password-box">
               <h4>Change Password</h4>
               <input
                 type="password"
@@ -316,7 +316,7 @@ export default function WaiterProfile() {
             </div>
           </section>
 
-          <div className="waiter-action-buttons">
+          <div className="waiter-profile-action-buttons">
             {isEditing ? (
               <>
                 <button onClick={handleSave}>Save Changes</button>
@@ -330,30 +330,30 @@ export default function WaiterProfile() {
 
         {/* ===== Right Side (Profile Image) ===== */}
         <div className="waiter-profile-picture">
-          <div className="waiter-image-wrapper">
+          <div className="waiter-profile-image-wrapper">
             {profile.profileImage ? (
               <img
                 src={profile.profileImage}
                 alt="Profile"
-                className="waiter-circle-img"
+                className="waiter-profile-circle-img"
               />
             ) : (
-              <div className="waiter-circle-img placeholder">
+              <div className="waiter-profile-circle-img placeholder">
                 {profile.fullName ? profile.fullName[0].toUpperCase() : "W"}
               </div>
             )}
 
-            <div className="waiter-menu-container">
+            <div className="waiter-profile-menu-container">
               <button
-                className="waiter-menu-button"
+                className="waiter-profile-menu-button"
                 onClick={() => setShowMenu((prev) => !prev)}
               >
                 <MoreVertical size={20} />
               </button>
 
               {showMenu && (
-                <div className="waiter-dropdown-menu">
-                  <label className="waiter-dropdown-item">
+                <div className="waiter-profile-dropdown-menu">
+                  <label className="waiter-profile-dropdown-item">
                     <Pencil size={16} /> Edit Photo
                     <input
                       type="file"
@@ -364,7 +364,7 @@ export default function WaiterProfile() {
                   </label>
                   {profile.profileImage && (
                     <button
-                      className="waiter-dropdown-item"
+                      className="waiter-profile-dropdown-item"
                       onClick={handleRemoveImage}
                     >
                       <Trash2 size={16} /> Remove Photo

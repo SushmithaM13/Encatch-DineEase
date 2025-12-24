@@ -20,7 +20,7 @@ export default function AdminFoodType() {
     error: false,
   });
 
-  // ✅ Fetch organizationId
+  //  Fetch organizationId
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -43,7 +43,7 @@ export default function AdminFoodType() {
     fetchProfile();
   }, []);
 
-  // ✅ Fetch Food Types
+  //  Fetch Food Types
   const fetchFoodTypes = async (orgId) => {
     try {
       const token = localStorage.getItem("token");
@@ -63,7 +63,7 @@ export default function AdminFoodType() {
     if (organizationId) fetchFoodTypes(organizationId);
   }, [organizationId]);
 
-  // ✅ Add / Update Food Type
+  //  Add / Update Food Type
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return toast.warning("Name is required");
@@ -100,7 +100,7 @@ export default function AdminFoodType() {
     }
   };
 
-  // ✅ Delete Food Type
+  //  Delete Food Type
   const handleDeleteFood = async (id) => {
     try {
       const token = localStorage.getItem("token");

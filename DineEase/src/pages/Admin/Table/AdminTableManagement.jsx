@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, } from "react";
 import {
   Sofa,
   Plus,
+  Check,
   X,
   User,
   QrCode,
@@ -39,7 +40,7 @@ export default function AdminTableManagement() {
   const [assignments, setAssignments] = useState([]);
   const [staffMap, setStaffMap] = useState({});
 
-const [_assignedWaiters, setAssignedWaiters] = useState([]);
+  const [_assignedWaiters, setAssignedWaiters] = useState([]);
 
 
   const [showAddPopup, setShowAddPopup] = useState(false);
@@ -68,6 +69,12 @@ const [_assignedWaiters, setAssignedWaiters] = useState([]);
     waiterEmail: "",
     tableNumber: "",
   });
+  const [successPopup, setSuccessPopup] = useState({ visible: false, message: "" });
+
+  const showSuccess = (message) => {
+    setSuccessPopup({ visible: true, message, messageType: "success" });
+    setTimeout(() => setSuccessPopup({ visible: false, message: "", messageType: "" }), 2000);
+  };
   // ---------------- FETCH ORGANIZATION ----------------
   useEffect(() => {
     const fetchProfile = async () => {
@@ -89,29 +96,29 @@ const [_assignedWaiters, setAssignedWaiters] = useState([]);
   }, [TOKEN, PROFILE_API]);
 
   // ---------------- FETCH TABLES ----------------
- const fetchTables = useCallback(async () => {
-  if (!organizationId || !TOKEN) return;
-  setLoading(true);
-  try {
-    const res = await fetch(
-      `${TABLE_GET_ALL_API}/${organizationId}?page=0&size=50&sortBy=id&sortDir=desc`,
-      { headers: { Authorization: `Bearer ${TOKEN}` } }
-    );
-    if (!res.ok) throw new Error("Failed to fetch tables");
-    const data = await res.json();
-    const tablesList = data.content || data || [];
-    setTables(tablesList);
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to fetch tables", { position: "top-center" });
-  } finally {
-    setLoading(false);
-  }
-}, [organizationId, TOKEN, TABLE_GET_ALL_API]); // ✅ Added dependency array
+  const fetchTables = useCallback(async () => {
+    if (!organizationId || !TOKEN) return;
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `${TABLE_GET_ALL_API}/${organizationId}?page=0&size=50&sortBy=id&sortDir=desc`,
+        { headers: { Authorization: `Bearer ${TOKEN}` } }
+      );
+      if (!res.ok) throw new Error("Failed to fetch tables");
+      const data = await res.json();
+      const tablesList = data.content || data || [];
+      setTables(tablesList);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch tables", { position: "top-center" });
+    } finally {
+      setLoading(false);
+    }
+  }, [organizationId, TOKEN, TABLE_GET_ALL_API]); 
 
-useEffect(() => {
-  fetchTables();
-}, [fetchTables]); // ✅ clean, no need to repeat dependencies here
+  useEffect(() => {
+    fetchTables();
+  }, [fetchTables]); 
 
 
   // ---------------- FETCH WAITERS ----------------
@@ -174,44 +181,44 @@ useEffect(() => {
 
 
   // ---------------- FETCH STAFF MAP ----------------
- const fetchStaff = useCallback(async () => {
-  if (!organizationId || !TOKEN) return;
-  try {
-    const res = await fetch(`${API_BASE}/staff/all?organizationId=${organizationId}`, {
-      headers: { Authorization: `Bearer ${TOKEN}` },
-    });
-    const data = await res.json();
-    const map = {};
-    (data.content || []).forEach((s) => {
-      map[s.email] = s.firstName + " " + s.lastName;
-    });
-    setStaffMap(map);
-  } catch (err) {
-    console.error(err);
-  }
-}, [organizationId, TOKEN, API_BASE]); // ✅ dependencies
+  const fetchStaff = useCallback(async () => {
+    if (!organizationId || !TOKEN) return;
+    try {
+      const res = await fetch(`${API_BASE}/staff/all?organizationId=${organizationId}`, {
+        headers: { Authorization: `Bearer ${TOKEN}` },
+      });
+      const data = await res.json();
+      const map = {};
+      (data.content || []).forEach((s) => {
+        map[s.email] = s.firstName + " " + s.lastName;
+      });
+      setStaffMap(map);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [organizationId, TOKEN, API_BASE]); 
 
-useEffect(() => {
-  fetchStaff();
-}, [fetchStaff]); // ✅ warning gone
+  useEffect(() => {
+    fetchStaff();
+  }, [fetchStaff]); 
 
 
   // ---------------- FETCH WAITER ASSIGNMENTS ----------------
- const fetchWaiterAssignments = useCallback(async () => {
-  if (!organizationId || !TOKEN) return;
-  try {
-    const res = await fetch(
-      `${API_BASE}/waiter-table-assignments/all?organizationId=${organizationId}&page=0&size=50&sortBy=id&sortDir=desc`,
-      { headers: { Authorization: `Bearer ${TOKEN}` } }
-    );
+  const fetchWaiterAssignments = useCallback(async () => {
+    if (!organizationId || !TOKEN) return;
+    try {
+      const res = await fetch(
+        `${API_BASE}/waiter-table-assignments/all?organizationId=${organizationId}&page=0&size=50&sortBy=id&sortDir=desc`,
+        { headers: { Authorization: `Bearer ${TOKEN}` } }
+      );
 
-    if (!res.ok) throw new Error("Failed to fetch waiter assignments");
-    const data = await res.json();
-    setAssignments(data.content || data || []);
-  } catch (err) {
-    console.error(err);
-  }
-}, [organizationId, TOKEN, API_BASE]); // ✅ THIS LINE IS REQUIRED
+      if (!res.ok) throw new Error("Failed to fetch waiter assignments");
+      const data = await res.json();
+      setAssignments(data.content || data || []);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [organizationId, TOKEN, API_BASE]);
 
   useEffect(() => {
     fetchTables();
@@ -240,6 +247,7 @@ useEffect(() => {
       setShowAddPopup(false);
       setNewTable({ tableNumber: "", tableStatus: "AVAILABLE", capacity: 1, section: "", locationDescription: "" });
       fetchTables();
+      showSuccess("Table added successfully!");
     } catch (err) {
       console.error(err);
       toast.error("Failed to add table: " + err.message, { position: "top-center" });
@@ -275,44 +283,51 @@ useEffect(() => {
         throw new Error(errorData.message || `Failed to update table ${editTable.tableNumber}`);
       }
 
-      toast.success(`✅ Table ${editTable.tableNumber} updated successfully!`, {
+      toast.success(` Table ${editTable.tableNumber} updated successfully!`, {
         position: "top-center",
       });
 
       setShowEditPopup(false);
       fetchTables();
+      showSuccess(` Table ${editTable.tableNumber} updated successfully!`);
     } catch (err) {
       console.error("Table update failed:", err);
       toast.error("Failed to update table: " + err.message, { position: "top-center" });
     }
   };
- const handleDeleteTable = async () => {
-  if (!selectedTable?.id || !organizationId) {
-    toast.error("Missing table or organization info");
-    return;
-  }
 
-  try {
-    const url = `${TABLE_DELETE_API}/${selectedTable.id}?organizationId=${organizationId}`;
-    const res = await fetch(url, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${TOKEN}` },
-    });
-
-    if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.message || "Failed to delete table");
+  const handleDeleteTable = async () => {
+    if (!selectedTable?.id || !organizationId) {
+      // Optionally show a popup for missing info
+      console.error("Missing table or organization info");
+      return;
     }
 
-    setTables((prev) => prev.filter((t) => t.id !== selectedTable.id));
-    toast.success(`✅ Table ${selectedTable.tablenumber} deleted successfully!`);
-  } catch (err) {
-    console.error("Error deleting table:", err);
-    toast.error(err.message);
-  }
-};
+    try {
+      const url = `${TABLE_DELETE_API}/delete/${selectedTable.id}/${organizationId}`;
 
+      const res = await fetch(url, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${TOKEN}` },
+      });
 
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Failed to delete table");
+      }
+
+      // Remove deleted table from state
+      setTables((prev) => prev.filter((t) => t.id !== selectedTable.id));
+
+      // Show custom success popup
+      setSuccessPopup({ visible: true, message: `Table ${selectedTable.tablenumber} deleted successfully!` });
+
+    } catch (err) {
+      console.error("Error deleting table:", err);
+      // Optionally, show an error popup instead of toast
+      setSuccessPopup({ visible: true, message: ` Failed to delete table: ${err.message}` });
+    }
+  };
 
 
   // ---------------- QR ACTIONS ----------------
@@ -326,8 +341,9 @@ useEffect(() => {
         body: JSON.stringify({ tableNumber, organizationId }),
       });
       if (!res.ok) throw new Error("QR generation failed");
-      toast.success("QR code generated successfully!", { position: "top-center" });
+      showSuccess(`QR for Table ${tableNumber} generated successfully!`);
       setQrStatus(prev => ({ ...prev, [tableNumber]: true }));
+
 
     } catch (err) {
       console.error(err);
@@ -370,7 +386,7 @@ useEffect(() => {
       return;
 
     try {
-      // ✅ Corrected endpoint — removed extra "delete-qr-code"
+      //  Corrected endpoint — removed extra "delete-qr-code"
       const res = await fetch(
         `${QR_DELETE_API}/${organizationId}/${tableNumber}`,
         {
@@ -388,13 +404,12 @@ useEffect(() => {
         const data = await res.json().catch(() => ({}));
         throw new Error(data.message || "Failed to delete QR");
       }
-
-      toast.success(`✅ QR for Table ${tableNumber} deleted successfully!`, {
-        position: "top-center",
+      toast.success(`QR for Table ${tableNumber} deleted successfully!`, {
       });
 
       setShowQrPopup(false);
       setQrStatus((prev) => ({ ...prev, [tableNumber]: false }));
+      showSuccess(` QR for Table ${tableNumber} deleted successfully!`);
     } catch (err) {
       console.error("QR delete failed:", err);
       toast.error("Failed to delete QR: " + err.message, { position: "top-center" });
@@ -410,7 +425,7 @@ useEffect(() => {
       const payload = {
         waiterEmail,
         tableNumber: tableNumber.toString(),
-        organizationId, // ✅ include this
+        organizationId,
       };
 
       const url = update
@@ -432,7 +447,7 @@ useEffect(() => {
         throw new Error(errData.message || "Failed to assign/update waiter");
       }
 
-      toast.success(update ? "Waiter updated successfully!" : "Waiter assigned successfully!", { position: "top-center" });
+      showSuccess(`Waiter ${update ? "updated " : "assigned"} successfully to Table ${tableNumber}!`);
       await fetchWaiterAssignments();
       setShowWaiterPopup(false);
     } catch (err) {
@@ -471,6 +486,7 @@ useEffect(() => {
       await fetchWaiterAssignments();
       setShowRemoveWaiterPopup({ visible: false, tableNumber: null, waiters: [] });
       setSelectedWaitersToRemove([]);
+      showSuccess("Selected waiter(s) removed successfully!");
     } catch (err) {
       console.error(err);
       toast.error("Failed to remove waiter(s): " + err.message, {
@@ -544,36 +560,24 @@ useEffect(() => {
                 </button>
               )}
             </div>
-            {/* {showTableDeletePopup && (
-              <div className="admin-table-popup-overlay">
-                <div className="admin-table-popup-box">
-                  <h2>Confirm Delete</h2>
-                  <p>Are you sure you want to delete Table {selectedTable.number}?</p>
-                  <div className="admin-table-popup-buttons">
-                    <button onClick={handleDeleteTable} className="admin-table-popup-btn admin-table-delete">Delete</button>
-                    <button onClick={() => setShowTableDeletePopup(false)} className="admin-table-popup-btn admin-table-cancel">Cancel</button>
-                  </div>
-                </div>
-              </div>
-            )} */}
 
             <div className="admin-waiter-section">
               <h4><User size={16} /> Waiter Assignment</h4>
               <p>{assignments.filter(a => a.tableNumber === table.tableNumber).map(a => staffMap[a.waiterEmail] || a.waiterEmail).join(", ") || "—"}</p>
 
               <button
-  onClick={() => {
-    const assigned = Array.isArray(assignments)
-      ? assignments
-          .filter((a) => a.tableNumber === table.tableNumber)
-          .map((a) => a.waiterEmail)
-      : [];
+                onClick={() => {
+                  const assigned = Array.isArray(assignments)
+                    ? assignments
+                      .filter((a) => a.tableNumber === table.tableNumber)
+                      .map((a) => a.waiterEmail)
+                    : [];
 
-    setAssignedWaiters(assigned); // ✅ using it here
-    setWaiterData({ waiterEmail: "", tableNumber: table.tableNumber });
-    setShowWaiterPopup(true);
-  }}
->
+                  setAssignedWaiters(assigned); 
+                  setWaiterData({ waiterEmail: "", tableNumber: table.tableNumber });
+                  setShowWaiterPopup(true);
+                }}
+              >
 
                 {Array.isArray(assignments) &&
                   assignments.filter((a) => a.tableNumber === table.tableNumber).length > 0
@@ -675,65 +679,65 @@ useEffect(() => {
       )}
 
       {showEditPopup && editTable && (
-  <div className="admin-popup-overlay">
-    <div className="admin-popup">
-      <button className="admin-popup-close" onClick={() => setShowEditPopup(false)}>
-        <X size={18} />
-      </button>
-      <h3>Edit Table</h3>
-      
-      {/* Table Number (disabled) */}
-      <label>
-        Table Number: 
-        <input 
-          type="text" 
-          value={editTable.tableNumber} 
-          disabled  // ✅ Disable editing
-        />
-      </label>
+        <div className="admin-popup-overlay">
+          <div className="admin-popup">
+            <button className="admin-popup-close" onClick={() => setShowEditPopup(false)}>
+              <X size={18} />
+            </button>
+            <h3>Edit Table</h3>
 
-      <label>Status:
-        <select value={editTable.tableStatus} onChange={(e) => setEditTable({ ...editTable, tableStatus: e.target.value })}>
-          <option value="AVAILABLE">AVAILABLE</option>
-          <option value="BOOKED">BOOKED</option>
-          <option value="CLEANING">CLEANING</option>
-        </select>
-      </label>
+            {/* Table Number (disabled) */}
+            <label>
+              Table Number:
+              <input
+                type="text"
+                value={editTable.tableNumber}
+                disabled  
+              />
+            </label>
 
-      <label>Capacity: 
-        <input 
-          type="number" 
-          min="1" 
-          value={editTable.capacity} 
-          onChange={(e) => setEditTable({ ...editTable, capacity: Number(e.target.value) })} 
-        />
-      </label>
+            <label>Status:
+              <select value={editTable.tableStatus} onChange={(e) => setEditTable({ ...editTable, tableStatus: e.target.value })}>
+                <option value="AVAILABLE">AVAILABLE</option>
+                <option value="BOOKED">BOOKED</option>
+                <option value="CLEANING">CLEANING</option>
+              </select>
+            </label>
 
-      <label>Section: 
-        <input 
-          type="text" 
-          value={editTable.section} 
-          onChange={(e) => setEditTable({ ...editTable, section: e.target.value })} 
-        />
-      </label>
+            <label>Capacity:
+              <input
+                type="number"
+                min="1"
+                value={editTable.capacity}
+                onChange={(e) => setEditTable({ ...editTable, capacity: Number(e.target.value) })}
+              />
+            </label>
 
-      <label>Location: 
-        <textarea 
-          value={editTable.locationDescription} 
-          onChange={(e) => setEditTable({ ...editTable, locationDescription: e.target.value })} 
-        />
-      </label>
+            <label>Section:
+              <input
+                type="text"
+                value={editTable.section}
+                onChange={(e) => setEditTable({ ...editTable, section: e.target.value })}
+              />
+            </label>
+
+            <label>Location:
+              <textarea
+                value={editTable.locationDescription}
+                onChange={(e) => setEditTable({ ...editTable, locationDescription: e.target.value })}
+              />
+            </label>
 
 
-      <button
-        onClick={() => setShowConfirmPopup(true)}
-        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-      >
-        Save Changes
-      </button>
-    </div>
-  </div>
-)}
+            <button
+              onClick={() => setShowConfirmPopup(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      )}
 
 
       {/* ---------- Edit Confirmation Popup ---------- */}
@@ -769,7 +773,7 @@ useEffect(() => {
       {showSuccessPopup && (
         <div className="admin-success-overlay">
           <div className="admin-success-box">
-            <h2>✅ Table Updated!</h2>
+            <h2> Table Updated!</h2>
             <p>{editTable.tableNumber} updated successfully.</p>
             <button onClick={() => setShowSuccessPopup(false)}>OK</button>
           </div>
@@ -778,35 +782,35 @@ useEffect(() => {
 
       {/* ---------- Delete Table Confirmation Popup ---------- */}
       {showTableDeletePopup && selectedTable && (
-  <div className="delete-popup-overlay">
-    <div className="delete-popup-box">
-      <h2>Delete Table {selectedTable.tablenumber}?</h2>
-      <p>This will also remove its QR and waiter assignments. Are you sure?</p>
+        <div className="delete-popup-overlay">
+          <div className="delete-popup-box">
+            <h2>Delete Table {selectedTable.tablenumber}?</h2>
+            <p>This will also remove its QR and waiter assignments. Are you sure?</p>
 
-      <div className="delete-popup-actions">
-        <button
-          onClick={() => setShowTableDeletePopup(false)}  // ✅ FIXED
-          disabled={isDeleting}
-          className="cancel-btn"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={async () => {
-            setIsDeleting(true);
-            await handleDeleteTable();
-            setIsDeleting(false);
-            setShowTableDeletePopup(false);  // ✅ CLOSE AFTER DELETE
-          }}
-          disabled={isDeleting}
-          className="delete-btn"
-        >
-          {isDeleting ? "Deleting..." : "Confirm Delete"}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+            <div className="delete-popup-actions">
+              <button
+                onClick={() => setShowTableDeletePopup(false)}  
+                disabled={isDeleting}
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  setIsDeleting(true);
+                  await handleDeleteTable();
+                  setIsDeleting(false);
+                  setShowTableDeletePopup(false);  
+                }}
+                disabled={isDeleting}
+                className="delete-btn"
+              >
+                {isDeleting ? "Deleting..." : "Confirm Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ---------- Assign / Remove Waiter Popups ---------- */}
       {showWaiterPopup && (
@@ -917,7 +921,7 @@ useEffect(() => {
         </div>
       )}
 
-      {showQRDeletePopup &&  (
+      {showQRDeletePopup && (
         <div className="admin-qr-delete-overlay">
           <div className="admin-qr-delete-card">
             <h4 className="admin-qr-delete-title">
@@ -947,6 +951,24 @@ useEffect(() => {
           </div>
         </div>
       )}
+      {successPopup.visible && (
+        <div className="admin-success-overlay">
+          <div className="admin-success-box">
+            <h2>
+              {successPopup.messageType === "success" ? (
+                <Check size={20} style={{ marginRight: "8px", color: "green" }} />
+              ) : (
+                <X size={20} style={{ marginRight: "8px", color: "red" }} />
+              )}
+              {successPopup.message}
+            </h2>
+            <button onClick={() => setSuccessPopup({ visible: false, message: "", messageType: "" })}>
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
       <ToastContainer />
     </div>
   );

@@ -1,571 +1,257 @@
-/* ===== Profile Page Layout ===== */
+/* ===========================
+   PAGE WRAPPER
+=========================== */
 .admin-profile-page {
-  padding: 20px;
-  font-family: Arial, sans-serif;
+  padding: 20px 30px;
+  font-family: "Inter", sans-serif;
   color: #333;
 }
 
 .admin-profile-heading {
   display: flex;
   align-items: center;
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 20px;
+  gap: 10px;
+  font-size: 26px;
+  margin-bottom: 25px;
 }
 
-.admin-user-icon {
-  margin-right: 8px;
-  color: black;
+.admin-profile-user-icon {
+  color: #4a90e2;
 }
 
+/* ===========================
+   MAIN CONTAINER
+=========================== */
 .admin-profile-container {
   display: flex;
-  justify-content: space-between;
-  gap: 20px;
+  gap: 30px;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-/* ===== Left Side (Details) ===== */
+/* ===========================
+   LEFT SIDE DETAILS
+=========================== */
 .admin-profile-details {
   flex: 2;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 30px;
 }
 
 .admin-profile-details section {
-  border: 1px solid #ddd;
-  padding: 15px;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  background: #fafafa;
+  padding: 18px 20px;
+  border-radius: 10px;
+  border: 1px solid #eee;
 }
 
-.admin-profile-details h3 {
-  margin-bottom: 10px;
+.admin-profile-details section h3 {
+  margin-bottom: 15px;
   color: #444;
-  font-size: 18px;
 }
 
+/* Labels & Inputs */
 .admin-profile-details label {
-  display: block;
-  margin-bottom: 12px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.admin-profile-details input,
-.admin-profile-details textarea {
-  margin-left: 10px;
-  padding: 6px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  outline: none;
-  font-size: 14px;
-}
-
-.admin-profile-details textarea {
-  width: 100%;
-  resize: vertical;
-  min-height: 60px;
-}
-
-/* ===== Password Section ===== */
-.admin-password-box {
-  margin-top: 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.admin-password-box h4 {
-  margin-bottom: 5px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.admin-password-box input {
-  width: 100%;
-}
-
-/* ===== Buttons ===== */
-.admin-action-buttons {
-  margin-top: 15px;
-}
-
-.admin-action-buttons button {
-  margin-right: 10px;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
-  background: black;
-  color: white;
-  cursor: pointer;
+  margin-bottom: 12px;
   font-size: 14px;
-  font-weight: 500;
-  transition: background 0.2s ease;
+  gap: 4px;
 }
 
-.admin-action-buttons button:hover {
-  background: #454545;
+.admin-profile-details input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: 0.2s;
 }
 
-.admin-action-buttons button:nth-child(2) {
-  background: #9e9e9e;
-}
-
-.admin-action-buttons button:nth-child(2):hover {
-  background: #757575;
-}
-
-/* ===== Right Side (Profile Picture) ===== */
-.admin-profile-picture {
-  flex: 1;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-.admin-image-wrapper {
-  position: relative;
-}
-
-.admin-circle-img {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
+.admin-profile-details input:disabled {
   background: #eee;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-  font-weight: 600;
-  color: #666;
-  border: 2px solid #ddd;
+  cursor: not-allowed;
 }
 
-.admin-circle-img.placeholder {
-  background: #e5e7eb;
-  color: #555;
+.admin-profile-details input:focus {
+  border-color: #4a90e2;
 }
 
-/* ===== Remove Photo Button ===== */
-.admin-remove-photo {
-  margin-top: 10px;
-  padding: 6px 12px;
-  background-color: #ef4444; /* red */
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px; /* space between icon and text */
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.admin-remove-photo:hover {
-  background-color: #dc2626; /* darker red */
-}
-
-.admin-remove-photo svg {
-  flex-shrink: 0;
-}
-
-/* ===== Edit Icon / 3 Dots Menu ===== */
-.admin-menu-container {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  background: rgba(0, 0, 0, 0.5); /* dark circle */
-  border-radius: 50%;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.admin-menu-button {
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.admin-menu-button:hover {
-  color: #ddd;
-}
-
-.admin-dropdown-menu {
-  position: absolute;
-  top: 30px;
-  right: 0;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  min-width: 140px;
-  z-index: 10;
-}
-
-.admin-dropdown-item {
-  width: 100%;
-  padding: 8px 12px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  text-align: left;
-  cursor: pointer;
-}
-
-.admin-dropdown-item:hover {
-  background: #f3f4f6;
-}
-
-
-/* ===== Responsive ===== */
-
-/* ===== Profile Page Layout ===== */
-.admin-profile-page {
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  color: #333;
-}
-
-.admin-profile-heading {
-  display: flex;
-  align-items: center;
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 20px;
-}
-
-.admin-user-icon {
-  margin-right: 8px;
-  color: black;
-}
-
-.admin-profile-container {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap; /* allow wrapping on small screens */
-}
-
-/* ===== Left Side (Details) ===== */
-.admin-profile-details {
-  flex: 2;
+/* ===========================
+   PASSWORD BOX
+=========================== */
+.admin-profile-password-box {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-
-.admin-profile-details section {
-  border: 1px solid #ddd;
-  padding: 15px;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.admin-profile-details h3 {
-  margin-bottom: 10px;
-  color: #444;
-  font-size: 18px;
-}
-
-.admin-profile-details label {
-  display: block;
-  margin-bottom: 12px;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.admin-profile-details input,
-.admin-profile-details textarea {
-  margin-left: 10px;
-  padding: 6px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  outline: none;
-  font-size: 14px;
-  width: calc(100% - 10px);
-}
-
-.admin-profile-details textarea {
-  width: 100%;
-  resize: vertical;
-  min-height: 60px;
-}
-
-/* ===== Password Section ===== */
-.admin-password-box {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.admin-password-box h4 {
-  margin-bottom: 5px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.admin-password-box input {
-  width: 100%;
-}
-
-/* ===== Buttons ===== */
-.admin-action-buttons {
-  margin-top: 15px;
-  display: flex;
-  flex-wrap: wrap;
   gap: 10px;
 }
 
-.admin-action-buttons button {
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
-  background: black;
+.admin-profile-password-box h4 {
+  margin-bottom: 5px;
+  color: #222;
+}
+
+.admin-profile-password-box button {
+  background: #4a90e2;
   color: white;
-  cursor: pointer;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
   font-size: 14px;
-  font-weight: 500;
-  transition: background 0.2s ease;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-.admin-action-buttons button:hover {
-  background: #454545;
+.admin-profile-password-box button:hover {
+  background: #357ab7;
 }
 
-.admin-action-buttons button:nth-child(2) {
-  background: #9e9e9e;
+/* ===========================
+   ACTION BUTTONS
+=========================== */
+.admin-profile-action-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: -10px;
 }
 
-.admin-action-buttons button:nth-child(2):hover {
-  background: #757575;
+.admin-profile-action-buttons button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
-/* ===== Right Side (Profile Picture) ===== */
+.admin-profile-action-buttons button:first-child {
+  background: #4caf50;
+  color: white;
+}
+
+.admin-profile-action-buttons button:first-child:hover {
+  background: #3d8b40;
+}
+
+.admin-profile-action-buttons button:last-child {
+  background: #f44336;
+  color: white;
+}
+
+.admin-profile-action-buttons button:last-child:hover {
+  background: #d32f2f;
+}
+
+/* ===========================
+   RIGHT SIDE IMAGE
+=========================== */
 .admin-profile-picture {
   flex: 1;
   display: flex;
-  align-items: flex-start;
   justify-content: center;
-  margin-top: 20px; /* for mobile spacing */
 }
 
-.admin-image-wrapper {
+.admin-profile-image-wrapper {
   position: relative;
+  text-align: center;
 }
 
-.admin-circle-img {
-  width: 120px;
-  height: 120px;
+.admin-profile-circle-img {
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   object-fit: cover;
-  background: #eee;
+  background: #ddd;
+}
+
+.admin-profile-circle-img.placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
-  font-weight: 600;
-  color: #666;
-  border: 2px solid #ddd;
+  font-size: 48px;
+  font-weight: bold;
+  color: white;
+  background: #4a90e2;
 }
 
-.admin-circle-img.placeholder {
-  background: #e5e7eb;
-  color: #555;
-}
-
-/* ===== Remove Photo Button ===== */
-.admin-remove-photo {
-  margin-top: 10px;
-  padding: 6px 12px;
-  background-color: #ef4444; /* red */
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.admin-remove-photo:hover {
-  background-color: #dc2626;
-}
-
-.admin-remove-photo svg {
-  flex-shrink: 0;
-}
-
-/* ===== Edit Icon / 3 Dots Menu ===== */
-.admin-menu-container {
+/* ===========================
+   DROPDOWN MENU (EDIT/REMOVE)
+=========================== */
+.admin-profile-menu-container {
   position: absolute;
-  top: 6px;
-  right: 6px;
-  background: rgba(0, 0, 0, 0.5);
+  top: 0;
+  right: -10px;
+}
+
+.admin-profile-menu-button {
+  background: white;
+  border: 1px solid #ccc;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.admin-menu-button {
-  background: none;
-  border: none;
-  color: #fff;
   cursor: pointer;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
-.admin-menu-button:hover {
-  color: #ddd;
-}
-
-.admin-dropdown-menu {
+.admin-profile-dropdown-menu {
   position: absolute;
-  top: 30px;
+  top: 40px;
   right: 0;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
   min-width: 140px;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
   z-index: 10;
 }
 
-.admin-dropdown-item {
-  width: 100%;
-  padding: 8px 12px;
-  font-size: 14px;
+.admin-profile-dropdown-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  text-align: left;
+  gap: 8px;
+  padding: 10px;
+  font-size: 14px;
   cursor: pointer;
+  width: 100%;
+  color: #333;
+  background: white;
+  border: none;
 }
 
-.admin-dropdown-item:hover {
-  background: #f3f4f6;
+.admin-profile-dropdown-item:hover {
+  background: #f1f1f1;
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 1024px) {
+/* ===========================
+   RESPONSIVE
+=========================== */
+@media (max-width: 900px) {
   .admin-profile-container {
     flex-direction: column;
-    gap: 15px;
   }
 
   .admin-profile-picture {
-    margin-top: 15px;
     justify-content: flex-start;
   }
 }
 
-@media (max-width: 768px) {
-  .admin-profile-heading {
-    font-size: 20px;
-  }
-
-  .admin-profile-details section {
-    padding: 12px;
-  }
-
-  .admin-profile-details h3 {
-    font-size: 16px;
-  }
-
-  .admin-profile-details label {
-    font-size: 13px;
-  }
-
-  .admin-profile-details input,
-  .admin-profile-details textarea {
-    font-size: 13px;
-    padding: 5px 8px;
-  }
-
-  .admin-action-buttons button {
-    flex: 1;
-    font-size: 13px;
-    padding: 6px 10px;
-  }
-
-  .admin-circle-img {
-    width: 100px;
-    height: 100px;
-    font-size: 32px;
-  }
-
-  .admin-remove-photo {
-    font-size: 13px;
-    padding: 5px 10px;
-  }
-}
-
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .admin-profile-page {
-    padding: 10px;
+    padding: 15px;
   }
 
-  .admin-profile-heading {
-    font-size: 18px;
-    flex-wrap: wrap;
-    justify-content: center;
+  .admin-profile-container {
+    padding: 15px;
   }
 
-  .admin-profile-details h3 {
-    font-size: 15px;
-  }
-
-  .admin-profile-details label {
-    font-size: 12px;
-  }
-
-  .admin-profile-details input,
-  .admin-profile-details textarea {
-    font-size: 12px;
-  }
-
-  .admin-action-buttons {
-    flex-direction: column;
-  }
-
-  .admin-action-buttons button {
-    width: 100%;
-    margin-right: 0;
-  }
-
-  .admin-circle-img {
-    width: 90px;
-    height: 90px;
-    font-size: 28px;
-  }
-
-  .admin-remove-photo {
-    width: 100%;
-    font-size: 12px;
-    padding: 5px 8px;
+  .admin-profile-circle-img {
+    width: 120px;
+    height: 120px;
   }
 }

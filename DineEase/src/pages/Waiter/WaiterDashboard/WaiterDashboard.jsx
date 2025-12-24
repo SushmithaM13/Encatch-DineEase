@@ -1,235 +1,273 @@
-import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
+import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+
+
 import {
   LayoutDashboard,
   Utensils,
   ShoppingCart,
   Newspaper,
   LogOut,
-  Users,
-  Settings,
-  CalendarDays,
-  User
+  User,
+  ChevronDown,
+  ChevronRight,
+  Sofa,
 } from "lucide-react";
+
+import { FaBell, FaBars, FaTimes } from "react-icons/fa";
+import { MdCurrencyRupee } from "react-icons/md";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import WaiterNotification from "../Notifications/WaiterNotification";
+
 import "./WaiterDashboard.css";
 
 export default function WaiterDashboard() {
-  const [adminName, setAdminName] = useState("Waiter");
-  const [restaurantName, setRestaurantName] = useState("Restaurant");
-  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [waiterName, setWaiterName] = useState("Waiter");
   const [profilePic, setProfilePic] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [ordersExpanded, setOrdersExpanded] = useState(false);
+
+  const [showNotificationPopup, setShowNotificationPopup] = useState(false);
+  const [, setOrganizationId] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const notificationRef = useRef(null);
+
+
+
+  const [searchParams] = useSearchParams();
+
+  const sessionId = searchParams.get("sessionId");
+  const tableNumber = searchParams.get("tableNumber");
+
   const dropdownRef = useRef(null);
-
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Resize handler
+
+
+  const TOKEN = localStorage.getItem("token");
+  const API_BASE = "http://localhost:8082/dine-ease/api/v1";
+  const PROFILE_API = "http://localhost:8082/dine-ease/api/v1/staff/profile";
+
+
+
+  const isActive = (path) => location.pathname === path;
+
+
   useEffect(() => {
-    const handleResize = () => {
-      setSidebarOpen(window.innerWidth > 768);
+    if (!TOKEN) return;
+
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(PROFILE_API, {
+          headers: { Authorization: `Bearer ${TOKEN}` },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch profile");
+        const data = await res.json();
+
+        setWaiterName(data.firstName || "Waiter");
+        if (data.profileImage) setProfilePic(`data:image/jpeg;base64,${data.profileImage}`);
+        setOrganizationId(data.organizationId);
+        sessionStorage.setItem("organizationId", data.organizationId);
+      } catch (err) {
+        console.error("Profile Error:", err);
+        toast.error("Failed to load profile");
+      }
     };
-    handleResize();
+
+    fetchProfile();
+  }, [TOKEN]);
+
+
+
+  const handleLogout = async () => {
+    try {
+      const res = await fetch("http://localhost:8082/dine-ease/api/v1/users/logout", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${TOKEN}`, "Content-Type": "application/json" },
+      });
+      if (!res.ok) throw new Error("Logout failed");
+
+      localStorage.removeItem("token");
+      sessionStorage.clear();
+      toast.success("Logged out successfully!");
+      setTimeout(() => navigate("/"), 800);
+    } catch (err) {
+      console.error("Logout Error:", err);
+      toast.error("Logout failed");
+    }
+  };
+
+  useEffect(() => {
+    const needsTableContext =
+      location.pathname.includes("/menu");
+
+    if (needsTableContext) {
+      if (!sessionId || !tableNumber) {
+        toast.error("Please select a table first");
+        navigate("/WaiterDashboard/tables");
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname, sessionId, tableNumber]);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Dropdown close on outside click
   useEffect(() => {
-    function handleClickOutside(event) {
+    const handleClickOutside = (e) => {
       if (
-        dropdownRef.current &&
-        event.target instanceof Node &&
-        !dropdownRef.current.contains(event.target)
+        showNotificationPopup &&
+        notificationRef.current &&
+        !notificationRef.current.contains(e.target)
       ) {
-        setDropdownOpen(false);
+        setShowNotificationPopup(false);
       }
-    }
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [showNotificationPopup]);
 
-  // Search logic
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
-    }
-
-    const dummyResults = [
-      { type: "Staff", label: "John Doe (Chef)" },
-      { type: "Menu", label: "Pasta - ₹250" },
-      { type: "Table", label: "Table 5 (Available)" },
-    ];
-
-    setSearchResults(
-      dummyResults.filter((res) =>
-        res.label.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    );
-  }, [searchQuery]);
-
-  // Logout
-  const handleLogout = () => {
-    setAdminName("Admin");
-    setRestaurantName("Restaurant");
-    setProfilePic(null);
-    navigate("/");
-  };
 
   return (
-    <div className="waiter-layout-container">
-      {window.innerWidth <= 768 && sidebarOpen && (
-        <div
-          className="waiter-sidebar-overlay"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside className={`waiter-sidebar ${sidebarOpen ? "open" : "collapsed"}`}>
-        <div className="waiter-sidebar-header">
-          <div className="waiter-sidebar-title">
-            <Utensils size={22} />
-            {sidebarOpen && <span style={{ marginLeft: "8px" }}>Dineease</span>}
-          </div>
-          <button
-            className="waiter-hamburger desktop-only"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
+    <div className="waiter-dashboard-layout-container">
+      <nav className="waiter-dashboard-top-navbar">
+        {/* LOGO */}
+        <div className="waiter-dashboard-topnav-logo">
+          <Utensils size={26} />
+          <span>Dineease</span>
         </div>
 
-        <nav className="waiter-sidebar-nav">
-          <Link
-            to="/WaiterDashboard"
-            onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-          >
-            <LayoutDashboard size={18} />
-            {sidebarOpen && <span>Dashboard</span>}
-          </Link>
+        {/* Desktop Links */}
+        {!isMobile && (
+          <div className="waiter-dashboard-topnav-links">
+            <Link to="/WaiterDashboard" className={`waiter-dashboard-topnav-item ${isActive("/WaiterDashboard") ? "active" : ""}`}>
+              <LayoutDashboard size={20} /><span>Dashboard</span>
+            </Link>
+            <div className="waiter-dashboard-topnav-item" onClick={() => navigate("/WaiterDashboard/tables")}><Sofa size={20} /><span>Tables</span></div>
+            <div className="waiter-dashboard-topnav-item" onClick={() => navigate("/WaiterDashboard/menu")}><Newspaper size={20} /><span>Menu</span></div>
 
-          <Link
-            to="/WaiterDashboard/reservations"
-            onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-          >
-            <CalendarDays size={18} />
-            {sidebarOpen && <span>Reservations</span>}
-          </Link>
-
-          <Link
-            to="/WaiterDashboard/menu"
-            onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-          >
-            <Newspaper size={22} />
-            {sidebarOpen && <span>Menu</span>}
-          </Link>
-
-          <Link
-            to="/WaiterDashboard/orders"
-            onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-          >
-            <ShoppingCart size={22} />
-            {sidebarOpen && <span>Orders</span>}
-          </Link>
-
-          <Link
-            to="/WaiterDashboard/customers"
-            onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-          >
-            <Users size={22} />
-            {sidebarOpen && <span>Customers</span>}
-          </Link>
-
-          <Link
-            to="/WaiterDashboard/settings"
-            onClick={() => window.innerWidth <= 768 && setSidebarOpen(false)}
-          >
-            <Settings size={22} />
-            {sidebarOpen && <span>Settings</span>}
-          </Link>
-        </nav>
-      </aside>
-
-      {/* Main Content */}
-      <div className="waiter-main-content">
-        <header className="waiter-dashboard-header">
-          <button
-            className="waiter-hamburger mobile-only"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-
-          <div className="waiter-header-left">Welcome, {adminName}</div>
-
-          <div className="waiter-header-center">
-            <div className="waiter-restaurant-display">
-              <Utensils size={18} color="black" />
-              <span>{restaurantName}</span>
-            </div>
-          </div>
-
-          <div className="waiter-header-right" ref={dropdownRef}>
-            {/* Search Bar */}
-            <div className="waiter-search-container">
-              <input
-                type="text"
-                placeholder="🔍 Search..."
-                className="waiter-search-bar"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchResults.length > 0 && (
-                <div className="waiter-search-results">
-                  {searchResults.map((res, i) => (
-                    <div key={i} className="waiter-search-item">
-                      <strong>{res.type}:</strong> {res.label}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Profile Dropdown */}
-            <div className="waiter-profile-dropdown">
+            {/* Orders Dropdown */}
+            <div className="waiter-dashboard-orders-dropdown" ref={dropdownRef}>
               <div
-                className="waiter-profile-circle"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className={`waiter-dashboard-topnav-item orders-toggle ${ordersExpanded ? "active" : ""
+                  }`}
+                onClick={() => setOrdersExpanded((prev) => !prev)}
               >
-                {profilePic ? (
-                  <img src={profilePic} alt="Profile" className="waiter-circle-img" />
-                ) : (
-                  adminName.charAt(0).toUpperCase()
-                )}
+                <ShoppingCart size={20} />
+                <span>Orders</span>
+                {ordersExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
               </div>
-              {dropdownOpen && (
-                <div className="waiter-dropdown-menu">
-                  <button onClick={() => navigate("/WaiterDashboard/profile")}>
-                    <User size={16} /> Profile
-                  </button>
-                  <button onClick={() => navigate("/WaiterDashboard/settings")}>
-                    <Settings size={16} /> Settings
-                  </button>
-                  <button onClick={handleLogout}>
-                    <LogOut size={16} /> Logout
-                  </button>
+
+              {ordersExpanded && (
+                <div className="waiter-dashboard-topnav-dropdown">
+                  <Link
+                    to="/WaiterDashboard/orders?type=NEW"
+                    className="waiter-dashboard-topnav-dropdown-item"
+                    onClick={() => setOrdersExpanded(false)}
+                  >
+                    New Orders
+                  </Link>
+                  <Link
+                    to="/WaiterDashboard/orders/all"
+                    className="waiter-dashboard-topnav-dropdown-item"
+                    onClick={() => setOrdersExpanded(false)}
+                  >
+                    All Orders
+                  </Link>
                 </div>
               )}
             </div>
-          </div>
-        </header>
 
-        <main className="waiter-dashboard-content">
-          <Outlet />
-        </main>
-      </div>
+
+            <div className="waiter-dashboard-topnav-item" onClick={() => navigate("/WaiterDashboard/payments")}><MdCurrencyRupee size={20} /><span>Payments</span></div>
+          </div>
+        )}
+
+        {/* Right Section */}
+        <div className="waiter-dashboard-topnav-right">
+          <div
+  ref={notificationRef}
+  className="waiter-dashboard-notification-icon"
+  title="Notifications"
+  onClick={() => setShowNotificationPopup((prev) => !prev)}
+>
+  <FaBell size={22} />
+
+  {notificationCount > 0 && (
+    <span className="waiter-dashboard-notification-count-badge">
+      {notificationCount}
+    </span>
+  )}
+
+  {showNotificationPopup && (
+    <div className="waiter-dashboard-notification-popup">
+      <WaiterNotification
+        smallView
+        onCountChange={setNotificationCount}
+      />
     </div>
+  )}
+</div>
+
+
+
+
+
+          <div className="waiter-dashboard-header-right" ref={dropdownRef}>
+            <div className="waiter-dashboard-profile-circle" onClick={() => setDropdownOpen(!dropdownOpen)}>
+              {profilePic ? <img src={profilePic} alt="Profile" className="waiter--dashboard-circle-img" /> : waiterName.charAt(0).toUpperCase()}
+            </div>
+            {dropdownOpen && (
+              <div className="waiter--dashboard-dropdown-menu">
+                <button className="waiter-dashboard-dropdown-item" onClick={() => navigate("/WaiterDashboard/profile")}><User size={16} /> Profile</button>
+                <button className="waiter-dashboard-dropdown-item" onClick={() => navigate("/WaiterDashboard/settings")}><User size={16} /> Settings</button>
+                <button className="waiter-dashboard-dropdown-item" onClick={handleLogout}><LogOut size={16} /> Logout</button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile Hamburger */}
+        {isMobile && (
+          <div className="waiter-dashboard-topnav-mobile-menu">
+            <button className="hamburger-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
+              {dropdownOpen ? <FaTimes /> : <FaBars />}
+            </button>
+            {dropdownOpen && (
+              <div className="mobile-dropdown-links">
+                <Link to="/WaiterDashboard" onClick={() => setDropdownOpen(false)}>Dashboard</Link>
+                <Link to="/WaiterDashboard/tables" onClick={() => setDropdownOpen(false)}>Tables</Link>
+                <Link to="/WaiterDashboard/menu" onClick={() => setDropdownOpen(false)}>Menu</Link>
+                <Link to="/WaiterDashboard/orders?type=NEW" onClick={() => setDropdownOpen(false)}>New Orders</Link>
+                <Link to="/WaiterDashboard/orders/all" onClick={() => setDropdownOpen(false)}>All Orders</Link>
+                <Link to="/WaiterDashboard/payments" onClick={() => setDropdownOpen(false)}>Payments</Link>
+              </div>
+            )}
+          </div>
+        )}
+      </nav>
+
+
+
+
+      <main className="waiter-dashboard-content">
+        <Outlet />
+
+      </main>
+      <ToastContainer position="top-right" autoClose={1000} />
+
+    </div>
+
   );
-}
+}  

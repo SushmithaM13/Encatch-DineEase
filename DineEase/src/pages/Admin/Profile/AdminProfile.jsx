@@ -198,7 +198,7 @@ export default function AdminProfile() {
   return (
     <div className="admin-profile-page">
       <h2 className="admin-profile-heading">
-        <User size={28} className="admin-user-icon" /> Admin Profile
+        <User size={28} className="admin-profile-user-icon" /> Admin Profile
       </h2>
 
       <div className="admin-profile-container">
@@ -288,7 +288,7 @@ export default function AdminProfile() {
           {/* Password Change */}
           <section>
             <h3>Account Settings</h3>
-            <div className="admin-password-box">
+            <div className="admin-profile-password-box">
               <h4>Change Password</h4>
               <input
                 type="password"
@@ -336,7 +336,7 @@ export default function AdminProfile() {
             </div>
           </section>
 
-          <div className="admin-action-buttons">
+          <div className="admin-profile-action-buttons">
             {isEditing ? (
               <>
                 <button onClick={handleSave}>Save Changes</button>
@@ -350,30 +350,30 @@ export default function AdminProfile() {
 
         {/* Right Side */}
         <div className="admin-profile-picture">
-          <div className="admin-image-wrapper">
+          <div className="admin-profile-image-wrapper">
             {profile.profileImage ? (
               <img
                 src={profile.profileImage}
                 alt="Profile"
-                className="admin-circle-img"
+                className="admin-profile-circle-img"
               />
             ) : (
-              <div className="admin-circle-img placeholder">
+              <div className="admin-profile-circle-img placeholder">
                 {profile.fullName ? profile.fullName[0].toUpperCase() : "A"}
               </div>
             )}
 
-            <div className="admin-menu-container">
+            <div className="admin-profile-menu-container">
               <button
-                className="admin-menu-button"
+                className="admin-profile-menu-button"
                 onClick={() => setShowMenu((prev) => !prev)}
               >
                 <MoreVertical size={20} />
               </button>
 
               {showMenu && (
-                <div className="admin-dropdown-menu">
-                  <label className="admin-dropdown-item">
+                <div className="admin-profile-dropdown-menu">
+                  <label className="admin-profile-dropdown-item">
                     <Pencil size={16} /> Edit Photo
                     <input
                       type="file"
@@ -384,7 +384,7 @@ export default function AdminProfile() {
                   </label>
                   {profile.profileImage && (
                     <button
-                      className="admin-dropdown-item"
+                      className="admin-profile-dropdown-item"
                       onClick={handleRemoveImage}
                     >
                       <Trash2 size={16} /> Remove Photo
