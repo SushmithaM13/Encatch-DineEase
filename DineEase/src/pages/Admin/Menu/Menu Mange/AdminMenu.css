@@ -1,0 +1,116 @@
+.admin-menu-container {
+  padding: 20px;
+}
+
+.admin-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.admin-menu-add-menu-btn {
+  background: #007bff;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.admin-menu-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.admin-menu-menu-card {
+  background: white;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-menu-menu-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+}
+
+/* IMAGE BOX */
+.menu-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 160px;          /* FIXED HEIGHT */
+  overflow: hidden;      /* PREVENT IMAGE OVERFLOW */
+  border-radius: 10px;   /* MATCH CARD STYLE */
+  margin-bottom: 10px;
+}
+
+.menu-image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;     /* PERFECT CROPPING */
+  display: block;
+}
+
+.admin-menu-menu-image {
+  width: 100%;
+  height: 160px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.menu-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #f1f1f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #888;
+}
+.admin-menu-menu-card {
+  background: white;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: 0.2s;
+  overflow: hidden; /* EXTRA SAFETY */
+}
+
+/* VEG NON VEG badge */
+.veg-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+}
+
+.veg {
+  background: #28a745; /* Green */
+}
+
+.non-veg {
+  background: #d9534f; /* Red */
+}
+
+.price {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.admin-menu-view-more {
+  display: inline-block;
+  margin-top: 8px;
+  color: #007bff;
+  font-weight: 500;
+}

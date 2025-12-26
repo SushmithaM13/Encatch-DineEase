@@ -1,0 +1,107 @@
+/* ===============================
+   FULL PAGE CONTAINER
+================================ */
+.waiter-notifications-page {
+  padding: 20px;
+  background-color: #f4f6f8;
+  min-height: 100vh;
+}
+
+/* ===============================
+   POPUP CONTAINER
+================================ */
+.waiter-notifications-popup-list {
+  width: 320px;
+  max-height: 420px;
+  overflow-y: auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  padding: 12px;
+}
+
+/* ===============================
+   TITLE
+================================ */
+.waiter-notifications-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #1f2937;
+}
+
+/* ===============================
+   LIST
+================================ */
+.waiter-notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ===============================
+   CARD
+================================ */
+.waiter-notifications-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.waiter-notifications-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* ===============================
+   MESSAGE
+================================ */
+.waiter-notifications-message {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+/* ===============================
+   TIME
+================================ */
+.waiter-notifications-time {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* ===============================
+   EMPTY / LOADING / ERROR
+================================ */
+.waiter-notifications-empty {
+  text-align: center;
+  font-size: 14px;
+  color: #6b7280;
+  padding: 20px 0;
+}
+
+.waiter-notifications-empty.error {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+/* ===============================
+   SCROLLBAR (POPUP)
+================================ */
+.waiter-notifications-popup-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.waiter-notifications-popup-list::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 10px;
+}
+
+.waiter-notifications-popup-list::-webkit-scrollbar-track {
+  background: transparent;
+}

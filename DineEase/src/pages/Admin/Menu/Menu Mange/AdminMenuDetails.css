@@ -1,0 +1,207 @@
+/* ===========================
+   AdminMenuDetails.css
+============================ */
+
+.admin-menu-details-container {
+  padding: 20px;
+  font-family: "Poppins", sans-serif;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+/* Header with back button and title */
+.admin-menu-details-top {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.admin-menu-details-back-btn {
+  padding: 6px 12px;
+  background: #ddd;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.admin-menu-details-back-btn:hover {
+  background: #ccc;
+}
+
+.menu-title {
+  font-size: 26px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Main card containing image + details */
+.admin-menu-details-details-card {
+  margin-top: 20px;
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* LEFT panel: image */
+.admin-menu-details-left-panel {
+  flex: 1 1 300px;
+  max-width: 380px;
+  position: relative;
+}
+
+.admin-menu-details-image-wrapper img {
+  width: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Action buttons on image (edit/delete) */
+.admin-menu-details-action-buttons {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.admin-menu-details-edit-btn,
+.admin-menu-details-delete-btn {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  transition: background 0.2s;
+}
+
+.admin-menu-details-edit-btn {
+  background: #1976d2;
+}
+
+.admin-menu-details-edit-btn:hover {
+  background: #115293;
+}
+
+.admin-menu-details-delete-btn {
+  background: #d32f2f;
+}
+
+.admin-menu-details-delete-btn:hover {
+  background: #a92323;
+}
+
+/* RIGHT panel: info and details */
+.admin-menu-details-right-panel {
+  flex: 2 1 400px;
+  min-width: 280px;
+}
+
+/* Sections styling */
+.admin-menu-details-details-section {
+  margin-bottom: 25px;
+}
+
+.admin-menu-details-details-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 500;
+  color: #222;
+  border-left: 4px solid #1976d2;
+  padding-left: 10px;
+}
+
+/* Info grid for basic details */
+.admin-menu-details-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px 20px;
+  font-size: 15px;
+}
+
+.admin-menu-details-info-grid p {
+  margin: 4px 0;
+}
+
+/* Lists and cards */
+.admin-menu-details-list-block {
+  background: #f7f8fa;
+  padding: 12px 14px;
+  border-radius: 8px;
+}
+
+.admin-menu-details-list-block ul,
+.admin-menu-details-list-block li {
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-menu-details-variant-card {
+  background: #fff;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  border-left: 4px solid #1976d2;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.admin-menu-details-variant-card p {
+  margin: 4px 0;
+}
+
+.admin-menu-details-nested-list {
+  margin-left: 16px;
+  margin-top: 6px;
+}
+
+.admin-menu-details-nested-list li {
+  list-style: disc;
+  margin-left: 12px;
+  margin-bottom: 4px;
+}
+
+/* Responsive behavior */
+@media (max-width: 880px) {
+  .admin-menu-details-details-card {
+    flex-direction: column;
+    padding: 15px;
+  }
+  
+  .admin-menu-details-left-panel,
+  .admin-menu-details-right-panel {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-title {
+    font-size: 22px;
+  }
+  .admin-menu-details-edit-btn,
+  .admin-menu-details-delete-btn {
+    padding: 5px 9px;
+    font-size: 13px;
+  }
+  .admin-menu-details-details-section h3 {
+    font-size: 18px;
+  }
+  .admin-menu-details-info-grid {
+    font-size: 14px;
+  }
+  .admin-menu-details-variant-card {
+    font-size: 13px;
+  }
+}

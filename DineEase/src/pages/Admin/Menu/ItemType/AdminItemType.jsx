@@ -20,7 +20,7 @@ export default function AdminItemType() {
     error: false,
   });
 
-  // ✅ Fetch organizationId
+  //  Fetch organizationId
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -43,7 +43,7 @@ export default function AdminItemType() {
     fetchProfile();
   }, []);
 
-  // ✅ Fetch Item Types
+  //  Fetch Item Types
   const fetchItemTypes = async (orgId) => {
     try {
       const token = localStorage.getItem("token");
@@ -63,7 +63,7 @@ export default function AdminItemType() {
     if (organizationId) fetchItemTypes(organizationId);
   }, [organizationId]);
 
-  // ✅ Add / Update Item Type
+  //  Add / Update Item Type
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.name.trim()) return toast.warning("Name is required");
@@ -98,7 +98,7 @@ export default function AdminItemType() {
     }
   };
 
-  // ✅ Delete Item Type
+  //  Delete Item Type
   const handleDeleteItem = async (id) => {
     try {
       const token = localStorage.getItem("token");

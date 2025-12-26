@@ -1,251 +1,443 @@
-/* Layout container */
-.waiter-layout-container {
+/* ------------------------------------------------------
+   GLOBAL THEME VARIABLES
+------------------------------------------------------ */
+:root {
+  --primary: #6d28d9 !important;
+  --primary-light: #eef2ff;
+  --primary-dark: #4c1d95 !important;
+
+  --bg-white: #ffffff;
+  --bg-light: #f9fafb;
+
+  --text-dark: #111827;
+  --text-light: #6b7280;
+
+  --border: #e5e7eb;
+  --radius: 10px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* ------------------------------------------------------
+   MAIN LAYOUT
+------------------------------------------------------ */
+.waiter-dashboard-layout-container {
   display: flex;
+  flex-direction: column;
   height: 100vh;
+  background: var(--bg-light);
+  overflow: hidden;
 }
 
-/* Sidebar */
-.waiter-sidebar {
-  background: #111;
-  color: white;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 20px 10px;
-  transition: width 0.3s ease, left 0.3s ease;
-  width: 250px;
-  z-index: 200;
-}
-.waiter-sidebar.open {
-  width: 250px;
-}
-.waiter-sidebar.collapsed {
-  width: 70px;
-}
+/* ------------------------------------------------------
+   TOP NAVIGATION BAR
+------------------------------------------------------ */
+.waiter-dashboard-top-navbar {
+  height: 70px;
+  background: var(--bg-white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
 
-/* Sidebar header */
-.waiter-sidebar-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
+
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: var(--shadow);
 }
-.waiter-sidebar-title {
+
+/* Logo */
+.waiter-dashboard-topnav-logo {
   display: flex;
   align-items: center;
-  font-size: 22px;
+  gap: 10px;
+  font-size: 19px;
   font-weight: 700;
+  color: var(--primary);
 }
 
-/* Hamburger */
-.waiter-hamburger {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-}
-.waiter-hamburger span {
-  display: block;
-  height: 3px;
-  width: 22px;
-  background: white;
-  border-radius: 2px;
-  transition: background 0.3s ease;
-}
-.desktop-only {
-  display: flex;
-}
-@media (max-width: 768px) {
-  .desktop-only {
-    display: none;
-  }
-}
-.mobile-only {
-  display: none;
-}
-@media (max-width: 768px) {
-  .mobile-only {
-    display: flex;
-  }
-  .mobile-only span {
-    background: white;
-  }
-}
-
-/* Sidebar navigation */
-.waiter-sidebar-nav a {
+/* Nav links */
+.waiter-dashboard-topnav-links {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 15px;
-  margin-bottom: 10px;
-  border-radius: 6px;
+  gap: 22px;
+}
+
+/* Nav item */
+.waiter-dashboard-topnav-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 15px;
   font-weight: 500;
-  color: #fff;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: 0.25s;
   text-decoration: none;
-  white-space: nowrap;
-  transition: background 0.3s ease, color 0.3s ease;
-}
-.waiter-sidebar-nav a:hover {
-  background: #f5f5f5;
-  color: #111;
 }
 
-/* Main content */
-.waiter-main-content {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+.waiter-dashboard-topnav-item:hover,
+.waiter-dashboard-topnav-item.active {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 600;
 }
 
-/* Dashboard header */
-.waiter-dashboard-header {
+/* Dropdown under Orders */
+.waiter-dashboard-topnav-dropdown {
+  position: absolute;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-top: 6px;
+  padding: 10px 0;
+  min-width: 160px;
+  box-shadow: var(--shadow);
+  z-index: 250;
+}
+
+.waiter-dashboard-topnav-dropdown-item {
+  padding: 10px 14px;
+  display: block;
+  color: var(--text-dark);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.waiter-dashboard-topnav-dropdown-item:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* ------------------------------------------------------
+   RIGHT SIDE: Notifications, Cart, Profile
+------------------------------------------------------ */
+.waiter-dashboard-topnav-right {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* keep left/right spaced */
-  padding: 0 16px;
-  height: 60px;
+  gap: 16px;
+}
+
+/* Notifications */
+.waiter-dashboard-notification-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: 0.25s;
+}
+
+.waiter-dashboard-notification-icon:hover {
+  transform: scale(1.1);
+}
+
+.waiter-dashboard-notification-count-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 50%;
+}
+
+.waiter-dashboard-notification-popup {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  width: 320px;
+  max-height: 320px;
+
+  background: var(--bg-white);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  z-index: 200;
+
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Cart */
+.waiter-dashboard-cart-icon {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.waiter-dashboard-cart-icon:hover {
+  transform: scale(1.1);
+}
+
+.waiter-dashboard-waiter-cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 6px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+/* Profile */
+.waiter-dashboard-header-right {
+  display: flex;
+  align-items: center;
   position: relative;
 }
 
-.waiter-header-left {
-  flex: 1;
-}
-
-.waiter-header-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  font-weight: 600;
-  font-size: 18px;
-  gap: 4px;
-}
-
-.waiter-header-right {
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-
-
-/* Profile circle */
-.waiter-profile-circle {
-  width: 40px;
-  height: 40px;
+.waiter-dashboard-profile-circle {
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  background: black;
-  color: white;
+  background: var(--bg-white);
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  font-size: 18px;
+  font-weight: 600;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   cursor: pointer;
-  font-weight: 600;
-  user-select: none;
-}
-.waiter-circle-img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
+  overflow: hidden;
+  transition: 0.25s;
 }
 
-/* Dropdown menu */
-.waiter-dropdown-menu {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  min-width: 140px;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.waiter-dashboard-profile-circle:hover {
+  background: var(--primary-light);
+  transform: scale(1.08);
 }
-.waiter-dropdown-menu button {
+
+.waiter--dashboard-circle-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Profile dropdown */
+.waiter--dashboard-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 58px;
+  background: var(--bg-white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  min-width: 180px;
+  overflow: hidden;
+  z-index: 260;
+  animation: fadeIn 0.2s ease;
+}
+
+.waiter-dashboard-dropdown-item {
+  padding: 12px 16px;
   background: none;
   border: none;
-  padding: 10px;
-  text-align: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
   cursor: pointer;
+  color: var(--text-dark);
   font-size: 14px;
 }
-.waiter-dropdown-menu button:hover {
-  background: #f3f4f6;
+
+.waiter-dashboard-dropdown-item:hover {
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
-/* Search */
-.waiter-search-container {
-  position: relative;
-}
-.waiter-search-bar {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-.waiter-search-results {
-  position: absolute;
-  top: 40px;
-  left: 0;
-  width: 100%;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  max-height: 200px;
+/* ------------------------------------------------------
+   CART SLIDE DRAWER
+------------------------------------------------------ */
+.waiter-dashboard-waiter-cart-drawer {
+  position: fixed;
+  top: 70px;
+  right: -420px; /* hidden by default */
+  width: 380px;
+  height: calc(100vh - 70px);
+  background: var(--bg-white);
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.08);
+  transition: right 0.35s ease-in-out;
+  z-index: 300;
   overflow-y: auto;
-  z-index: 100;
-}
-.waiter-search-item {
-  padding: 8px 10px;
-  cursor: pointer;
-}
-.waiter-search-item:hover {
-  background: #f5f5f5;
 }
 
-/* Dashboard content */
+.waiter-dashboard-waiter-cart-drawer.open {
+  right: 0;
+}
+
+
+.waiter-dashboard-waiter-cart-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 250;
+}
+.waiter-dashboard-orders-dropdown {
+  position: relative; /* ensure dropdown aligns relative to parent */
+}
+
+.waiter-dashboard-topnav-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 100;
+  min-width: 160px;
+}
+
+.waiter-dashboard-topnav-dropdown-item {
+  display: block;
+  padding: 8px 12px;
+  color: #333;
+  text-decoration: none;
+}
+
+.waiter-dashboard-topnav-dropdown-item:hover {
+  background-color: #f1f1f1;
+}
+
+
+/* ------------------------------------------------------
+   PAGE INNER CONTENT
+------------------------------------------------------ */
 .waiter-dashboard-content {
   flex: 1;
-  padding: 30px;
-  background: #f9fafb;
+  padding: 24px;
   overflow-y: auto;
+  background: var(--bg-light);
 }
 
-/* Mobile sidebar overlay */
-.waiter-sidebar-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  z-index: 150;
+/* ------------------------------------------------------
+   ANIMATIONS
+------------------------------------------------------ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Responsive */
+/* ------------------------------------------------------
+   RESPONSIVE (MOBILE)
+------------------------------------------------------ */
 @media (max-width: 768px) {
-  .waiter-layout-container {
-    flex-direction: column;
+  .waiter-dashboard-topnav-links {
+    display: none;
   }
-  .waiter-sidebar {
-    position: fixed;
-    top: 0;
-    left: -250px;
-    height: 100%;
-    transition: left 0.3s ease;
-  }
-  .waiter-sidebar.open {
-    left: 0;
-  }
-  .waiter-main-content {
-    margin-left: 0;
+
+  .waiter-dashboard-waiter-cart-drawer {
     width: 100%;
   }
+}
+/* Hamburger menu */
+.waiter-dashboard-topnav-mobile-menu {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.hamburger-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.hamburger-line {
+  width: 25px;
+  height: 3px;
+  background-color: #333;
+}
+
+.mobile-dropdown-links {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.mobile-dropdown-links a {
+  padding: 10px;
+  text-decoration: none;
+  color: #333;
+  border-bottom: 1px solid #eee;
+}
+
+/* Full width cart drawer on mobile */
+@media (max-width: 768px) {
+  .waiter-dashboard-topnav-links {
+    display: none;
+  }
+
+  .waiter-dashboard-waiter-cart-drawer {
+    width: 100% !important;
+  }
+}
+/* Hamburger Menu */
+.hamburger-btn {
+  font-size: 28px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+.mobile-dropdown-links {
+  position: absolute;
+  top: 85px;
+  right: 0;
+  width: 100%;
+  background: var(--primary-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 0;
+  z-index: 999;
+}
+
+.mobile-dropdown-links a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 20px;
+  padding: 10px 25px;
+}
+
+.mobile-dropdown-links a:hover {
+  color: var(--accent-color);
+  background: rgba(255, 255, 255, 0.05);
 }

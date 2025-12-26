@@ -1,152 +1,226 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./ChefHomePage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { 
-  faChartLine, 
-  faClipboardList, 
-  faUtensils, 
+import {
+  faClipboardList,
+  faUtensils,
   faBoxes,
-  faHourglassHalf,
-  faExclamationTriangle,
-  faLeaf,
-  faEdit,
-  faWarehouse
+  faCalendarDays
 } from "@fortawesome/free-solid-svg-icons";
+
+/* =========================
+   DATE FORMAT HELPERS
+========================= */
+const formatDateForApi = (date) => {
+  return date.toISOString().split("T")[0]; // YYYY-MM-DD
+};
 
 export default function ChefHomePage() {
   const navigate = useNavigate();
+  const TOKEN = localStorage.getItem("token");
 
+  const [chefId, setChefId] = useState(null);
+  const [orgId, setOrgId] = useState(null);
+  const [stats, setStats] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Date states
+  const today = new Date();
+  const [startDate, setStartDate] = useState(formatDateForApi(today));
+  const [endDate, setEndDate] = useState(formatDateForApi(today));
+
+  /* =========================
+     1. FETCH CHEF PROFILE
+  ========================== */
+  useEffect(() => {
+    if (!TOKEN) return;
+
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:8082/dine-ease/api/v1/staff/profile",
+          {
+            headers: { Authorization: `Bearer ${TOKEN}` },
+          }
+        );
+
+        setChefId(res.data.id);
+        setOrgId(res.data.organizationId);
+      } catch (err) {
+        console.error("Profile fetch failed", err);
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [TOKEN]);
+
+  /* =========================
+     2. FETCH SUMMARY (WITH DATES)
+  ========================== */
+  useEffect(() => {
+    if (!chefId || !orgId) return;
+
+    const fetchSummary = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(
+          `http://localhost:8082/dine-ease/api/v1/chef-notifications/summary/${orgId}/${chefId}`,
+          {
+            headers: { Authorization: `Bearer ${TOKEN}` },
+            params: {
+              startDate,
+              endDate,
+            },
+          }
+        );
+
+        const d = res.data;
+
+        setStats([
+          { icon: "📦", label: "Total Items", value: d.totalItems ?? 0, color: "blue" },
+          { icon: "📋", label: "Active Items", value: d.activeItems ?? 0, color: "purple" },
+          { icon: "🟢", label: "Accepted", value: d.acceptedItems ?? 0, color: "green" },
+          { icon: "⏳", label: "Preparing", value: d.preparingItems ?? 0, color: "orange" },
+          { icon: "✅", label: "Completed", value: d.completedItems ?? 0, color: "teal" },
+          { icon: "❌", label: "Cancelled", value: d.cancelledItems ?? 0, color: "red" },
+          { icon: "🚫", label: "Out Of Stock", value: d.outOfStockItems ?? 0, color: "gray" }
+        ]);
+      } catch (err) {
+        console.error("Summary fetch failed", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummary();
+  }, [chefId, orgId, startDate, endDate, TOKEN]);
+
+  /* =========================
+     UI
+  ========================== */
   return (
-    <div className="chef-home-container chef-container">
-      {/* Welcome Section */}
-      <div className="chef-welcome-section">
-        <div className="chef-welcome-text">
-          <h1>Welcome, Chef!</h1>
-          <p>
-            Track orders in real-time, prioritize urgent tickets, and keep your
-            menu & inventory in sync — all in one clean workspace.
-          </p>
-
-          <div className="chef-button-group">
-            <button
-              className="chef-btn chef-btn-green"
-              onClick={() => navigate("ChefDashboard")}
-            >
-              <FontAwesomeIcon icon={faChartLine} className="chef-btn-icon" />
-              Go to Dashboard
-            </button>
-            <button
-              className="chef-btn chef-btn-outline-green"
-              onClick={() => navigate("OrdersQueue")}
-            >
-              <FontAwesomeIcon icon={faClipboardList} className="chef-btn-icon" />
-              Order Queue
-            </button>
-            <button
-              className="chef-btn chef-btn-outline-orange"
-              onClick={() => navigate("menu")}
-            >
-              <FontAwesomeIcon icon={faUtensils} className="chef-btn-icon" />
-              Menu Catalog
-            </button>
-            <button
-              className="chef-btn chef-btn-outline-red"
-              onClick={() => navigate("inventory")}
-            >
-              <FontAwesomeIcon icon={faBoxes} className="chef-btn-icon" />
-              Inventory
-            </button>
+    <div className="chef-homepage-wrapper">
+      {/* ================= TOP BAR ================= */}
+      <div className="chef-top-bar">
+        <div className="chef-top-bar-content">
+          <div className="chef-greeting">
+            <h1 className="chef-title">Welcome Back, Chef 👨‍🍳</h1>
           </div>
 
-          <div className="chef-badges">
-            <span className="chef-badge chef-orange">
-              <FontAwesomeIcon icon={faHourglassHalf} className="chef-badge-icon" />
-              Timers & Overdue alerts
-            </span>
-            <span className="chef-badge chef-red">
-              <FontAwesomeIcon icon={faExclamationTriangle} className="chef-badge-icon" />
-              Urgent ticket highlighting
-            </span>
-            <span className="chef-badge chef-green">
-              <FontAwesomeIcon icon={faLeaf} className="chef-badge-icon" />
-              Stock-aware menu
-            </span>
-          </div>
-        </div>
+          {/* ================= DATE FILTER ================= */}
+          <div className="chef-date-filter">
+            <FontAwesomeIcon icon={faCalendarDays} className="date-icon" />
+            <div className="date-inputs">
+              <div className="date-input-group">
+                <label>From</label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="date-input"
+                />
+              </div>
 
-        <div className="chef-welcome-image">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png"
-            alt="Chef Illustration"
-          />
-        </div>
-      </div>
+              <div className="date-separator">-</div>
 
-      {/* Info Cards Section */}
-      <div className="chef-info-cards">
-        <div className="chef-card chef-green" onClick={() => navigate("ChefDashboard")}>
-          <FontAwesomeIcon icon={faChartLine} className="chef-card-icon" />
-          <h3>Dashboard</h3>
-          <p>Overview & Kanban board</p>
-        </div>
-        <div className="chef-card chef-orange" onClick={() => navigate("OrdersQueue")}>
-          <FontAwesomeIcon icon={faClipboardList} className="chef-card-icon" />
-          <h3>Order Queue</h3>
-          <p>Accept, ready, reopen</p>
-        </div>
-        <div className="chef-card chef-green-light" onClick={() => navigate("menu")}>
-          <FontAwesomeIcon icon={faUtensils} className="chef-card-icon" />
-          <h3>Menu Catalog</h3>
-          <p>Stock-aware menu cards</p>
-        </div>
-        <div className="chef-card chef-red" onClick={() => navigate("inventory")}>
-          <FontAwesomeIcon icon={faBoxes} className="chef-card-icon" />
-          <h3>Inventory</h3>
-          <p>Low & OOS at a glance</p>
-        </div>
-      </div>
-
-      {/* Tips & Shortcuts Section */}
-      <div className="chef-bottom-section">
-        <div className="chef-tips-card">
-          <h3>Today’s Tips</h3>
-          <ul>
-            <li>
-              Focus on cards with <span className="chef-text-red">Overdue</span>{" "}
-              badges first.
-            </li>
-            <li>Use drag-and-drop to move tickets between stages.</li>
-          </ul>
-        </div>
-
-        <div className="chef-shortcuts-card">
-          <h3>Shortcuts</h3>
-          <div className="chef-shortcut-buttons">
-            <button
-              className="chef-btn chef-btn-outline"
-              onClick={() => navigate("OrdersQueue")}
-            >
-              <FontAwesomeIcon icon={faClipboardList} className="chef-btn-icon" />
-              View Orders
-            </button>
-            <button
-              className="chef-btn chef-btn-outline"
-              onClick={() => navigate("menu")}
-            >
-              <FontAwesomeIcon icon={faEdit} className="chef-btn-icon" />
-              Edit Menu
-            </button>
-            <button
-              className="chef-btn chef-btn-outline"
-              onClick={() => navigate("inventory")}
-            >
-              <FontAwesomeIcon icon={faWarehouse} className="chef-btn-icon" />
-              Check Inventory
-            </button>
+              <div className="date-input-group">
+                <label>To</label>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  className="date-input"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* ================= MAIN CONTENT ================= */}
+      
+        {/* ================= HERO SECTION WITH IMAGE ================= */}
+        <div className="chef-hero-section">
+          <div className="chef-hero-left">
+            <p className="hero-description">
+              Track orders in real-time, prioritize urgent tickets, and keep your
+              menu & inventory in sync — all in one clean workspace.
+            </p>
+            
+            {loading ? (
+              <div className="loading-state">
+                <div className="spinner"></div>
+                <p>Loading your dashboard...</p>
+              </div>
+            ) : (
+              <div className="stats-grid">
+                {stats.map((s, i) => (
+                  <div key={i} className={`stat-card stat-${s.color}`}>
+                    <div className="stat-icon">{s.icon}</div>
+                    <div className="stat-details">
+                      <div className="stat-value">{s.value}</div>
+                      <div className="stat-label">{s.label}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="chef-hero-right">
+            <img src="src/Images/chef.png" alt="Chef Illustration" className="chef-image" />
+          </div>
+        </div>
+
+        {/* ================= QUICK ACTIONS ================= */}
+        <div className="chef-actions-section">
+          <h2 className="section-title">Quick Actions</h2>
+          
+          <div className="chef-cards-grid">
+            <div
+              className="chef-feature-card card-yellow"
+              onClick={() => navigate("/chefDashboard/OrdersQueue")}
+            >
+              <div className="card-icon-wrapper">
+                <FontAwesomeIcon icon={faClipboardList} className="card-icon" />
+              </div>
+              <div className="card-content">
+                <h3>Order Queue</h3>
+                <p>Accept, prepare and complete orders</p>
+              </div>
+            </div>
+
+            <div
+              className="chef-feature-card card-green"
+              onClick={() => navigate("/chefDashboard/menu")}
+            >
+              <div className="card-icon-wrapper">
+                <FontAwesomeIcon icon={faUtensils} className="card-icon" />
+              </div>
+              <div className="card-content">
+                <h3>Menu Catalog</h3>
+                <p>Manage your menu items</p>
+              </div>
+            </div>
+
+            <div
+              className="chef-feature-card card-red"
+              onClick={() => navigate("/chefDashboard/inventory")}
+            >
+              <div className="card-icon-wrapper">
+                <FontAwesomeIcon icon={faBoxes} className="card-icon" />
+              </div>
+              <div className="card-content">
+                <h3>Inventory</h3>
+                <p>Track stock and supplies</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
   );
 }

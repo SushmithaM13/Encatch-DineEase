@@ -1,248 +1,260 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import "./OrderQueue.css";
 
-export default function ChefOrderQueue() {
-  const defaultOrders = {
-    newOrders: [],
-    accepted: [],
-    preparing: [],
-    ready: [],
-  };
-  
-  const [orders, setOrders] = useState(defaultOrders);
+const BASE_URL = "http://localhost:8082/dine-ease/api/v1";
 
+const ChefOrderQueue = () => {
+  const [chefId, setChefId] = useState(null);
+  const [orgId, setOrgId] = useState(null);
+
+  const [assigned, setAssigned] = useState([]);
+  const [accepted, setAccepted] = useState([]);
+  const [preparing, setPreparing] = useState([]);
+  const [readyToServe, setReadyToServe] = useState([]);
+
+  // Cancel modal
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+  const [selectedItemId, setSelectedItemId] = useState(null);
+
+  const token = localStorage.getItem("token");
+
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+
+  // ================= PROFILE =================
   useEffect(() => {
-    const initialData = {
-      newOrders: [
-        {
-          table: "Table 5",
-          time: "12:30 PM",
-          ago: "2 min ago",
-          items: "2x Grilled Salmon, 1x Veg Pasta",
-          note: "Extra spicy for both salmon",
-          urgent: true,
-          timer: 12,
-        },
-        {
-          table: "Table 8",
-          time: "12:32 PM",
-          ago: "1 min ago",
-          items: "1x Burger, 1x Fries, 2x Coke",
-          timer: 15,
-        },
-      ],
-      accepted: [],
-      preparing: [
-        {
-          table: "Table 3",
-          time: "12:25 PM",
-          ago: "7 min ago",
-          items: "2x Chicken Curry, 2x Rice",
-          timer: 8,
-        },
-        {
-          table: "Table 7",
-          time: "12:28 PM",
-          ago: "4 min ago",
-          items: "1x Pizza, 1x Salad",
-          note: "Gluten-free pizza base",
-          urgent: true,
-          timer: 5,
-        },
-      ],
-      ready: [
-        {
-          table: "Table 2",
-          time: "12:20 PM",
-          ago: "10 min ago",
-          items: "1x Salad, 2x Soup",
-          timer: 3,
-        },
-      ],
-    };
-    setOrders(initialData);
+    fetchProfile();
   }, []);
 
+  const fetchProfile = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/staff/profile`, { headers });
+      setChefId(res.data.userId || res.data.id);
+      setOrgId(res.data.organizationId || res.data.organization?.organizationId);
+    } catch (err) {
+      console.error("Profile fetch failed", err);
+    }
+  };
+
+  // ================= ORDERS =================
   useEffect(() => {
-    const interval = setInterval(() => {
-      setOrders((prev) => {
-        const updateTimer = (arr) =>
-          (arr || []).map((o) => ({ ...o, timer: o.timer > 0 ? o.timer - 1 : 1 }));
-        return {
-          newOrders: updateTimer(prev.newOrders),
-          accepted: updateTimer(prev.accepted),
-          preparing: updateTimer(prev.preparing),
-          ready: updateTimer(prev.ready),
-        };
-      });
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
+    if (chefId && orgId) {
+      fetchAllOrders();
+    }
+  }, [chefId, orgId]);
 
-  const moveOrder = (from, to, index) => {
-    if (!orders[from] || !orders[to]) return;
-    const orderToMove = orders[from][index];
-    if (!orderToMove) return;
-    setOrders((prev) => {
-      const updatedFrom = (prev[from] || []).filter((_, i) => i !== index);
-      const updatedTo = [...(prev[to] || []), orderToMove];
-      return { ...prev, [from]: updatedFrom, [to]: updatedTo };
-    });
+  const fetchAllOrders = async () => {
+    setAssigned(await fetchOrders("ASSIGNED"));
+    setAccepted(await fetchOrders("ACCEPTED"));
+    setPreparing(await fetchOrders("PREPARING"));
+    setReadyToServe(await fetchOrders("READY_TO_SERVE"));
   };
 
-  const handleAcceptOrder = (index) => {
-    const order = orders.newOrders[index];
-    if (!order) return;
-    const itemParts = order.items.split(",").map((s) => s.trim()).filter(Boolean);
-    const acceptedItems = itemParts.map((itemText, idx) => ({
-      id: `${order.table}-${Date.now()}-${idx}`,
-      table: order.table,
-      time: order.time,
-      ago: order.ago,
-      item: itemText,
-      note: order.note || "",
-      urgent: !!order.urgent,
-      timer: order.timer || 15,
-    }));
-
-    setOrders((prev) => {
-      const updatedNew = prev.newOrders.filter((_, i) => i !== index);
-      return { ...prev, newOrders: updatedNew, accepted: [...acceptedItems, ...prev.accepted] };
-    });
+  const fetchOrders = async (status) => {
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/chef-notifications/all/orders`,
+        {
+          headers,
+          params: {
+            organizationId: orgId,
+            chefId,
+            status,
+          },
+        }
+      );
+      return res.data || [];
+    } catch (err) {
+      console.error(`Failed to fetch ${status}`, err);
+      return [];
+    }
   };
 
-  const handleRejectNewOrder = (index) => {
-    setOrders((prev) => ({
-      ...prev,
-      newOrders: prev.newOrders.filter((_, i) => i !== index),
-    }));
+  // ================= ORDER ITEM STATUS =================
+  const updateItemStatus = async (orderItemId, status, notes = "") => {
+    await axios.put(
+      `${BASE_URL}/${orgId}/orders/order-item/status`,
+      {
+        orderItemId,
+        itemStatus: status,
+        notes,
+      },
+      { headers }
+    );
   };
 
-  const handleRejectAccepted = (index) => {
-    setOrders((prev) => ({
-      ...prev,
-      accepted: prev.accepted.filter((_, i) => i !== index),
-    }));
+  // ================= MENU OUT OF STOCK =================
+  const markMenuOutOfStock = async (menuId) => {
+    await axios.put(
+      `${BASE_URL}/${orgId}/menu/${menuId}/availability`,
+      {
+        available: false,
+        reason: "Out of Stock",
+      },
+      { headers }
+    );
   };
 
-  const handleStartPreparationFromAccepted = (index) => {
-    const acceptedItem = orders.accepted[index];
-    if (!acceptedItem) return;
-    const prepObj = {
-      table: acceptedItem.table,
-      time: acceptedItem.time,
-      ago: acceptedItem.ago,
-      items: acceptedItem.item,
-      note: acceptedItem.note,
-      urgent: acceptedItem.urgent,
-      timer: acceptedItem.timer || 10,
-    };
-    setOrders((prev) => ({
-      ...prev,
-      accepted: prev.accepted.filter((_, i) => i !== index),
-      preparing: [...prev.preparing, prepObj],
-    }));
+  // ================= ACTION HANDLERS =================
+  const handleNext = async (itemId, status) => {
+    try {
+      await updateItemStatus(itemId, status);
+      setTimeout(fetchAllOrders, 300);
+    } catch (err) {
+      console.error("Status update failed", err);
+    }
   };
+
+  const openCancelModal = (itemId) => {
+    setSelectedItemId(itemId);
+    setCancelReason("");
+    setShowCancelModal(true);
+  };
+
+  const confirmCancel = async () => {
+    if (!cancelReason.trim()) {
+      alert("Please enter cancel reason");
+      return;
+    }
+
+    try {
+      await updateItemStatus(selectedItemId, "CANCELLED", cancelReason);
+      setShowCancelModal(false);
+      setTimeout(fetchAllOrders, 300);
+    } catch (err) {
+      console.error("Cancel failed", err);
+    }
+  };
+
+  const handleOutOfStock = async (itemId, menuId) => {
+    try {
+      await updateItemStatus(itemId, "OUT_OF_STOCK");
+      await markMenuOutOfStock(menuId);
+      setTimeout(fetchAllOrders, 300);
+    } catch (err) {
+      console.error("Out of stock failed", err);
+    }
+  };
+
+  // ================= UI =================
+  const renderOrders = (orders, stage) =>
+    orders.length === 0 ? (
+      <p className="empty">No orders</p>
+    ) : (
+      orders.map((order) =>
+        order.orderItems.map((item) => (
+          <div key={item.orderItemId} className="order-card">
+            <p><b>Order Ref:</b> {order.orderReference}</p>
+            <p><b>Table:</b> {order.tableNumber}</p>
+            <p><b>Item:</b> {item.orderItemName}</p>
+            <p><b>Qty:</b> {item.quantity}</p>
+
+            <div className="actions">
+              {stage !== "PREPARING" && stage !== "READY_TO_SERVE" && (
+                <>
+                  <button
+                    className="btn cancel"
+                    onClick={() => openCancelModal(item.orderItemId)}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    className="btn out"
+                    onClick={() =>
+                      handleOutOfStock(item.orderItemId, item.menuId)
+                    }
+                  >
+                    Out of Stock
+                  </button>
+                </>
+              )}
+
+              {stage === "ASSIGNED" && (
+                <button
+                  className="btn accept"
+                  onClick={() => handleNext(item.orderItemId, "ACCEPTED")}
+                >
+                  Accept
+                </button>
+              )}
+
+              {stage === "ACCEPTED" && (
+                <button
+                  className="btn ready"
+                  onClick={() => handleNext(item.orderItemId, "PREPARING")}
+                >
+                  Start Preparing
+                </button>
+              )}
+
+              {stage === "PREPARING" && (
+                <button
+                  className="btn serve"
+                  onClick={() =>
+                    handleNext(item.orderItemId, "READY_TO_SERVE")
+                  }
+                >
+                  Ready to Serve
+                </button>
+              )}
+            </div>
+          </div>
+        ))
+      )
+    );
 
   return (
-    <div className="chef-order-management container">
-      <div className="chef-header-row">
-        <h2>Order Management</h2>
-        <button className="chef-refresh-btn" onClick={() => window.location.reload()}>
-          🔄 Refresh
-        </button>
+    <div className="order-queue">
+      <div className="column">
+        <h3>New Orders</h3>
+        {renderOrders(assigned, "ASSIGNED")}
       </div>
 
-      <div className="chef-kanban-board">
-        {/* New Orders */}
-        <div className="chef-kanban-column">
-          <div className="chef-column-header">
-            <span>New Orders</span>
-            <span className="chef-order-count">{orders?.newOrders?.length || 0}</span>
-          </div>
-          {(orders?.newOrders || []).map((o, i) => (
-            <div key={`new-${i}`} className={`chef-order-item ${o.urgent ? "chef-urgent" : ""}`}>
-              <div className="chef-order-table">
-                <span>{o.table}</span>
-                <span className="chef-timer">{o.timer} min</span>
-              </div>
-              <div className="chef-order-time">{o.time} ({o.ago})</div>
-              <div className="chef-order-items">{o.items}</div>
-              {o.note && <div className="chef-order-note">{o.note}</div>}
-              <div className="chef-order-actions">
-                <button className="chef-btn chef-btn-primary chef-btn-sm" onClick={() => handleAcceptOrder(i)}>✅ Accept</button>
-                <button className="chef-btn chef-btn-reject chef-btn-sm" onClick={() => handleRejectNewOrder(i)}>✖ Reject</button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Accepted */}
-        <div className="chef-kanban-column chef-accepted-column">
-          <div className="chef-column-header">
-            <span>Accepted</span>
-            <span className="chef-order-count">{orders?.accepted?.length || 0}</span>
-          </div>
-          {(orders?.accepted || []).map((a, ai) => (
-            <div key={a.id || `acc-${ai}`} className={`chef-order-item ${a.urgent ? "chef-urgent" : ""}`}>
-              <div className="chef-order-table">
-                <span>{a.table}</span>
-                <span className="chef-timer">{a.timer} min</span>
-              </div>
-              <div className="chef-order-time">{a.time} ({a.ago})</div>
-              <div className="chef-order-items">{a.item}</div>
-              {a.note && <div className="chef-order-note">{a.note}</div>}
-              <div className="chef-order-actions">
-                <button className="chef-btn chef-btn-secondary chef-btn-sm" onClick={() => handleStartPreparationFromAccepted(ai)}>▶ Start Prep</button>
-                <button className="chef-btn chef-btn-reject chef-btn-sm" onClick={() => handleRejectAccepted(ai)}>✖ Reject</button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Preparing */}
-        <div className="chef-kanban-column">
-          <div className="chef-column-header">
-            <span>Preparing</span>
-            <span className="chef-order-count">{orders?.preparing?.length || 0}</span>
-          </div>
-          {(orders?.preparing || []).map((o, i) => (
-            <div key={`prep-${i}`} className={`chef-order-item ${o.urgent ? "chef-urgent" : ""}`}>
-              <div className="chef-order-table">
-                <span>{o.table}</span>
-                <span className="chef-timer">{o.timer} min</span>
-              </div>
-              <div className="chef-order-time">{o.time} ({o.ago})</div>
-              <div className="chef-order-items">{o.items}</div>
-              {o.note && <div className="chef-order-note">{o.note}</div>}
-              <div className="chef-order-actions">
-                <button className="chef-btn chef-btn-secondary chef-btn-sm" onClick={() => moveOrder("preparing", "ready", i)}>🔔 Mark Ready</button>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Ready */}
-        <div className="chef-kanban-column">
-          <div className="chef-column-header">
-            <span>Ready to Serve</span>
-            <span className="chef-order-count">{orders?.ready?.length || 0}</span>
-          </div>
-          {(orders?.ready || []).map((o, i) => (
-            <div key={`ready-${i}`} className="chef-order-item">
-              <div className="chef-order-table">
-                <span>{o.table}</span>
-                <span className="chef-timer">{o.timer} min</span>
-              </div>
-              <div className="chef-order-time">{o.time} ({o.ago})</div>
-              <div className="chef-order-items">{o.items}</div>
-              <div className="chef-order-actions">
-                <button className="chef-btn chef-btn-outline chef-btn-sm" onClick={() => moveOrder("ready", "preparing", i)}>↩ Reopen</button>
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="column">
+        <h3>Accepted Orders</h3>
+        {renderOrders(accepted, "ACCEPTED")}
       </div>
+
+      <div className="column">
+        <h3>Preparing</h3>
+        {renderOrders(preparing, "PREPARING")}
+      </div>
+
+      <div className="column">
+        <h3>Ready to Serve</h3>
+        {renderOrders(readyToServe, "READY_TO_SERVE")}
+      </div>
+
+      {showCancelModal && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <h3>Cancel Order Item</h3>
+
+            <textarea
+              placeholder="Enter reason for cancellation"
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+            />
+
+            <div className="modal-actions">
+              <button className="btn cancel" onClick={() => setShowCancelModal(false)}>
+                Close
+              </button>
+
+              <button className="btn accept" onClick={confirmCancel}>
+                Confirm Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
-}
+};
+
+export default ChefOrderQueue;

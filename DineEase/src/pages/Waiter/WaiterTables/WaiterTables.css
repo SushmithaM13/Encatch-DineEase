@@ -1,0 +1,331 @@
+/* ===========================
+   Container
+=========================== */
+.waiter-table-container {
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ===========================
+   Header
+=========================== */
+.waiter-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.waiter-table-header h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* ===========================
+   Filter Dropdown
+=========================== */
+.waiter-table-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.waiter-table-filter-btn {
+  appearance: none;
+  padding: 8px 32px 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  color: #374151;
+  background: #fff;
+  cursor: pointer;
+}
+
+.waiter-table-filter svg {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  color: #6b7280;
+}
+
+/* ===========================
+   Grid
+=========================== */
+.waiter-table-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 18px;
+}
+
+/* ===========================
+   Card Styles
+=========================== */
+.waiter-table-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  transition: 0.2s ease;
+}
+
+.waiter-table-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+}
+
+.waiter-table-info h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.waiter-table-info p {
+  margin: 3px 0;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+/* ===========================
+   Action Buttons
+=========================== */
+.waiter-table-actions {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.invisible-btn {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.invisible-btn:hover {
+  background: #e5e7eb;
+}
+
+/* ===========================
+   Status Color Indicators
+=========================== */
+.waiter-table-card[data-status="AVAILABLE"] {
+  border-color: #34d399;
+  background: #ecfdf5;
+}
+
+.waiter-table-card[data-status="OCCUPIED"] {
+  border-color: #f87171;
+  background: #fef2f2;
+}
+
+.waiter-table-card[data-status="CLEANING"] {
+  border-color: #facc15;
+  background: #fffbeb;
+}
+
+.waiter-table-card[data-status="RESERVED"] {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.waiter-table-card[data-status="OUT_OF_ORDER"] {
+  border-color: #9ca3af;
+  background: #f3f4f6;
+}
+
+/* ===========================
+   Extra Action Colors
+=========================== */
+.waiter-table-confirm-btn {
+  background: #c7f5d4 !important;
+  border-color: #dc918d !important;
+}
+
+.waiter-table-confirm-btn:hover {
+  background: #efc7b1 !important;
+}
+
+.waiter-table-create-order-btn {
+  background: #fef3c7 !important;
+  border-color: #fcd34d !important;
+}
+
+.waiter-table-create-order-btn:hover {
+  background: #fde68a !important;
+}
+
+.waiter-table-paid-btn {
+  background: #dbeafe !important;
+  border-color: #93c5fd !important;
+}
+
+.waiter-table-paid-btn:hover {
+  background: #bfdbfe !important;
+}
+
+/* ===========================
+   Empty State
+=========================== */
+.waiter-table-grid p {
+  font-size: 15px;
+  color: #6b7280;
+}
+
+/* ===========================
+   Session Badge
+=========================== */
+.waiter-table-session-badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.session-active {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #93c5fd;
+}
+
+.session-none {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+}
+
+/* ===========================
+   Popup Backdrop
+=========================== */
+.waiter-table-popup-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5000;
+}
+
+/* ===========================
+   Popup Box
+=========================== */
+.waiter-table-popup-box {
+  background: white;
+  padding: 20px 26px;
+  border-radius: 12px;
+  width: 330px;
+  text-align: center;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+  animation: fadeScale 0.25s ease-out;
+}
+
+@keyframes fadeScale {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.waiter-table-popup-box h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+/* ===========================
+   Popup Buttons
+=========================== */
+.waiter-table-popup-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.waiter-table-popup-cancel {
+  background: #f3f4f6;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.waiter-table-popup-cancel:hover {
+  background: #e5e7eb;
+}
+
+.waiter-table-popup-confirm {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.waiter-table-popup-confirm:hover {
+  background: #1d4ed8;
+}
+
+.waiter-table-popup-ok {
+  margin-top: 14px;
+  width: 100%;
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.waiter-table-popup-ok:hover {
+  background: #15803d;
+}
+
+/* ===========================
+   Responsive
+=========================== */
+@media (max-width: 768px) {
+  .waiter-tables-page {
+    padding: 15px;
+  }
+
+  .waiter-page-title {
+    font-size: 20px;
+    gap: 6px;
+  }
+
+  .waiter-table-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .waiter-table-card {
+    padding: 12px;
+  }
+
+  .waiter-table-card h3 {
+    font-size: 16px;
+  }
+
+  .waiter-table-card p {
+    font-size: 13px;
+  }
+}

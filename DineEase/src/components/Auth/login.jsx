@@ -57,7 +57,10 @@ const Login = () => {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
+        console.log("🔑 Token:", data.token);
+        
         localStorage.setItem("role", data.role);
+        console.log("👤 Role:", data.role);
 
         if (data.role === "WAITER" && data.name) {
           localStorage.setItem("waiterName", data.name);

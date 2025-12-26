@@ -1,54 +1,337 @@
+/* ============================
+   FORM CARD
+=============================== */
 .admin-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  max-width: 450px;
-  margin: 20px auto;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  max-width: 480px;
+  margin: 25px auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  border-left: 6px solid #ff6600;
 }
 
 .admin-card h3 {
   text-align: center;
-  color: #444;
-  font-size: 1.3rem;
+  color: #333;
+  font-size: 1.4rem;
+  font-weight: 600;
 }
 
+/* ============================
+   INPUT FIELDS
+=============================== */
 .admin-card input,
-.admin-card textarea {
+.admin-card textarea,
+.admin-card select {
   border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 10px;
+  border-radius: 10px;
+  padding: 11px;
   font-size: 1rem;
   width: 100%;
   outline: none;
+  transition: border-color 0.3s;
 }
 
 .admin-card input:focus,
-.admin-card textarea:focus {
+.admin-card textarea:focus,
+.admin-card select:focus {
   border-color: #ff6600;
+  box-shadow: 0 0 4px rgba(255, 102, 0, 0.4);
 }
 
+/* ============================
+   BUTTONS
+=============================== */
 .admin-card button {
   background: #ff6600;
   color: #fff;
   font-weight: bold;
   border: none;
-  border-radius: 8px;
-  padding: 10px;
+  border-radius: 10px;
+  padding: 12px;
   cursor: pointer;
   transition: 0.3s;
+  font-size: 1rem;
 }
 
 .admin-card button:hover {
   background: #ff5500;
 }
 
+/* ============================
+   TABLE STYLING
+=============================== */
+.admin-table {
+  width: 100%;
+  margin: 30px auto;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.admin-table th {
+  background: #ff6600;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.admin-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.9rem;
+}
+
+.admin-table tr:hover {
+  background: #fff3e6;
+}
+
+/* Image thumbnail */
+.admin-table img {
+  width: 55px;
+  height: 55px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+/* ============================
+   ACTION BUTTONS
+=============================== */
+.admin-table button {
+  padding: 7px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+/* Edit button */
+.admin-table button:nth-child(1) {
+  background: #0077ff;
+  color: white;
+}
+
+.admin-table button:nth-child(1):hover {
+  background: #0063d4;
+}
+
+/* Delete button */
+.admin-table .danger {
+  background: #ff3b3b;
+  color: white;
+}
+
+.admin-table .danger:hover {
+  background: #e60000;
+}
+
+
+.admin-container {
+  padding: 20px;
+}
+
+.add-btn {
+  background: #5f63f2;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.admin-table th {
+  background: #5f63f2;
+  color: white;
+  padding: 12px;
+}
+
+.admin-table td {
+  border-bottom: 1px solid #ddd;
+  padding: 10px;
+}
+
+.edit-btn {
+  background: #ffa83d;
+  padding: 6px 12px;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.delete-btn {
+  background: #ff3d57;
+  padding: 6px 12px;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* POPUP */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-card {
+  background: white;
+  width: 420px;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0px 5px 15px rgba(0,0,0,0.3);
+}
+
+.popup-card input,
+.popup-card textarea,
+.popup-card select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #bbb;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: right;
+  gap: 10px;
+}
+
+.save-btn {
+  background: #5f63f2;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+}
+
+.cancel-btn {
+  background: #aaa;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+}
+
+/* ============================
+   ADD-ON VIEW TOGGLE SECTION
+=============================== */
+
+/* Hidden by default */
+.view-details-row {
+  background: #fff7ec;
+  display: none;
+  transition: 0.3s ease-in-out;
+}
+
+/* When active (opened) */
+.view-details-row.active {
+  display: table-row;
+}
+
+/* Box inside opened details */
+.view-box {
+  padding: 15px;
+  background: #fff;
+  border-radius: 8px;
+  border-left: 4px solid #ff6600;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.12);
+}
+
+.view-box h4 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.view-box p {
+  margin: 4px 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.view-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  object-fit: cover;
+  margin-top: 10px;
+  border: 2px solid #ddd;
+}
+
+/* View button style */
+.view-btn {
+  background: #0077ff;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.view-btn:hover {
+  background: #0062d1;
+}
+
+
+
+/* ============================
+   RESPONSIVE DESIGN
+=============================== */
+
+@media (max-width: 900px) {
+  .admin-table th,
+  .admin-table td {
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+}
+
 @media (max-width: 600px) {
   .admin-card {
-    width: 90%;
-    padding: 15px;
+    width: 92%;
+    padding: 18px;
+  }
+
+  .admin-table {
+    font-size: 0.8rem;
+    overflow-x: auto;
+    display: block;
+    white-space: nowrap;
+  }
+
+  .admin-table img {
+    width: 45px;
+    height: 45px;
   }
 }

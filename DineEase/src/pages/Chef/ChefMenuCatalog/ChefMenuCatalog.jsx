@@ -1,35 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./ChefMenuCatalog.css";
 
 export default function ChefMenuCatalog() {
-  const [menuItems, setMenuItems] = useState([
-    {
-      name: "Grilled Salmon",
-      desc: "Fresh Atlantic salmon with herbs and lemon butter sauce",
-      price: 24.99,
-      category: "Main Course",
-      status: "In Stock",
-      img: "https://via.placeholder.com/300x200/FF8F00/FFFFFF?text=Grilled+Salmon",
-    },
-    {
-      name: "Vegetarian Pasta",
-      desc: "Penne pasta with seasonal vegetables in creamy sauce",
-      price: 16.99,
-      category: "Vegetarian",
-      status: "In Stock",
-      img: "https://via.placeholder.com/300x200/2E7D32/FFFFFF?text=Veg+Pasta",
-    },
-    {
-      name: "Chocolate Cake",
-      desc: "Rich chocolate cake with ganache frosting",
-      price: 8.99,
-      category: "Desserts",
-      status: "Out of Stock",
-      img: "https://via.placeholder.com/300x200/EF5350/FFFFFF?text=Chocolate+Cake",
-    },
-  ]);
-
-  const [activeFilter, setActiveFilter] = useState("All Items");
+  const API_PROFILE =
+    "http://localhost:8082/dine-ease/api/v1/staff/profile";
+  const API_MENU =
+    "http://localhost:8082/dine-ease/api/v1/menu/getAll";
+  const API_AVAILABILITY =
+    "http://localhost:8082/dine-ease/api/v1/menu";
 
   const categories = [
     "All Items",
@@ -41,98 +19,192 @@ export default function ChefMenuCatalog() {
     "Desserts",
   ];
 
-  const filteredItems =
-    activeFilter === "All Items"
-      ? menuItems
-      : menuItems.filter((item) => item.category === activeFilter);
+  const token = localStorage.getItem("token");
 
-  const toggleStock = (name) => {
-    const updated = menuItems.map((item) =>
-      item.name === name
-        ? {
-            ...item,
-            status: item.status === "Out of Stock" ? "In Stock" : "Out of Stock",
-          }
-        : item
-    );
-    setMenuItems(updated);
+  const [orgId, setOrgId] = useState(null);
+  const [menuItems, setMenuItems] = useState([]);
+  const [filteredItems, setFilteredItems] = useState([]);
+  const [activeCategory, setActiveCategory] = useState("All Items");
+  const [loading, setLoading] = useState(true);
+
+  const normalize = (str) => str?.toLowerCase().trim();
+
+  /* -------------------- FETCH PROFILE (ORG ID) -------------------- */
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch(API_PROFILE, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+      if (data.organizationId) {
+        setOrgId(data.organizationId);
+      }
+    } catch (error) {
+      console.error("Profile fetch error:", error);
+    }
   };
 
-  const handleReportOut = () => {
-    const outItems = menuItems.filter((i) => i.status === "Out of Stock");
-    alert(
-      outItems.length
-        ? `Out of Stock Items:\n${outItems.map((i) => i.name).join("\n")}`
-        : "No items are out of stock!"
-    );
+  /* -------------------- FETCH MENU ITEMS -------------------- */
+  const fetchMenuItems = async (organizationId) => {
+    try {
+      setLoading(true);
+      const res = await fetch(
+        `${API_MENU}?organizationId=${organizationId}&page=0&size=200`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+      const items = Array.isArray(data.content) ? data.content : data;
+
+      const formatted = items.map((i) => ({
+        id: i.id,
+        name: i.itemName,
+        desc: i.description,
+        price: i.price || 0,
+        img: i.imageData
+          ? `data:image/jpeg;base64,${i.imageData}`
+          : "",
+        category: i.categoryName,
+        isVeg: i.itemTypeName?.toLowerCase() === "veg",
+        inStock: i.isAvailable,
+      }));
+
+      setMenuItems(formatted);
+    } catch (error) {
+      console.error("Menu fetch error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  /* -------------------- TOGGLE AVAILABILITY -------------------- */
+  const toggleStock = async (itemId) => {
+    const currentItem = menuItems.find((i) => i.id === itemId);
+    if (!currentItem) return;
+
+    try {
+      const res = await fetch(
+        `${API_AVAILABILITY}/${itemId}/availability`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            isAvailable: !currentItem.inStock,
+            reason: !currentItem.inStock
+              ? "Item back in stock"
+              : "Item temporarily unavailable",
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        console.error(await res.text());
+        return;
+      }
+
+      setMenuItems((prev) =>
+        prev.map((m) =>
+          m.id === itemId
+            ? { ...m, inStock: !m.inStock }
+            : m
+        )
+      );
+    } catch (error) {
+      console.error("Availability update error:", error);
+    }
+  };
+
+  /* -------------------- FILTER DERIVED STATE -------------------- */
+  useEffect(() => {
+    let result = menuItems;
+
+    if (activeCategory === "Vegetarian") {
+      result = menuItems.filter((i) => i.isVeg);
+    } else if (activeCategory === "Non-Vegetarian") {
+      result = menuItems.filter((i) => !i.isVeg);
+    } else if (activeCategory !== "All Items") {
+      result = menuItems.filter(
+        (i) => normalize(i.category) === normalize(activeCategory)
+      );
+    }
+
+    setFilteredItems(result);
+  }, [menuItems, activeCategory]);
+
+  /* -------------------- EFFECTS -------------------- */
+  useEffect(() => {
+    if (token) fetchProfile();
+  }, [token]);
+
+  useEffect(() => {
+    if (orgId) fetchMenuItems(orgId);
+  }, [orgId]);
+
+  /* -------------------- UI -------------------- */
   return (
     <div className="chef-menu-catalog chef-container">
-      <div className="chef-menu-header">
-        <h2>Menu Catalog</h2>
-        <button className="chef-btn chef-btn-outline" onClick={handleReportOut}>
-          ⚠ Report Out of Stock
-        </button>
-      </div>
+      <h2>🍽 Menu Catalog</h2>
 
-      <div className="chef-filter-chips">
+      <div className="chef-category-filter">
         {categories.map((cat) => (
           <button
             key={cat}
-            className={`chef-chip ${activeFilter === cat ? "chef-active" : ""}`}
-            onClick={() => setActiveFilter(cat)}
+            className={`chef-category-btn ${
+              activeCategory === cat ? "active" : ""
+            }`}
+            onClick={() => setActiveCategory(cat)}
           >
             {cat}
           </button>
         ))}
       </div>
 
-      <div className="chef-menu-grid">
-        {filteredItems.length === 0 ? (
-          <p className="chef-no-items">No items in this category.</p>
-        ) : (
-          filteredItems.map((item) => (
-            <div
-              key={item.name}
-              className={`chef-menu-card ${
-                item.status === "Out of Stock" ? "chef-out-of-stock" : ""
-              }`}
-            >
+      {loading ? (
+        <p>Loading…</p>
+      ) : filteredItems.length === 0 ? (
+        <p>No Items Found.</p>
+      ) : (
+        <div className="chef-menu-grid">
+          {filteredItems.map((item) => (
+            <div key={item.id} className="chef-menu-card">
               <div
                 className="chef-menu-img"
                 style={{ backgroundImage: `url(${item.img})` }}
-              ></div>
+              />
+
               <div className="chef-menu-body">
                 <div className="chef-menu-title">
                   <span>{item.name}</span>
-                  <span className="chef-price">${item.price.toFixed(2)}</span>
+                  <span className="chef-price">₹{item.price}</span>
                 </div>
+
                 <p className="chef-desc">{item.desc}</p>
-                <div className="chef-menu-footer">
-                  <span
-                    className={`chef-badge ${
-                      item.status === "Out of Stock"
-                        ? "chef-badge-error"
-                        : "chef-badge-success"
-                    }`}
-                  >
-                    {item.status}
-                  </span>
-                  <button
-                    className="chef-btn chef-btn-sm chef-btn-outline"
-                    onClick={() => toggleStock(item.name)}
-                  >
-                    {item.status === "Out of Stock"
-                      ? "Mark In Stock"
-                      : "Mark Out"}
-                  </button>
-                </div>
+
+                <button
+                  className={`chef-badge ${
+                    item.inStock
+                      ? "chef-badge-success"
+                      : "chef-badge-error"
+                  }`}
+                  onClick={() => toggleStock(item.id)}
+                >
+                  {item.inStock ? "✔ In Stock" : "✘ Out of Stock"}
+                </button>
               </div>
             </div>
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

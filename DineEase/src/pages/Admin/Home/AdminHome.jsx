@@ -146,7 +146,7 @@ export default function AdminHome() {
         <div className="admin-home-section-header">
           <span>Staff Members</span>
           <button onClick={() => navigate("/AdminDashboard/staff")}>
-            More →
+            View all →
           </button>
         </div>
         <div className="admin-home-preview-list">
@@ -169,7 +169,7 @@ export default function AdminHome() {
         <div className="admin-home-section-header">
           <span>Menu Items</span>
           <button onClick={() => navigate("/AdminDashboard/menu")}>
-            More →
+            View all →
           </button>
         </div>
 
@@ -214,7 +214,7 @@ export default function AdminHome() {
         <div className="admin-home-section-header">
           <span>Restaurant Tables</span>
           <button onClick={() => navigate("/AdminDashboard/table")}>
-            More →
+            View all →
           </button>
         </div>
         <div className="admin-home-preview-list">

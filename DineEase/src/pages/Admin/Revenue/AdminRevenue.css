@@ -1,74 +1,57 @@
-/* ============================= */
-/* 🍛 Admin Revenue Management Styles */
-/* ============================= */
-
+/* ================= ROOT PAGE ================= */
 .admin-revenue-page {
   padding: 20px;
-  font-family: Arial, sans-serif;
-  background: #f9f9f9;
+  background: #f4f6f8;
   min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, sans-serif;
 }
 
-/* Page Title */
 .admin-page-title {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 20px;
-  text-align: center;
-  color: #222;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 20px;
 }
 
-/* Revenue Summary Cards */
+/* ================= SUMMARY CARDS ================= */
 .admin-revenue-cards {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .admin-card {
-  flex: 1 1 200px;
-  background: #fff;
-  border-radius: 12px;
+  background: #ffffff;
   padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.admin-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
 }
 
 .admin-card h4 {
   font-size: 20px;
   margin-bottom: 6px;
-  color: #111;
+  color: #2e7d32;
 }
 
 .admin-card p {
   font-size: 14px;
-  color: #555;
-  margin: 0;
+  color: #666;
 }
 
-/* Graph Box */
+/* ================= GRAPH ================= */
 .admin-revenue-graph-box {
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  padding: 15px;
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   overflow-x: auto;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* Graph Header */
 .admin-revenue-graph-header {
   display: flex;
   justify-content: space-between;
@@ -78,69 +61,117 @@
 
 .admin-revenue-graph-header h3 {
   font-size: 18px;
-  color: #111;
-  margin: 0;
+  font-weight: 600;
 }
 
-.admin-revenue-filter {
-  padding: 6px 12px;
+.admin-revenue-graph-header select {
+  padding: 6px 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  background: #fff;
-  cursor: pointer;
+  outline: none;
+}
+
+/* ================= CUSTOM DATE PICKER ================= */
+.admin-revenue-custom-dates {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.react-datepicker-wrapper input {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+/* ================= TABLE SECTION ================= */
+.admin-revenue-table-section {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.admin-revenue-table-section h3 {
+  margin-bottom: 14px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ================= MAIN TABLE ================= */
+.admin-revenue-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-revenue-table th,
+.admin-revenue-table td {
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  text-align: center;
   font-size: 14px;
 }
 
-.admin-revenue-filter:hover {
-  border-color: #888;
+.admin-revenue-table th {
+  background: #f4f6f8;
+  font-weight: 600;
 }
 
-/* Custom Date Picker */
-.admin-revenue-custom-dates {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
+/* ================= BUTTON ================= */
+.admin-revenue-table button {
+  padding: 5px 12px;
+  border: none;
+  background: #4caf50;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
 }
 
-/* Chart Container */
-.admin-revenue-chart-container {
-  min-height: 300px;
+.admin-revenue-table button:hover {
+  background: #43a047;
 }
 
-/* Scrollbar Styling */
-.admin-revenue-graph-box::-webkit-scrollbar {
-  height: 6px;
+/* ================= DROPDOWN ROW ================= */
+.admin-revenue-table tr:nth-child(even) {
+  background: #fafafa;
 }
 
-.admin-revenue-graph-box::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 6px;
+/* ================= NESTED ORDERS TABLE ================= */
+.nested-orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
 }
 
-.admin-revenue-graph-box::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 6px;
+.nested-orders-table th,
+.nested-orders-table td {
+  padding: 8px;
+  border: 1px solid #d0d0d0;
+  font-size: 13px;
 }
 
-/* Responsive */
+.nested-orders-table th {
+  background: #eeeeee;
+  font-weight: 600;
+}
+
+/* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
-  .admin-revenue-cards {
-    flex-direction: column;
-  }
-}
-
-@media (max-width: 480px) {
-  .admin-page-title {
-    font-size: 20px;
-  }
-
-  .admin-card h4 {
-    font-size: 18px;
-  }
-
   .admin-revenue-graph-header {
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     align-items: flex-start;
+  }
+
+  .admin-revenue-custom-dates {
+    flex-direction: column;
+  }
+
+  .admin-revenue-table th,
+  .admin-revenue-table td {
+    font-size: 12px;
+    padding: 8px;
   }
 }

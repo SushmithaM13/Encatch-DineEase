@@ -1,248 +1,774 @@
+/* ================= ROOT VARIABLES ================= */
 :root {
-  --green: #27ae60;
-  --orange: #f39c12;
-  --red: #e74c3c;
-  --light-green: #a8e6cf;
-  --bg-light: #f9fafb;
-  --text-dark: #2d3436;
-  --gray: #64748b;
-  --shadow: rgba(0, 0, 0, 0.08);
+  /* Soft, Pastel Colors */
+  --primary-green: #7dd3ae;
+  --green-hover: #5bc59a;
+  --soft-blue: #8cb4ff;
+  --soft-purple: #b8a3ff;
+  --soft-orange: #ffb380;
+  --soft-red: #ff9999;
+  --soft-teal: #6fd9cf;
+  --soft-yellow: #ffd966;
+  --soft-gray: #b0b8c4;
+  --soft-pink: #ffb3d9;
+  
+  /* Text Colors */
+  --text-primary: #2d3748;
+  --text-secondary: #718096;
+  --text-light: #a0aec0;
+  
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f7fafc;
+  --bg-tertiary: #edf2f7;
+  --bg-light-green: #f0fdf4;
+  --bg-light-blue: #eff6ff;
+  --bg-light-purple: #f5f3ff;
+  --bg-light-orange: #fff7ed;
+  --bg-light-red: #fef2f2;
+  
+  /* Border & Shadow */
+  --border-light: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 30px -5px rgba(0, 0, 0, 0.12);
+  
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Border Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
 }
 
-.chef-home-container {
-  padding: 2rem;
-  font-family: "Inter", sans-serif;
+/* ================= RESET & BASE ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ✅ Welcome Section */
-.chef-welcome-section {
+/* ================= MAIN WRAPPER ================= */
+.chef-homepage-wrapper {
+  min-height: 100vh;
+  background: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text-primary);
+}
+
+/* ================= TOP BAR ================= */
+.chef-top-bar {
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+  border-bottom: 2px solid var(--primary-green);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.chef-top-bar-content {
+  width: 85%;
+  max-width: 1400px;
+  height: auto;
+  min-height: 15vh;
+  margin: 0 auto;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.chef-greeting {
+  flex: 1;
+  min-width: 250px;
+}
+
+.chef-title {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #10b981, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--spacing-xs);
+  letter-spacing: -0.03em;
+}
+
+.chef-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ================= DATE FILTER ================= */
+.chef-date-filter {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-  background: white;
-  padding: 2rem;
-  border-radius: 14px;
-  box-shadow: 0 4px 10px var(--shadow);
+  gap: var(--spacing-md);
+  background: linear-gradient(135deg, #ffffff, #f0fdf4);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  border: 2px solid var(--primary-green);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
 }
 
-.chef-welcome-text h1 {
-  font-size: 2rem;
+.chef-date-filter:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  border-color: var(--green-hover);
+}
+
+.date-icon {
+  font-size: 1.5rem;
+  color: var(--primary-green);
+}
+
+.date-inputs {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.date-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.date-input-group label {
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--text-dark);
+  color: var(--primary-green);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
-.chef-welcome-text p {
+.date-input {
+  padding: 0.6rem 0.9rem;
+  border: 2px solid var(--primary-green);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  transition: all 0.25s ease;
+  cursor: pointer;
+  min-width: 145px;
+}
+
+.date-input:hover {
+  border-color: var(--green-hover);
+  background: var(--bg-light-green);
+  transform: scale(1.02);
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: var(--green-hover);
+  box-shadow: 0 0 0 4px rgba(125, 211, 174, 0.2);
+  background: var(--bg-primary);
+}
+
+.date-separator {
+  font-size: 1.25rem;
+  color: var(--primary-green);
+  font-weight: 700;
+  padding-top: 1rem;
+}
+
+/* ================= MAIN CONTENT ================= */
+.chef-main-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-lg);
+  letter-spacing: -0.03em;
+  position: relative;
+  padding-left: var(--spacing-md);
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 70%;
+  background: linear-gradient(180deg, #10b981, #06b6d4);
+  border-radius: 10px;
+}
+
+/* ================= HERO SECTION WITH IMAGE ================= */
+.chef-hero-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 50%, #eff6ff 100%);
+  border-radius: var(--radius-2xl);
+  padding: var(--spacing-2xl);
+  margin-bottom: var(--spacing-2xl);
+  box-shadow: var(--shadow-lg);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-image: linear-gradient(135deg, var(--primary-green), var(--soft-blue)) 1;
+  display: flex;
+  gap: var(--spacing-2xl);
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.chef-hero-section:hover {
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-5px);
+}
+
+.chef-hero-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #10b981, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--spacing-md);
+  letter-spacing: -0.03em;
+}
+
+.hero-description {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-xl);
+  font-weight: 500;
+}
+
+.chef-hero-right {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.chef-hero-right::before {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.2), transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.chef-image {
+  width: 350px;
+  height: auto;
+  filter: drop-shadow(0 15px 30px rgb(255, 255, 255));
+  transition: transform 0.4s ease;
+  background-color: #12a16d;
+  position: relative;
+  z-index: 1;
+}
+
+.chef-image:hover {
+  transform: scale(1.08) rotate(2deg);
+}
+
+/* ================= STATS SECTION (INSIDE HERO) ================= */
+
+.stats-grid {
+  display: grid;
+  gap: var(--spacing-md);
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.stat-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  box-shadow: var(--shadow-md);
+  border: 2px solid;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background: currentColor;
+  transition: all 0.35s ease;
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, currentColor, transparent 70%);
+  opacity: 0.08;
+  transition: opacity 0.35s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 15px 35px -5px currentColor;
+  border-color: currentColor;
+}
+
+.stat-card:hover::after {
+  opacity: 0.12;
+}
+
+.stat-icon {
+  font-size: 2.8rem;
+  line-height: 1;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.stat-details {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* Stat Color Variants with Enhanced Colors */
+.stat-blue { 
+  color: #3b82f6;
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #eff6ff, #ffffff);
+}
+.stat-purple { 
+  color: #8b5cf6;
+  border-color: #8b5cf6;
+  background: linear-gradient(135deg, #f5f3ff, #ffffff);
+}
+.stat-green { 
+  color: #10b981;
+  border-color: #10b981;
+  background: linear-gradient(135deg, #f0fdf4, #ffffff);
+}
+.stat-orange { 
+  color: #f59e0b;
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, #fff7ed, #ffffff);
+}
+.stat-teal { 
+  color: #14b8a6;
+  border-color: #14b8a6;
+  background: linear-gradient(135deg, #f0fdfa, #ffffff);
+}
+.stat-red { 
+  color: #ef4444;
+  border-color: #ef4444;
+  background: linear-gradient(135deg, #fef2f2, #ffffff);
+}
+.stat-gray { 
+  color: #6b7280;
+  border-color: #6b7280;
+  background: linear-gradient(135deg, #f9fafb, #ffffff);
+}
+
+/* ================= LOADING STATE ================= */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl);
+  gap: var(--spacing-md);
+}
+
+.spinner {
+  width: 52px;
+  height: 52px;
+  border: 5px solid var(--border-light);
+  border-top-color: #10b981;
+  border-right-color: #06b6d4;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-state p {
+  color: var(--text-secondary);
+  font-weight: 600;
   font-size: 1rem;
-  margin-top: 8px;
-  color: var(--gray);
+}
+
+/* ================= QUICK ACTIONS ================= */
+.chef-actions-section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.chef-cards-grid {
+  display: grid;
+  gap: var(--spacing-lg);
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.chef-feature-card {
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  border: 3px solid;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.chef-feature-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, currentColor, transparent 70%);
+  opacity: 0.08;
+  transition: opacity 0.35s ease;
+}
+
+.chef-feature-card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 20px 40px -5px currentColor;
+}
+
+.chef-feature-card:hover::before {
+  opacity: 0.12;
+}
+
+.chef-feature-card:active {
+  transform: translateY(-6px) scale(1.02);
+}
+
+.card-icon-wrapper {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.35s ease;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.chef-feature-card:hover .card-icon-wrapper {
+  transform: scale(1.2) rotate(-10deg);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.card-icon {
+  font-size: 2rem;
+  color: #ffffff;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.card-content {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.card-content h3 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.02em;
+}
+
+.card-content p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
   line-height: 1.6;
 }
 
-/* ✅ Buttons */
-.chef-button-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 1rem;
+/* Card Color Variants - Enhanced with Bold Colors */
+.card-yellow {
+  color: #f59e0b;
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, #fffbeb, #ffffff);
+}
+.card-yellow .card-icon-wrapper {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
 }
 
-.chef-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 15px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  border: none;
-  transition: 0.2s ease;
-  font-weight: 600;
+.card-green {
+  color: #10b981;
+  border-color: #10b981;
+  background: linear-gradient(135deg, #f0fdf4, #ffffff);
+}
+.card-green .card-icon-wrapper {
+  background: linear-gradient(135deg, #34d399, #10b981);
 }
 
-.chef-btn-icon {
-  font-size: 1rem;
+.card-red {
+  color: #ef4444;
+  border-color: #ef4444;
+  background: linear-gradient(135deg, #fef2f2, #ffffff);
+}
+.card-red .card-icon-wrapper {
+  background: linear-gradient(135deg, #f87171, #ef4444);
 }
 
-/* Filled button */
-.chef-btn-green {
-  background: var(--green);
-  color: white;
-}
+/* ================= RESPONSIVE DESIGN ================= */
 
-.chef-btn-green:hover {
-  opacity: 0.85;
-}
-
-/* Outline buttons */
-.chef-btn-outline-green {
-  border: 2px solid var(--green);
-  color: var(--green);
-  background: transparent;
-}
-
-.chef-btn-outline-green:hover {
-  background: var(--green);
-  color: white;
-}
-
-.chef-btn-outline-orange {
-  border: 2px solid var(--orange);
-  color: var(--orange);
-}
-
-.chef-btn-outline-orange:hover {
-  background: var(--orange);
-  color: white;
-}
-
-.chef-btn-outline-red {
-  border: 2px solid var(--red);
-  color: var(--red);
-}
-
-.chef-btn-outline-red:hover {
-  background: var(--red);
-  color: white;
-}
-
-/* ✅ Badges */
-.chef-badges {
-  display: flex;
-  gap: 10px;
-  margin-top: 1rem;
-  flex-wrap: wrap;
-}
-
-.chef-badge {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  gap: 6px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  color: white;
-  font-weight: 600;
-}
-
-.chef-badge.chef-orange { background: var(--orange); }
-.chef-badge.chef-red { background: var(--red); }
-.chef-badge.chef-green { background: var(--green); }
-
-/* ✅ Welcome Image */
-.chef-welcome-image img {
-  width: 260px;
-  filter: drop-shadow(0 4px 8px var(--shadow));
-}
-
-/* ✅ Info Cards */
-.chef-info-cards {
-  margin-top: 2rem;
-  display: grid;
-  gap: 1.2rem;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.chef-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px var(--shadow);
-  text-align: center;
-  cursor: pointer;
-  transition: 0.25s ease;
-}
-
-.chef-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 5px 15px var(--shadow);
-}
-
-.chef-card-icon {
-  font-size: 2rem;
-  margin-bottom: 8px;
-}
-
-.chef-card.chef-green { border-left: 6px solid var(--green); }
-.chef-card.chef-orange { border-left: 6px solid var(--orange); }
-.chef-card.chef-red { border-left: 6px solid var(--red); }
-.chef-card.chef-green-light { border-left: 6px solid var(--light-green); }
-
-/* ✅ Bottom Section */
-.chef-bottom-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.2rem;
-  margin-top: 2rem;
-}
-
-.chef-tips-card, 
-.chef-shortcuts-card {
-  background: white;
-  padding: 1.6rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px var(--shadow);
-}
-
-.chef-tips-card h3,
-.chef-shortcuts-card h3 {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text-dark);
-  margin-bottom: 0.8rem;
-}
-
-.chef-tips-card ul {
-  padding-left: 18px;
-  color: var(--gray);
-  font-size: 0.95rem;
-}
-
-.chef-text-red {
-  color: var(--red);
-}
-
-/* ✅ Shortcut Buttons */
-.chef-shortcut-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.chef-btn-outline {
-  border: 2px solid var(--gray);
-  color: var(--text-dark);
-  background: transparent;
-  width: 100%;
-}
-
-.chef-btn-outline:hover {
-  background: var(--text-dark);
-  color: white;
-}
-
-/* ✅ Responsive */
-@media (max-width: 900px) {
-  .chef-welcome-section {
+/* Mobile Devices (up to 640px) */
+@media (max-width: 640px) {
+  .chef-top-bar-content {
+    width: 95%;
     flex-direction: column;
-    text-align: center;
+    align-items: stretch;
+    padding: var(--spacing-md);
+    min-height: auto;
   }
-
-  .chef-welcome-image img {
-    width: 200px;
+  
+  .chef-title {
+    font-size: 1.6rem;
   }
-
-  .chef-button-group {
-    justify-content: center;
+  
+  .chef-subtitle {
+    font-size: 0.85rem;
+  }
+  
+  .chef-date-filter {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--spacing-md);
+    width: 100%;
+  }
+  
+  .date-inputs {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .date-separator {
+    display: none;
+  }
+  
+  .date-input {
+    min-width: 100%;
+  }
+  
+  .chef-main-content {
+    padding: var(--spacing-md);
+  }
+  
+  /* Hero section - stack vertically on mobile */
+  .chef-hero-section {
+    flex-direction: column;
+    padding: var(--spacing-lg);
+  }
+  
+  .hero-title {
+    font-size: 1.6rem;
+  }
+  
+  .hero-description {
+    font-size: 0.9rem;
+  }
+  
+  .chef-hero-right::before {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .chef-image {
+    width: 280px;
+    margin-top: var(--spacing-lg);
+  }
+  
+  .section-title {
+    font-size: 1.35rem;
+  }
+  
+  /* Single column on mobile */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .chef-cards-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .chef-feature-card {
+    padding: var(--spacing-lg);
+  }
+  
+  .card-icon-wrapper {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .card-icon {
+    font-size: 1.6rem;
   }
 }
 
-@media (max-width: 600px) {
-  .chef-home-container {
-    padding: 1rem;
+/* Tablets (641px to 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .chef-top-bar-content {
+    width: 90%;
+    padding: var(--spacing-lg);
   }
+  
+  .chef-hero-section {
+    padding: var(--spacing-xl);
+  }
+  
+  .chef-hero-right::before {
+    width: 350px;
+    height: 350px;
+  }
+  
+  .chef-image {
+    width: 300px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .chef-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
-  .chef-welcome-text h1 {
-    font-size: 1.6rem;
+/* Small Laptops (1025px to 1280px) */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .chef-top-bar-content {
+    width: 88%;
+  }
+  
+  .chef-image {
+    width: 320px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .chef-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Normal & Gaming Laptops (1281px and above) */
+@media (min-width: 1281px) {
+  .chef-top-bar-content {
+    width: 85%;
+  }
+  
+  .chef-image {
+    width: 350px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .chef-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Extra Large Screens (1536px and above) */
+@media (min-width: 1536px) {
+  .chef-main-content {
+    max-width: 1600px;
+  }
+  
+  .chef-hero-right::before {
+    width: 450px;
+    height: 450px;
+  }
+  
+  .chef-image {
+    width: 400px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .chef-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
