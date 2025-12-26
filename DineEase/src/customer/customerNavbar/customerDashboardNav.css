@@ -1,27 +1,20 @@
-/* .customer-dashboard-navbar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  border: 2px solid blue;
-} */
+
 .customer-navbar-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #ff914d;
-  padding: 10px 26px;
-  box-shadow: 0 2px 16px #ff914d23;
-  position: sticky;
-  top: 0;
-  z-index: 101;
-  border-radius: 0 0 18px 18px;
   /* border: 2px solid green; */
+  height: 72px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 1.2rem;
+  background: #ff914d;
+  box-shadow: 0 2px 16px #ff914d23;
 }
 
 .customer-navbar-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.6rem;
 }
 .customer-navbar-logo { width: 34px; }
 .customer-navbar-title { font-size: 1.4rem; font-weight: 700; color: #fff; }
@@ -31,12 +24,16 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 22px;
+  /* margin: 0 22px; */
   max-width: 440px;
   background: #fff9f0;
   border-radius: 24px;
   box-shadow: 0 2px 8px #ffd70020;
+  
   position: relative;
+  /* max-width: 520px; */
+  width: 100%;
+  margin: auto;
 }
 
 .customer-navbar-search-icon {
@@ -49,7 +46,7 @@
 
 /* Only input, no button */
 .customer-navbar-search-input {
-  flex: 1;
+  /* flex: 1; */
   padding: 8px 20px 8px 8px;
   border: none;
   outline: none;
@@ -59,6 +56,12 @@
   color: #242424;
   min-width: 140px;
   font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  width: 100%;
+  padding: 0.65rem 0.9rem 0.65rem 2.5rem;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  font-size: 0.95rem;
 }
 .customer-navbar-search-input::placeholder {
   color: #b97c44;

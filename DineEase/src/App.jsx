@@ -75,7 +75,7 @@ import Footer from './components/footer/Footer';
 // ===== Customer pages =====
 import CustomerLogin from './customer/customerLogin/customerLogin';
 import OTPVerification from './customer/customerLogin/otpVerification';
-import CustomerDashboard from './customer/customerDashboard/CustomerDashboard';
+import CustomerDashboard from './customer/customerDashboard/customerDashboard';
 import EnterSessionId from './customer/customerLogin/EnterSessionId';
 
 function App() {
