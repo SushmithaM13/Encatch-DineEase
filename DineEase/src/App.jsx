@@ -89,7 +89,6 @@ import Footer from './components/footer/Footer';
 import CustomerLogin from './customer/customerLogin/customerLogin';
 import OTPVerification from './customer/customerLogin/otpVerification';
 import CustomerDashboard from './customer/customerDashboard/customerDashboard';
-
 import EnterSessionId from './customer/customerLogin/EnterSessionId';
 import CustomerCart from "./customer/customercart/CustomerCart";
 import CustomerOrders from './customer/order/CustomerOrder';
