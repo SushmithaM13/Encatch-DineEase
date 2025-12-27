@@ -21,7 +21,6 @@ import {
   FaChartBar,
   FaFileAlt,
 } from "react-icons/fa";
-import { icon } from "@fortawesome/fontawesome-svg-core";
 
 const SuperAdminDashboard = () => {
   const [hotels, setHotels] = useState([]);
@@ -50,104 +49,87 @@ const SuperAdminDashboard = () => {
   ];
 
   const menuOptions = [
-  { path: "/superAdminDashboard/AddMenu-form", label: "Menu List", icon: <FaUtensils /> },
-  { path: "/superAdminDashboard/category-form", label: "Add Category", icon: <FaFolder /> },
-  { path: "/superAdminDashboard/add-item-type", label: "Add Item", icon: <FaPlusCircle /> },
-  { path: "/superAdminDashboard/food-type", label: "Food Type", icon: <FaUtensils /> },
-  { path: "/superAdminDashboard/cuisine-type", label: "Cuisine Type", icon: <FaBars /> },
-  { path: "/superAdminDashboard/addon-form", label: "Add Addon", icon: <FaPuzzlePiece /> },
-  { path: "/superAdminDashboard/customization-group-form", label: "Customization Group", icon: <FaMagic /> },
-];
-
-
+    { path: "/superAdminDashboard/AddMenu-form", label: "Menu List", icon: <FaUtensils /> },
+    { path: "/superAdminDashboard/category-form", label: "Add Category", icon: <FaFolder /> },
+    { path: "/superAdminDashboard/add-item-type", label: "Add Item", icon: <FaPlusCircle /> },
+    { path: "/superAdminDashboard/food-type", label: "Food Type", icon: <FaUtensils /> },
+    { path: "/superAdminDashboard/cuisine-type", label: "Cuisine Type", icon: <FaBars /> },
+    { path: "/superAdminDashboard/addon-form", label: "Add Addon", icon: <FaPuzzlePiece /> },
+    { path: "/superAdminDashboard/customization-group-form", label: "Customization Group", icon: <FaMagic /> },
+  ];
 
   useEffect(() => {
-  // ======================
-  //  LOAD DATA ONCE
-  // ======================
-
-  try {
-    const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
-    setHotels(storedHotels);
-  } catch {
-    setHotels([]);
-  }
-
-  // USER NAME LOAD
-  const updatedFullName = localStorage.getItem("superAdminFullName");
-  if (updatedFullName && updatedFullName !== "null" && updatedFullName !== "undefined") {
-    setUserName(updatedFullName);
-  } else {
-    const userRaw = localStorage.getItem("user");
-    const userObj =
-      userRaw && userRaw !== "undefined" ? JSON.parse(userRaw) : {};
-    setUserName(userObj?.name || "User");
-  }
-
-  // ORGANIZATION LOAD
-  const storedOrgRaw = localStorage.getItem("organization");
-  if (storedOrgRaw) {
-    const org = JSON.parse(storedOrgRaw);
-    setOrganizationName(org.name || "");
-    setOrganizationFullName(org.fullName || "");
-  }
-
-  // FALLBACK
-  const orgName = localStorage.getItem("organizationName");
-  const orgFull = localStorage.getItem("organizationFullName");
-
-  if (orgName) setOrganizationName(orgName);
-  if (orgFull) setOrganizationFullName(orgFull);
-
-  // ======================
-  //  LISTENERS FOR DYNAMIC UPDATE
-  // ======================
-
-  // USER NAME dynamic update
-  const handleNameUpdate = () => {
-    const newName = localStorage.getItem("superAdminFullName") || "User";
-    setUserName(newName);
-  };
-
-  // ORGANIZATION dynamic update
-  const handleOrgUpdate = () => {
-    const newOrgName = localStorage.getItem("organizationName") || "";
-    const newOrgFullName = localStorage.getItem("organizationFullName") || "";
-
-    setOrganizationName(newOrgName);
-    setOrganizationFullName(newOrgFullName);
-  };
-
-  window.addEventListener("superAdminNameUpdated", handleNameUpdate);
-  window.addEventListener("organizationUpdated", handleOrgUpdate);
-
-  // When localStorage changes (other tabs)
-  const handleStorage = (e) => {
-    if (e.key === "superAdminFullName") {
-      setUserName(e.newValue || "User");
+    // Load data once
+    try {
+      const storedHotels = JSON.parse(localStorage.getItem("hotels") || "[]");
+      setHotels(storedHotels);
+    } catch {
+      setHotels([]);
     }
-    if (e.key === "organizationName") {
-      setOrganizationName(e.newValue || "");
+
+    // User name load
+    const updatedFullName = localStorage.getItem("superAdminFullName");
+    if (updatedFullName && updatedFullName !== "null" && updatedFullName !== "undefined") {
+      setUserName(updatedFullName);
+    } else {
+      const userRaw = localStorage.getItem("user");
+      const userObj = userRaw && userRaw !== "undefined" ? JSON.parse(userRaw) : {};
+      setUserName(userObj?.name || "User");
     }
-    if (e.key === "organizationFullName") {
-      setOrganizationFullName(e.newValue || "");
+
+    // Organization load
+    const storedOrgRaw = localStorage.getItem("organization");
+    if (storedOrgRaw) {
+      const org = JSON.parse(storedOrgRaw);
+      setOrganizationName(org.name || "");
+      setOrganizationFullName(org.fullName || "");
     }
-  };
 
-  window.addEventListener("storage", handleStorage);
+    // Fallback
+    const orgName = localStorage.getItem("organizationName");
+    const orgFull = localStorage.getItem("organizationFullName");
 
-  return () => {
-    window.removeEventListener("superAdminNameUpdated", handleNameUpdate);
-    window.removeEventListener("organizationUpdated", handleOrgUpdate);
-    window.removeEventListener("storage", handleStorage);
-  };
-}, []);
+    if (orgName) setOrganizationName(orgName);
+    if (orgFull) setOrganizationFullName(orgFull);
 
+    // Listeners for dynamic update
+    const handleNameUpdate = () => {
+      const newName = localStorage.getItem("superAdminFullName") || "User";
+      setUserName(newName);
+    };
 
+    const handleOrgUpdate = () => {
+      const newOrgName = localStorage.getItem("organizationName") || "";
+      const newOrgFullName = localStorage.getItem("organizationFullName") || "";
+      setOrganizationName(newOrgName);
+      setOrganizationFullName(newOrgFullName);
+    };
 
-  // ======================
-  //  MOBILE MENU HANDLER
-  // ======================
+    window.addEventListener("superAdminNameUpdated", handleNameUpdate);
+    window.addEventListener("organizationUpdated", handleOrgUpdate);
+
+    const handleStorage = (e) => {
+      if (e.key === "superAdminFullName") {
+        setUserName(e.newValue || "User");
+      }
+      if (e.key === "organizationName") {
+        setOrganizationName(e.newValue || "");
+      }
+      if (e.key === "organizationFullName") {
+        setOrganizationFullName(e.newValue || "");
+      }
+    };
+
+    window.addEventListener("storage", handleStorage);
+
+    return () => {
+      window.removeEventListener("superAdminNameUpdated", handleNameUpdate);
+      window.removeEventListener("organizationUpdated", handleOrgUpdate);
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, []);
+
+  // Mobile menu handler
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? "hidden" : "unset";
     return () => (document.body.style.overflow = "unset");
@@ -164,9 +146,7 @@ const SuperAdminDashboard = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ======================
-  // PREVENT BACK NAVIGATION
-  // ======================
+  // Prevent back navigation
   useEffect(() => {
     const handlePopState = () => {
       const token = localStorage.getItem("token");
@@ -180,9 +160,7 @@ const SuperAdminDashboard = () => {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  // ======================
-  // LOGOUT
-  // ======================
+  // Logout
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -206,9 +184,7 @@ const SuperAdminDashboard = () => {
     }
   };
 
-  // ======================
-  // SEARCH BAR HANDLER
-  // ======================
+  // Search bar handler
   useEffect(() => {
     const t = setTimeout(() => {
       if (searchQuery.trim() !== "") {
@@ -225,39 +201,39 @@ const SuperAdminDashboard = () => {
   }, [searchQuery]);
 
   return (
-    <div className={`dashboard ${sidebarOpen ? "expanded" : "collapsed"}`}>
-      <div className={`sidebar-overlay ${mobileMenuOpen ? "active" : ""}`} onClick={() => setMobileMenuOpen(false)}></div>
+    <div className={`SuperAdmin-Dashboard-dashboard ${sidebarOpen ? "SuperAdmin-Dashboard-expanded" : "SuperAdmin-Dashboard-collapsed"}`}>
+      <div className={`SuperAdmin-Dashboard-sidebar-overlay ${mobileMenuOpen ? "SuperAdmin-Dashboard-active" : ""}`} onClick={() => setMobileMenuOpen(false)}></div>
 
       {/* SIDEBAR */}
-      <aside className={`sidebar ${sidebarOpen ? "sidebar-expanded" : "sidebar-collapsed"} ${mobileMenuOpen ? "mobile-open" : ""}`}>
-        <div className="sidebar-header">
+      <aside className={`SuperAdmin-Dashboard-sidebar ${sidebarOpen ? "SuperAdmin-Dashboard-sidebar-expanded" : "SuperAdmin-Dashboard-sidebar-collapsed"} ${mobileMenuOpen ? "SuperAdmin-Dashboard-mobile-open" : ""}`}>
+        <div className="SuperAdmin-Dashboard-sidebar-header">
           <div
-            className="logo-container"
+            className="SuperAdmin-Dashboard-logo-container"
             onClick={() => { navigate("/superAdminDashboard"); window.location.reload(); }}
             style={{ cursor: "pointer" }}
           >
-            <div className="logo-icon"><SoupIcon size={58} /></div>
-            {sidebarOpen && <h2 className="logo">DINE_EASE</h2>}
+            <div className="SuperAdmin-Dashboard-logo-icon"><SoupIcon size={58} /></div>
+            {sidebarOpen && <h2 className="SuperAdmin-Dashboard-logo">DINE_EASE</h2>}
           </div>
         </div>
 
         {/* ALL MENU ITEMS */}
-        <ul className="sidebar-menu">
+        <ul className="SuperAdmin-Dashboard-sidebar-menu">
 
           {/* Dashboard Dropdown */}
-          <li className={`menu-dropdown ${dashboardDropdownOpen ? "active" : ""}`}>
-            <div className="menu-link" onClick={() => setDashboardDropdownOpen((prev) => !prev)}>
+          <li className={`SuperAdmin-Dashboard-menu-dropdown ${dashboardDropdownOpen ? "SuperAdmin-Dashboard-active" : ""}`}>
+            <div className="SuperAdmin-Dashboard-menu-link" onClick={() => setDashboardDropdownOpen((prev) => !prev)}>
               <FaHome />
               {sidebarOpen && (
                 <>
                   <span>Super Admin Console</span>
-                  <FaChevronRight className={`dropdown-icon ${dashboardDropdownOpen ? "rotated" : ""}`} />
+                  <FaChevronRight className={`SuperAdmin-Dashboard-dropdown-icon ${dashboardDropdownOpen ? "SuperAdmin-Dashboard-rotated" : ""}`} />
                 </>
               )}
             </div>
 
             {dashboardDropdownOpen && sidebarOpen && (
-              <ul className="submenu">
+              <ul className="SuperAdmin-Dashboard-submenu">
                 {dashboardOptions.map((option) => (
                   <li key={option.path}>
                     <NavLink
@@ -273,19 +249,19 @@ const SuperAdminDashboard = () => {
           </li>
 
           {/* STAFF Dropdown */}
-          <li className={`menu-dropdown ${staffDropdownOpen ? "active" : ""}`}>
-            <div className="menu-link" onClick={() => setStaffDropdownOpen((prev) => !prev)}>
+          <li className={`SuperAdmin-Dashboard-menu-dropdown ${staffDropdownOpen ? "SuperAdmin-Dashboard-active" : ""}`}>
+            <div className="SuperAdmin-Dashboard-menu-link" onClick={() => setStaffDropdownOpen((prev) => !prev)}>
               <FaUsers />
               {sidebarOpen && (
                 <>
                   <span>Staff Management</span>
-                  <FaChevronRight className={`dropdown-icon ${staffDropdownOpen ? "rotated" : ""}`} />
+                  <FaChevronRight className={`SuperAdmin-Dashboard-dropdown-icon ${staffDropdownOpen ? "SuperAdmin-Dashboard-rotated" : ""}`} />
                 </>
               )}
             </div>
 
             {staffDropdownOpen && sidebarOpen && (
-              <ul className="submenu">
+              <ul className="SuperAdmin-Dashboard-submenu">
                 <li>
                   <NavLink to="/superAdminDashboard/staff" onClick={() => window.innerWidth <= 768 && setMobileMenuOpen(false)}>
                     <FaUsers /> <span>Staff</span>
@@ -302,19 +278,19 @@ const SuperAdminDashboard = () => {
           </li>
 
           {/* MENU Dropdown */}
-          <li className={`menu-dropdown ${menuDropdownOpen ? "active" : ""}`}>
-            <div className="menu-link" onClick={() => setMenuDropdownOpen((prev) => !prev)}>
+          <li className={`SuperAdmin-Dashboard-menu-dropdown ${menuDropdownOpen ? "SuperAdmin-Dashboard-active" : ""}`}>
+            <div className="SuperAdmin-Dashboard-menu-link" onClick={() => setMenuDropdownOpen((prev) => !prev)}>
               <FaUtensils />
               {sidebarOpen && (
                 <>
                   <span>Menu Dashboard</span>
-                  <FaChevronRight className={`dropdown-icon ${menuDropdownOpen ? "rotated" : ""}`} />
+                  <FaChevronRight className={`SuperAdmin-Dashboard-dropdown-icon ${menuDropdownOpen ? "SuperAdmin-Dashboard-rotated" : ""}`} />
                 </>
               )}
             </div>
 
             {menuDropdownOpen && sidebarOpen && (
-              <ul className="submenu">
+              <ul className="SuperAdmin-Dashboard-submenu">
                 {menuOptions.map((option) => (
                   <li key={option.path}>
                     <NavLink
@@ -340,10 +316,10 @@ const SuperAdminDashboard = () => {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main className="main-content">
-        <div className="topbar">
+      <main className="SuperAdmin-Dashboard-main-content">
+        <div className="SuperAdmin-Dashboard-topbar">
           <div
-            className={`menu-toggle ${mobileMenuOpen || !sidebarOpen ? "active" : ""}`}
+            className={`SuperAdmin-Dashboard-menu-toggle ${mobileMenuOpen || !sidebarOpen ? "SuperAdmin-Dashboard-active" : ""}`}
             onClick={() => {
               if (window.innerWidth <= 768) {
                 setMobileMenuOpen((prev) => !prev);
@@ -360,13 +336,11 @@ const SuperAdminDashboard = () => {
           </div>
 
           {/* Search */}
-          <div className="search-bar">
-           
-
+          <div className="SuperAdmin-Dashboard-search-bar">
             {searchResults.length > 0 && (
-              <div className="search-results">
+              <div className="SuperAdmin-Dashboard-search-results">
                 {searchResults.map((item, idx) => (
-                  <div key={idx} className="search-item">
+                  <div key={idx} className="SuperAdmin-Dashboard-search-item">
                     {item.name || item.title}
                   </div>
                 ))}
@@ -375,36 +349,36 @@ const SuperAdminDashboard = () => {
           </div>
 
           {/* CENTER TITLE */}
-          <div className="organization-center">
-            <h2 className="organization-title">
+          <div className="SuperAdmin-Dashboard-organization-center">
+            <h2 className="SuperAdmin-Dashboard-organization-title">
               {organizationName || "Organization Name"}
             </h2>
           </div>
 
           {/* PROFILE */}
-          <div className="topbar-actions" ref={dropdownRef}>
-            <div className="profile-info">
+          <div className="SuperAdmin-Dashboard-topbar-actions" ref={dropdownRef}>
+            <div className="SuperAdmin-Dashboard-profile-info">
               <div
-                className="hello-bubble"
+                className="SuperAdmin-Dashboard-hello-bubble"
                 onClick={() => setDropdownOpen((prev) => !prev)}
               >
                 <span>Hello, {userName}</span>
                 <img
                   src="https://via.placeholder.com/40"
                   alt="profile"
-                  className="profile-avatar-curved"
+                  className="SuperAdmin-Dashboard-profile-avatar-curved"
                 />
               </div>
 
               {dropdownOpen && (
-                <div className="profile-dropdown">
+                <div className="SuperAdmin-Dashboard-profile-dropdown">
                   <button onClick={() => navigate("/superAdminDashboard/profile")}>
                     <FaIdBadge /> Profile
                   </button>
                   <button onClick={() => navigate("/superAdminDashboard/settings")}>
                     <FaCog /> Settings
                   </button>
-                  <button className="logout-btn" onClick={handleLogout}>
+                  <button className="SuperAdmin-Dashboard-logout-btn" onClick={handleLogout}>
                     <FaSignOutAlt /> Logout
                   </button>
                 </div>

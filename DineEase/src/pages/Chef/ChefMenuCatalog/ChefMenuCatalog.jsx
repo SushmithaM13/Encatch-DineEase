@@ -27,56 +27,53 @@ export default function ChefMenuCatalog() {
   const [activeCategory, setActiveCategory] = useState("All Items");
   const [loading, setLoading] = useState(true);
 
+  // 🔹 POPUP STATE
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [outOfStockReason, setOutOfStockReason] = useState("");
+
   const normalize = (str) => str?.toLowerCase().trim();
 
-  /* -------------------- FETCH PROFILE (ORG ID) -------------------- */
+  /* -------------------- FETCH PROFILE -------------------- */
   const fetchProfile = async () => {
     try {
       const res = await fetch(API_PROFILE, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (!res.ok) return;
-
       const data = await res.json();
-      if (data.organizationId) {
-        setOrgId(data.organizationId);
-      }
+      if (data.organizationId) setOrgId(data.organizationId);
     } catch (error) {
       console.error("Profile fetch error:", error);
     }
   };
 
-  /* -------------------- FETCH MENU ITEMS -------------------- */
+  /* -------------------- FETCH MENU -------------------- */
   const fetchMenuItems = async (organizationId) => {
     try {
       setLoading(true);
       const res = await fetch(
         `${API_MENU}?organizationId=${organizationId}&page=0&size=200`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       if (!res.ok) return;
 
       const data = await res.json();
       const items = Array.isArray(data.content) ? data.content : data;
 
-      const formatted = items.map((i) => ({
-        id: i.id,
-        name: i.itemName,
-        desc: i.description,
-        price: i.price || 0,
-        img: i.imageData
-          ? `data:image/jpeg;base64,${i.imageData}`
-          : "",
-        category: i.categoryName,
-        isVeg: i.itemTypeName?.toLowerCase() === "veg",
-        inStock: i.isAvailable,
-      }));
-
-      setMenuItems(formatted);
+      setMenuItems(
+        items.map((i) => ({
+          id: i.id,
+          name: i.itemName,
+          desc: i.description,
+          img: i.imageData
+            ? `data:image/jpeg;base64,${i.imageData}`
+            : "",
+          category: i.categoryName,
+          isVeg: i.itemTypeName?.toLowerCase() === "veg",
+          inStock: i.isAvailable,
+        }))
+      );
     } catch (error) {
       console.error("Menu fetch error:", error);
     } finally {
@@ -84,14 +81,24 @@ export default function ChefMenuCatalog() {
     }
   };
 
-  /* -------------------- TOGGLE AVAILABILITY -------------------- */
-  const toggleStock = async (itemId) => {
-    const currentItem = menuItems.find((i) => i.id === itemId);
-    if (!currentItem) return;
+  /* -------------------- OPEN POPUP -------------------- */
+  const openOutOfStockPopup = (item) => {
+    if (!item.inStock) return;
+    setSelectedItem(item);
+    setOutOfStockReason("");
+    setShowPopup(true);
+  };
+
+  /* -------------------- CONFIRM OUT OF STOCK -------------------- */
+  const confirmOutOfStock = async () => {
+    if (!outOfStockReason.trim()) {
+      alert("Please enter a reason.");
+      return;
+    }
 
     try {
       const res = await fetch(
-        `${API_AVAILABILITY}/${itemId}/availability`,
+        `${API_AVAILABILITY}/${selectedItem.id}/availability`,
         {
           method: "PUT",
           headers: {
@@ -99,10 +106,8 @@ export default function ChefMenuCatalog() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            isAvailable: !currentItem.inStock,
-            reason: !currentItem.inStock
-              ? "Item back in stock"
-              : "Item temporarily unavailable",
+            isAvailable: false,
+            reason: outOfStockReason,
           }),
         }
       );
@@ -114,17 +119,23 @@ export default function ChefMenuCatalog() {
 
       setMenuItems((prev) =>
         prev.map((m) =>
-          m.id === itemId
-            ? { ...m, inStock: !m.inStock }
-            : m
+          m.id === selectedItem.id ? { ...m, inStock: false } : m
         )
       );
+
+      closePopup();
     } catch (error) {
-      console.error("Availability update error:", error);
+      console.error("Out of stock update error:", error);
     }
   };
 
-  /* -------------------- FILTER DERIVED STATE -------------------- */
+  const closePopup = () => {
+    setShowPopup(false);
+    setSelectedItem(null);
+    setOutOfStockReason("");
+  };
+
+  /* -------------------- FILTER -------------------- */
   useEffect(() => {
     let result = menuItems;
 
@@ -141,26 +152,33 @@ export default function ChefMenuCatalog() {
     setFilteredItems(result);
   }, [menuItems, activeCategory]);
 
-  /* -------------------- EFFECTS -------------------- */
+  /* -------------------- LOAD -------------------- */
   useEffect(() => {
     if (token) fetchProfile();
   }, [token]);
 
   useEffect(() => {
-    if (orgId) fetchMenuItems(orgId);
+    if (!orgId) return;
+    fetchMenuItems(orgId);
+
+    const interval = setInterval(() => {
+      fetchMenuItems(orgId);
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, [orgId]);
 
   /* -------------------- UI -------------------- */
   return (
-    <div className="chef-menu-catalog chef-container">
-      <h2>🍽 Menu Catalog</h2>
+    <div className="Chef-MenuCatalog-container">
+      <h2 className="Chef-MenuCatalog-title">🍽 Menu Catalog</h2>
 
-      <div className="chef-category-filter">
+      <div className="Chef-MenuCatalog-category-filter">
         {categories.map((cat) => (
           <button
             key={cat}
-            className={`chef-category-btn ${
-              activeCategory === cat ? "active" : ""
+            className={`Chef-MenuCatalog-category-btn ${
+              activeCategory === cat ? "Chef-MenuCatalog-active" : ""
             }`}
             onClick={() => setActiveCategory(cat)}
           >
@@ -169,40 +187,79 @@ export default function ChefMenuCatalog() {
         ))}
       </div>
 
-      {loading ? (
-        <p>Loading…</p>
-      ) : filteredItems.length === 0 ? (
-        <p>No Items Found.</p>
-      ) : (
-        <div className="chef-menu-grid">
-          {filteredItems.map((item) => (
-            <div key={item.id} className="chef-menu-card">
-              <div
-                className="chef-menu-img"
-                style={{ backgroundImage: `url(${item.img})` }}
-              />
+      <div className="Chef-MenuCatalog-menu-grid">
+        {filteredItems.map((item) => (
+          <div
+            key={item.id}
+            className={`Chef-MenuCatalog-menu-card ${
+              !item.inStock ? "Chef-MenuCatalog-out-of-stock" : ""
+            }`}
+          >
+            <div
+  className="Chef-MenuCatalog-menu-img"
+  style={{
+    backgroundImage: item.img ? `url(${item.img})` : "none",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    backgroundColor: !item.img ? "#e5e3dc" : "transparent",
+  }}
+>
+  {!item.inStock && (
+    <div className="Chef-MenuCatalog-stock-overlay">
+      OUT OF STOCK
+    </div>
+  )}
 
-              <div className="chef-menu-body">
-                <div className="chef-menu-title">
-                  <span>{item.name}</span>
-                  <span className="chef-price">₹{item.price}</span>
-                </div>
+  {item.isVeg ? (
+    <span className="Chef-MenuCatalog-veg-badge">🌿 Veg</span>
+  ) : (
+    <span className="Chef-MenuCatalog-nonveg-badge">🍖 Non-Veg</span>
+  )}
+</div>
 
-                <p className="chef-desc">{item.desc}</p>
 
-                <button
-                  className={`chef-badge ${
-                    item.inStock
-                      ? "chef-badge-success"
-                      : "chef-badge-error"
-                  }`}
-                  onClick={() => toggleStock(item.id)}
-                >
-                  {item.inStock ? "✔ In Stock" : "✘ Out of Stock"}
-                </button>
-              </div>
+            <div className="Chef-MenuCatalog-menu-body">
+              <span className="Chef-MenuCatalog-item-name">{item.name}</span>
+              <p className="Chef-MenuCatalog-desc">{item.desc}</p>
+
+              <button
+                className={`Chef-MenuCatalog-badge ${
+                  item.inStock
+                    ? "Chef-MenuCatalog-badge-success"
+                    : "Chef-MenuCatalog-badge-error"
+                }`}
+                disabled={!item.inStock}
+                onClick={() => openOutOfStockPopup(item)}
+              >
+                {item.inStock ? "✔ In Stock" : "✘ Out of Stock"}
+              </button>
             </div>
-          ))}
+          </div>
+        ))}
+      </div>
+
+      {/* -------------------- POPUP -------------------- */}
+      {showPopup && (
+        <div className="Chef-MenuCatalog-popup-overlay">
+          <div className="Chef-MenuCatalog-popup">
+            <h3>Mark "{selectedItem?.name}" Out of Stock</h3>
+
+            <textarea
+              placeholder="Enter reason (required)"
+              value={outOfStockReason}
+              onChange={(e) => setOutOfStockReason(e.target.value)}
+            />
+
+            <div className="Chef-MenuCatalog-popup-actions">
+              <button onClick={closePopup} className="cancel">
+                Cancel
+              </button>
+              <button onClick={confirmOutOfStock} className="confirm">
+                Confirm
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

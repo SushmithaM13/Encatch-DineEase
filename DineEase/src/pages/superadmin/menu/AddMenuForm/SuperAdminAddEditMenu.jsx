@@ -395,6 +395,94 @@ export default function SuperAdminAddEditMenu() {
           {imagePreview && <img src={imagePreview} className="Superadmin-add-edit-menu-preview-img" alt="preview" />}
         </div>
 
+        <div className="admin-add-edit-menu-section-card">
+          <h3>Additional Details</h3>
+
+          <div className="admin-add-edit-menu-form-grid">
+
+            {/* Spice Level */}
+            <div>
+              <label>Spice Level (1–5)</label>
+              <input
+                type="number"
+                name="spiceLevel"
+                min="1"
+                max="5"
+                value={menu.spiceLevel}
+                onChange={handleInput}
+              />
+            </div>
+
+            {/* Preparation Time */}
+            <div>
+              <label>Preparation Time (mins)</label>
+              <input
+                type="number"
+                name="preparationTime"
+                min="1"
+                value={menu.preparationTime}
+                onChange={handleInput}
+              />
+            </div>
+
+            {/* Allergen Info */}
+            <div className="admin-add-edit-full">
+              <label>Allergen Information</label>
+              <input
+                type="text"
+                name="allergenInfo"
+                value={menu.allergenInfo}
+                onChange={handleInput}
+                placeholder="Eg: Contains nuts, dairy, gluten"
+              />
+            </div>
+
+            {/* Flags */}
+            <div className="admin-checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  name="isAvailable"
+                  checked={menu.isAvailable}
+                  onChange={handleInput}
+                />
+                Available
+              </label>
+
+              <label>
+                <input
+                  type="checkbox"
+                  name="isRecommended"
+                  checked={menu.isRecommended}
+                  onChange={handleInput}
+                />
+                Recommended
+              </label>
+
+              <label>
+                <input
+                  type="checkbox"
+                  name="isBestseller"
+                  checked={menu.isBestseller}
+                  onChange={handleInput}
+                />
+                Bestseller
+              </label>
+
+              <label>
+                <input
+                  type="checkbox"
+                  name="chefSpecial"
+                  checked={menu.chefSpecial}
+                  onChange={handleInput}
+                />
+                Chef Special
+              </label>
+            </div>
+
+          </div>
+        </div>
+
         {/* VARIANTS */}
         <div className="Superadmin-add-edit-menu-section-card">
           <h4>Variants</h4>

@@ -1,658 +1,846 @@
+/* ===============================================
+   CHEF DASHBOARD - PREMIUM CULINARY DESIGN
+   Responsive across all devices & screen sizes
+   All classes prefixed with "ChefDashboard-"
+   =============================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* ===========================
+   CSS VARIABLES & THEMING
+   =========================== */
 :root {
-  --primary: #27ae60;
-  --secondary: #f39c12;
-  --accent: #e74c3c;
-  --dark: #1e293b;
-  --light: #ffffff;
-  --gray: #64748b;
-  --border: #e2e8f0;
-  --shadow: rgba(0, 0, 0, 0.08);
+  /* Core Colors - Sophisticated Culinary Palette */
+  --ChefDashboard-primary-dark: #1a1a1a;
+  --ChefDashboard-primary-charcoal: #2d2d2d;
+  --ChefDashboard-accent-gold: #d4af37;
+  --ChefDashboard-accent-copper: #b87333;
+  --ChefDashboard-accent-sage: #8b9f8f;
+  --ChefDashboard-accent-cream: #f5f1e8;
+  
+  /* UI Colors */
+  --ChefDashboard-bg-primary: #fafaf9;
+  --ChefDashboard-bg-card: #ffffff;
+  --ChefDashboard-bg-hover: #f5f1e8;
+  --ChefDashboard-border-color: #e5e3dc;
+  --ChefDashboard-text-primary: #1a1a1a;
+  --ChefDashboard-text-secondary: #6b6b6b;
+  --ChefDashboard-text-light: #999999;
+  
+  /* Status Colors */
+  --ChefDashboard-success: #4caf50;
+  --ChefDashboard-warning: #ff9800;
+  --ChefDashboard-error: #f44336;
+  --ChefDashboard-info: #2196f3;
+  
+  /* Shadows & Effects */
+  --ChefDashboard-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --ChefDashboard-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --ChefDashboard-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --ChefDashboard-shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  
+  /* Spacing System */
+  --ChefDashboard-spacing-xs: 0.5rem;
+  --ChefDashboard-spacing-sm: 0.75rem;
+  --ChefDashboard-spacing-md: 1rem;
+  --ChefDashboard-spacing-lg: 1.5rem;
+  --ChefDashboard-spacing-xl: 2rem;
+  --ChefDashboard-spacing-2xl: 3rem;
+  
+  /* Border Radius */
+  --ChefDashboard-radius-sm: 6px;
+  --ChefDashboard-radius-md: 12px;
+  --ChefDashboard-radius-lg: 16px;
+  --ChefDashboard-radius-full: 50%;
+  
+  /* Typography */
+  --ChefDashboard-font-display: 'Playfair Display', serif;
+  --ChefDashboard-font-body: 'Outfit', sans-serif;
+  
+  /* Layout */
+  --ChefDashboard-navbar-height: 72px;
+  --ChefDashboard-sidebar-width: 280px;
+  
+  /* Transitions */
+  --ChefDashboard-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --ChefDashboard-transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --ChefDashboard-transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-body {
-  margin: 0;
-  font-family: sans-serif;
-  background: #f8fafc;
-}
-
-/* ===== LAYOUT ===== */
-.chef-layout {
-  display: flex;
+/* ===========================
+   MAIN LAYOUT STRUCTURE
+   =========================== */
+.ChefDashboard-layout {
   min-height: 100vh;
-  background: #f9fafb;
-  overflow-x: hidden;
-  transition: all 0.3s ease;
-}
-
-/* ===== SIDEBAR ===== */
-.chef-sidebar {
-  width: 240px;
-  background: var(--dark);
-  color: var(--light);
   display: flex;
   flex-direction: column;
-  padding: 1rem 0;
+  background: linear-gradient(135deg, #fafaf9 0%, #f5f1e8 100%);
+  position: relative;
+}
+
+/* Decorative Background Elements */
+.ChefDashboard-layout::before {
+  content: '';
   position: fixed;
-  height: 100vh;
-  z-index: 100;
-  overflow-y: auto;
-  transition: width 0.3s ease, transform 0.3s ease;
+  top: 0;
+  right: 0;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: ChefDashboard-pulseGlow 8s ease-in-out infinite;
 }
 
-.chef-sidebar-header {
+@keyframes ChefDashboard-pulseGlow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+/* ===========================
+   NAVBAR / HEADER
+   =========================== */
+.ChefDashboard-navbar {
+  height: var(--ChefDashboard-navbar-height);
+  background: var(--ChefDashboard-bg-card);
+  border-bottom: 2px solid var(--ChefDashboard-border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.chef-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  color: #fff;
-  font-size: 1.1rem;
-}
-
-.chef-brand-name {
-  white-space: nowrap;
-}
-
-.chef-menu-toggle {
-  background: none;
-  border: none;
-  color: #fff;
-  cursor: pointer;
-}
-
-.chef-nav-links {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 0 0.5rem;
-}
-
-.chef-nav-link {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #cbd5e1;
-  padding: 10px 15px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 0.95rem;
-  transition: 0.2s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.chef-nav-link:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: white;
-}
-
-.chef-nav-link.chef-active {
-  background: var(--primary);
-  color: white;
-}
-
-/* Collapsed Sidebar */
-.chef-layout.chef-collapsed .chef-sidebar {
-  width: 72px;
-}
-
-.chef-layout.chef-collapsed .chef-nav-link span {
-  display: none;
-}
-
-/* ===== MAIN AREA ===== */
-.chef-main {
-  flex: 1;
-  margin-left: 240px;
-  transition: margin-left 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-.chef-layout.chef-collapsed .chef-main {
-  margin-left: 72px;
-}
-
-/* ===== HEADER ===== */
-.chef-header {
-  background: white;
-  padding: 12px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--border);
+  padding: 0 var(--ChefDashboard-spacing-xl);
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 100;
+  box-shadow: var(--ChefDashboard-shadow-sm);
+  backdrop-filter: blur(10px);
+  transition: all var(--ChefDashboard-transition-base);
 }
 
-.chef-page-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--dark);
+.ChefDashboard-navbar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--ChefDashboard-accent-gold) 0%, var(--ChefDashboard-accent-copper) 50%, var(--ChefDashboard-accent-gold) 100%);
+  background-size: 200% 100%;
+  animation: ChefDashboard-shimmer 3s linear infinite;
 }
 
-.chef-restaurant-badge {
+@keyframes ChefDashboard-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Left Side - Brand & Navigation */
+.ChefDashboard-navbar-left {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: var(--primary);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.85rem;
+  gap: var(--ChefDashboard-spacing-2xl);
+  flex: 1;
 }
 
-.chef-header-right {
+.ChefDashboard-brand {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: var(--ChefDashboard-spacing-sm);
+  font-family: var(--ChefDashboard-font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ChefDashboard-primary-dark);
+  position: relative;
+  padding: var(--ChefDashboard-spacing-sm) var(--ChefDashboard-spacing-md);
+  transition: all var(--ChefDashboard-transition-base);
 }
 
-/* ===== PROFILE & NOTIFICATIONS ===== */
-.chef-profile-circle {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: white;
+.ChefDashboard-brand svg {
+  color: var(--ChefDashboard-accent-gold);
+  filter: drop-shadow(0 2px 4px rgba(212, 175, 55, 0.3));
+  transition: all var(--ChefDashboard-transition-base);
+}
+
+.ChefDashboard-brand:hover svg {
+  transform: rotate(15deg) scale(1.1);
+  filter: drop-shadow(0 4px 8px rgba(212, 175, 55, 0.5));
+}
+
+.ChefDashboard-brand span {
+  background: linear-gradient(135deg, var(--ChefDashboard-primary-dark) 0%, var(--ChefDashboard-accent-copper) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Navigation Links */
+.ChefDashboard-nav-links {
+  display: flex;
+  gap: var(--ChefDashboard-spacing-sm);
+  align-items: center;
+}
+
+.ChefDashboard-nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--ChefDashboard-spacing-xs);
+  padding: var(--ChefDashboard-spacing-sm) var(--ChefDashboard-spacing-lg);
+  border-radius: var(--ChefDashboard-radius-md);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ChefDashboard-text-secondary);
+  text-decoration: none;
+  position: relative;
+  transition: all var(--ChefDashboard-transition-base);
+  overflow: hidden;
+}
+
+.ChefDashboard-nav-link::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--ChefDashboard-accent-gold), var(--ChefDashboard-accent-copper));
+  transform: translateX(-50%);
+  transition: width var(--ChefDashboard-transition-base);
+}
+
+.ChefDashboard-nav-link:hover {
+  color: var(--ChefDashboard-primary-dark);
+  background: var(--ChefDashboard-bg-hover);
+  transform: translateY(-2px);
+}
+
+.ChefDashboard-nav-link:hover::before {
+  width: 80%;
+}
+
+.ChefDashboard-nav-link.active {
+  color: var(--ChefDashboard-accent-gold);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(184, 115, 51, 0.1));
   font-weight: 600;
+  box-shadow: var(--ChefDashboard-shadow-inset);
+}
+
+.ChefDashboard-nav-link.active::before {
+  width: 80%;
+}
+
+.ChefDashboard-nav-link svg {
+  transition: transform var(--ChefDashboard-transition-base);
+}
+
+.ChefDashboard-nav-link:hover svg {
+  transform: scale(1.15);
+}
+
+/* Right Side - Notifications & Profile */
+.ChefDashboard-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--ChefDashboard-spacing-lg);
+  position: relative;
+}
+
+/* ===========================
+   NOTIFICATIONS
+   =========================== */
+.ChefDashboard-notification-wrapper {
+  position: relative;
+}
+
+.ChefDashboard-notif-btn {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--ChefDashboard-radius-full);
+  border: none;
+  background: var(--ChefDashboard-bg-hover);
+  color: var(--ChefDashboard-text-secondary);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  transition: all var(--ChefDashboard-transition-base);
+  box-shadow: var(--ChefDashboard-shadow-sm);
 }
 
-/* ===== CONTENT WRAPPER ===== */
-.chef-page-container {
-  padding: 20px;
-  flex: 1;
-}
-
-/* ===== NOTIFICATIONS ===== */
-.chef-notification-wrapper {
-  position: relative;
-}
-
-.chef-notif-btn {
-  position: relative;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--text-dark);
-  padding: 6px;
-  border-radius: 50%;
-  transition: background 0.2s;
-}
-
-.chef-notif-btn:hover {
-  transform: scale(1.1);
-  background: var(--bg-light);
-}
-
-.chef-notif-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: var(--accent);
+.ChefDashboard-notif-btn:hover {
+  background: var(--ChefDashboard-accent-gold);
   color: white;
-  font-size: 0.65rem;
-  padding: 2px 6px;
-  border-radius: 50%;
+  transform: scale(1.05);
+  box-shadow: var(--ChefDashboard-shadow-md);
+}
+
+.ChefDashboard-notif-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg, var(--ChefDashboard-error), #ff6b6b);
+  color: white;
+  border-radius: var(--ChefDashboard-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
   font-weight: 700;
-  line-height: 1;
+  padding: 0 6px;
+  border: 3px solid var(--ChefDashboard-bg-card);
+  box-shadow: var(--ChefDashboard-shadow-md);
+  animation: ChefDashboard-notifPulse 2s ease-in-out infinite;
+}
+
+@keyframes ChefDashboard-notifPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
 }
 
 /* Notification Dropdown */
-.chef-notif-dropdown {
+.ChefDashboard-notif-dropdown {
   position: absolute;
+  top: calc(100% + 12px);
   right: 0;
-  top: 45px;
-  width: 340px;
-  background: var(--white);
-  border-radius: 12px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-  border: 1px solid var(--border);
-  z-index: 999;
+  width: 380px;
+  max-height: 520px;
+  background: var(--ChefDashboard-bg-card);
+  border-radius: var(--ChefDashboard-radius-lg);
+  box-shadow: var(--ChefDashboard-shadow-lg);
+  border: 1px solid var(--ChefDashboard-border-color);
   overflow: hidden;
-
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  z-index: 300;
-  animation: fadeIn 0.2s ease;
+  animation: ChefDashboard-dropdownSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1000;
 }
 
-/* Fade in effect */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes ChefDashboard-dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* Action Buttons (Mark all read / Clear) */
-.chef-notif-actions {
+.ChefDashboard-notif-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-  font-weight: 700;
-}
-
-.chef-notif-actions button {
-  background: none;
-  border: none;
-  color: var(--primary);
-  cursor: pointer;
+  padding: var(--ChefDashboard-spacing-lg);
+  background: linear-gradient(135deg, var(--ChefDashboard-accent-gold), var(--ChefDashboard-accent-copper));
+  color: white;
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 1.1rem;
 }
 
-.chef-notif-actions button:hover {
-  color: var(--secondary);
-  text-decoration: underline;
+.ChefDashboard-read-all-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: var(--ChefDashboard-spacing-xs) var(--ChefDashboard-spacing-md);
+  border-radius: var(--ChefDashboard-radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all var(--ChefDashboard-transition-fast);
+  backdrop-filter: blur(10px);
 }
 
-/* Notification List */
-.chef-notif-list {
-  flex: 1;
+.ChefDashboard-read-all-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.ChefDashboard-notif-list {
+  max-height: 420px;
   overflow-y: auto;
-  max-height: 300px;
+  padding: var(--ChefDashboard-spacing-sm);
 }
 
-.chef-notif-item {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  background: #fff;
-  transition: background 0.2s ease;
-  position: relative;
-   font-size: 0.85rem;
-}
-
-.chef-notif-item:hover {
-  background: #f1f5f9;
-}
-
-.chef-notif-item.chef-unread {
-  background: #ecfdf5;
-}
-
-.chef-notif-item:last-child {
-  border-bottom: none;
-}
-
-/* Unread */
-.chef-unread {
-  background: var(--bg-light);
-}
-
-/* Notification content */
-.chef-notif-main {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.chef-notif-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--dark);
-}
-
-.chef-notif-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-   font-weight: 700;
-  font-size: 0.9rem;
-}
-
-.chef-priority-icon {
-  color: var(--accent);
-}
-
-.chef-notif-table,
-.chef-notif-details {
-  font-size: 0.85rem;
-  
-   margin: 4px 0;
-  color: var(--text-light);
-}
-
-.chef-notif-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 6px;
-  font-size: 0.75rem;
-  color: var(--gray);
-}
-
-.chef-notif-status {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 500;
-}
-
-.chef-notif-status svg {
-  vertical-align: middle;
-}
-
-.chef-notif-time {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.chef-read-btn {
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  font-size: 0.7rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.chef-read-btn:hover {
-  background: #1f8d50;
-}
-
-/* Unread dot */
-.chef-unread-dot {
-  width: 10px;
-  height: 10px;
-  background: var(--accent);
-  border-radius: 50%;
-  position: absolute;
-  top: 12px;
-  right: 16px;
-}
-
-/* Notification Footer */
-.chef-notif-footer {
-  padding: 10px 12px;
-  text-align: center;
-  background: #f9fafb;
-}
-
-.chef-view-all-btn {
-  border: none;
-  background: var(--primary);
-  color: white;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.chef-view-all-btn:hover {
-  background: var(--secondary);
-}
-
-/* Empty state */
-.chef-notif-empty {
-padding: 20px;
-  text-align: center;
-  font-size: 0.85rem;
-  color: var(--text-light);
-}
-
-/* Scrollbar for notifications */
-.chef-notif-list::-webkit-scrollbar {
+/* Custom Scrollbar */
+.ChefDashboard-notif-list::-webkit-scrollbar {
   width: 6px;
 }
 
-.chef-notif-list::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.1);
-  border-radius: 3px;
-}
-
-.chef-notif-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* ===== PROFILE DROPDOWN ===== */
-.chef-dropdown-menu {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  background: #fff;
+.ChefDashboard-notif-list::-webkit-scrollbar-track {
+  background: var(--ChefDashboard-bg-hover);
   border-radius: 10px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e2e8f0;
-  width: 180px;
-  overflow: hidden;
-  z-index: 200;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  transform-origin: top right;
 }
 
-.chef-dropdown-menu button {
-  width: 100%;
+.ChefDashboard-notif-list::-webkit-scrollbar-thumb {
+  background: var(--ChefDashboard-accent-gold);
+  border-radius: 10px;
+}
+
+.ChefDashboard-notif-list::-webkit-scrollbar-thumb:hover {
+  background: var(--ChefDashboard-accent-copper);
+}
+
+.ChefDashboard-notif-item {
+  padding: var(--ChefDashboard-spacing-md);
+  margin-bottom: var(--ChefDashboard-spacing-sm);
+  background: var(--ChefDashboard-bg-hover);
+  border-radius: var(--ChefDashboard-radius-md);
+  cursor: pointer;
+  transition: all var(--ChefDashboard-transition-base);
+  border-left: 4px solid transparent;
+}
+
+.ChefDashboard-notif-item:hover {
+  background: white;
+  transform: translateX(4px);
+  box-shadow: var(--ChefDashboard-shadow-sm);
+}
+
+.ChefDashboard-notif-item.ChefDashboard-unread {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(184, 115, 51, 0.1));
+  border-left-color: var(--ChefDashboard-accent-gold);
+  font-weight: 500;
+}
+
+.ChefDashboard-notif-item strong {
+  display: block;
+  color: var(--ChefDashboard-accent-copper);
+  font-size: 0.95rem;
+  margin-bottom: var(--ChefDashboard-spacing-xs);
+}
+
+.ChefDashboard-notif-item div {
+  font-size: 0.85rem;
+  color: var(--ChefDashboard-text-secondary);
+  margin-top: 4px;
+}
+
+.ChefDashboard-notif-item b {
+  color: var(--ChefDashboard-text-primary);
+  font-weight: 600;
+}
+
+.ChefDashboard-notif-empty {
+  padding: var(--ChefDashboard-spacing-2xl);
+  text-align: center;
+  color: var(--ChefDashboard-text-light);
+  font-size: 0.95rem;
+}
+
+/* ===========================
+   PROFILE DROPDOWN
+   =========================== */
+.ChefDashboard-profile-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--ChefDashboard-radius-full);
+  background: linear-gradient(135deg, var(--ChefDashboard-accent-gold), var(--ChefDashboard-accent-copper));
+  color: white;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 15px;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-family: var(--ChefDashboard-font-display);
+  cursor: pointer;
+  box-shadow: var(--ChefDashboard-shadow-md);
+  transition: all var(--ChefDashboard-transition-base);
+  border: 3px solid var(--ChefDashboard-bg-card);
+}
+
+.ChefDashboard-profile-circle:hover {
+  transform: scale(1.08) rotate(5deg);
+  box-shadow: var(--ChefDashboard-shadow-lg);
+}
+
+.ChefDashboard-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 220px;
+  background: var(--ChefDashboard-bg-card);
+  border-radius: var(--ChefDashboard-radius-lg);
+  box-shadow: var(--ChefDashboard-shadow-lg);
+  border: 1px solid var(--ChefDashboard-border-color);
+  overflow: hidden;
+  animation: ChefDashboard-dropdownSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1000;
+}
+
+.ChefDashboard-dropdown-menu button {
+  width: 100%;
+  padding: var(--ChefDashboard-spacing-md) var(--ChefDashboard-spacing-lg);
+  border: none;
+  background: transparent;
+  text-align: left;
   font-size: 0.95rem;
   font-weight: 500;
-  color: #1e293b;
-  background: none;
-  border: none;
+  color: var(--ChefDashboard-text-primary);
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.chef-dropdown-menu button:hover {
-  background: #f1f5f9;
-  color: #0f172a;
-}
-
-.chef-dropdown-menu button svg {
-  stroke: #64748b;
-  transition: stroke 0.2s ease;
-}
-
-.chef-dropdown-menu button:hover svg {
-  stroke: #1e293b;
-}
-
-/* Optional triangle pointer */
-.chef-dropdown-menu::before {
-  content: "";
-  position: absolute;
-  top: -6px;
-  right: 16px;
-  width: 12px;
-  height: 12px;
-  background: #fff;
-  transform: rotate(45deg);
-  border-left: 1px solid #e2e8f0;
-  border-top: 1px solid #e2e8f0;
-  z-index: -1;
-}
-
-/* ===== MOBILE RESPONSIVE ===== */
-@media (max-width: 768px) {
-  /* Sidebar hidden by default */
-  .chef-sidebar {
-    transform: translateX(-100%);
-    width: 240px;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.35);
-    z-index: 200;
-  }
-
-  /* Show sidebar on toggle */
-  .chef-layout.chef-sidebar-open .chef-sidebar {
-    transform: translateX(0);
-  }
-
-  /* Sidebar backdrop */
-  .chef-sidebar-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.48);
-    opacity: 1;
-    pointer-events: auto;
-    z-index: 180;
-    transition: opacity 0.3s ease;
-  }
-
-  /* Main content full width */
-  .chef-main {
-    margin-left: 0 !important;
-  }
-
-  /* Hide restaurant badge */
-  .chef-restaurant-badge {
-    display: none;
-  }
-
-  /* Notifications dropdown */
-  .chef-notif-dropdown {
-    width: 90vw;
-    max-width: 350px;
-    right: 5vw;
-    top: 45px;
-    max-height: 60vh;
-  }
-
-  /* Profile dropdown adjustments */
-  .chef-dropdown-menu {
-    right: 10px;
-    width: 160px;
-  }
-}
-
-/* Smooth transitions */
-.chef-sidebar,
-.chef-sidebar-backdrop,
-.chef-main {
-  transition: all 0.3s ease;
-}
-/* ===== SIDEBAR ===== */
-.chef-sidebar {
-  width: 240px;
-  background: var(--dark);
-  color: var(--light);
   display: flex;
-  flex-direction: column;
-  padding: 1rem 0;
-  position: fixed;
-  height: 100vh;
-  z-index: 100;
-  overflow-y: auto;
-  transition: width 0.3s ease, transform 0.3s ease; /* Smooth transition */
-  transform: translateX(0);
+  align-items: center;
+  gap: var(--ChefDashboard-spacing-sm);
+  transition: all var(--ChefDashboard-transition-fast);
+  border-left: 3px solid transparent;
 }
 
-.chef-layout.chef-collapsed .chef-sidebar {
-  width: 72px;
-  transform: translateX(0);
+.ChefDashboard-dropdown-menu button:hover {
+  background: var(--ChefDashboard-bg-hover);
+  border-left-color: var(--ChefDashboard-accent-gold);
+  padding-left: calc(var(--ChefDashboard-spacing-lg) + 4px);
 }
 
-/* ===== MOBILE RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .chef-sidebar {
-    transform: translateX(-100%);
-    width: 240px;
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.35);
-    z-index: 200;
-    transition: transform 0.3s ease-in-out; /* Smooth sliding */
-  }
+.ChefDashboard-dropdown-menu button:last-child {
+  color: var(--ChefDashboard-error);
+  border-top: 1px solid var(--ChefDashboard-border-color);
+}
 
-  .chef-layout.chef-sidebar-open .chef-sidebar {
-    transform: translateX(0); /* Slide in */
-  }
+.ChefDashboard-dropdown-menu button:last-child:hover {
+  background: rgba(244, 67, 54, 0.05);
+  border-left-color: var(--ChefDashboard-error);
+}
 
-  /* Sidebar backdrop */
-  .chef-sidebar-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.48);
-    opacity: 1;
-    pointer-events: auto;
-    z-index: 180;
-    transition: opacity 0.3s ease;
-  }
+/* ===========================
+   MAIN CONTENT AREA
+   =========================== */
+.ChefDashboard-main {
+  flex: 1;
+  padding: var(--ChefDashboard-spacing-2xl);
+  position: relative;
+  z-index: 1;
+}
 
-  .chef-layout:not(.chef-sidebar-open) .chef-sidebar-backdrop {
+.ChefDashboard-page-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  background: var(--ChefDashboard-bg-card);
+  border-radius: var(--ChefDashboard-radius-lg);
+  padding: var(--ChefDashboard-spacing-2xl);
+  box-shadow: var(--ChefDashboard-shadow-md);
+  min-height: calc(100vh - var(--ChefDashboard-navbar-height) - var(--ChefDashboard-spacing-2xl) * 2);
+  animation: ChefDashboard-fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes ChefDashboard-fadeInUp {
+  from {
     opacity: 0;
-    pointer-events: none;
+    transform: translateY(30px);
   }
-
-  /* Main content full width */
-  .chef-main {
-    margin-left: 0 !important;
-    transition: margin-left 0.3s ease;
-  }
-
-  /* Hide restaurant badge on mobile */
-  .chef-restaurant-badge {
-    display: none;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
-/* Mobile Sidebar */
-@media (max-width: 768px) {
-  .chef-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 240px;
-    height: 100vh;
-    transform: translateX(-100%);
-    z-index: 300; /* above content */
-    background: var(--dark);
-    transition: transform 0.3s ease;
-  }
 
-  .chef-layout.chef-sidebar-open .chef-sidebar {
-    transform: translateX(0);
-  }
+/* ===========================
+   RESPONSIVE BREAKPOINTS
+   =========================== */
 
-  /* Backdrop to cover the rest of the page */
-  .chef-sidebar-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.48);
-    z-index: 250;
-    transition: opacity 0.3s ease;
+/* Large Desktop & 4K (1920px+) */
+@media (min-width: 1920px) {
+  :root {
+    --ChefDashboard-navbar-height: 80px;
+    --ChefDashboard-spacing-2xl: 4rem;
   }
-
-  .chef-layout.chef-sidebar-open .chef-sidebar-backdrop {
-    display: block;
+  
+  .ChefDashboard-navbar {
+    padding: 0 var(--ChefDashboard-spacing-2xl);
   }
-
-  /* Prevent main content from shifting */
-  .chef-main {
-    margin-left: 0 !important;
+  
+  .ChefDashboard-brand {
+    font-size: 1.75rem;
+  }
+  
+  .ChefDashboard-nav-link {
+    font-size: 1.05rem;
+    padding: var(--ChefDashboard-spacing-md) var(--ChefDashboard-spacing-xl);
   }
 }
+
+/* Standard Desktop (1440px - 1919px) */
+@media (max-width: 1919px) and (min-width: 1440px) {
+  .ChefDashboard-page-container {
+    max-width: 1400px;
+  }
+}
+
+/* Laptop (1024px - 1439px) */
+@media (max-width: 1439px) and (min-width: 1024px) {
+  .ChefDashboard-page-container {
+    max-width: 1200px;
+  }
+  
+  .ChefDashboard-navbar {
+    padding: 0 var(--ChefDashboard-spacing-lg);
+  }
+  
+  .ChefDashboard-nav-link {
+    padding: var(--ChefDashboard-spacing-sm) var(--ChefDashboard-spacing-md);
+    font-size: 0.9rem;
+  }
+}
+
+/* Tablet Landscape (768px - 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .ChefDashboard-navbar {
+    padding: 0 var(--ChefDashboard-spacing-md);
+  }
+  
+  .ChefDashboard-navbar-left {
+    gap: var(--ChefDashboard-spacing-lg);
+  }
+  
+  .ChefDashboard-nav-links {
+    gap: var(--ChefDashboard-spacing-xs);
+  }
+  
+  .ChefDashboard-nav-link {
+    padding: var(--ChefDashboard-spacing-xs) var(--ChefDashboard-spacing-sm);
+    font-size: 0.85rem;
+  }
+  
+  .ChefDashboard-nav-link svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .ChefDashboard-notif-dropdown {
+    width: 340px;
+  }
+  
+  .ChefDashboard-main {
+    padding: var(--ChefDashboard-spacing-lg);
+  }
+  
+  .ChefDashboard-page-container {
+    padding: var(--ChefDashboard-spacing-lg);
+  }
+}
+
+/* Tablet Portrait & Mobile Landscape (481px - 767px) */
+@media (max-width: 767px) {
+  :root {
+    --ChefDashboard-navbar-height: auto;
+  }
+  
+  .ChefDashboard-navbar {
+    flex-direction: column;
+    padding: var(--ChefDashboard-spacing-md);
+    gap: var(--ChefDashboard-spacing-md);
+    height: auto;
+  }
+  
+  .ChefDashboard-navbar-left {
+    width: 100%;
+    flex-direction: column;
+    gap: var(--ChefDashboard-spacing-md);
+  }
+  
+  .ChefDashboard-brand {
+    justify-content: center;
+  }
+  
+  .ChefDashboard-nav-links {
+    width: 100%;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+  
+  .ChefDashboard-nav-link {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-width: 120px;
+  }
+  
+  .ChefDashboard-header-right {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .ChefDashboard-notif-dropdown {
+    width: 100%;
+    max-width: 340px;
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .ChefDashboard-dropdown-menu {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .ChefDashboard-main {
+    padding: var(--ChefDashboard-spacing-md);
+  }
+  
+  .ChefDashboard-page-container {
+    padding: var(--ChefDashboard-spacing-md);
+    border-radius: var(--ChefDashboard-radius-md);
+  }
+}
+
+/* Mobile (320px - 480px) */
+@media (max-width: 480px) {
+  .ChefDashboard-navbar {
+    padding: var(--ChefDashboard-spacing-sm);
+  }
+  
+  .ChefDashboard-brand {
+    font-size: 1.25rem;
+  }
+  
+  .ChefDashboard-nav-links {
+    flex-direction: column;
+    width: 100%;
+    gap: var(--ChefDashboard-spacing-xs);
+  }
+  
+  .ChefDashboard-nav-link {
+    width: 100%;
+    justify-content: flex-start;
+    padding: var(--ChefDashboard-spacing-sm) var(--ChefDashboard-spacing-md);
+  }
+  
+  .ChefDashboard-notif-btn,
+  .ChefDashboard-profile-circle {
+    width: 42px;
+    height: 42px;
+  }
+  
+  .ChefDashboard-notif-dropdown {
+    width: calc(100vw - 32px);
+    left: 16px;
+    right: 16px;
+    transform: none;
+  }
+  
+  .ChefDashboard-main {
+    padding: var(--ChefDashboard-spacing-sm);
+  }
+  
+  .ChefDashboard-page-container {
+    padding: var(--ChefDashboard-spacing-sm);
+  }
+}
+
+/* Small Mobile (320px and below) */
+@media (max-width: 320px) {
+  .ChefDashboard-brand span {
+    font-size: 1.1rem;
+  }
+  
+  .ChefDashboard-nav-link {
+    font-size: 0.8rem;
+    padding: var(--ChefDashboard-spacing-xs) var(--ChefDashboard-spacing-sm);
+  }
+}
+
+/* ===========================
+   PRINT STYLES
+   =========================== */
+@media print {
+  .ChefDashboard-navbar,
+  .ChefDashboard-header-right,
+  .ChefDashboard-notification-wrapper,
+  .ChefDashboard-dropdown-menu {
+    display: none !important;
+  }
+  
+  .ChefDashboard-page-container {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}
+
+/* ===========================
+   HIGH CONTRAST MODE
+   =========================== */
+@media (prefers-contrast: high) {
+  :root {
+    --ChefDashboard-border-color: #000;
+    --ChefDashboard-shadow-sm: 0 0 0 2px rgba(0, 0, 0, 0.3);
+    --ChefDashboard-shadow-md: 0 0 0 3px rgba(0, 0, 0, 0.4);
+  }
+  
+  .ChefDashboard-nav-link.active {
+    outline: 2px solid var(--ChefDashboard-accent-gold);
+  }
+}
+
+/* ===========================
+   REDUCED MOTION
+   =========================== */
+@media (prefers-reduced-motion: reduce) {
+  .ChefDashboard-layout,
+  .ChefDashboard-layout::before,
+  .ChefDashboard-navbar,
+  .ChefDashboard-navbar::after,
+  .ChefDashboard-nav-link,
+  .ChefDashboard-notif-badge,
+  .ChefDashboard-notif-dropdown,
+  .ChefDashboard-dropdown-menu,
+  .ChefDashboard-page-container {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===========================
+   ACCESSIBILITY ENHANCEMENTS
+   =========================== */
+.ChefDashboard-nav-link:focus-visible,
+.ChefDashboard-notif-btn:focus-visible,
+.ChefDashboard-profile-circle:focus-visible,
+.ChefDashboard-dropdown-menu button:focus-visible {
+  outline: 3px solid var(--ChefDashboard-accent-gold);
+  outline-offset: 2px;
+}
+
+/* Skip to main content link */
+.ChefDashboard-skip-to-main {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--ChefDashboard-accent-gold);
+  color: white;
+  padding: var(--ChefDashboard-spacing-sm) var(--ChefDashboard-spacing-md);
+  text-decoration: none;
+  border-radius: var(--ChefDashboard-radius-sm);
+  z-index: 10000;
+}
+
+.ChefDashboard-skip-to-main:focus {
+  top: var(--ChefDashboard-spacing-sm);
+}
+
+/* ===========================
+   LOADING STATES
+   =========================== */
+@keyframes ChefDashboard-shimmerLoading {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.ChefDashboard-loading-skeleton {
+  background: linear-gradient(90deg, var(--ChefDashboard-bg-hover) 25%, var(--ChefDashboard-bg-card) 50%, var(--ChefDashboard-bg-hover) 75%);
+  background-size: 1000px 100%;
+  animation: ChefDashboard-shimmerLoading 2s infinite;
+  border-radius: var(--ChefDashboard-radius-md);
+}
+
+/* ===========================
+   UTILITY CLASSES
+   =========================== */
+.ChefDashboard-text-gold { color: var(--ChefDashboard-accent-gold); }
+.ChefDashboard-text-copper { color: var(--ChefDashboard-accent-copper); }
+.ChefDashboard-bg-gold { background-color: var(--ChefDashboard-accent-gold); }
+.ChefDashboard-bg-copper { background-color: var(--ChefDashboard-accent-copper); }
+.ChefDashboard-shadow-sm { box-shadow: var(--ChefDashboard-shadow-sm); }
+.ChefDashboard-shadow-md { box-shadow: var(--ChefDashboard-shadow-md); }
+.ChefDashboard-shadow-lg { box-shadow: var(--ChefDashboard-shadow-lg); }
