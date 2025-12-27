@@ -1,774 +1,915 @@
-/* ================= ROOT VARIABLES ================= */
+/* ===============================================
+   CHEF HOME PAGE - PREMIUM CULINARY DESIGN
+   Responsive Command Center Interface
+   All classes prefixed with "ChefHome-"
+   =============================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+/* ===========================
+   CSS VARIABLES & THEMING
+   =========================== */
 :root {
-  /* Soft, Pastel Colors */
-  --primary-green: #7dd3ae;
-  --green-hover: #5bc59a;
-  --soft-blue: #8cb4ff;
-  --soft-purple: #b8a3ff;
-  --soft-orange: #ffb380;
-  --soft-red: #ff9999;
-  --soft-teal: #6fd9cf;
-  --soft-yellow: #ffd966;
-  --soft-gray: #b0b8c4;
-  --soft-pink: #ffb3d9;
+  /* Core Colors - Sophisticated Culinary Palette */
+  --ChefHome-primary-dark: #1a1a1a;
+  --ChefHome-primary-charcoal: #2d2d2d;
+  --ChefHome-accent-gold: #d4af37;
+  --ChefHome-accent-copper: #b87333;
+  --ChefHome-accent-sage: #8b9f8f;
+  --ChefHome-accent-cream: #f5f1e8;
   
-  /* Text Colors */
-  --text-primary: #2d3748;
-  --text-secondary: #718096;
-  --text-light: #a0aec0;
+  /* UI Colors */
+  --ChefHome-bg-primary: #fafaf9;
+  --ChefHome-bg-card: #ffffff;
+  --ChefHome-bg-hover: #f5f1e8;
+  --ChefHome-border-color: #e5e3dc;
+  --ChefHome-text-primary: #1a1a1a;
+  --ChefHome-text-secondary: #6b6b6b;
+  --ChefHome-text-light: #999999;
   
-  /* Background Colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f7fafc;
-  --bg-tertiary: #edf2f7;
-  --bg-light-green: #f0fdf4;
-  --bg-light-blue: #eff6ff;
-  --bg-light-purple: #f5f3ff;
-  --bg-light-orange: #fff7ed;
-  --bg-light-red: #fef2f2;
+  /* Status Colors */
+  --ChefHome-color-amber: #f59e0b;
+  --ChefHome-color-purple: #7c3aed;
+  --ChefHome-color-green: #10b981;
+  --ChefHome-color-orange: #f97316;
+  --ChefHome-color-cyan: #06b6d4;
+  --ChefHome-color-red: #ef4444;
+  --ChefHome-color-brown: #92400e;
   
-  /* Border & Shadow */
-  --border-light: #e2e8f0;
-  --border-medium: #cbd5e1;
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 30px -5px rgba(0, 0, 0, 0.12);
+  /* Shadows & Effects */
+  --ChefHome-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --ChefHome-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --ChefHome-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --ChefHome-shadow-glow: 0 0 20px rgba(212, 175, 55, 0.3);
   
-  /* Spacing */
-  --spacing-xs: 0.5rem;
-  --spacing-sm: 0.75rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --spacing-2xl: 3rem;
+  /* Spacing System */
+  --ChefHome-spacing-xs: 0.5rem;
+  --ChefHome-spacing-sm: 0.75rem;
+  --ChefHome-spacing-md: 1rem;
+  --ChefHome-spacing-lg: 1.5rem;
+  --ChefHome-spacing-xl: 2rem;
+  --ChefHome-spacing-2xl: 2.5rem;
+  --ChefHome-spacing-3xl: 3rem;
   
   /* Border Radius */
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
-  --radius-2xl: 2rem;
+  --ChefHome-radius-sm: 8px;
+  --ChefHome-radius-md: 12px;
+  --ChefHome-radius-lg: 16px;
+  --ChefHome-radius-xl: 20px;
+  
+  /* Typography */
+  --ChefHome-font-display: 'Playfair Display', serif;
+  --ChefHome-font-body: 'Outfit', sans-serif;
+  
+  /* Transitions */
+  --ChefHome-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --ChefHome-transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --ChefHome-transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ================= RESET & BASE ================= */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* ================= MAIN WRAPPER ================= */
-.chef-homepage-wrapper {
+/* ===========================
+   MAIN CONTAINER
+   =========================== */
+.ChefHome-dashboard {
   min-height: 100vh;
-  background: #f8fafc;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  color: var(--text-primary);
-}
-
-/* ================= TOP BAR ================= */
-.chef-top-bar {
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
-  border-bottom: 2px solid var(--primary-green);
-  box-shadow: var(--shadow-md);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.chef-top-bar-content {
-  width: 85%;
-  max-width: 1400px;
-  height: auto;
-  min-height: 15vh;
-  margin: 0 auto;
-  padding: var(--spacing-lg) var(--spacing-xl);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-xl);
-  flex-wrap: wrap;
-}
-
-.chef-greeting {
-  flex: 1;
-  min-width: 250px;
-}
-
-.chef-title {
-  font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #10b981, #06b6d4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: var(--spacing-xs);
-  letter-spacing: -0.03em;
-}
-
-.chef-subtitle {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-/* ================= DATE FILTER ================= */
-.chef-date-filter {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  background: linear-gradient(135deg, #ffffff, #f0fdf4);
-  padding: var(--spacing-md) var(--spacing-lg);
-  border-radius: var(--radius-xl);
-  border: 2px solid var(--primary-green);
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
-}
-
-.chef-date-filter:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-  border-color: var(--green-hover);
-}
-
-.date-icon {
-  font-size: 1.5rem;
-  color: var(--primary-green);
-}
-
-.date-inputs {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-}
-
-.date-input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.date-input-group label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--primary-green);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.date-input {
-  padding: 0.6rem 0.9rem;
-  border: 2px solid var(--primary-green);
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  background: var(--bg-primary);
-  transition: all 0.25s ease;
-  cursor: pointer;
-  min-width: 145px;
-}
-
-.date-input:hover {
-  border-color: var(--green-hover);
-  background: var(--bg-light-green);
-  transform: scale(1.02);
-}
-
-.date-input:focus {
-  outline: none;
-  border-color: var(--green-hover);
-  box-shadow: 0 0 0 4px rgba(125, 211, 174, 0.2);
-  background: var(--bg-primary);
-}
-
-.date-separator {
-  font-size: 1.25rem;
-  color: var(--primary-green);
-  font-weight: 700;
-  padding-top: 1rem;
-}
-
-/* ================= MAIN CONTENT ================= */
-.chef-main-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: var(--spacing-xl) var(--spacing-lg);
-}
-
-.section-title {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-lg);
-  letter-spacing: -0.03em;
+  padding: var(--ChefHome-spacing-2xl);
+  background: linear-gradient(135deg, #fafaf9 0%, #f5f1e8 100%);
   position: relative;
-  padding-left: var(--spacing-md);
+  animation: ChefHome-fadeIn 0.6s ease-out;
 }
 
-.section-title::before {
+/* Decorative Background */
+.ChefHome-dashboard::before {
   content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 5px;
-  height: 70%;
-  background: linear-gradient(180deg, #10b981, #06b6d4);
-  border-radius: 10px;
-}
-
-/* ================= HERO SECTION WITH IMAGE ================= */
-.chef-hero-section {
-  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 50%, #eff6ff 100%);
-  border-radius: var(--radius-2xl);
-  padding: var(--spacing-2xl);
-  margin-bottom: var(--spacing-2xl);
-  box-shadow: var(--shadow-lg);
-  border: 3px solid transparent;
-  background-clip: padding-box;
-  border-image: linear-gradient(135deg, var(--primary-green), var(--soft-blue)) 1;
-  display: flex;
-  gap: var(--spacing-2xl);
-  align-items: center;
-  transition: all 0.3s ease;
-}
-
-.chef-hero-section:hover {
-  box-shadow: var(--shadow-xl);
-  transform: translateY(-5px);
-}
-
-.chef-hero-left {
-  flex: 1;
-  min-width: 0;
-}
-
-.hero-title {
-  font-size: 2.2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #10b981, #3b82f6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: var(--spacing-md);
-  letter-spacing: -0.03em;
-}
-
-.hero-description {
-  font-size: 1.05rem;
-  color: var(--text-secondary);
-  line-height: 1.7;
-  margin-bottom: var(--spacing-xl);
-  font-weight: 500;
-}
-
-.chef-hero-right {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.chef-hero-right::before {
-  content: '';
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.2), transparent 70%);
-  border-radius: 50%;
+  position: fixed;
+  top: -200px;
+  right: -200px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  animation: ChefHome-floatGlow 10s ease-in-out infinite;
   z-index: 0;
-  animation: pulse 3s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.5;
+@keyframes ChefHome-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.8;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.chef-image {
-  width: 350px;
-  height: auto;
-  filter: drop-shadow(0 15px 30px rgb(255, 255, 255));
-  transition: transform 0.4s ease;
-  background-color: #12a16d;
-  position: relative;
-  z-index: 1;
+@keyframes ChefHome-floatGlow {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, 30px) scale(1.1); }
 }
 
-.chef-image:hover {
-  transform: scale(1.08) rotate(2deg);
-}
-
-/* ================= STATS SECTION (INSIDE HERO) ================= */
-
-.stats-grid {
+/* ===========================
+   HEADER SECTION
+   =========================== */
+.ChefHome-dashboard-top {
   display: grid;
-  gap: var(--spacing-md);
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.stat-card {
-  background: #ffffff;
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  display: flex;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--ChefHome-spacing-xl);
   align-items: center;
-  gap: var(--spacing-md);
-  box-shadow: var(--shadow-md);
-  border: 2px solid;
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--ChefHome-bg-card);
+  padding: var(--ChefHome-spacing-2xl);
+  border-radius: var(--ChefHome-radius-xl);
+  box-shadow: var(--ChefHome-shadow-lg);
   position: relative;
   overflow: hidden;
+  z-index: 1;
+  animation: ChefHome-slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.stat-card::before {
+@keyframes ChefHome-slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Gold accent border */
+.ChefHome-dashboard-top::after {
   content: '';
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
-  width: 6px;
-  height: 100%;
-  background: currentColor;
-  transition: all 0.35s ease;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--ChefHome-accent-gold) 0%, var(--ChefHome-accent-copper) 50%, var(--ChefHome-accent-gold) 100%);
+  background-size: 200% 100%;
+  animation: ChefHome-shimmer 3s linear infinite;
 }
 
-.stat-card::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, currentColor, transparent 70%);
-  opacity: 0.08;
-  transition: opacity 0.35s ease;
+@keyframes ChefHome-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-.stat-card:hover {
-  transform: translateY(-8px) scale(1.03);
-  box-shadow: 0 15px 35px -5px currentColor;
-  border-color: currentColor;
-}
-
-.stat-card:hover::after {
-  opacity: 0.12;
-}
-
-.stat-icon {
-  font-size: 2.8rem;
-  line-height: 1;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 1;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.stat-details {
-  flex: 1;
-  position: relative;
-  z-index: 1;
-}
-
-.stat-value {
-  font-size: 2.2rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  line-height: 1;
-  margin-bottom: 0.3rem;
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-/* Stat Color Variants with Enhanced Colors */
-.stat-blue { 
-  color: #3b82f6;
-  border-color: #3b82f6;
-  background: linear-gradient(135deg, #eff6ff, #ffffff);
-}
-.stat-purple { 
-  color: #8b5cf6;
-  border-color: #8b5cf6;
-  background: linear-gradient(135deg, #f5f3ff, #ffffff);
-}
-.stat-green { 
-  color: #10b981;
-  border-color: #10b981;
-  background: linear-gradient(135deg, #f0fdf4, #ffffff);
-}
-.stat-orange { 
-  color: #f59e0b;
-  border-color: #f59e0b;
-  background: linear-gradient(135deg, #fff7ed, #ffffff);
-}
-.stat-teal { 
-  color: #14b8a6;
-  border-color: #14b8a6;
-  background: linear-gradient(135deg, #f0fdfa, #ffffff);
-}
-.stat-red { 
-  color: #ef4444;
-  border-color: #ef4444;
-  background: linear-gradient(135deg, #fef2f2, #ffffff);
-}
-.stat-gray { 
-  color: #6b7280;
-  border-color: #6b7280;
-  background: linear-gradient(135deg, #f9fafb, #ffffff);
-}
-
-/* ================= LOADING STATE ================= */
-.loading-state {
+/* Header Left Section */
+.ChefHome-dashboard-top > div:first-child {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-2xl);
-  gap: var(--spacing-md);
+  gap: var(--ChefHome-spacing-xs);
 }
 
-.spinner {
-  width: 52px;
-  height: 52px;
-  border: 5px solid var(--border-light);
-  border-top-color: #10b981;
-  border-right-color: #06b6d4;
-  border-radius: 50%;
-  animation: spin 0.9s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-state p {
-  color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-/* ================= QUICK ACTIONS ================= */
-.chef-actions-section {
-  margin-bottom: var(--spacing-2xl);
-}
-
-.chef-cards-grid {
-  display: grid;
-  gap: var(--spacing-lg);
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.chef-feature-card {
-  background: #ffffff;
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-xl);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  cursor: pointer;
-  box-shadow: var(--shadow-lg);
-  border: 3px solid;
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.chef-feature-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, currentColor, transparent 70%);
-  opacity: 0.08;
-  transition: opacity 0.35s ease;
-}
-
-.chef-feature-card:hover {
-  transform: translateY(-10px) scale(1.03);
-  box-shadow: 0 20px 40px -5px currentColor;
-}
-
-.chef-feature-card:hover::before {
-  opacity: 0.12;
-}
-
-.chef-feature-card:active {
-  transform: translateY(-6px) scale(1.02);
-}
-
-.card-icon-wrapper {
-  width: 72px;
-  height: 72px;
-  border-radius: var(--radius-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.35s ease;
-  position: relative;
-  z-index: 1;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.chef-feature-card:hover .card-icon-wrapper {
-  transform: scale(1.2) rotate(-10deg);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-}
-
-.card-icon {
+.ChefHome-dashboard-title {
+  font-family: var(--ChefHome-font-display);
   font-size: 2rem;
-  color: #ffffff;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--ChefHome-accent-gold), var(--ChefHome-accent-copper));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--ChefHome-spacing-xs);
+  letter-spacing: -0.5px;
+}
+
+.ChefHome-dashboard-top h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ChefHome-text-primary);
+  margin-bottom: var(--ChefHome-spacing-xs);
+}
+
+.ChefHome-dashboard-subtitle {
+  color: var(--ChefHome-text-secondary);
+  font-size: 0.95rem;
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Header Center - Organization Name */
+.ChefHome-header-center {
+  text-align: center;
+  padding: var(--ChefHome-spacing-lg);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(184, 115, 51, 0.1));
+  border-radius: var(--ChefHome-radius-md);
+  border: 2px solid rgba(212, 175, 55, 0.2);
+}
+
+.ChefHome-organization-name {
+  font-family: var(--ChefHome-font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--ChefHome-accent-copper);
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+.ChefHome-organization-name::before,
+.ChefHome-organization-name::after {
+  content: '⚡';
+  position: absolute;
+  color: var(--ChefHome-accent-gold);
+  font-size: 1.2rem;
+  opacity: 0.6;
+}
+
+.ChefHome-organization-name::before {
+  left: -30px;
+}
+
+.ChefHome-organization-name::after {
+  right: -30px;
+}
+
+/* Header Right - Date/Time */
+.ChefHome-top-datetime {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ChefHome-spacing-sm);
+  background: linear-gradient(135deg, var(--ChefHome-accent-gold), var(--ChefHome-accent-copper));
+  color: white;
+  padding: var(--ChefHome-spacing-md) var(--ChefHome-spacing-lg);
+  border-radius: var(--ChefHome-radius-md);
+  font-weight: 600;
+  box-shadow: var(--ChefHome-shadow-md);
+  transition: all var(--ChefHome-transition-base);
+}
+
+.ChefHome-top-datetime:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ChefHome-shadow-lg);
+}
+
+.ChefHome-top-datetime svg {
+  font-size: 1.1rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-.card-content {
-  flex: 1;
+.ChefHome-top-datetime strong {
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+/* ===========================
+   MAIN GRID LAYOUT
+   =========================== */
+.ChefHome-dashboard-main-grid {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr;
+  gap: var(--ChefHome-spacing-2xl);
+  margin-top: var(--ChefHome-spacing-3xl);
   position: relative;
   z-index: 1;
 }
 
-.card-content h3 {
-  font-size: 1.4rem;
+/* ===========================
+   STATS GRID
+   =========================== */
+.ChefHome-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--ChefHome-spacing-lg);
+  animation: ChefHome-fadeInUp 0.8s ease-out 0.2s both;
+}
+
+@keyframes ChefHome-fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===========================
+   STAT CARDS
+   =========================== */
+.ChefHome-stat-card {
+  background: var(--ChefHome-bg-card);
+  padding: var(--ChefHome-spacing-xl);
+  border-radius: var(--ChefHome-radius-lg);
+  text-align: center;
+  box-shadow: var(--ChefHome-shadow-md);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--ChefHome-transition-base);
+  border: 2px solid transparent;
+  cursor: default;
+}
+
+/* Gradient background overlay */
+.ChefHome-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.05;
+  transition: opacity var(--ChefHome-transition-base);
+  z-index: 0;
+}
+
+.ChefHome-stat-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: var(--ChefHome-shadow-lg);
+  border-color: currentColor;
+}
+
+.ChefHome-stat-card:hover::before {
+  opacity: 0.1;
+}
+
+/* Icon styling */
+.ChefHome-stat-card svg {
+  font-size: 2.5rem;
+  margin-bottom: var(--ChefHome-spacing-md);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+  transition: all var(--ChefHome-transition-base);
+  position: relative;
+  z-index: 1;
+}
+
+.ChefHome-stat-card:hover svg {
+  transform: scale(1.15) rotate(5deg);
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
+}
+
+/* Value styling */
+.ChefHome-stat-card h2 {
+  font-size: 2.5rem;
   font-weight: 800;
-  color: var(--text-primary);
-  margin-bottom: 0.4rem;
-  letter-spacing: -0.02em;
+  margin: var(--ChefHome-spacing-sm) 0;
+  font-family: var(--ChefHome-font-display);
+  line-height: 1;
+  position: relative;
+  z-index: 1;
 }
 
-.card-content p {
+/* Label styling */
+.ChefHome-stat-card p {
+  color: var(--ChefHome-text-secondary);
+  font-weight: 600;
   font-size: 0.95rem;
-  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===========================
+   COLOR VARIANTS
+   =========================== */
+.ChefHome-amber svg { color: var(--ChefHome-color-amber); }
+.ChefHome-amber::before { background: linear-gradient(135deg, var(--ChefHome-color-amber), #fbbf24); }
+.ChefHome-amber h2 { color: var(--ChefHome-color-amber); }
+.ChefHome-amber:hover { border-color: var(--ChefHome-color-amber); }
+
+.ChefHome-purple svg { color: var(--ChefHome-color-purple); }
+.ChefHome-purple::before { background: linear-gradient(135deg, var(--ChefHome-color-purple), #a78bfa); }
+.ChefHome-purple h2 { color: var(--ChefHome-color-purple); }
+.ChefHome-purple:hover { border-color: var(--ChefHome-color-purple); }
+
+.ChefHome-green svg { color: var(--ChefHome-color-green); }
+.ChefHome-green::before { background: linear-gradient(135deg, var(--ChefHome-color-green), #34d399); }
+.ChefHome-green h2 { color: var(--ChefHome-color-green); }
+.ChefHome-green:hover { border-color: var(--ChefHome-color-green); }
+
+.ChefHome-orange svg { color: var(--ChefHome-color-orange); }
+.ChefHome-orange::before { background: linear-gradient(135deg, var(--ChefHome-color-orange), #fb923c); }
+.ChefHome-orange h2 { color: var(--ChefHome-color-orange); }
+.ChefHome-orange:hover { border-color: var(--ChefHome-color-orange); }
+
+.ChefHome-cyan svg { color: var(--ChefHome-color-cyan); }
+.ChefHome-cyan::before { background: linear-gradient(135deg, var(--ChefHome-color-cyan), #22d3ee); }
+.ChefHome-cyan h2 { color: var(--ChefHome-color-cyan); }
+.ChefHome-cyan:hover { border-color: var(--ChefHome-color-cyan); }
+
+.ChefHome-red svg { color: var(--ChefHome-color-red); }
+.ChefHome-red::before { background: linear-gradient(135deg, var(--ChefHome-color-red), #f87171); }
+.ChefHome-red h2 { color: var(--ChefHome-color-red); }
+.ChefHome-red:hover { border-color: var(--ChefHome-color-red); }
+
+.ChefHome-brown svg { color: var(--ChefHome-color-brown); }
+.ChefHome-brown::before { background: linear-gradient(135deg, var(--ChefHome-color-brown), #b45309); }
+.ChefHome-brown h2 { color: var(--ChefHome-color-brown); }
+.ChefHome-brown:hover { border-color: var(--ChefHome-color-brown); }
+
+/* ===========================
+   RIGHT PANEL
+   =========================== */
+.ChefHome-right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ChefHome-spacing-xl);
+  animation: ChefHome-fadeInRight 0.8s ease-out 0.3s both;
+}
+
+@keyframes ChefHome-fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ===========================
+   DATE FILTER
+   =========================== */
+.ChefHome-date-filter {
+  background: var(--ChefHome-bg-card);
+  padding: var(--ChefHome-spacing-xl);
+  border-radius: var(--ChefHome-radius-lg);
+  box-shadow: var(--ChefHome-shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ChefHome-spacing-lg);
+  border: 2px solid var(--ChefHome-border-color);
+  transition: all var(--ChefHome-transition-base);
+}
+
+.ChefHome-date-filter:hover {
+  border-color: var(--ChefHome-accent-gold);
+  box-shadow: var(--ChefHome-shadow-lg);
+}
+
+.ChefHome-date-filter > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ChefHome-spacing-xs);
+}
+
+.ChefHome-date-filter label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ChefHome-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ChefHome-date-filter input {
+  padding: var(--ChefHome-spacing-sm) var(--ChefHome-spacing-md);
+  border: 2px solid var(--ChefHome-border-color);
+  border-radius: var(--ChefHome-radius-sm);
+  font-size: 0.95rem;
+  font-family: var(--ChefHome-font-body);
   font-weight: 500;
-  line-height: 1.6;
+  transition: all var(--ChefHome-transition-fast);
+  background: var(--ChefHome-bg-primary);
+  color: var(--ChefHome-text-primary);
 }
 
-/* Card Color Variants - Enhanced with Bold Colors */
-.card-yellow {
-  color: #f59e0b;
-  border-color: #f59e0b;
-  background: linear-gradient(135deg, #fffbeb, #ffffff);
-}
-.card-yellow .card-icon-wrapper {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+.ChefHome-date-filter input:focus {
+  outline: none;
+  border-color: var(--ChefHome-accent-gold);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
 }
 
-.card-green {
-  color: #10b981;
-  border-color: #10b981;
-  background: linear-gradient(135deg, #f0fdf4, #ffffff);
-}
-.card-green .card-icon-wrapper {
-  background: linear-gradient(135deg, #34d399, #10b981);
+.ChefHome-date-filter input:hover {
+  border-color: var(--ChefHome-accent-copper);
 }
 
-.card-red {
-  color: #ef4444;
-  border-color: #ef4444;
-  background: linear-gradient(135deg, #fef2f2, #ffffff);
-}
-.card-red .card-icon-wrapper {
-  background: linear-gradient(135deg, #f87171, #ef4444);
+/* ===========================
+   CHEF IMAGE CONTAINER
+   =========================== */
+.ChefHome-chef-image-container {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(184, 115, 51, 0.1));
+  padding: var(--ChefHome-spacing-xl);
+  border-radius: var(--ChefHome-radius-lg);
+  box-shadow: var(--ChefHome-shadow-md);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid rgba(212, 175, 55, 0.2);
+  position: relative;
+  overflow: hidden;
 }
 
-/* ================= RESPONSIVE DESIGN ================= */
+.ChefHome-chef-image-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(212, 175, 55, 0.1), transparent);
+  animation: ChefHome-pulseBackground 4s ease-in-out infinite;
+}
 
-/* Mobile Devices (up to 640px) */
-@media (max-width: 640px) {
-  .chef-top-bar-content {
-    width: 95%;
-    flex-direction: column;
-    align-items: stretch;
-    padding: var(--spacing-md);
-    min-height: auto;
+@keyframes ChefHome-pulseBackground {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.ChefHome-chef-image-container img {
+  width: 100%;
+  max-width: 350px;
+  display: block;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+  transition: all var(--ChefHome-transition-slow);
+}
+
+.ChefHome-chef-image-container:hover img {
+  transform: scale(1.05) rotate(2deg);
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.25));
+}
+
+/* ===========================
+   QUICK ACCESS SECTION
+   =========================== */
+.ChefHome-quick-access-section {
+  margin-top: var(--ChefHome-spacing-3xl);
+  position: relative;
+  z-index: 1;
+  animation: ChefHome-fadeInUp 1s ease-out 0.4s both;
+}
+
+.ChefHome-quick-access-section h2 {
+  font-family: var(--ChefHome-font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--ChefHome-text-primary);
+  margin-bottom: var(--ChefHome-spacing-lg);
+  position: relative;
+  display: inline-block;
+}
+
+.ChefHome-quick-access-section h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--ChefHome-accent-gold), var(--ChefHome-accent-copper));
+  border-radius: 2px;
+}
+
+.ChefHome-quick-access-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--ChefHome-spacing-lg);
+}
+
+/* ===========================
+   QUICK ACCESS CARDS
+   =========================== */
+.ChefHome-quick-card {
+  background: var(--ChefHome-bg-card);
+  padding: var(--ChefHome-spacing-xl) var(--ChefHome-spacing-2xl);
+  border-radius: var(--ChefHome-radius-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--ChefHome-spacing-md);
+  cursor: pointer;
+  box-shadow: var(--ChefHome-shadow-md);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--ChefHome-text-primary);
+  border: 2px solid transparent;
+  transition: all var(--ChefHome-transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.ChefHome-quick-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+  transition: left var(--ChefHome-transition-slow);
+}
+
+.ChefHome-quick-card:hover::before {
+  left: 100%;
+}
+
+.ChefHome-quick-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: var(--ChefHome-shadow-lg);
+  border-color: var(--ChefHome-accent-gold);
+  background: linear-gradient(135deg, var(--ChefHome-bg-card), var(--ChefHome-bg-hover));
+}
+
+.ChefHome-quick-card:active {
+  transform: translateY(-2px) scale(1);
+}
+
+.ChefHome-quick-card svg {
+  font-size: 1.75rem;
+  color: var(--ChefHome-accent-gold);
+  transition: all var(--ChefHome-transition-base);
+}
+
+.ChefHome-quick-card:hover svg {
+  color: var(--ChefHome-accent-copper);
+  transform: scale(1.2) rotate(5deg);
+}
+
+/* ===========================
+   LOADING STATE
+   =========================== */
+.ChefHome-stat-card h2:empty::after {
+  content: '⋯';
+  color: var(--ChefHome-text-light);
+  animation: ChefHome-loadingDots 1.5s infinite;
+}
+
+@keyframes ChefHome-loadingDots {
+  0%, 20% { content: '⋯'; }
+  40% { content: '⋯⋯'; }
+  60%, 100% { content: '⋯⋯⋯'; }
+}
+
+/* ===========================
+   RESPONSIVE BREAKPOINTS
+   =========================== */
+
+/* Large Desktop (1920px+) */
+@media (min-width: 1920px) {
+  .ChefHome-dashboard {
+    padding: var(--ChefHome-spacing-3xl);
   }
   
-  .chef-title {
-    font-size: 1.6rem;
+  .ChefHome-dashboard-title {
+    font-size: 2.5rem;
   }
   
-  .chef-subtitle {
-    font-size: 0.85rem;
+  .ChefHome-stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+/* Desktop (1440px - 1919px) */
+@media (max-width: 1919px) and (min-width: 1440px) {
+  .ChefHome-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Laptop (1024px - 1439px) */
+@media (max-width: 1439px) and (min-width: 1024px) {
+  .ChefHome-dashboard-main-grid {
+    grid-template-columns: 2fr 1fr;
+    gap: var(--ChefHome-spacing-xl);
   }
   
-  .chef-date-filter {
-    flex-direction: column;
-    align-items: stretch;
-    padding: var(--spacing-md);
-    width: 100%;
+  .ChefHome-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
   
-  .date-inputs {
-    flex-direction: column;
-    gap: var(--spacing-sm);
+  .ChefHome-dashboard-title {
+    font-size: 1.75rem;
   }
   
-  .date-separator {
+  .ChefHome-organization-name {
+    font-size: 1.5rem;
+  }
+}
+
+/* Tablet Landscape (768px - 1023px) */
+@media (max-width: 1023px) {
+  .ChefHome-dashboard-main-grid {
+    grid-template-columns: 1fr;
+    gap: var(--ChefHome-spacing-xl);
+  }
+  
+  .ChefHome-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .ChefHome-dashboard-top {
+    grid-template-columns: 1fr;
+    gap: var(--ChefHome-spacing-lg);
+    text-align: center;
+  }
+  
+  .ChefHome-header-center {
+    order: -1;
+  }
+  
+  .ChefHome-top-datetime {
+    justify-content: center;
+  }
+  
+  .ChefHome-organization-name::before,
+  .ChefHome-organization-name::after {
     display: none;
   }
   
-  .date-input {
-    min-width: 100%;
+  .ChefHome-right-panel {
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
   }
   
-  .chef-main-content {
-    padding: var(--spacing-md);
+  .ChefHome-quick-access-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet Portrait & Mobile Landscape (481px - 767px) */
+@media (max-width: 767px) {
+  .ChefHome-dashboard {
+    padding: var(--ChefHome-spacing-lg);
   }
   
-  /* Hero section - stack vertically on mobile */
-  .chef-hero-section {
-    flex-direction: column;
-    padding: var(--spacing-lg);
+  .ChefHome-dashboard-top {
+    padding: var(--ChefHome-spacing-lg);
   }
   
-  .hero-title {
-    font-size: 1.6rem;
+  .ChefHome-dashboard-title {
+    font-size: 1.5rem;
   }
   
-  .hero-description {
+  .ChefHome-dashboard-top h3 {
+    font-size: 1.1rem;
+  }
+  
+  .ChefHome-organization-name {
+    font-size: 1.25rem;
+  }
+  
+  .ChefHome-stats-grid {
+    grid-template-columns: 1fr;
+    gap: var(--ChefHome-spacing-md);
+  }
+  
+  .ChefHome-stat-card {
+    padding: var(--ChefHome-spacing-lg);
+  }
+  
+  .ChefHome-stat-card svg {
+    font-size: 2rem;
+  }
+  
+  .ChefHome-stat-card h2 {
+    font-size: 2rem;
+  }
+  
+  .ChefHome-quick-access-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .ChefHome-top-datetime {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Mobile (320px - 480px) */
+@media (max-width: 480px) {
+  .ChefHome-dashboard {
+    padding: var(--ChefHome-spacing-md);
+  }
+  
+  .ChefHome-dashboard-top {
+    padding: var(--ChefHome-spacing-md);
+  }
+  
+  .ChefHome-dashboard-title {
+    font-size: 1.25rem;
+  }
+  
+  .ChefHome-dashboard-top h3 {
+    font-size: 1rem;
+  }
+  
+  .ChefHome-dashboard-subtitle {
+    font-size: 0.85rem;
+  }
+  
+  .ChefHome-organization-name {
+    font-size: 1.1rem;
+  }
+  
+  .ChefHome-top-datetime {
+    font-size: 0.85rem;
+    padding: var(--ChefHome-spacing-sm) var(--ChefHome-spacing-md);
+  }
+  
+  .ChefHome-top-datetime strong {
     font-size: 0.9rem;
   }
   
-  .chef-hero-right::before {
-    width: 300px;
-    height: 300px;
+  .ChefHome-stat-card {
+    padding: var(--ChefHome-spacing-md);
   }
   
-  .chef-image {
-    width: 280px;
-    margin-top: var(--spacing-lg);
+  .ChefHome-stat-card svg {
+    font-size: 1.75rem;
   }
   
-  .section-title {
-    font-size: 1.35rem;
+  .ChefHome-stat-card h2 {
+    font-size: 1.75rem;
   }
   
-  /* Single column on mobile */
-  .stats-grid {
+  .ChefHome-stat-card p {
+    font-size: 0.85rem;
+  }
+  
+  .ChefHome-date-filter {
+    padding: var(--ChefHome-spacing-md);
+  }
+  
+  .ChefHome-quick-card {
+    padding: var(--ChefHome-spacing-lg);
+    font-size: 0.95rem;
+  }
+  
+  .ChefHome-quick-access-section h2 {
+    font-size: 1.5rem;
+  }
+  
+  .ChefHome-chef-image-container img {
+    max-width: 250px;
+  }
+}
+
+/* Small Mobile (320px and below) */
+@media (max-width: 320px) {
+  .ChefHome-dashboard-title {
+    font-size: 1.1rem;
+  }
+  
+  .ChefHome-stat-card h2 {
+    font-size: 1.5rem;
+  }
+  
+  .ChefHome-quick-card {
+    padding: var(--ChefHome-spacing-md);
+  }
+}
+
+/* ===========================
+   PRINT STYLES
+   =========================== */
+@media print {
+  .ChefHome-dashboard::before,
+  .ChefHome-quick-access-section,
+  .ChefHome-chef-image-container {
+    display: none !important;
+  }
+  
+  .ChefHome-dashboard-main-grid {
     grid-template-columns: 1fr;
-    gap: var(--spacing-md);
   }
   
-  .chef-cards-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-  }
-  
-  .chef-feature-card {
-    padding: var(--spacing-lg);
-  }
-  
-  .card-icon-wrapper {
-    width: 60px;
-    height: 60px;
-  }
-  
-  .card-icon {
-    font-size: 1.6rem;
+  .ChefHome-stat-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ddd;
   }
 }
 
-/* Tablets (641px to 1024px) */
-@media (min-width: 641px) and (max-width: 1024px) {
-  .chef-top-bar-content {
-    width: 90%;
-    padding: var(--spacing-lg);
-  }
-  
-  .chef-hero-section {
-    padding: var(--spacing-xl);
-  }
-  
-  .chef-hero-right::before {
-    width: 350px;
-    height: 350px;
-  }
-  
-  .chef-image {
-    width: 300px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .chef-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
+/* ===========================
+   ACCESSIBILITY
+   =========================== */
+.ChefHome-quick-card:focus-visible,
+.ChefHome-date-filter input:focus-visible {
+  outline: 3px solid var(--ChefHome-accent-gold);
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .ChefHome-dashboard,
+  .ChefHome-dashboard::before,
+  .ChefHome-dashboard-top,
+  .ChefHome-stats-grid,
+  .ChefHome-stat-card,
+  .ChefHome-right-panel,
+  .ChefHome-quick-access-section,
+  .ChefHome-quick-card,
+  .ChefHome-quick-card::before,
+  .ChefHome-chef-image-container::before {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-/* Small Laptops (1025px to 1280px) */
-@media (min-width: 1025px) and (max-width: 1280px) {
-  .chef-top-bar-content {
-    width: 88%;
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .ChefHome-stat-card,
+  .ChefHome-quick-card,
+  .ChefHome-date-filter {
+    border: 2px solid var(--ChefHome-text-primary);
   }
   
-  .chef-image {
-    width: 320px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .chef-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* Normal & Gaming Laptops (1281px and above) */
-@media (min-width: 1281px) {
-  .chef-top-bar-content {
-    width: 85%;
-  }
-  
-  .chef-image {
-    width: 350px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .chef-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* Extra Large Screens (1536px and above) */
-@media (min-width: 1536px) {
-  .chef-main-content {
-    max-width: 1600px;
-  }
-  
-  .chef-hero-right::before {
-    width: 450px;
-    height: 450px;
-  }
-  
-  .chef-image {
-    width: 400px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .chef-cards-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .ChefHome-dashboard-top::after,
+  .ChefHome-quick-access-section h2::after {
+    display: none;
   }
 }

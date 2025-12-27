@@ -35,7 +35,6 @@ export default function SuperAdminStaffManagement() {
   const [popupOpen, setPopupOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("All Staff");
 
-  // ✅ Pagination states - FIXED: Start from page 1 for display
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(5);
   const [totalPages, setTotalPages] = useState(1);
@@ -65,12 +64,10 @@ export default function SuperAdminStaffManagement() {
     }
   };
 
-  // ===== Fetch All Staff with Pagination (API uses 0-based indexing) =====
   const fetchStaff = useCallback(async (page = 1, size = pageSize) => {
     if (!TOKEN || !ORG_ID) return;
     setLoading(true);
     try {
-      // Convert display page (1-based) to API page (0-based)
       const apiPage = page - 1;
       
       const res = await fetch(
@@ -136,7 +133,6 @@ export default function SuperAdminStaffManagement() {
     }
   }, [API_BASE, TOKEN, ORG_ID, pageSize, previousActiveIds]);
 
-  // ===== Fetch Roles =====
   const fetchRoles = useCallback(async () => {
     if (!TOKEN || !ORG_ID) return;
     try {
@@ -164,7 +160,6 @@ export default function SuperAdminStaffManagement() {
     if (!popupOpen && TOKEN) fetchStaff(currentPage, pageSize);
   }, [popupOpen, TOKEN, fetchStaff, currentPage, pageSize]);
 
-  // ===== Add / Update Staff =====
   const handleAddOrUpdate = async () => {
     if (!form.firstName || !form.lastName || !form.email || !form.phoneNumber) {
       toast.error("Please fill all required fields.");
@@ -260,7 +255,6 @@ export default function SuperAdminStaffManagement() {
     }
   };
 
-  // ✅ Filter staff by tab
   const filteredStaff =
     activeTab === "All Staff"
       ? staffList
@@ -288,7 +282,6 @@ export default function SuperAdminStaffManagement() {
                 )
                 : staffList;
 
-  // ✅ FIXED: Pagination now properly handles the display
   const handleNext = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
@@ -302,18 +295,17 @@ export default function SuperAdminStaffManagement() {
   };
 
   useEffect(() => {
-    setCurrentPage(1); // reset to first page on tab change
+    setCurrentPage(1);
   }, [activeTab]);
 
   return (
-    <div className="user-management">
-      {/* Header and Add Button */}
-      <div className="user-header">
+    <div className="SuperAdminStaff-user-management">
+      <div className="SuperAdminStaff-user-header">
         <h2>
           <UserCog size={20} /> Staff Management
         </h2>
         <button
-          className="add-btn"
+          className="SuperAdminStaff-add-btn"
           onClick={() => {
             setForm(initialForm);
             setEditId(null);
@@ -324,12 +316,11 @@ export default function SuperAdminStaffManagement() {
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="tab-navigation">
+      <div className="SuperAdminStaff-tab-navigation">
         {["All Staff", "Admin", "Waiters", "Chef", "Acountent", "Other"].map((tab) => (
           <div
             key={tab}
-            className={`tab ${activeTab === tab ? "active" : ""}`}
+            className={`SuperAdminStaff-tab ${activeTab === tab ? "SuperAdminStaff-active" : ""}`}
             onClick={() => setActiveTab(tab)}
           >
             {tab}
@@ -337,8 +328,7 @@ export default function SuperAdminStaffManagement() {
         ))}
       </div>
 
-      {/* Table */}
-      <div className="table-container">
+      <div className="SuperAdminStaff-table-container">
         <table>
           <thead>
             <tr>
@@ -375,15 +365,15 @@ export default function SuperAdminStaffManagement() {
                   <td>{staff.contractStartDate}</td>
                   <td>{staff.contractEndDate}</td>
                   <td>
-                    <span className={`status ${staff.status?.toLowerCase()}`}>
+                    <span className={`SuperAdminStaff-status SuperAdminStaff-${staff.status?.toLowerCase()}`}>
                       {staff.status || "Inactive"}
                     </span>
                   </td>
                   <td>
-                    <button className="action-btn edit" onClick={() => handleEdit(staff)}>
+                    <button className="SuperAdminStaff-action-btn SuperAdminStaff-edit" onClick={() => handleEdit(staff)}>
                       <Edit size={16} />
                     </button>
-                    <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
+                    <button className="SuperAdminStaff-action-btn SuperAdminStaff-delete" onClick={() => handleRemove(staff.id)}>
                       <Trash2 size={16} />
                     </button>
                   </td>
@@ -400,48 +390,48 @@ export default function SuperAdminStaffManagement() {
         </table>
       </div>
 
-      <div className="mobile-user-cards">
+      <div className="SuperAdminStaff-mobile-user-cards">
         {loading ? (
-          <div className="no-users-mobile">Loading...</div>
+          <div className="SuperAdminStaff-no-users-mobile">Loading...</div>
         ) : filteredStaff.length > 0 ? (
           filteredStaff.map((staff, index) => (
-            <div key={staff.id} className="user-card-mobile">
-              <div className="user-row user-name-cell">
-                <span className="cell-label">SL.NO</span>
-                <span className="cell-value">{index + 1 + (currentPage - 1) * pageSize}</span>
+            <div key={staff.id} className="SuperAdminStaff-user-card-mobile">
+              <div className="SuperAdminStaff-user-row SuperAdminStaff-user-name-cell">
+                <span className="SuperAdminStaff-cell-label">SL.NO</span>
+                <span className="SuperAdminStaff-cell-value">{index + 1 + (currentPage - 1) * pageSize}</span>
               </div>
-              <div className="user-row user-name-cell">
-                <span className="cell-label">Name</span>
-                <span className="cell-value">{staff.firstName} {staff.lastName}</span>
+              <div className="SuperAdminStaff-user-row SuperAdminStaff-user-name-cell">
+                <span className="SuperAdminStaff-cell-label">Name</span>
+                <span className="SuperAdminStaff-cell-value">{staff.firstName} {staff.lastName}</span>
               </div>
-              <div className="user-row">
-                <span className="cell-label">Email</span>
-                <span className="cell-value">{staff.email}</span>
+              <div className="SuperAdminStaff-user-row">
+                <span className="SuperAdminStaff-cell-label">Email</span>
+                <span className="SuperAdminStaff-cell-value">{staff.email}</span>
               </div>
-              <div className="user-row">
-                <span className="cell-label">Phone</span>
-                <span className="cell-value">{staff.phoneNumber}</span>
+              <div className="SuperAdminStaff-user-row">
+                <span className="SuperAdminStaff-cell-label">Phone</span>
+                <span className="SuperAdminStaff-cell-value">{staff.phoneNumber}</span>
               </div>
-              <div className="user-row">
-                <span className="cell-label">Role</span>
-                <span className="cell-value">{staff.staffRoleType}</span>
+              <div className="SuperAdminStaff-user-row">
+                <span className="SuperAdminStaff-cell-label">Role</span>
+                <span className="SuperAdminStaff-cell-value">{staff.staffRoleType}</span>
               </div>
-              <div className="user-row">
-                <span className="cell-label">Shift</span>
-                <span className="cell-value">{staff.shiftTiming}</span>
+              <div className="SuperAdminStaff-user-row">
+                <span className="SuperAdminStaff-cell-label">Shift</span>
+                <span className="SuperAdminStaff-cell-value">{staff.shiftTiming}</span>
               </div>
-              <div className="user-row">
-                <span className="cell-label">Status</span>
-                <span className={`status ${staff.status?.toLowerCase()}`}>
+              <div className="SuperAdminStaff-user-row">
+                <span className="SuperAdminStaff-cell-label">Status</span>
+                <span className={`SuperAdminStaff-status SuperAdminStaff-${staff.status?.toLowerCase()}`}>
                   {staff.status || "Inactive"}
                 </span>
               </div>
-              <div className="user-row actions-cell">
-                <div className="user-actions">
-                  <button className="action-btn edit" onClick={() => handleEdit(staff)}>
+              <div className="SuperAdminStaff-user-row SuperAdminStaff-actions-cell">
+                <div className="SuperAdminStaff-user-actions">
+                  <button className="SuperAdminStaff-action-btn SuperAdminStaff-edit" onClick={() => handleEdit(staff)}>
                     <Edit size={16} />
                   </button>
-                  <button className="action-btn delete" onClick={() => handleRemove(staff.id)}>
+                  <button className="SuperAdminStaff-action-btn SuperAdminStaff-delete" onClick={() => handleRemove(staff.id)}>
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -449,49 +439,48 @@ export default function SuperAdminStaffManagement() {
             </div>
           ))
         ) : (
-          <div className="no-users-mobile">No staff available in {activeTab}.</div>
+          <div className="SuperAdminStaff-no-users-mobile">No staff available in {activeTab}.</div>
         )}
       </div>
 
-      {/* ✅ Pagination controls */}
-      <div className="pagination-container">
+      <div className="SuperAdminStaff-pagination-container">
         <button
           onClick={handlePrevious}
           disabled={currentPage === 1 || loading}
-          className="pagination-btn"
+          className="SuperAdminStaff-pagination-btn"
         >
           ⬅ Previous
         </button>
 
-        <span className="pagination-info">
+        <span className="SuperAdminStaff-pagination-info">
           Page {currentPage} of {totalPages}
         </span>
 
         <button
           onClick={handleNext}
           disabled={currentPage === totalPages || loading}
-          className="pagination-btn"
+          className="SuperAdminStaff-pagination-btn"
         >
           Next ➡
         </button>
       </div>
 
       {popupOpen && (
-        <div className="popup" onClick={(e) => {
-          if (e.target.className === 'popup') setPopupOpen(false);
+        <div className="SuperAdminStaff-popup" onClick={(e) => {
+          if (e.target.className === 'SuperAdminStaff-popup') setPopupOpen(false);
         }}>
-          <div className="popup-content wide-popup">
+          <div className="SuperAdminStaff-popup-content SuperAdminStaff-wide-popup">
             <button
-              className="close-btn"
+              className="SuperAdminStaff-close-btn"
               onClick={() => setPopupOpen(false)}
               aria-label="Close"
             >
               ✕
             </button>
             <h3>{editId ? "Edit Staff Details" : "Add Staff Details"}</h3>
-            <form className="popup-form" onSubmit={(e) => e.preventDefault()}>
-              <div className="popup-grid">
-                <div className="form-group">
+            <form className="SuperAdminStaff-popup-form" onSubmit={(e) => e.preventDefault()}>
+              <div className="SuperAdminStaff-popup-grid">
+                <div className="SuperAdminStaff-form-group">
                   <label>First Name *</label>
                   <input
                     type="text"
@@ -501,7 +490,7 @@ export default function SuperAdminStaffManagement() {
                     required
                   />
                 </div>
-                <div className="form-group">
+                <div className="SuperAdminStaff-form-group">
                   <label>Last Name *</label>
                   <input
                     type="text"
@@ -511,7 +500,7 @@ export default function SuperAdminStaffManagement() {
                     required
                   />
                 </div>
-                <div className="form-group">
+                <div className="SuperAdminStaff-form-group">
                   <label>Email ID *</label>
                   <input
                     type="email"
@@ -521,7 +510,7 @@ export default function SuperAdminStaffManagement() {
                     required
                   />
                 </div>
-                <div className="form-group">
+                <div className="SuperAdminStaff-form-group">
                   <label>Phone Number *</label>
                   <input
                     type="text"
@@ -531,7 +520,7 @@ export default function SuperAdminStaffManagement() {
                     required
                   />
                 </div>
-                <div className="form-group">
+                <div className="SuperAdminStaff-form-group">
                   <label>Role</label>
                   <select
                     name="staffRoleType"
@@ -546,7 +535,7 @@ export default function SuperAdminStaffManagement() {
                     ))}
                   </select>
                 </div>
-                <div className="form-group">
+                <div className="SuperAdminStaff-form-group">
                   <label>Shift Timing</label>
                   <input
                     type="text"
@@ -556,7 +545,7 @@ export default function SuperAdminStaffManagement() {
                     placeholder="e.g., 9AM to 5PM"
                   />
                 </div>
-                <div className="form-group">
+                <div className="SuperAdminStaff-form-group">
                   <label>Salary</label>
                   <input
                     type="number"
@@ -567,7 +556,7 @@ export default function SuperAdminStaffManagement() {
                   />
                 </div>
                 {!editId && (
-                  <div className="form-group">
+                  <div className="SuperAdminStaff-form-group">
                     <label>Contract Start</label>
                     <input
                       type="date"
@@ -577,7 +566,7 @@ export default function SuperAdminStaffManagement() {
                     />
                   </div>
                 )}
-                <div className="form-group">
+                <div className="SuperAdminStaff-form-group">
                   <label>Contract End</label>
                   <input
                     type="date"
@@ -587,7 +576,7 @@ export default function SuperAdminStaffManagement() {
                   />
                 </div>
                 {!editId && (
-                  <div className="form-group">
+                  <div className="SuperAdminStaff-form-group">
                     <label>Password *</label>
                     <input
                       type="password"
@@ -601,17 +590,17 @@ export default function SuperAdminStaffManagement() {
                 )}
               </div>
 
-              <div className="form-buttons center-buttons">
+              <div className="SuperAdminStaff-form-buttons SuperAdminStaff-center-buttons">
                 <button
                   type="button"
-                  className="cancel-btn"
+                  className="SuperAdminStaff-cancel-btn"
                   onClick={() => setPopupOpen(false)}
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
-                  className="save-btn"
+                  className="SuperAdminStaff-save-btn"
                   onClick={handleAddOrUpdate}
                 >
                   {editId ? "Update" : "Add"}

@@ -1,8 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
-
-
 import {
   LayoutDashboard,
   Utensils,
@@ -17,12 +15,9 @@ import {
 
 import { FaBell, FaBars, FaTimes } from "react-icons/fa";
 import { MdCurrencyRupee } from "react-icons/md";
-
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 import WaiterNotification from "../Notifications/WaiterNotification";
-
 import "./WaiterDashboard.css";
 
 export default function WaiterDashboard() {
@@ -37,8 +32,6 @@ export default function WaiterDashboard() {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [notificationCount, setNotificationCount] = useState(0);
   const notificationRef = useRef(null);
-
-
 
   const [searchParams] = useSearchParams();
 
@@ -55,10 +48,7 @@ export default function WaiterDashboard() {
   const API_BASE = "http://localhost:8082/dine-ease/api/v1";
   const PROFILE_API = "http://localhost:8082/dine-ease/api/v1/staff/profile";
 
-
-
   const isActive = (path) => location.pathname === path;
-
 
   useEffect(() => {
     if (!TOKEN) return;
@@ -84,8 +74,6 @@ export default function WaiterDashboard() {
 
     fetchProfile();
   }, [TOKEN]);
-
-
 
   const handleLogout = async () => {
     try {
@@ -188,8 +176,6 @@ export default function WaiterDashboard() {
                 </div>
               )}
             </div>
-
-
             <div className="waiter-dashboard-topnav-item" onClick={() => navigate("/WaiterDashboard/payments")}><MdCurrencyRupee size={20} /><span>Payments</span></div>
           </div>
         )}
@@ -219,11 +205,6 @@ export default function WaiterDashboard() {
     </div>
   )}
 </div>
-
-
-
-
-
           <div className="waiter-dashboard-header-right" ref={dropdownRef}>
             <div className="waiter-dashboard-profile-circle" onClick={() => setDropdownOpen(!dropdownOpen)}>
               {profilePic ? <img src={profilePic} alt="Profile" className="waiter--dashboard-circle-img" /> : waiterName.charAt(0).toUpperCase()}
@@ -237,7 +218,6 @@ export default function WaiterDashboard() {
             )}
           </div>
         </div>
-
         {/* Mobile Hamburger */}
         {isMobile && (
           <div className="waiter-dashboard-topnav-mobile-menu">
@@ -257,16 +237,10 @@ export default function WaiterDashboard() {
           </div>
         )}
       </nav>
-
-
-
-
       <main className="waiter-dashboard-content">
         <Outlet />
-
       </main>
       <ToastContainer position="top-right" autoClose={1000} />
-
     </div>
 
   );
