@@ -1,0 +1,238 @@
+/* ========================================================= */
+/*  WAITER ALL ORDERS — MATCHING STAFF TABLE COLORS       */
+/* ========================================================= */
+
+/* Page Wrapper */
+.waiter-all-orders-page {
+  padding: 16px;
+  font-family: "Inter", sans-serif;
+  width: 100%;
+  min-height: 100vh;
+  background: #f8fafc; /* same as staff page */
+  color: #1e293b;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+/* Title */
+.waiter-all-orders-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  color: #0f172a;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+/* Filter Bar */
+.waiter-all-orders-filters {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  background: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.waiter-all-orders-filters span {
+  font-weight: 600;
+}
+
+.waiter-all-orders-filters button {
+  background: #2563eb;
+  border: none;
+  padding: 8px 16px;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.waiter-all-orders-filters button:hover {
+  background: #1e40af;
+  transform: translateY(-1px);
+}
+
+/* Orders Table */
+.waiter-all-orders-orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.waiter-all-orders-orders-table th,
+.waiter-all-orders-orders-table td {
+  padding: 12px 10px;
+  text-align: left;
+  font-size: 0.9rem;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.waiter-all-orders-orders-table th {
+  background: #f1f5f9;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.waiter-all-orders-orders-table tr:hover td {
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+.waiter-all-orders-orders-table td:first-child {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Expand Button */
+.waiter-all-orders-expand-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.25s ease;
+}
+
+.waiter-all-orders-expand-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Expanded Section */
+.waiter-all-orders-expand-row {
+  background: #fafafa !important;
+}
+
+.waiter-all-orders-order-block {
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.waiter-all-orders-order-block h4 {
+  margin-bottom: 12px;
+  font-size: 15px;
+  background: #f1f3f5;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Items Table (Inside Expand) */
+.waiter-all-orders-items-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.waiter-all-orders-items-table th {
+  background: #e8ebef;
+  padding: 10px;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.waiter-all-orders-items-table td {
+  padding: 10px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+/* Status Badge */
+.waiter-all-orders-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  border: 1px solid #e2e8f0;
+  transition: all 0.25s ease;
+}
+.waiter-all-orders-status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.waiter-all-orders-status.active::before {
+  background-color: #16a34a;
+}
+.waiter-all-orders-status.active {
+  color: #16a34a;
+  border-color: #16a34a33;
+}
+
+.waiter-all-orders-status.cancelled::before {
+  background-color: #dc2626;
+}
+.waiter-all-orders-status.cancelled {
+  color: #dc2626;
+  border-color: #dc262633;
+}
+
+.waiter-all-orders-status.pending::before {
+  background-color: #eab308;
+}
+.waiter-all-orders-status.pending {
+  color: #eab308;
+  border-color: #eab30833;
+}
+
+/* Pagination */
+.waiter-all-orders-pagination {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.waiter-all-orders-pagination button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.25s ease;
+}
+
+.waiter-all-orders-pagination button:disabled {
+  background: #cbd5e1;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.waiter-all-orders-pagination button:hover:not(:disabled) {
+  background: #1e40af;
+  transform: translateY(-1px);
+}
+
+.waiter-all-orders-pagination span {
+  font-weight: 600;
+  font-size: 15px;
+}
+.waiter-orders-item-status.ASSIGNED { color: #6c757d; }
+.waiter-orders-item-status.ACCEPTED { color: #0d6efd; }
+.waiter-orders-item-status.PREPARING { color: #fd7e14; }
+.waiter-orders-item-status.READY_TO_SERVE { color: #198754; }
+.waiter-orders-item-status.SERVED { color: #20c997; }
+.waiter-orders-item-status.CANCELLED,
+.waiter-orders-item-status.OUT_OF_STOCK { color: #dc3545; }

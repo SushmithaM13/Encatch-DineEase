@@ -17,7 +17,7 @@ async function getRequest(url, params = {}) {
     method: "GET",
     headers: {
       Accept: "application/json",
-      Authorization: `Bearer ${token}`, // ✅ TOKEN ADDED
+      Authorization: `Bearer ${token}`, 
     },
   });
 

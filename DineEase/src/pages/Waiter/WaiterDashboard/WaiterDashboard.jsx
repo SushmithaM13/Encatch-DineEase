@@ -155,7 +155,7 @@ export default function WaiterDashboard() {
               <LayoutDashboard size={20} /><span>Dashboard</span>
             </Link>
             <div className="waiter-dashboard-topnav-item" onClick={() => navigate("/WaiterDashboard/tables")}><Sofa size={20} /><span>Tables</span></div>
-            <div className="waiter-dashboard-topnav-item" onClick={() => navigate("/WaiterDashboard/menu")}><Newspaper size={20} /><span>Menu</span></div>
+            {/* <div className="waiter-dashboard-topnav-item" onClick={() => navigate("/WaiterDashboard/menu")}><Newspaper size={20} /><span>Menu</span></div> */}
 
             {/* Orders Dropdown */}
             <div className="waiter-dashboard-orders-dropdown" ref={dropdownRef}>
@@ -197,28 +197,28 @@ export default function WaiterDashboard() {
         {/* Right Section */}
         <div className="waiter-dashboard-topnav-right">
           <div
-  ref={notificationRef}
-  className="waiter-dashboard-notification-icon"
-  title="Notifications"
-  onClick={() => setShowNotificationPopup((prev) => !prev)}
->
-  <FaBell size={22} />
+            ref={notificationRef}
+            className="waiter-dashboard-notification-icon"
+            title="Notifications"
+            onClick={() => setShowNotificationPopup((prev) => !prev)}
+          >
+            <FaBell size={22} />
 
-  {notificationCount > 0 && (
-    <span className="waiter-dashboard-notification-count-badge">
-      {notificationCount}
-    </span>
-  )}
+            {notificationCount > 0 && (
+              <span className="waiter-dashboard-notification-count-badge">
+                {notificationCount}
+              </span>
+            )}
 
-  {showNotificationPopup && (
-    <div className="waiter-dashboard-notification-popup">
-      <WaiterNotification
-        smallView
-        onCountChange={setNotificationCount}
-      />
-    </div>
-  )}
-</div>
+            {showNotificationPopup && (
+              <div className="waiter-dashboard-notification-popup">
+                <WaiterNotification
+                  smallView
+                  onCountChange={setNotificationCount}
+                />
+              </div>
+            )}
+          </div>
 
 
 
@@ -248,7 +248,7 @@ export default function WaiterDashboard() {
               <div className="mobile-dropdown-links">
                 <Link to="/WaiterDashboard" onClick={() => setDropdownOpen(false)}>Dashboard</Link>
                 <Link to="/WaiterDashboard/tables" onClick={() => setDropdownOpen(false)}>Tables</Link>
-                <Link to="/WaiterDashboard/menu" onClick={() => setDropdownOpen(false)}>Menu</Link>
+                {/* <Link to="/WaiterDashboard/menu" onClick={() => setDropdownOpen(false)}>Menu</Link> */}
                 <Link to="/WaiterDashboard/orders?type=NEW" onClick={() => setDropdownOpen(false)}>New Orders</Link>
                 <Link to="/WaiterDashboard/orders/all" onClick={() => setDropdownOpen(false)}>All Orders</Link>
                 <Link to="/WaiterDashboard/payments" onClick={() => setDropdownOpen(false)}>Payments</Link>

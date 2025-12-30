@@ -31,42 +31,55 @@ export default function WaiterMenuItemPopup({ item, onClose, onAddToCart }) {
   };
 
   const handleAddItem = () => {
-    if (!selectedVariant) {
-      toast.warning("Please select a variant");
-      return;
-    }
+  if (!selectedVariant) {
+    toast.warning("Please select a variant");
+    return;
+  }
 
-    // Send to Dashboard cart
-    onAddToCart({
-  selectedVariant, 
-  addons: selectedAddons,
-  customizations: Object.values(selectedCustomizations).flat(),
-});
+  // Convert Addons → backend-required format
+  const formattedAddons = selectedAddons.map(a => ({
+    addonId: a.id,
+    additionalCharge: a.price
+  }));
 
+  // Convert Customizations → backend-required format
+  const formattedCustomizations = Object
+    .values(selectedCustomizations)
+    .flat()
+    .map(c => ({
+      customizationOptionId: c.id,
+      customizationOptionName: c.optionName,
+      additionalCharge: c.additionalPrice
+    }));
 
-    // toast.success("Item added to cart!");
-    onClose();
-  };
+  onAddToCart({
+    selectedVariant,
+    addons: formattedAddons,
+    customizations: formattedCustomizations,
+  });
+
+  onClose();
+};
 
   return (
     <>
       {/* BACKDROP */}
-      <div className="waiter-drawer-backdrop" onClick={onClose}></div>
+      <div className="waiter-menuitempop-drawer-backdrop" onClick={onClose}></div>
 
       {/* RIGHT SLIDING DRAWER */}
-      <div className="waiter-drawer">
-        <div className="waiter-drawer-header">
+      <div className="waiter-menuitempop-drawer">
+        <div className="waiter-menuitempop-drawer-header">
           <h2>{item.itemName}</h2>
           <button onClick={onClose}>✖</button>
         </div>
 
-        <div className="waiter-drawer-content">
+        <div className="waiter-menuitempop-drawer-content">
           {/* VARIANTS */}
           {item.variants?.length > 0 && (
-            <div className="drawer-section">
+            <div className="waiter-menuitempop-drawer-section">
               <h4>Select Variant</h4>
               {item.variants.map((v) => (
-                <label key={v.id} className="drawer-option">
+                <label key={v.id} className="waiter-menuitempop-drawer-option">
                   <input
                     type="radio"
                     name="variant"
@@ -81,10 +94,10 @@ export default function WaiterMenuItemPopup({ item, onClose, onAddToCart }) {
 
           {/* ADDONS */}
           {item.availableAddons?.length > 0 && (
-            <div className="drawer-section">
+            <div className="waiter-menuitempop-drawer-section">
               <h4>Add-ons</h4>
               {item.availableAddons.map((a) => (
-                <label key={a.id} className="drawer-option">
+                <label key={a.id} className="waiter-menuitempop-drawer-option">
                   <input
                     type="checkbox"
                     checked={selectedAddons.some((ad) => ad.id === a.id)}
@@ -104,13 +117,13 @@ export default function WaiterMenuItemPopup({ item, onClose, onAddToCart }) {
 
           {/* CUSTOMIZATIONS */}
           {item.customizationGroups?.length > 0 && (
-            <div className="drawer-section">
+            <div className="waiter-menuitempop-drawer-section">
               <h4>Customizations</h4>
               {item.customizationGroups.map((group) => (
-                <div key={group.id} className="drawer-custom-group">
+                <div key={group.id} className="waiter-menuitempop-drawer-custom-group">
                   <h5>{group.name} {group.isRequired ? "(Required)" : ""}</h5>
                   {group.options.map((opt) => (
-                    <label key={opt.id} className="drawer-option">
+                    <label key={opt.id} className="waiter-menuitempop-drawer-option">
                       <input
                         type={group.selectionType === "SINGLE" ? "radio" : "checkbox"}
                         name={`custom-${group.id}`}
@@ -131,9 +144,9 @@ export default function WaiterMenuItemPopup({ item, onClose, onAddToCart }) {
         </div>
 
         {/* BOTTOM BUTTONS */}
-        <div className="drawer-actions">
-          <button className="cancel-btn" onClick={onClose}>Cancel</button>
-          <button className="add-btn" disabled={!selectedVariant} onClick={handleAddItem}>Add Item</button>
+        <div className="waiter-menuitempop-drawer-actions">
+          <button className="waiter-menuitempop-cancel-btn" onClick={onClose}>Cancel</button>
+          <button className="waiter-menuitempop-add-btn" disabled={!selectedVariant} onClick={handleAddItem}>Add Item</button>
         </div>
       </div>
     </>

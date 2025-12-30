@@ -9,10 +9,12 @@ import WaiterMenuCategorie from "./WaiterMenuCategorie";
 import WaiterMenuItemPopup from "./WaiterMenuItemPopup";
 import WaiterCart from "../Cart/WaiterCart";
 
+
 import { ShoppingCart } from "lucide-react";
 
 import {
   addItemToCartFromMenu,
+  getCart 
 } from "../api/WaiterCartApi";
 
 import {
@@ -39,11 +41,8 @@ export default function WaiterMenu() {
   /* ---------------- CART STATE ---------------- */
   const [cartOpen, setCartOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
-
-
-
-
-
+  // bottom sticky bar count
+  const [showBottomCart, setShowBottomCart] = useState(false);
 
   /* ---------------- URL PARAMS ---------------- */
   const [searchParams] = useSearchParams();
@@ -52,7 +51,7 @@ export default function WaiterMenu() {
   const reservedTableSource = searchParams.get("source");
 
   const TOKEN = localStorage.getItem("token");
-  
+
 
   /* ---------------- VALIDATION ---------------- */
   useEffect(() => {
@@ -131,40 +130,84 @@ export default function WaiterMenu() {
     loadMenus();
   }, [organizationId, selectedCategory, itemTypeFilter]);
 
+  /* ---------------- CART buttom  ---------------- */
+  useEffect(() => {
+    const handler = () => setShowBottomCart(true);
+    window.addEventListener("cartItemAdded", handler);
+    return () => window.removeEventListener("cartItemAdded", handler);
+  }, []);
+
+
+
   /* ---------------- ADD TO CART ---------------- */
-  const handleAddToCart = async (payload) => {
-    if (!payload?.selectedVariant?.id) {
-      toast.error("Variant not selected");
-      return;
-    }
+const handleAddToCart = async (payload) => {
+  if (!payload?.selectedVariant?.id) {
+    toast.error("Variant not selected");
+    return;
+  }
 
+  try {
+    await addItemToCartFromMenu(
+      organizationId,
+      {
+        menuItemVariantId: payload.selectedVariant.id,
+        quantity: 1,
+        addons: payload.addons || [],
+        customizations: payload.customizations || [],
+        sessionId,
+        tableNumber,
+      },
+      TOKEN
+    );
+
+    // Immediately update cart
+    updateCartCount();
+
+    window.dispatchEvent(new Event("cartItemAdded"));
+
+    window.dispatchEvent(new Event("cartUpdated"));
+
+    setActiveItem(null);
+  } catch (err) {
+    console.error("Add to cart failed:", err);
+    toast.error("Failed to add item");
+  }
+};
+const updateCartCount = async () => {
+  try {
+    const cart = await getCart(organizationId, sessionId, tableNumber);
+    const qty = cart?.totalQuantity || 0;
+
+    setCartCount(qty);
+    setShowBottomCart(qty > 0); 
+  } catch {
+    console.log("Failed to update cart");
+  }
+};
+
+
+  useEffect(() => {
+  const loadCartCount = async () => {
     try {
-      await addItemToCartFromMenu(
-        organizationId, // ✅ 1st argument
-        {
-          menuItemVariantId: payload.selectedVariant.id, // ✅ correct key
-          quantity: 1,
+      const cart = await getCart(organizationId, sessionId, tableNumber);
+      const totalQty = cart?.totalQuantity || 0;
 
-          // ✅ FULL OBJECTS (menu → cart)
-          addons: payload.addons || [],
-          customizations: payload.customizations || [],
 
-          sessionId,
-          tableNumber,
-        },
-        TOKEN // ✅ 3rd argument
-      );
+      setCartCount(totalQty);
 
-      setCartOpen(true);
-      window.dispatchEvent(new Event("openCart"));
-      setActiveItem(null);
-      setCartCount(prev => prev + 1);
-    } catch (err) {
-      console.error("❌ Add to cart failed:", err.message);
-      toast.error("Failed to add item");
+      // Only show on first load if there are items
+      if (totalQty > 0) setShowBottomCart(true);
+    } catch {
+      console.log("Failed to fetch cart");
     }
   };
 
+  if (organizationId) loadCartCount();
+}, [organizationId]);
+
+useEffect(() => {
+  if (organizationId) updateCartCount();
+}, [organizationId]);
 
 
 
@@ -173,9 +216,6 @@ export default function WaiterMenu() {
   return (
     <div className="waiter-menu-sidebar">
       <ToastContainer />
-
-
-
       {/* SESSION INFO */}
       {sessionId && tableNumber && (
         <div className="waiter-menu-session-info">
@@ -265,7 +305,7 @@ export default function WaiterMenu() {
 
               <p className="waiter-menu-tags">
                 <span
-                  className={item.itemType === "VEG" ? "veg-dot" : "nonveg-dot"}
+                  className={item.itemType === "VEG" ? "waiter-menu-veg-dot" : "waiter-menu-nonveg-dot"}
                 ></span>
                 {item.itemType} • {item.cuisineType}
               </p>
@@ -314,6 +354,22 @@ export default function WaiterMenu() {
           onClick={() => setCartOpen(false)}
         />
       )}
+     {showBottomCart && !cartOpen && !activeItem && (
+  <div
+    className="waiter-menu-cart-bottom-cart-bar"
+    onClick={() => {
+      setCartOpen(true);
+      window.dispatchEvent(new Event("openCart"));
+    }}
+  >
+    <div className="waiter-menu-cart-left">
+      {cartCount} item{cartCount > 1 ? "s" : ""} added
+    </div>
+    <div className="waiter-menu-cart-right">View Cart →</div>
+  </div>
+)}
+
+
     </div>
   );
 }

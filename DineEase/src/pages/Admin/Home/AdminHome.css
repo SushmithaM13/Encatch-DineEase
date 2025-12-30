@@ -189,7 +189,7 @@
   object-fit: cover;
 }
 
-.badge {
+.admin-home-badge {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -201,11 +201,11 @@
   text-transform: uppercase;
 }
 
-.badge.veg {
+.admin-home-badge.veg {
   background: #16a34a;
 }
 
-.badge.non-veg {
+.admin-home-badge.non-veg {
   background: #dc2626;
 }
 
