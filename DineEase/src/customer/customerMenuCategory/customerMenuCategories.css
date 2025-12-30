@@ -1,6 +1,6 @@
 .category-scroll-container {
   position: sticky;
-  top: 74px; /* Adjust this to match navbar height */
+  top: 72px; /* Adjust this to match navbar height */
   z-index: 99;
   width: 100%;
   overflow-x: auto;

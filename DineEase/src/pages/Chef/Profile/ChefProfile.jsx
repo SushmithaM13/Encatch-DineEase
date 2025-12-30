@@ -193,20 +193,22 @@ export default function ChefProfile() {
   };
 
   return (
-    <div className="chef-profile-page">
-      <h2 className="chef-profile-heading">
-        <User size={28} /> Chef Profile
-      </h2>
+    <div className="Chef-Profile-page">
+      <div className="Chef-Profile-heading">
+        <User size={32} />
+        <h2>Chef Profile</h2>
+      </div>
 
-      <div className="chef-profile-container">
+      <div className="Chef-Profile-container">
         {/* LEFT SIDE */}
-        <div className="chef-profile-details">
-          <section>
-            <h3>Basic Info</h3>
-            <label>
-              Full Name:
+        <div className="Chef-Profile-details">
+          <section className="Chef-Profile-section">
+            <h3 className="Chef-Profile-section-title">Basic Info</h3>
+            <label className="Chef-Profile-label">
+              <span>Full Name</span>
               <input
                 type="text"
+                className="Chef-Profile-input"
                 value={profile.fullName || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
@@ -215,15 +217,21 @@ export default function ChefProfile() {
               />
             </label>
 
-            <label>
-              Email:
-              <input type="email" value={profile.email || ""} disabled />
+            <label className="Chef-Profile-label">
+              <span>Email</span>
+              <input 
+                type="email" 
+                className="Chef-Profile-input Chef-Profile-disabled" 
+                value={profile.email || ""} 
+                disabled 
+              />
             </label>
 
-            <label>
-              Phone:
+            <label className="Chef-Profile-label">
+              <span>Phone</span>
               <input
                 type="text"
+                className="Chef-Profile-input"
                 value={profile.phoneNumber || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
@@ -232,23 +240,34 @@ export default function ChefProfile() {
               />
             </label>
 
-            <label>
-              Role:
-              <input type="text" value={profile.staffRoleName || ""} disabled />
+            <label className="Chef-Profile-label">
+              <span>Role</span>
+              <input 
+                type="text" 
+                className="Chef-Profile-input Chef-Profile-disabled" 
+                value={profile.staffRoleName || ""} 
+                disabled 
+              />
             </label>
           </section>
 
-          <section>
-            <h3>Organization Info</h3>
-            <label>
-              Organization ID:
-              <input type="text" value={profile.organizationId || ""} disabled />
+          <section className="Chef-Profile-section">
+            <h3 className="Chef-Profile-section-title">Organization Info</h3>
+            <label className="Chef-Profile-label">
+              <span>Organization ID</span>
+              <input 
+                type="text" 
+                className="Chef-Profile-input Chef-Profile-disabled" 
+                value={profile.organizationId || ""} 
+                disabled 
+              />
             </label>
 
-            <label>
-              Organization:
+            <label className="Chef-Profile-label">
+              <span>Organization</span>
               <input
                 type="text"
+                className="Chef-Profile-input"
                 value={profile.organizationName || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
@@ -257,10 +276,11 @@ export default function ChefProfile() {
               />
             </label>
 
-            <label>
-              Shift Timing:
+            <label className="Chef-Profile-label">
+              <span>Shift Timing</span>
               <input
                 type="text"
+                className="Chef-Profile-input"
                 value={profile.shiftTiming || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
@@ -269,10 +289,11 @@ export default function ChefProfile() {
               />
             </label>
 
-            <label>
-              Contract Start:
+            <label className="Chef-Profile-label">
+              <span>Contract Start</span>
               <input
                 type="date"
+                className="Chef-Profile-input"
                 value={profile.contractStartDate?.substring(0, 10) || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
@@ -281,10 +302,11 @@ export default function ChefProfile() {
               />
             </label>
 
-            <label>
-              Contract End:
+            <label className="Chef-Profile-label">
+              <span>Contract End</span>
               <input
                 type="date"
+                className="Chef-Profile-input"
                 value={profile.contractEndDate?.substring(0, 10) || ""}
                 disabled={!isEditing}
                 onChange={(e) =>
@@ -295,13 +317,14 @@ export default function ChefProfile() {
           </section>
 
           {/* PASSWORD SECTION */}
-          <section>
-            <h3>Account Settings</h3>
-            <div className="chef-password-box">
-              <h4>Change Password</h4>
+          <section className="Chef-Profile-section">
+            <h3 className="Chef-Profile-section-title">Account Settings</h3>
+            <div className="Chef-Profile-password-box">
+              <h4 className="Chef-Profile-password-title">Change Password</h4>
 
               <input
                 type="password"
+                className="Chef-Profile-input"
                 placeholder="New Password"
                 value={passwordForm.newPass}
                 disabled={!isEditing}
@@ -312,6 +335,7 @@ export default function ChefProfile() {
 
               <input
                 type="password"
+                className="Chef-Profile-input"
                 placeholder="Confirm Password"
                 value={passwordForm.confirm}
                 disabled={!isEditing}
@@ -325,62 +349,95 @@ export default function ChefProfile() {
                   <>
                     <input
                       type="text"
+                      className="Chef-Profile-input"
                       placeholder="Enter OTP"
                       value={otp}
                       onChange={(e) => setOtp(e.target.value)}
                     />
-                    <button onClick={handlePasswordChange}>Save Password</button>
-                    <button onClick={() => setOtpSent(false)}>Cancel</button>
+                    <button 
+                      className="Chef-Profile-btn Chef-Profile-btn-primary"
+                      onClick={handlePasswordChange}
+                    >
+                      Save Password
+                    </button>
+                    <button 
+                      className="Chef-Profile-btn Chef-Profile-btn-secondary"
+                      onClick={() => setOtpSent(false)}
+                    >
+                      Cancel
+                    </button>
                   </>
                 ) : (
-                  <button onClick={sendOtp}>Send OTP</button>
+                  <button 
+                    className="Chef-Profile-btn Chef-Profile-btn-primary"
+                    onClick={sendOtp}
+                  >
+                    Send OTP
+                  </button>
                 ))}
 
               {passwordSuccess && (
-                <p style={{ color: "green" }}>✅ Password changed successfully!</p>
+                <p className="Chef-Profile-success-message">
+                  ✅ Password changed successfully!
+                </p>
               )}
             </div>
           </section>
 
           {/* Action Buttons */}
-          <div className="chef-action-buttons">
+          <div className="Chef-Profile-action-buttons">
             {isEditing ? (
               <>
-                <button onClick={handleSave}>Save Changes</button>
-                <button onClick={() => setIsEditing(false)}>Cancel</button>
+                <button 
+                  className="Chef-Profile-btn Chef-Profile-btn-save"
+                  onClick={handleSave}
+                >
+                  Save Changes
+                </button>
+                <button 
+                  className="Chef-Profile-btn Chef-Profile-btn-cancel"
+                  onClick={() => setIsEditing(false)}
+                >
+                  Cancel
+                </button>
               </>
             ) : (
-              <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+              <button 
+                className="Chef-Profile-btn Chef-Profile-btn-edit"
+                onClick={() => setIsEditing(true)}
+              >
+                Edit Profile
+              </button>
             )}
           </div>
         </div>
 
         {/* RIGHT SIDE */}
-        <div className="chef-profile-picture">
-          <div className="chef-image-wrapper">
+        <div className="Chef-Profile-picture">
+          <div className="Chef-Profile-image-wrapper">
             {profile.profileImage ? (
               <img
                 src={profile.profileImage}
                 alt="Profile"
-                className="chef-circle-img"
+                className="Chef-Profile-circle-img"
               />
             ) : (
-              <div className="chef-circle-img placeholder">
+              <div className="Chef-Profile-circle-img Chef-Profile-placeholder">
                 {profile.fullName ? profile.fullName[0].toUpperCase() : "C"}
               </div>
             )}
 
-            <div className="chef-menu-container">
+            <div className="Chef-Profile-menu-container">
               <button
-                className="chef-menu-button"
+                className="Chef-Profile-menu-button"
                 onClick={() => setShowMenu((prev) => !prev)}
               >
                 <MoreVertical size={20} />
               </button>
 
               {showMenu && (
-                <div className="chef-dropdown-menu">
-                  <label className="chef-dropdown-item">
+                <div className="Chef-Profile-dropdown-menu">
+                  <label className="Chef-Profile-dropdown-item">
                     <Pencil size={16} /> Edit Photo
                     <input
                       type="file"
@@ -391,7 +448,7 @@ export default function ChefProfile() {
                   </label>
                   {profile.profileImage && (
                     <button
-                      className="chef-dropdown-item"
+                      className="Chef-Profile-dropdown-item"
                       onClick={handleRemoveImage}
                     >
                       <Trash2 size={16} /> Remove Photo

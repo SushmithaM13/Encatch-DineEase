@@ -1,76 +1,140 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef } from "react";
 import "./customerMenuSection.css";
-import { fetchMenuItems, searchMenuItems } from "../api/customerMenuAPI"; // import API function
+import {
+  fetchMenuItems,
+  fetchItemTypes,
+  fetchFoodTypes,
+  fetchCuisineTypes,
+  searchMenuItems,
+} from "../api/customerMenuAPI";
 import CustomerMenuItemDetails from "./customerMenuItemDetails";
-import CustomerBestsellerCarousel from "./CustomerBestsellerCarousel";
+import CustomerMenuFilters from "./customerMenuFilters";
 import { useSession } from "../../context/SessionContext";
 import { useNavigate } from "react-router-dom";
 
-const CustomerMenuSection = ({selectedCategory,searchKeyword, ref, onMenuLoad}) => {
-  const [menuItems, setMenuItems] = useState([]);
-  const [filteredItems, setFilteredItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedItemId, setSelectedItemId] = useState(null);
-  const [itemTypeFilter, setItemTypeFilter] = useState("ALL");
-  const { tableId, orgId, sessionId } = useSession();
-  const navigate = useNavigate();
+const CustomerMenuSection = forwardRef(
+  ({ searchKeyword, onMenuLoad, externalSelectedItemId, selectedCategory }, ref) => {
+    const { tableId, orgId, sessionId } = useSession();
+    const navigate = useNavigate();
 
-  // If session missing → send back to login
-  useEffect(() => {
-    if (!sessionId || !tableId || !orgId) {
-      navigate("/customerLogin");
-    }
-  }, [sessionId, tableId, orgId, navigate]);
+    const [menuItems, setMenuItems] = useState([]);
+    const [fullMenuItems, setFullMenuItems] = useState([]); //Keep ONE immutable menu list for carousel
+    const [filteredItems, setFilteredItems] = useState([]); //for category filtering
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [selectedItemId, setSelectedItemId] = useState(null);
 
-  useEffect(() => {
-    if (!orgId) {
-      console.warn("⚠️ Organization ID missing, skipping fetch");
-      setError("Organization ID missing");
-      setLoading(false);
-      return;
-    }
+    const [itemTypes, setItemTypes] = useState([]);
+    const [foodTypes, setFoodTypes] = useState([]);
+    const [cuisineTypes, setCuisineTypes] = useState([]);
+    const [selectedPriceLabel, setSelectedPriceLabel] = useState("Any Price");
 
-    console.log("🍽️ Fetching menu for organization ID:", orgId);
+    const [filters, setFilters] = useState({
+      organizationId: "",
+      itemTypeName: "",
+      foodTypeName: "",
+      cuisineTypeName: "",
+      minPrice: "",
+      maxPrice: "",
+      isRecommended: "",
+      isBestseller: "",
+    });
 
-    const loadMenu = async () => {
-      try {
-        const data = await fetchMenuItems(orgId); //  use helper function
-        console.log("Menu data fetched:", data);
-        setMenuItems(data);
-        setFilteredItems(data);
-        if (onMenuLoad) onMenuLoad(data); // pass menu items to parent
-      } catch (err) {
-        setError(err.message || "Failed to fetch menu");
-      } finally {
-        setLoading(false);
+    // Redirect if session invalid
+    useEffect(() => {
+      if (!sessionId || !tableId || !orgId) {
+        navigate("/customerLogin", { replace: true });
       }
-    };
+    }, [sessionId, tableId, orgId, navigate]);
 
-    loadMenu();
-  }, [orgId, onMenuLoad]);
+    useEffect(() => {
+  if (externalSelectedItemId) {
+    setSelectedItemId(externalSelectedItemId);
+  }
+}, [externalSelectedItemId]);
 
-  useEffect(() => {
-  if (!orgId) return;
+    // Sync orgId into filters
+    useEffect(() => {
+      if (orgId) {
+        setFilters((prev) => ({
+          ...prev,
+          organizationId: orgId,
+        }));
+      }
+    }, [orgId]);
+
+    // Load dropdowns once
+    useEffect(() => {
+      if (!orgId) return;
+
+      Promise.all([
+        fetchItemTypes(orgId),
+        fetchFoodTypes(orgId),
+        fetchCuisineTypes(orgId),
+      ])
+        .then(([item, food, cuisine]) => {
+          setItemTypes(item);
+          setFoodTypes(food);
+          setCuisineTypes(cuisine);
+        })
+        .catch(console.error);
+    }, [orgId]);
+
+    // BACKEND FILTERING - Fetch menu items on filter change
+    useEffect(() => {
+  if (!filters.organizationId) return;
+
+  const loadMenu = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchMenuItems(filters);
+
+      setMenuItems(data);
+      setFilteredItems(data); //currently no category filter applied
+
+      // only set full list ONCE
+      setFullMenuItems((prev) =>
+        prev.length === 0 ? data : prev
+      );
+
+      // send ONLY full menu to parent
+      if (fullMenuItems.length === 0) {
+        onMenuLoad?.(data);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadMenu();
+}, [filters]);
+
+
+    // Search (separate API)
+    useEffect(() => {
+      if (!orgId) return;
 
   if (!searchKeyword || searchKeyword.trim() === "") {
-    setFilteredItems(menuItems);
+    // setFilteredItems(menuItems);
     return;
   }
 
-  const delayDebounce = setTimeout(async () => {
-    try {
-      const results = await searchMenuItems(orgId, searchKeyword);
-      setFilteredItems(results);
-    } catch (err) {
-      console.error("Search error:", err);
-    }
-  }, 400);
+      const delayDebounce = setTimeout(async () => {
+        try {
+          const results = await searchMenuItems(orgId, searchKeyword.trim());
+          setMenuItems(results);
+          setFilteredItems(results);
+        } catch (e) {
+          console.error("Search failed:",e);
+        }
+      }, 400);
 
-  return () => clearTimeout(delayDebounce);
-}, [searchKeyword, orgId]); // menuItems removed
+      return () => clearTimeout(delayDebounce);
+    }, [searchKeyword, orgId]);
 
-  // Helper to get correct variant price
+    // Helper to get correct variant price
   const getDefaultVariantPrice = (item) => {
     if (!item?.variants?.length) return 0;
     const defaultVariant = item.variants.find((v) => v.isDefault);
@@ -83,12 +147,31 @@ const CustomerMenuSection = ({selectedCategory,searchKeyword, ref, onMenuLoad}) 
     return firstVariant.finalPrice > 0 ? firstVariant.finalPrice : firstVariant.price;
   };
 
- //  Apply category + itemType filters
+    const updateFilter = (key, value) => {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    };
+
+    const handleShowAll = () => {
+      setFilters({
+        organizationId: orgId,
+        itemTypeName: "",
+        foodTypeName: "",
+        cuisineTypeName: "",
+        minPrice: "",
+        maxPrice: "",
+        isRecommended: "",
+        isBestseller: "",
+      });
+      setSelectedPriceLabel("Any Price");
+    };
+
+     //  Apply category + itemType filters
 useEffect(() => {
-  // ❗ If searching, DO NOT apply category filter
+  if (!menuItems) return;
+  // If searching, DO NOT apply category filter
   if (searchKeyword && searchKeyword.trim() !== "") return;
 
-  let items = menuItems;
+  let items = [...menuItems];
 
   if (selectedCategory) {
     items = items.filter(
@@ -97,33 +180,26 @@ useEffect(() => {
         selectedCategory.name?.toLowerCase()
     );
   }
-
-  if (itemTypeFilter !== "ALL") {
-    items = items.filter((item) => item.itemType === itemTypeFilter);
-  }
-
   setFilteredItems(items);
-}, [selectedCategory, menuItems, itemTypeFilter, searchKeyword]);
+}, [selectedCategory, menuItems, searchKeyword]);
 
+const handlePriceChange = (label, priceOptions) => {
+      const range = priceOptions.find((p) => p.label === label);
+      if (!range) return;
 
-  if (loading) return <p className="loading-text">🍽️ Loading menu...</p>;
-  if (error) return <p className="error-text">⚠️ {error}</p>;
+      setSelectedPriceLabel(label);
+      setFilters((prev) => ({
+        ...prev,
+        minPrice: range.min,
+        maxPrice: range.max,
+      }));
+    };
+
+    if (loading) return <p>🍽️ Loading menu...</p>;
+    if (error) return <p>⚠️ {error}</p>;
 
  return (
-    <main className="customer-menu-main-container" ref={ref}>
-      <p>
-        Table: <b>{tableId}</b> <br />
-        Session: <b>{sessionId}</b>
-      </p>
-      {/* Bestseller */}
-      {!searchKeyword && (
-        <section className="customer-bestseller-section">
-          <CustomerBestsellerCarousel
-            items={menuItems}
-            onItemSelect={(id) => setSelectedItemId(id)}
-          />
-        </section>
-      )}
+    <div className="customer-menu-main-container" ref={ref}>
 
       {/* Menu */}
       <section className="customer-menu-section">
@@ -133,19 +209,16 @@ useEffect(() => {
 
         {/* Filter Bar */}
         {!searchKeyword && (
-          <div className="customer-menu-filter-bar">
-            {["ALL", "VEG", "NON VEG"].map((type) => (
-              <button
-                key={type}
-                className={`customer-menu-filter-btn ${
-                  itemTypeFilter === type ? "active" : ""
-                }`}
-                onClick={() => setItemTypeFilter(type)}
-              >
-                {type === "ALL" ? "All Items" : type === "VEG" ? "Veg 🌿" : "Non-Veg 🍗"}
-              </button>
-            ))}
-          </div>
+         <CustomerMenuFilters
+         filters={filters}
+              itemTypes={itemTypes}
+              foodTypes={foodTypes}
+              cuisineTypes={cuisineTypes}
+              selectedPriceLabel={selectedPriceLabel}
+              onUpdateFilter={updateFilter}
+              onPriceChange={handlePriceChange}
+              onShowAll={handleShowAll}
+         />
         )}
 
         {/* Menu Grid */}
@@ -154,10 +227,10 @@ useEffect(() => {
             <p className="customer-menu-no-items">No menu items found.</p>
           ) : (
             filteredItems.map((item) => (
-              <div key={item.id} className="customer-menu-card">
+              <div key={item.id} className="customer-menu-card" onClick={() => setSelectedItemId(item.id)}>
                 <div className="customer-menu-img-wrap">
                   <img src={`data:image/jpeg;base64,${item.imageData}`} alt={item.itemName} />
-                  {item.isBestseller && <span className="customer-badge bestseller">🔥 Bestseller</span>}
+                  {item.isRecommended && <span className="customer-badge bestseller">⭐ Recommended</span>}
                 </div>
 
                 <div className="customer-menu-info">
@@ -177,7 +250,6 @@ useEffect(() => {
                     </p>
                     <button
                       className="customer-add-btn"
-                      onClick={() => setSelectedItemId(item.id)}
                     >
                       Add +
                     </button>
@@ -196,9 +268,11 @@ useEffect(() => {
           onClose={() => setSelectedItemId(null)}
         />
       )}
-    </main>
+    </div>
   );
 
-};
+}
+);
 
 export default CustomerMenuSection;
+

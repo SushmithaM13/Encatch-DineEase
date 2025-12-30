@@ -3,47 +3,21 @@ import "./customerDashboard.css";
 import CustomerDashboardNav from "../customerNavbar/customerDashboardNav";
 import CustomerMenuSection from "../customerMenu/customerMenuSection";
 import CustomerMenuCategories from "../customerMenuCategory/customerMenuCategories";
-// import { useCustomer } from "../../context/CustomerContext";
+import CustomerBestsellerCarousel from "../customerMenu/CustomerBestsellerCarousel";
 import Footer from "../../components/footer/Footer";
 import { useSession } from "../../context/SessionContext";
 import { Outlet } from "react-router-dom";
 
 
 const CustomerDashboard = () => {
-  const [tab, setTab] = useState("menu");
-  const { orgId, tableId } = useSession();;
+  const { sessionId, tableId, orgId } = useSession();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState("");
   const menuSectionRef = useRef(null);
   const [allMenuItems, setAllMenuItems] = useState([]);
+  const [selectedItemIdFromCarousel, setSelectedItemIdFromCarousel] = useState(null);
 
-   //  Wrap this in useCallback
-  const handleMenuLoad = useCallback((data) => {
-    setAllMenuItems(data);
-    console.log("🍽️ Menu loaded in parent:", data.length, "items");
-  }, []);
-
-  useEffect(() => {
-    console.log("🏠 CustomerDashboard Loaded", { orgId, tableId });
-  }, [orgId, tableId]);
-
-  // Handle category selection
-  const handleCategorySelect = (category) => {
-    if (selectedCategory?.id === category.id) {
-      setSelectedCategory(null);
-    } else {
-      setSelectedCategory(category);
-    }
-    setTimeout(() => {
-      menuSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 300);
-  };
-
-  // Handle search from navbar
-  const handleSearch = (keyword) => {
-    setSearchKeyword(keyword);
-  };
-
+  
   // Prevent back navigation
   useEffect(() => {
     const handlePopState = () => {
@@ -54,36 +28,78 @@ const CustomerDashboard = () => {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  if (!orgId) {
-    return (
-      <div className="missing-org">
-        ⚠️ Missing organization details. Please scan QR again.
-      </div>
+  // Receive full menu list from MenuSection
+  const handleMenuLoad = useCallback((data) => {
+    setAllMenuItems(data);
+    console.log("🍽️ Menu loaded in parent:", data.length, "items");
+  }, []);
+
+  useEffect(() => {
+    console.log("🏠 CustomerDashboard Loaded", { orgId, tableId, sessionId });
+  }, [orgId, tableId, sessionId]);
+
+  const handleCategorySelect = (category) => {
+    setSelectedCategory((prev) =>
+      prev?.id === category.id ? null : category
     );
-  }
+
+    setTimeout(() => {
+      menuSectionRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 300);
+  };
+
+  const handleSearch = (keyword) => {
+    setSearchKeyword(keyword);
+    setSelectedCategory(null); // Reset category on search
+  };
+
 
   return (
-    <div className="customer-dashboard-wrapper">
-      <header className="customer-dashboard-navbar">
-        <CustomerDashboardNav onTabChange={setTab} onSearch={handleSearch} allMenuItems={allMenuItems}/>
-      </header>
+   <div className="customer-dashboard-wrapper">
 
-      <CustomerMenuCategories 
-        onCategorySelect={handleCategorySelect} 
-        selectedCategory={selectedCategory}  
+  {/* Sticky Navbar */}
+  <div className="dashboard-navbar-wrapper">
+    <CustomerDashboardNav
+      onSearch={handleSearch}
+      allMenuItems={allMenuItems}
+    />
+  </div>
+
+  {/* Sticky Categories */}
+  <div className="dashboard-category-wrapper">
+    <CustomerMenuCategories
+      onCategorySelect={handleCategorySelect}
+      selectedCategory={selectedCategory}
+    />
+  </div>
+
+  {/* Bestseller Carousel */}
+  {!searchKeyword && allMenuItems.length > 0 && (
+    <section className="dashboard-carousel-wrapper">
+      <CustomerBestsellerCarousel
+        items={allMenuItems}
+        onItemSelect={setSelectedItemIdFromCarousel}
       />
+    </section>
+  )}
 
-      <main className="customer-dashboard-content">
-        {tab === "menu" && (
-          <CustomerMenuSection ref={menuSectionRef} selectedCategory={selectedCategory} 
-          searchKeyword={searchKeyword} onMenuLoad={handleMenuLoad}/>
-        )}
-      </main>
+  {/* Menu Section */}
+  <section className="dashboard-menu-wrapper">
+    <CustomerMenuSection
+      ref={menuSectionRef}
+      selectedCategory={selectedCategory}
+      searchKeyword={searchKeyword}
+      onMenuLoad={handleMenuLoad}
+      externalSelectedItemId={selectedItemIdFromCarousel}
+    />
+  </section>
 
-      <footer className="customer-dashboard-footer">
-        <Footer />
-      </footer>
-    </div>
+  <Footer />
+</div>
+
   );
 };
 

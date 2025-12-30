@@ -117,6 +117,20 @@ const CustomerNavbar = ({ onSearch, allMenuItems = null }) => {
 
       {/* SEARCH */}
       <div className="customer-navbar-search" ref={suggestionBoxRef}>
+        <span className="customer-navbar-search-icon">
+          <svg width="20" height="20" fill="none" viewBox="0 0 20 20">
+            <circle cx="9" cy="9" r="7" stroke="#FF914D" strokeWidth="2" />
+            <line
+              x1="15.2"
+              y1="15.2"
+              x2="19"
+              y2="19"
+              stroke="#FF914D"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </span>
         <input
           type="text"
           className="customer-navbar-search-input"

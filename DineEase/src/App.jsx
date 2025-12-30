@@ -79,7 +79,7 @@ import WaiterProfile from "./pages/Waiter/Profile/WaiterProfile";
 import ChefHomePage from "./pages/Chef/ChefHomepage/ChefHomepage";
 import ChefDashboard from "./pages/Chef/ChefDashboard/ChefDashboard";
 import ChefMenuCatalog from './pages/Chef/ChefMenuCatalog/ChefMenuCatalog';
-import OrderQueue from "./pages/Chef/OrderQueue/OrderQueue";
+import OrderQueue from "./pages/Chef/OrderQueue/OrderQuery";
 import Inventory from "./pages/Chef/Inventory/Inventory";
 import ChefProfile from "./pages/Chef/Profile/ChefProfile";
 
@@ -89,7 +89,6 @@ import Footer from './components/footer/Footer';
 import CustomerLogin from './customer/customerLogin/customerLogin';
 import OTPVerification from './customer/customerLogin/otpVerification';
 import CustomerDashboard from './customer/customerDashboard/customerDashboard';
-
 import EnterSessionId from './customer/customerLogin/EnterSessionId';
 import CustomerCart from "./customer/customercart/CustomerCart";
 import CustomerOrders from './customer/order/CustomerOrder';
@@ -232,7 +231,7 @@ function App() {
           <Route path="homepage" element={<ChefHomePage />} />
           <Route path="chefDashboard" element={<ChefDashboard />} />
           <Route path="menu" element={<ChefMenuCatalog />} />
-          <Route path="OrdersQueue" element={<OrderQueue />} />
+          <Route path="OrdersQuery" element={<OrderQueue />} />
           <Route path="profile" element={<ChefProfile />} />
           <Route path="inventory" element={<Inventory />} />
         </Route>

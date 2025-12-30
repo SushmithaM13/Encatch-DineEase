@@ -1,0 +1,541 @@
+/* ===============================================
+   CHEF ORDER QUERY - PREMIUM CULINARY DESIGN
+   Enhanced styling with Chef-OrderQ- prefix
+   All original functionality preserved
+   =============================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+/* ===========================
+   CSS VARIABLES
+   =========================== */
+:root {
+  /* Matching Dashboard Palette */
+  --Chef-OrderQ-primary-dark: #1a1a1a;
+  --Chef-OrderQ-accent-gold: #d4af37;
+  --Chef-OrderQ-accent-copper: #b87333;
+  --Chef-OrderQ-accent-cream: #f5f1e8;
+  
+  /* UI Colors */
+  --Chef-OrderQ-bg-primary: #f6f8fc;
+  --Chef-OrderQ-bg-card: #ffffff;
+  --Chef-OrderQ-bg-hover: #f5f1e8;
+  --Chef-OrderQ-border-color: #e5e3dc;
+  --Chef-OrderQ-text-primary: #1a1a1a;
+  --Chef-OrderQ-text-secondary: #6b6b6b;
+  
+  /* Status Colors */
+  --Chef-OrderQ-color-new: #6366f1;
+  --Chef-OrderQ-color-accepted: #10b981;
+  --Chef-OrderQ-color-preparing: #ff9d00;
+  --Chef-OrderQ-color-ready: #8b5cf6;
+  
+  /* Button Colors */
+  --Chef-OrderQ-btn-cancel-bg: #ffebee;
+  --Chef-OrderQ-btn-cancel-color: #ff0000;
+  --Chef-OrderQ-btn-cancel-hover: #ff0000;
+  
+  --Chef-OrderQ-btn-out-bg: #fff3e0;
+  --Chef-OrderQ-btn-out-color: #ef6c00;
+  --Chef-OrderQ-btn-out-hover: #ef6c00;
+  
+  --Chef-OrderQ-btn-accept-bg: #e3f2fd;
+  --Chef-OrderQ-btn-accept-color: #1976d2;
+  --Chef-OrderQ-btn-accept-hover: #1976d2;
+  
+  --Chef-OrderQ-btn-ready-bg: #e8f5e9;
+  --Chef-OrderQ-btn-ready-color: #2e7d32;
+  --Chef-OrderQ-btn-ready-hover: #2e7d32;
+  
+  --Chef-OrderQ-btn-serve-bg: #fff8e1;
+  --Chef-OrderQ-btn-serve-color: #ff9d00;
+  --Chef-OrderQ-btn-serve-hover: #ff9d00;
+  
+  /* Shadows */
+  --Chef-OrderQ-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --Chef-OrderQ-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --Chef-OrderQ-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  
+  /* Spacing */
+  --Chef-OrderQ-spacing-xs: 0.5rem;
+  --Chef-OrderQ-spacing-sm: 0.75rem;
+  --Chef-OrderQ-spacing-md: 1rem;
+  --Chef-OrderQ-spacing-lg: 1.5rem;
+  
+  /* Border Radius */
+  --Chef-OrderQ-radius-sm: 6px;
+  --Chef-OrderQ-radius-md: 12px;
+  --Chef-OrderQ-radius-lg: 16px;
+  
+  /* Typography */
+  --Chef-OrderQ-font-display: 'Playfair Display', serif;
+  --Chef-OrderQ-font-body: 'Outfit', sans-serif;
+  
+  /* Transitions */
+  --Chef-OrderQ-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===========================
+   Page Layout
+   =========================== */
+.Chef-OrderQ-order-queue {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--Chef-OrderQ-spacing-md);
+  padding: 0;
+  background: transparent;
+  min-height: calc(100vh - 200px);
+  font-family: var(--Chef-OrderQ-font-body);
+}
+
+/* ===========================
+   Columns
+   =========================== */
+.Chef-OrderQ-column {
+  background: var(--Chef-OrderQ-bg-card);
+  border-radius: var(--Chef-OrderQ-radius-lg);
+  padding: var(--Chef-OrderQ-spacing-md);
+  box-shadow: var(--Chef-OrderQ-shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--Chef-OrderQ-spacing-md);
+  transition: all var(--Chef-OrderQ-transition);
+  border-top: 4px solid var(--Chef-OrderQ-accent-gold);
+}
+
+.Chef-OrderQ-column:hover {
+  box-shadow: var(--Chef-OrderQ-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.Chef-OrderQ-column:nth-child(1) {
+  border-top-color: var(--Chef-OrderQ-color-new);
+}
+
+.Chef-OrderQ-column:nth-child(2) {
+  border-top-color: var(--Chef-OrderQ-color-accepted);
+}
+
+.Chef-OrderQ-column:nth-child(3) {
+  border-top-color: var(--Chef-OrderQ-color-preparing);
+}
+
+.Chef-OrderQ-column:nth-child(4) {
+  border-top-color: var(--Chef-OrderQ-color-ready);
+}
+
+.Chef-OrderQ-column h3 {
+  text-align: center;
+  font-family: var(--Chef-OrderQ-font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding-bottom: var(--Chef-OrderQ-spacing-sm);
+  border-bottom: 2px solid var(--Chef-OrderQ-border-color);
+  margin: 0;
+  color: var(--Chef-OrderQ-text-primary);
+  background: linear-gradient(135deg, var(--Chef-OrderQ-accent-gold), var(--Chef-OrderQ-accent-copper));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===========================
+   Empty / Loading
+   =========================== */
+.Chef-OrderQ-empty {
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--Chef-OrderQ-text-secondary);
+  font-style: italic;
+  padding: var(--Chef-OrderQ-spacing-lg);
+  margin: 0;
+}
+
+.Chef-OrderQ-loading {
+  text-align: center;
+  font-size: 1.1rem;
+  padding: var(--Chef-OrderQ-spacing-lg);
+  color: var(--Chef-OrderQ-text-primary);
+}
+
+/* ===========================
+   Order Card
+   =========================== */
+.Chef-OrderQ-order-card {
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  border-radius: var(--Chef-OrderQ-radius-md);
+  padding: var(--Chef-OrderQ-spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--Chef-OrderQ-spacing-sm);
+  border-left: 5px solid var(--Chef-OrderQ-accent-gold);
+  box-shadow: var(--Chef-OrderQ-shadow-sm);
+  transition: all var(--Chef-OrderQ-transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.Chef-OrderQ-order-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.03), transparent);
+  pointer-events: none;
+}
+
+.Chef-OrderQ-order-card:hover {
+  box-shadow: var(--Chef-OrderQ-shadow-md);
+  transform: translateX(4px);
+  border-left-color: var(--Chef-OrderQ-accent-copper);
+}
+
+/* Card Fields */
+.Chef-OrderQ-field {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--Chef-OrderQ-text-secondary);
+  position: relative;
+  z-index: 1;
+}
+
+.Chef-OrderQ-field b {
+  color: var(--Chef-OrderQ-text-primary);
+  font-weight: 700;
+  margin-right: var(--Chef-OrderQ-spacing-xs);
+}
+
+/* ===========================
+   Actions
+   =========================== */
+.Chef-OrderQ-actions {
+  display: flex;
+  gap: var(--Chef-OrderQ-spacing-sm);
+  flex-wrap: wrap;
+  margin-top: var(--Chef-OrderQ-spacing-xs);
+  position: relative;
+  z-index: 1;
+}
+
+/* ===========================
+   Buttons
+   =========================== */
+.Chef-OrderQ-btn {
+  padding: var(--Chef-OrderQ-spacing-sm) var(--Chef-OrderQ-spacing-md);
+  border-radius: var(--Chef-OrderQ-radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--Chef-OrderQ-font-body);
+  border: none;
+  cursor: pointer;
+  transition: all var(--Chef-OrderQ-transition);
+  flex: 1;
+  min-width: fit-content;
+  position: relative;
+  overflow: hidden;
+}
+
+.Chef-OrderQ-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.Chef-OrderQ-btn:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* Cancel Button */
+.Chef-OrderQ-btn.Chef-OrderQ-cancel {
+  background: var(--Chef-OrderQ-btn-cancel-bg);
+  color: var(--Chef-OrderQ-btn-cancel-color);
+  box-shadow: 0 2px 6px rgba(255, 0, 0, 0.2);
+}
+
+.Chef-OrderQ-btn.Chef-OrderQ-cancel:hover {
+  background: var(--Chef-OrderQ-btn-cancel-hover);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Out of Stock Button */
+.Chef-OrderQ-btn.Chef-OrderQ-out {
+  background: var(--Chef-OrderQ-btn-out-bg);
+  color: var(--Chef-OrderQ-btn-out-color);
+  box-shadow: 0 2px 6px rgba(239, 108, 0, 0.2);
+}
+
+.Chef-OrderQ-btn.Chef-OrderQ-out:hover {
+  background: var(--Chef-OrderQ-btn-out-hover);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(239, 108, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Accept Button */
+.Chef-OrderQ-btn.Chef-OrderQ-accept {
+  background: var(--Chef-OrderQ-btn-accept-bg);
+  color: var(--Chef-OrderQ-btn-accept-color);
+  box-shadow: 0 2px 6px rgba(25, 118, 210, 0.2);
+}
+
+.Chef-OrderQ-btn.Chef-OrderQ-accept:hover {
+  background: var(--Chef-OrderQ-btn-accept-hover);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Ready / Start Preparing Button */
+.Chef-OrderQ-btn.Chef-OrderQ-ready {
+  background: var(--Chef-OrderQ-btn-ready-bg);
+  color: var(--Chef-OrderQ-btn-ready-color);
+  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.2);
+}
+
+.Chef-OrderQ-btn.Chef-OrderQ-ready:hover {
+  background: var(--Chef-OrderQ-btn-ready-hover);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Serve Button */
+.Chef-OrderQ-btn.Chef-OrderQ-serve {
+  background: var(--Chef-OrderQ-btn-serve-bg);
+  color: var(--Chef-OrderQ-btn-serve-color);
+  box-shadow: 0 2px 6px rgba(255, 157, 0, 0.2);
+}
+
+.Chef-OrderQ-btn.Chef-OrderQ-serve:hover {
+  background: var(--Chef-OrderQ-btn-serve-hover);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 157, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.Chef-OrderQ-btn.Chef-OrderQ-preparing {
+  background: var(--Chef-OrderQ-btn-serve-bg);
+  color: var(--Chef-OrderQ-btn-serve-color);
+  box-shadow: 0 2px 6px rgba(255, 157, 0, 0.2);
+}
+
+.Chef-OrderQ-btn.Chef-OrderQ-preparing:hover {
+  background: var(--Chef-OrderQ-btn-serve-hover);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 157, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ===========================
+   Modal
+   =========================== */
+.Chef-OrderQ-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.Chef-OrderQ-modal-box {
+  background: var(--Chef-OrderQ-bg-card);
+  padding: var(--Chef-OrderQ-spacing-lg);
+  border-radius: var(--Chef-OrderQ-radius-lg);
+  width: 400px;
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--Chef-OrderQ-spacing-md);
+  box-shadow: var(--Chef-OrderQ-shadow-lg);
+  border: 2px solid var(--Chef-OrderQ-accent-gold);
+  animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.Chef-OrderQ-modal-box h3 {
+  font-family: var(--Chef-OrderQ-font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--Chef-OrderQ-text-primary);
+  background: linear-gradient(135deg, var(--Chef-OrderQ-accent-gold), var(--Chef-OrderQ-accent-copper));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.Chef-OrderQ-modal-box textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: var(--Chef-OrderQ-spacing-md);
+  border-radius: var(--Chef-OrderQ-radius-sm);
+  border: 2px solid var(--Chef-OrderQ-border-color);
+  font-family: var(--Chef-OrderQ-font-body);
+  font-size: 0.95rem;
+  resize: vertical;
+  transition: all var(--Chef-OrderQ-transition);
+}
+
+.Chef-OrderQ-modal-box textarea:focus {
+  outline: none;
+  border-color: var(--Chef-OrderQ-accent-gold);
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+}
+
+.Chef-OrderQ-modal-box textarea::placeholder {
+  color: var(--Chef-OrderQ-text-secondary);
+  font-style: italic;
+}
+
+.Chef-OrderQ-modal-actions {
+  display: flex;
+  gap: var(--Chef-OrderQ-spacing-sm);
+  justify-content: flex-end;
+}
+
+/* ===========================
+   Responsive
+   =========================== */
+@media (max-width: 1439px) and (min-width: 1024px) {
+  .Chef-OrderQ-order-queue {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .Chef-OrderQ-column h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .Chef-OrderQ-order-queue {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .Chef-OrderQ-order-queue {
+    grid-template-columns: 1fr;
+    gap: var(--Chef-OrderQ-spacing-sm);
+  }
+
+  .Chef-OrderQ-column {
+    padding: var(--Chef-OrderQ-spacing-sm);
+  }
+
+  .Chef-OrderQ-actions {
+    flex-direction: column;
+  }
+
+  .Chef-OrderQ-btn {
+    width: 100%;
+  }
+  
+  .Chef-OrderQ-modal-box {
+    width: calc(100% - 32px);
+  }
+}
+
+@media (max-width: 480px) {
+  .Chef-OrderQ-column h3 {
+    font-size: 1rem;
+  }
+  
+  .Chef-OrderQ-order-card {
+    padding: var(--Chef-OrderQ-spacing-sm);
+  }
+  
+  .Chef-OrderQ-field {
+    font-size: 0.85rem;
+  }
+  
+  .Chef-OrderQ-btn {
+    font-size: 0.8rem;
+    padding: var(--Chef-OrderQ-spacing-xs) var(--Chef-OrderQ-spacing-sm);
+  }
+}
+
+/* ===========================
+   Print Styles
+   =========================== */
+@media print {
+  .Chef-OrderQ-modal-overlay,
+  .Chef-OrderQ-actions {
+    display: none !important;
+  }
+  
+  .Chef-OrderQ-order-queue {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .Chef-OrderQ-column {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}
+
+/* ===========================
+   Accessibility
+   =========================== */
+.Chef-OrderQ-btn:focus-visible,
+.Chef-OrderQ-modal-box textarea:focus-visible {
+  outline: 3px solid var(--Chef-OrderQ-accent-gold);
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .Chef-OrderQ-order-queue,
+  .Chef-OrderQ-column,
+  .Chef-OrderQ-order-card,
+  .Chef-OrderQ-btn,
+  .Chef-OrderQ-modal-overlay,
+  .Chef-OrderQ-modal-box {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .Chef-OrderQ-column,
+  .Chef-OrderQ-order-card,
+  .Chef-OrderQ-modal-box {
+    border: 2px solid var(--Chef-OrderQ-text-primary);
+  }
+}

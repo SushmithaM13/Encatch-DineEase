@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
-import "./OrderQueue.css";
+import {
+  getStaffProfile,
+  getChefOrders,
+  updateOrderItemStatus,
+  markMenuOutOfStock,
+} from "./Api/OrderQuery";
+import "./OrderQuery.css";
 
-const BASE_URL = "http://localhost:8082/dine-ease/api/v1";
-
-const ChefOrderQueue = () => {
+const ChefOrderQuery = () => {
   const [chefId, setChefId] = useState(null);
   const [orgId, setOrgId] = useState(null);
 
@@ -18,29 +21,24 @@ const ChefOrderQueue = () => {
   const [cancelReason, setCancelReason] = useState("");
   const [selectedItemId, setSelectedItemId] = useState(null);
 
-  const token = localStorage.getItem("token");
-
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
-
-  // ================= PROFILE =================
+  /* ================= PROFILE ================= */
   useEffect(() => {
-    fetchProfile();
+    loadProfile();
   }, []);
 
-  const fetchProfile = async () => {
+  const loadProfile = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/staff/profile`, { headers });
-      setChefId(res.data.userId || res.data.id);
-      setOrgId(res.data.organizationId || res.data.organization?.organizationId);
+      const profile = await getStaffProfile();
+      setChefId(profile.userId || profile.id);
+      setOrgId(
+        profile.organizationId || profile.organization?.organizationId
+      );
     } catch (err) {
-      console.error("Profile fetch failed", err);
+      console.error("Profile load failed", err);
     }
   };
 
-  // ================= ORDERS =================
+  /* ================= ORDERS ================= */
   useEffect(() => {
     if (chefId && orgId) {
       fetchAllOrders();
@@ -56,53 +54,25 @@ const ChefOrderQueue = () => {
 
   const fetchOrders = async (status) => {
     try {
-      const res = await axios.get(
-        `${BASE_URL}/chef-notifications/all/orders`,
-        {
-          headers,
-          params: {
-            organizationId: orgId,
-            chefId,
-            status,
-          },
-        }
-      );
-      return res.data || [];
+      return await getChefOrders({
+        organizationId: orgId,
+        chefId,
+        status,
+      });
     } catch (err) {
-      console.error(`Failed to fetch ${status}`, err);
+      console.error(`Fetch failed: ${status}`, err);
       return [];
     }
   };
 
-  // ================= ORDER ITEM STATUS =================
-  const updateItemStatus = async (orderItemId, status, notes = "") => {
-    await axios.put(
-      `${BASE_URL}/${orgId}/orders/order-item/status`,
-      {
-        orderItemId,
-        itemStatus: status,
-        notes,
-      },
-      { headers }
-    );
-  };
-
-  // ================= MENU OUT OF STOCK =================
-  const markMenuOutOfStock = async (menuId) => {
-    await axios.put(
-      `${BASE_URL}/${orgId}/menu/${menuId}/availability`,
-      {
-        available: false,
-        reason: "Out of Stock",
-      },
-      { headers }
-    );
-  };
-
-  // ================= ACTION HANDLERS =================
+  /* ================= STATUS HANDLERS ================= */
   const handleNext = async (itemId, status) => {
     try {
-      await updateItemStatus(itemId, status);
+      await updateOrderItemStatus({
+        organizationId: orgId,
+        orderItemId: itemId,
+        itemStatus: status,
+      });
       setTimeout(fetchAllOrders, 300);
     } catch (err) {
       console.error("Status update failed", err);
@@ -122,7 +92,12 @@ const ChefOrderQueue = () => {
     }
 
     try {
-      await updateItemStatus(selectedItemId, "CANCELLED", cancelReason);
+      await updateOrderItemStatus({
+        organizationId: orgId,
+        orderItemId: selectedItemId,
+        itemStatus: "CANCELLED",
+        notes: cancelReason,
+      });
       setShowCancelModal(false);
       setTimeout(fetchAllOrders, 300);
     } catch (err) {
@@ -132,39 +107,51 @@ const ChefOrderQueue = () => {
 
   const handleOutOfStock = async (itemId, menuId) => {
     try {
-      await updateItemStatus(itemId, "OUT_OF_STOCK");
-      await markMenuOutOfStock(menuId);
+      await updateOrderItemStatus({
+        organizationId: orgId,
+        orderItemId: itemId,
+        itemStatus: "OUT_OF_STOCK",
+      });
+      await markMenuOutOfStock({ organizationId: orgId, menuId });
       setTimeout(fetchAllOrders, 300);
     } catch (err) {
       console.error("Out of stock failed", err);
     }
   };
 
-  // ================= UI =================
+  /* ================= UI RENDER ================= */
   const renderOrders = (orders, stage) =>
     orders.length === 0 ? (
-      <p className="empty">No orders</p>
+      <p className="Chef-OrderQ-empty">No orders</p>
     ) : (
       orders.map((order) =>
         order.orderItems.map((item) => (
-          <div key={item.orderItemId} className="order-card">
-            <p><b>Order Ref:</b> {order.orderReference}</p>
-            <p><b>Table:</b> {order.tableNumber}</p>
-            <p><b>Item:</b> {item.orderItemName}</p>
-            <p><b>Qty:</b> {item.quantity}</p>
+          <div key={item.orderItemId} className="Chef-OrderQ-order-card">
+            <p className="Chef-OrderQ-field">
+              <b>Order Ref:</b> {order.orderReference}
+            </p>
+            <p className="Chef-OrderQ-field">
+              <b>Table:</b> {order.tableNumber}
+            </p>
+            <p className="Chef-OrderQ-field">
+              <b>Item:</b> {item.orderItemName}
+            </p>
+            <p className="Chef-OrderQ-field">
+              <b>Qty:</b> {item.quantity}
+            </p>
 
-            <div className="actions">
+            <div className="Chef-OrderQ-actions">
               {stage !== "PREPARING" && stage !== "READY_TO_SERVE" && (
                 <>
                   <button
-                    className="btn cancel"
+                    className="Chef-OrderQ-btn Chef-OrderQ-cancel"
                     onClick={() => openCancelModal(item.orderItemId)}
                   >
                     Cancel
                   </button>
 
                   <button
-                    className="btn out"
+                    className="Chef-OrderQ-btn Chef-OrderQ-out"
                     onClick={() =>
                       handleOutOfStock(item.orderItemId, item.menuId)
                     }
@@ -176,8 +163,10 @@ const ChefOrderQueue = () => {
 
               {stage === "ASSIGNED" && (
                 <button
-                  className="btn accept"
-                  onClick={() => handleNext(item.orderItemId, "ACCEPTED")}
+                  className="Chef-OrderQ-btn Chef-OrderQ-accept"
+                  onClick={() =>
+                    handleNext(item.orderItemId, "ACCEPTED")
+                  }
                 >
                   Accept
                 </button>
@@ -185,8 +174,10 @@ const ChefOrderQueue = () => {
 
               {stage === "ACCEPTED" && (
                 <button
-                  className="btn ready"
-                  onClick={() => handleNext(item.orderItemId, "PREPARING")}
+                  className="Chef-OrderQ-btn Chef-OrderQ-ready"
+                  onClick={() =>
+                    handleNext(item.orderItemId, "PREPARING")
+                  }
                 >
                   Start Preparing
                 </button>
@@ -194,12 +185,12 @@ const ChefOrderQueue = () => {
 
               {stage === "PREPARING" && (
                 <button
-                  className="btn serve"
+                  className="Chef-OrderQ-btn Chef-OrderQ-serve"
                   onClick={() =>
                     handleNext(item.orderItemId, "READY_TO_SERVE")
                   }
                 >
-                  Ready to Serve
+                  Ready To Serve
                 </button>
               )}
             </div>
@@ -209,44 +200,49 @@ const ChefOrderQueue = () => {
     );
 
   return (
-    <div className="order-queue">
-      <div className="column">
+    <div className="Chef-OrderQ-order-queue">
+      <div className="Chef-OrderQ-column">
         <h3>New Orders</h3>
         {renderOrders(assigned, "ASSIGNED")}
       </div>
 
-      <div className="column">
+      <div className="Chef-OrderQ-column">
         <h3>Accepted Orders</h3>
         {renderOrders(accepted, "ACCEPTED")}
       </div>
 
-      <div className="column">
+      <div className="Chef-OrderQ-column">
         <h3>Preparing</h3>
         {renderOrders(preparing, "PREPARING")}
       </div>
 
-      <div className="column">
-        <h3>Ready to Serve</h3>
+      <div className="Chef-OrderQ-column">
+        <h3>Ready To Serve</h3>
         {renderOrders(readyToServe, "READY_TO_SERVE")}
       </div>
 
       {showCancelModal && (
-        <div className="modal-overlay">
-          <div className="modal-box">
+        <div className="Chef-OrderQ-modal-overlay">
+          <div className="Chef-OrderQ-modal-box">
             <h3>Cancel Order Item</h3>
 
             <textarea
-              placeholder="Enter reason for cancellation"
+              placeholder="Enter cancel reason"
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
             />
 
-            <div className="modal-actions">
-              <button className="btn cancel" onClick={() => setShowCancelModal(false)}>
+            <div className="Chef-OrderQ-modal-actions">
+              <button
+                className="Chef-OrderQ-btn Chef-OrderQ-cancel"
+                onClick={() => setShowCancelModal(false)}
+              >
                 Close
               </button>
-
-              <button className="btn accept" onClick={confirmCancel}>
+              <button 
+                className="Chef-OrderQ-btn Chef-OrderQ-accept" 
+                onClick={confirmCancel}
+              >
                 Confirm Cancel
               </button>
             </div>
@@ -257,4 +253,4 @@ const ChefOrderQueue = () => {
   );
 };
 
-export default ChefOrderQueue;
+export default ChefOrderQuery;

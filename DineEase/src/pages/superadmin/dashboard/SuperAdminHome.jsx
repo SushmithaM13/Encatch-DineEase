@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  FaUsers,
-
-  FaEdit,
-
-} from "react-icons/fa";
+import { FaUsers, FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import "./SuperAdminDashboard.css";
+import "./SuperAdminHomepage.css";
 
 const SuperAdminHome = () => {
   const [hotel, setHotel] = useState(null);
@@ -18,21 +13,17 @@ const SuperAdminHome = () => {
     inactiveStaff: 0,
   });
 
-
-  const [menuStats, setMenuStats] = useState({ totalMenu: 0, });
+  const [menuStats, setMenuStats] = useState({ totalMenu: 0 });
   const [showPopup, setShowPopup] = useState(false);
   const [editData, setEditData] = useState({});
   const [role, setRole] = useState("");
   const [menuList, setMenuList] = useState([]);
   const [search, setSearch] = useState("");
 
-
-
   const navigate = useNavigate();
   const API_BASE = "http://localhost:8082/dine-ease/api/v1";
 
-  // ----------------- STAFF STATS -----------------
-
+  // Fetch staff stats
   const fetchStaffStats = async (orgId, token) => {
     try {
       const response = await fetch(
@@ -46,8 +37,8 @@ const SuperAdminHome = () => {
       const staffData = Array.isArray(data)
         ? data
         : Array.isArray(data.content)
-          ? data.content
-          : [];
+        ? data.content
+        : [];
 
       const total = staffData.length;
       const active = staffData.filter(
@@ -71,8 +62,7 @@ const SuperAdminHome = () => {
     }
   };
 
-  // ----------------- MENU STATS -----------------
-
+  // Fetch menu stats
   const fetchMenuStats = async (orgId, token) => {
     try {
       const response = await fetch(
@@ -87,22 +77,20 @@ const SuperAdminHome = () => {
       const menuData = Array.isArray(data)
         ? data
         : Array.isArray(data.content)
-          ? data.content
-          : [];
+        ? data.content
+        : [];
 
       setMenuStats({
         totalMenu: menuData.length,
       });
 
       setMenuList(menuData);
-
     } catch (error) {
       console.error("Error fetching menu stats:", error);
     }
   };
 
-  // ----------------- INITIAL LOAD -----------------
-
+  // Initial load
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userRole = localStorage.getItem("role");
@@ -151,8 +139,7 @@ const SuperAdminHome = () => {
       });
   }, [navigate]);
 
-  // ----------------- LISTEN TO STAFF AND MENU UPDATES -----------------
-
+  // Listen to staff and menu updates
   useEffect(() => {
     const handleStaffUpdate = () => {
       const orgId = localStorage.getItem("organizationId");
@@ -179,7 +166,6 @@ const SuperAdminHome = () => {
     const { name, value } = e.target;
     setEditData((prev) => ({ ...prev, [name]: value }));
   };
-
 
   const handleUpdate = (e) => {
     e.preventDefault();
@@ -208,82 +194,65 @@ const SuperAdminHome = () => {
       .catch((err) => console.log(err));
   };
 
-  // ----------------- RENDER -----------------
-
   return (
-    <div className="dashboard-container">
-
-      <div className="welcome-header">
+    <div className="SuperAdmin-HomePage-dashboard-container">
+      <div className="SuperAdmin-HomePage-welcome-header">
         <div>
-          <h2 className="welcome-subtitle">Welcome to Dine_Ease ! ! ! ..</h2>
+          <h2 className="SuperAdmin-HomePage-welcome-subtitle">Welcome to Dine_Ease! ! ! ..</h2>
         </div>
-
       </div>
 
       {/* Stats Cards */}
-      <div className="stats-grid">
-        <div className="stat-card blue">
-          <div className="stat-icon-wrapper">
+      <div className="SuperAdmin-HomePage-stats-grid">
+        <div className="SuperAdmin-HomePage-stat-card SuperAdmin-HomePage-blue">
+          <div className="SuperAdmin-HomePage-stat-icon-wrapper">
             <FaUsers size={28} />
           </div>
-          <div className="stat-content">
+          <div className="SuperAdmin-HomePage-stat-content">
             <h3>{stats.totalStaff}</h3>
             <p>TOTAL STAFF</p>
           </div>
         </div>
 
-        <div className="stat-card purple">
-          <div className="stat-icon-wrapper">
-            {/* <FaUtensils size={28} /> */}
+        <div className="SuperAdmin-HomePage-stat-card SuperAdmin-HomePage-purple">
+          <div className="SuperAdmin-HomePage-stat-icon-wrapper">
+            {/* Icon placeholder */}
           </div>
-          <div className="stat-content">
+          <div className="SuperAdmin-HomePage-stat-content">
             <h3>{menuStats.totalMenu}</h3>
             <p>TOTAL MENU</p>
           </div>
         </div>
 
-
-        <div className="stat-card cyan">
-          <div className="stat-icon-wrapper">
-            {/* <FaShoppingCart size={28} /> */}
+        <div className="SuperAdmin-HomePage-stat-card SuperAdmin-HomePage-cyan">
+          <div className="SuperAdmin-HomePage-stat-icon-wrapper">
+            {/* Icon placeholder */}
           </div>
-          <div className="stat-content">
+          <div className="SuperAdmin-HomePage-stat-content">
             <h3>{stats.activeStaff}</h3>
             <p>ACTIVE STAFF</p>
           </div>
         </div>
 
-        <div className="stat-card pink">
-          <div className="stat-icon-wrapper">
-            {/* <FaUsers size={28} /> */}
+        <div className="SuperAdmin-HomePage-stat-card SuperAdmin-HomePage-pink">
+          <div className="SuperAdmin-HomePage-stat-icon-wrapper">
+            {/* Icon placeholder */}
           </div>
-          <div className="stat-content">
+          <div className="SuperAdmin-HomePage-stat-content">
             <h3>{stats.inactiveStaff}</h3>
             <p>INACTIVE STAFF</p>
           </div>
         </div>
       </div>
 
-
-
-      {/* ================== MENU LIST SECTION ================== */}
-      <div className="menu-grid">
+      {/* Menu List Section */}
+      <div className="SuperAdmin-HomePage-menu-grid">
         {menuList.length === 0 ? (
           <p>No menu items yet.</p>
         ) : (
           menuList
             .filter((m) => m.itemName?.toLowerCase().includes(search.toLowerCase()))
             .map((menu) => {
-              const imageUrl = menu.imageData
-                ? `data:image/jpeg;base64,${menu.imageData}`
-                : menu.imageUrl
-                  ? menu.imageUrl.replace(
-                    /C:\\\\dine-ease-backend\\\\dine-ease\\\\uploads\\\\/g,
-                    "http://localhost:8082/dine-ease/uploads/"
-                  )
-                  : "/images/placeholder.png";
-
-
               const price =
                 menu.variants && menu.variants.length > 0
                   ? Math.min(...menu.variants.map((v) => Number(v.price || 0)))
@@ -291,59 +260,52 @@ const SuperAdminHome = () => {
               return (
                 <div
                   key={menu.id}
-                  className="menu-card"
+                  className="SuperAdmin-HomePage-menu-card"
                   onClick={() => navigate(`/SuperAdminDashboard/menu/${menu.id}`)}
                 >
-                  <div className="menu-card-image-wrapper">
-                   {menu.imageData ? (
-      <img
-        src={`data:image/jpeg;base64,${menu.imageData}`}
-        alt={menu.itemName}
-        style={{ width: "200px", height: "150px", border: "1px solid red" }}
-        onError={(e) => {
-          e.target.src = "/images/placeholder.png";
-        }}
-      />
-    ) : menu.imageUrl ? (
-      <img
-        src={menu.imageUrl.replace(
-          /C:\\dine-ease-backend\\dine-ease\\uploads\\/g,
-          "http://localhost:8082/dine-ease/uploads/"
-        )}
-        alt={menu.itemName}
-        style={{ width: "200px", height: "150px", border: "1px solid red" }}
-        onError={(e) => {
-          console.log("Image failed:", menu.imageUrl);
-          e.target.src = "/images/placeholder.png";
-        }}
-      />
-    ) : (
-      <img
-        src="/images/placeholder.png"
-        alt="No Image"
-        style={{ width: "200px", height: "150px", border: "1px solid red" }}
-      />
-    )}
+                  <div className="SuperAdmin-HomePage-menu-card-image-wrapper">
+                    {menu.imageData ? (
+                      <img
+                        src={`data:image/jpeg;base64,${menu.imageData}`}
+                        alt={menu.itemName}
+                        onError={(e) => {
+                          e.target.src = "/images/placeholder.png";
+                        }}
+                      />
+                    ) : menu.imageUrl ? (
+                      <img
+                        src={menu.imageUrl.replace(
+                          /C:\\dine-ease-backend\\dine-ease\\uploads\\/g,
+                          "http://localhost:8082/dine-ease/uploads/"
+                        )}
+                        alt={menu.itemName}
+                        onError={(e) => {
+                          console.log("Image failed:", menu.imageUrl);
+                          e.target.src = "/images/placeholder.png";
+                        }}
+                      />
+                    ) : (
+                      <img src="/images/placeholder.png" alt="No Image" />
+                    )}
                   </div>
-                  <div className="menu-card-content">
-                    <h3 className="menu-card-title">Name:{menu.itemName}</h3>
-                    <p className="menu-card-price">Price-₹ {price}</p>
+                  <div className="SuperAdmin-HomePage-menu-card-content">
+                    <h3 className="SuperAdmin-HomePage-menu-card-title">Name: {menu.itemName}</h3>
+                    <p className="SuperAdmin-HomePage-menu-card-price">Price: ₹ {price}</p>
                   </div>
                 </div>
-
               );
             })
         )}
       </div>
 
       {/* Organization Details Section */}
-      <div className="content-row">
-        <section className="organization-section">
-          <div className="section-header">
+      <div className="SuperAdmin-HomePage-content-row">
+        <section className="SuperAdmin-HomePage-organization-section">
+          <div className="SuperAdmin-HomePage-section-header">
             <h2>Organization Details</h2>
             {!loading && hotel && role === "SUPER_ADMIN" && (
               <button
-                className="btn-update"
+                className="SuperAdmin-HomePage-btn-update"
                 onClick={() => setShowPopup(true)}
               >
                 <FaEdit /> Update
@@ -352,62 +314,62 @@ const SuperAdminHome = () => {
           </div>
 
           {loading ? (
-            <div className="loading-state">Loading organization...</div>
+            <div className="SuperAdmin-HomePage-loading-state">Loading organization...</div>
           ) : hotel ? (
-            <div className="organization-grid">
-              <div className="org-item">
-                <span className="org-label">ID</span>
-                <span className="org-value">{hotel.id || "N/A"}</span>
+            <div className="SuperAdmin-HomePage-organization-grid">
+              <div className="SuperAdmin-HomePage-org-item">
+                <span className="SuperAdmin-HomePage-org-label">ID</span>
+                <span className="SuperAdmin-HomePage-org-value">{hotel.id || "N/A"}</span>
               </div>
-              <div className="org-item">
-                <span className="org-label">Organization Name</span>
-                <span className="org-value">{hotel.organizationName || "N/A"}</span>
+              <div className="SuperAdmin-HomePage-org-item">
+                <span className="SuperAdmin-HomePage-org-label">Organization Name</span>
+                <span className="SuperAdmin-HomePage-org-value">{hotel.organizationName || "N/A"}</span>
               </div>
-              <div className="org-item">
-                <span className="org-label">Business Type</span>
-                <span className="org-value">{hotel.businessType || "N/A"}</span>
+              <div className="SuperAdmin-HomePage-org-item">
+                <span className="SuperAdmin-HomePage-org-label">Business Type</span>
+                <span className="SuperAdmin-HomePage-org-value">{hotel.businessType || "N/A"}</span>
               </div>
-              <div className="org-item">
-                <span className="org-label">Address</span>
-                <span className="org-value">{hotel.organizationAddress || "N/A"}</span>
+              <div className="SuperAdmin-HomePage-org-item">
+                <span className="SuperAdmin-HomePage-org-label">Address</span>
+                <span className="SuperAdmin-HomePage-org-value">{hotel.organizationAddress || "N/A"}</span>
               </div>
-              <div className="org-item">
-                <span className="org-label">Phone</span>
-                <span className="org-value">{hotel.organizationPhone || "N/A"}</span>
+              <div className="SuperAdmin-HomePage-org-item">
+                <span className="SuperAdmin-HomePage-org-label">Phone</span>
+                <span className="SuperAdmin-HomePage-org-value">{hotel.organizationPhone || "N/A"}</span>
               </div>
-              <div className="org-item">
-                <span className="org-label">Email</span>
-                <span className="org-value">{hotel.organizationEmail || "N/A"}</span>
+              <div className="SuperAdmin-HomePage-org-item">
+                <span className="SuperAdmin-HomePage-org-label">Email</span>
+                <span className="SuperAdmin-HomePage-org-value">{hotel.organizationEmail || "N/A"}</span>
               </div>
-              <div className="org-item">
-                <span className="org-label">Website</span>
-                <span className="org-value">{hotel.organizationWebsite || "N/A"}</span>
+              <div className="SuperAdmin-HomePage-org-item">
+                <span className="SuperAdmin-HomePage-org-label">Website</span>
+                <span className="SuperAdmin-HomePage-org-value">{hotel.organizationWebsite || "N/A"}</span>
               </div>
-              <div className="org-item">
-                <span className="org-label">Status</span>
-                <span className="org-value status-badge">{hotel.organizationStatus || "N/A"}</span>
+              <div className="SuperAdmin-HomePage-org-item">
+                <span className="SuperAdmin-HomePage-org-label">Status</span>
+                <span className="SuperAdmin-HomePage-org-value SuperAdmin-HomePage-status-badge">{hotel.organizationStatus || "N/A"}</span>
               </div>
-              <div className="org-item">
-                <span className="org-label">GST Number</span>
-                <span className="org-value">{hotel.gstNumber || "N/A"}</span>
+              <div className="SuperAdmin-HomePage-org-item">
+                <span className="SuperAdmin-HomePage-org-label">GST Number</span>
+                <span className="SuperAdmin-HomePage-org-value">{hotel.gstNumber || "N/A"}</span>
               </div>
             </div>
           ) : (
-            <div className="empty-state">No organization data available.</div>
+            <div className="SuperAdmin-HomePage-empty-state">No organization data available.</div>
           )}
         </section>
       </div>
 
       {/* Edit Popup */}
       {showPopup && role === "SUPER_ADMIN" && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
+        <div className="SuperAdmin-HomePage-modal-overlay">
+          <div className="SuperAdmin-HomePage-modal-content">
+            <div className="SuperAdmin-HomePage-modal-header">
               <h3>Edit Organization Details</h3>
             </div>
             <form onSubmit={handleUpdate}>
-              <div className="form-grid">
-                <div className="form-group">
+              <div className="SuperAdmin-HomePage-form-grid">
+                <div className="SuperAdmin-HomePage-form-group">
                   <label>Organization Name</label>
                   <input
                     name="organizationName"
@@ -417,7 +379,7 @@ const SuperAdminHome = () => {
                   />
                 </div>
 
-                <div className="form-group">
+                <div className="SuperAdmin-HomePage-form-group">
                   <label>Business Type</label>
                   <input
                     name="businessType"
@@ -425,7 +387,7 @@ const SuperAdminHome = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group">
+                <div className="SuperAdmin-HomePage-form-group">
                   <label>Address</label>
                   <input
                     name="organizationAddress"
@@ -433,7 +395,7 @@ const SuperAdminHome = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group">
+                <div className="SuperAdmin-HomePage-form-group">
                   <label>Phone</label>
                   <input
                     name="organizationPhone"
@@ -441,7 +403,7 @@ const SuperAdminHome = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group">
+                <div className="SuperAdmin-HomePage-form-group">
                   <label>Email</label>
                   <input
                     name="organizationEmail"
@@ -449,7 +411,7 @@ const SuperAdminHome = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group">
+                <div className="SuperAdmin-HomePage-form-group">
                   <label>Website</label>
                   <input
                     name="organizationWebsite"
@@ -457,7 +419,7 @@ const SuperAdminHome = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="form-group full-width">
+                <div className="SuperAdmin-HomePage-form-group SuperAdmin-HomePage-full-width">
                   <label>GST Number</label>
                   <input
                     name="gstNumber"
@@ -466,11 +428,11 @@ const SuperAdminHome = () => {
                   />
                 </div>
               </div>
-              <div className="modal-footer">
-                <button type="button" className="btn-secondary" onClick={() => setShowPopup(false)}>
+              <div className="SuperAdmin-HomePage-modal-footer">
+                <button type="button" className="SuperAdmin-HomePage-btn-secondary" onClick={() => setShowPopup(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary">
+                <button type="submit" className="SuperAdmin-HomePage-btn-primary">
                   Save Changes
                 </button>
               </div>

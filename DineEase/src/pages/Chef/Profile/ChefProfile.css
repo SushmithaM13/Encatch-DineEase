@@ -1,221 +1,677 @@
+/* ===============================================
+   CHEF PROFILE - PREMIUM CULINARY DESIGN
+   Professional profile management interface
+   All classes prefixed with "Chef-Profile-"
+   =============================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+/* ===========================
+   CSS VARIABLES
+   =========================== */
 :root {
-  --primary: #16a34a;
-  --primary-dark: #0f7a34;
-  --text: #1a1a1a;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --bg: #f8fafc;
-  --card: #ffffff;
+  /* Matching Dashboard Palette */
+  --Chef-Profile-primary-dark: #1a1a1a;
+  --Chef-Profile-accent-gold: #d4af37;
+  --Chef-Profile-accent-copper: #b87333;
+  --Chef-Profile-accent-cream: #f5f1e8;
+  
+  /* UI Colors */
+  --Chef-Profile-bg-primary: #fafaf9;
+  --Chef-Profile-bg-card: #ffffff;
+  --Chef-Profile-bg-hover: #f5f1e8;
+  --Chef-Profile-bg-disabled: #f8f9fa;
+  --Chef-Profile-border-color: #e5e3dc;
+  --Chef-Profile-text-primary: #1a1a1a;
+  --Chef-Profile-text-secondary: #6b6b6b;
+  --Chef-Profile-text-light: #999999;
+  
+  /* Status Colors */
+  --Chef-Profile-success: #16a34a;
+  --Chef-Profile-success-bg: #dcfce7;
+  --Chef-Profile-error: #dc2626;
+  --Chef-Profile-warning: #f59e0b;
+  
+  /* Shadows */
+  --Chef-Profile-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --Chef-Profile-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --Chef-Profile-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --Chef-Profile-shadow-glow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+  
+  /* Spacing */
+  --Chef-Profile-spacing-xs: 0.5rem;
+  --Chef-Profile-spacing-sm: 0.75rem;
+  --Chef-Profile-spacing-md: 1rem;
+  --Chef-Profile-spacing-lg: 1.5rem;
+  --Chef-Profile-spacing-xl: 2rem;
+  --Chef-Profile-spacing-2xl: 2.5rem;
+  
+  /* Border Radius */
+  --Chef-Profile-radius-sm: 8px;
+  --Chef-Profile-radius-md: 12px;
+  --Chef-Profile-radius-lg: 16px;
+  --Chef-Profile-radius-xl: 20px;
+  --Chef-Profile-radius-full: 50%;
+  
+  /* Typography */
+  --Chef-Profile-font-display: 'Playfair Display', serif;
+  --Chef-Profile-font-body: 'Outfit', sans-serif;
+  
+  /* Transitions */
+  --Chef-Profile-transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --Chef-Profile-transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Base */
-.chef-profile-page {
-  min-height: 100vh;
-  padding: clamp(16px, 2vw, 32px);
-  background: var(--bg);
-  font-family: "Inter", sans-serif;
+/* ===========================
+   PAGE CONTAINER
+   =========================== */
+.Chef-Profile-page {
+  padding: 0;
+  font-family: var(--Chef-Profile-font-body);
+  color: var(--Chef-Profile-text-primary);
+  animation: Chef-Profile-fadeIn 0.6s ease-out;
 }
 
-.chef-profile-heading {
-  font-size: clamp(20px, 2vw, 26px);
-  font-weight: 700;
-  color: var(--text);
+@keyframes Chef-Profile-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===========================
+   HEADING
+   =========================== */
+.Chef-Profile-heading {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
+  gap: var(--Chef-Profile-spacing-md);
+  margin-bottom: var(--Chef-Profile-spacing-xl);
+  padding: var(--Chef-Profile-spacing-lg);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(184, 115, 51, 0.1));
+  border-radius: var(--Chef-Profile-radius-lg);
+  border: 2px solid rgba(212, 175, 55, 0.2);
 }
 
-/* Card Container */
-.chef-profile-container {
+.Chef-Profile-heading svg {
+  color: var(--Chef-Profile-accent-gold);
+  filter: drop-shadow(0 2px 4px rgba(212, 175, 55, 0.3));
+}
+
+.Chef-Profile-heading h2 {
+  font-family: var(--Chef-Profile-font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, var(--Chef-Profile-accent-gold), var(--Chef-Profile-accent-copper));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===========================
+   MAIN CONTAINER
+   =========================== */
+.Chef-Profile-container {
   display: grid;
   grid-template-columns: 1.8fr 1fr;
-  gap: clamp(18px, 2vw, 32px);
-  background: var(--card);
-  padding: clamp(16px, 2vw, 32px);
-  border-radius: 18px;
-  border: 1px solid rgba(0,0,0,0.08);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 6px 22px rgba(0,0,0,0.08);
+  gap: var(--Chef-Profile-spacing-2xl);
+  background: var(--Chef-Profile-bg-card);
+  padding: var(--Chef-Profile-spacing-2xl);
+  border-radius: var(--Chef-Profile-radius-xl);
+  border: 2px solid var(--Chef-Profile-border-color);
+  box-shadow: var(--Chef-Profile-shadow-lg);
+  position: relative;
+  overflow: hidden;
 }
 
-/* Left Panel Form */
-.chef-profile-details section {
-  margin-bottom: clamp(16px, 2vw, 28px);
+.Chef-Profile-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.05), transparent);
+  pointer-events: none;
 }
 
-.chef-profile-details h3 {
-  font-size: clamp(14px, 1.4vw, 17px);
-  font-weight: 600;
-  color: var(--primary);
-  margin-bottom: 10px;
-}
-
-.chef-profile-details label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text);
+/* ===========================
+   LEFT PANEL - DETAILS
+   =========================== */
+.Chef-Profile-details {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  margin-bottom: 12px;
+  gap: var(--Chef-Profile-spacing-xl);
+  position: relative;
+  z-index: 1;
 }
 
-.chef-profile-details input {
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: #fff;
-  font-size: 0.95rem;
-  transition: 0.2s;
+.Chef-Profile-section {
+  padding: var(--Chef-Profile-spacing-lg);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(245, 241, 232, 0.3));
+  border-radius: var(--Chef-Profile-radius-lg);
+  border: 1px solid var(--Chef-Profile-border-color);
+  transition: all var(--Chef-Profile-transition-base);
 }
 
-.chef-profile-details input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(22,163,74,0.15);
-  outline: none;
+.Chef-Profile-section:hover {
+  border-color: var(--Chef-Profile-accent-gold);
+  box-shadow: var(--Chef-Profile-shadow-sm);
 }
 
-.chef-profile-details input:disabled {
-  background: #f2f3f5;
-  color: var(--muted);
-}
-
-/* Password Box */
-.chef-password-box input {
-  margin-bottom: 8px;
-}
-
-.chef-password-box button {
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  border: none;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-.chef-password-box button:first-child {
-  background: var(--primary);
-  color: #fff;
-}
-
-.chef-password-box button:last-child {
-  background: #e5e7eb;
-  color: #000;
-}
-
-/* Action Buttons */
-.chef-action-buttons {
-  display: flex;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.chef-action-buttons button {
-  flex: 1;
-  padding: 11px;
-  border-radius: 10px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.95rem;
-  transition: 0.2s;
-}
-
-.chef-action-buttons button:first-child {
-  background: var(--primary);
-  color: #fff;
-}
-
-.chef-action-buttons button:last-child {
-  background: #dc2626;
-  color: #fff;
-}
-
-/* Right Profile Card */
-.chef-profile-picture {
-  display: flex;
-  justify-content: center;
-  align-items: start;
-}
-
-.chef-image-wrapper {
+.Chef-Profile-section-title {
+  font-family: var(--Chef-Profile-font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--Chef-Profile-accent-copper);
+  margin: 0 0 var(--Chef-Profile-spacing-md) 0;
+  padding-bottom: var(--Chef-Profile-spacing-sm);
+  border-bottom: 2px solid var(--Chef-Profile-border-color);
   position: relative;
 }
 
-.chef-circle-img {
-  width: clamp(130px, 22vw, 180px);
-  height: clamp(130px, 22vw, 180px);
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid var(--primary);
-  background: #f0f0f0;
-  font-size: clamp(38px, 4vw, 50px);
+.Chef-Profile-section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--Chef-Profile-accent-gold), var(--Chef-Profile-accent-copper));
+}
+
+/* ===========================
+   FORM LABELS & INPUTS
+   =========================== */
+.Chef-Profile-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--Chef-Profile-spacing-xs);
+  margin-bottom: var(--Chef-Profile-spacing-md);
+}
+
+.Chef-Profile-label span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--Chef-Profile-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.85rem;
+}
+
+.Chef-Profile-input {
+  padding: var(--Chef-Profile-spacing-sm) var(--Chef-Profile-spacing-md);
+  border: 2px solid var(--Chef-Profile-border-color);
+  border-radius: var(--Chef-Profile-radius-sm);
+  background: var(--Chef-Profile-bg-card);
+  font-size: 0.95rem;
+  font-family: var(--Chef-Profile-font-body);
+  color: var(--Chef-Profile-text-primary);
+  transition: all var(--Chef-Profile-transition-base);
+}
+
+.Chef-Profile-input:focus {
+  outline: none;
+  border-color: var(--Chef-Profile-accent-gold);
+  box-shadow: var(--Chef-Profile-shadow-glow);
+}
+
+.Chef-Profile-input:disabled,
+.Chef-Profile-input.Chef-Profile-disabled {
+  background: var(--Chef-Profile-bg-disabled);
+  color: var(--Chef-Profile-text-secondary);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ===========================
+   PASSWORD BOX
+   =========================== */
+.Chef-Profile-password-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--Chef-Profile-spacing-sm);
+  padding: var(--Chef-Profile-spacing-lg);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.05), rgba(184, 115, 51, 0.05));
+  border-radius: var(--Chef-Profile-radius-md);
+  border: 1px dashed var(--Chef-Profile-accent-gold);
+}
+
+.Chef-Profile-password-title {
+  font-size: 1rem;
   font-weight: 700;
+  color: var(--Chef-Profile-text-primary);
+  margin: 0 0 var(--Chef-Profile-spacing-sm) 0;
+}
+
+.Chef-Profile-success-message {
+  color: var(--Chef-Profile-success);
+  font-weight: 600;
+  margin: var(--Chef-Profile-spacing-sm) 0 0 0;
+  padding: var(--Chef-Profile-spacing-sm);
+  background: var(--Chef-Profile-success-bg);
+  border-radius: var(--Chef-Profile-radius-sm);
+  text-align: center;
+}
+
+/* ===========================
+   BUTTONS
+   =========================== */
+.Chef-Profile-btn {
+  padding: var(--Chef-Profile-spacing-sm) var(--Chef-Profile-spacing-lg);
+  border-radius: var(--Chef-Profile-radius-sm);
+  border: none;
+  font-family: var(--Chef-Profile-font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--Chef-Profile-transition-base);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.Chef-Profile-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.Chef-Profile-btn:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+.Chef-Profile-btn-primary {
+  background: linear-gradient(135deg, var(--Chef-Profile-accent-gold), var(--Chef-Profile-accent-copper));
+  color: white;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.Chef-Profile-btn-primary:hover {
+  background: linear-gradient(135deg, var(--Chef-Profile-accent-copper), var(--Chef-Profile-accent-gold));
+  box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
+  transform: translateY(-2px);
+}
+
+.Chef-Profile-btn-secondary {
+  background: var(--Chef-Profile-bg-hover);
+  color: var(--Chef-Profile-text-primary);
+  border: 2px solid var(--Chef-Profile-border-color);
+}
+
+.Chef-Profile-btn-secondary:hover {
+  background: var(--Chef-Profile-border-color);
+  border-color: var(--Chef-Profile-accent-gold);
+  transform: translateY(-2px);
+}
+
+/* ===========================
+   ACTION BUTTONS
+   =========================== */
+.Chef-Profile-action-buttons {
+  display: flex;
+  gap: var(--Chef-Profile-spacing-md);
+  margin-top: var(--Chef-Profile-spacing-lg);
+}
+
+.Chef-Profile-action-buttons .Chef-Profile-btn {
+  flex: 1;
+  padding: var(--Chef-Profile-spacing-md) var(--Chef-Profile-spacing-lg);
+  font-size: 1rem;
+}
+
+.Chef-Profile-btn-save {
+  background: linear-gradient(135deg, var(--Chef-Profile-success), #22c55e);
+  color: white;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.Chef-Profile-btn-save:hover {
+  background: linear-gradient(135deg, #059669, var(--Chef-Profile-success));
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.4);
+  transform: translateY(-2px);
+}
+
+.Chef-Profile-btn-cancel {
+  background: linear-gradient(135deg, var(--Chef-Profile-error), #ef4444);
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.Chef-Profile-btn-cancel:hover {
+  background: linear-gradient(135deg, #b91c1c, var(--Chef-Profile-error));
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+  transform: translateY(-2px);
+}
+
+.Chef-Profile-btn-edit {
+  background: linear-gradient(135deg, var(--Chef-Profile-accent-gold), var(--Chef-Profile-accent-copper));
+  color: white;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.Chef-Profile-btn-edit:hover {
+  background: linear-gradient(135deg, var(--Chef-Profile-accent-copper), var(--Chef-Profile-accent-gold));
+  box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
+  transform: translateY(-2px);
+}
+
+/* ===========================
+   RIGHT PANEL - PROFILE PICTURE
+   =========================== */
+.Chef-Profile-picture {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: var(--Chef-Profile-spacing-xl);
+  position: relative;
+  z-index: 1;
 }
 
-/* Menu top of image */
-.chef-menu-container {
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
+.Chef-Profile-image-wrapper {
+  position: relative;
+  animation: Chef-Profile-imageFloat 0.8s ease-out;
 }
 
-.chef-menu-button {
-  padding: 8px;
-  background: #fff;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  transition: 0.2s;
-}
-
-.chef-menu-button:hover {
-  background: var(--primary);
-  color: white;
-}
-
-/* Dropdown */
-.chef-dropdown-menu {
-  position: absolute;
-  top: 45px;
-  right: 0;
-  background: white;
-  width: 160px;
-  border-radius: 12px;
-  padding: 6px 0;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-}
-
-.chef-dropdown-item {
-  padding: 10px 12px;
-  width: 100%;
-  font-size: 0.9rem;
-  display: flex;
-  gap: 8px;
-  border: none;
-  cursor: pointer;
-  background: transparent;
-}
-
-.chef-dropdown-item:hover {
-  background: #f3f4f6;
-}
-
-/* 📱 Mobile Responsive */
-@media (max-width: 900px) {
-  .chef-profile-container {
-    grid-template-columns: 1fr;
-    padding: 18px;
+@keyframes Chef-Profile-imageFloat {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
   }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
 
-  .chef-profile-picture {
-    justify-content: center;
+.Chef-Profile-circle-img {
+  width: clamp(160px, 20vw, 200px);
+  height: clamp(160px, 20vw, 200px);
+  border-radius: var(--Chef-Profile-radius-full);
+  object-fit: cover;
+  border: 5px solid var(--Chef-Profile-accent-gold);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.4), 0 0 0 12px rgba(212, 175, 55, 0.1);
+  transition: all var(--Chef-Profile-transition-base);
+  background: linear-gradient(135deg, var(--Chef-Profile-bg-card), var(--Chef-Profile-bg-hover));
+}
+
+.Chef-Profile-circle-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(212, 175, 55, 0.5), 0 0 0 12px rgba(212, 175, 55, 0.15);
+}
+
+.Chef-Profile-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--Chef-Profile-font-display);
+  font-size: clamp(3rem, 5vw, 4rem);
+  font-weight: 800;
+  color: var(--Chef-Profile-accent-gold);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(184, 115, 51, 0.15));
+}
+
+/* ===========================
+   MENU CONTAINER (THREE DOTS)
+   =========================== */
+.Chef-Profile-menu-container {
+  position: absolute;
+  bottom: var(--Chef-Profile-spacing-sm);
+  right: var(--Chef-Profile-spacing-sm);
+  z-index: 10;
+}
+
+.Chef-Profile-menu-button {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--Chef-Profile-radius-full);
+  border: none;
+  background: var(--Chef-Profile-bg-card);
+  box-shadow: var(--Chef-Profile-shadow-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--Chef-Profile-transition-base);
+}
+
+.Chef-Profile-menu-button:hover {
+  background: linear-gradient(135deg, var(--Chef-Profile-accent-gold), var(--Chef-Profile-accent-copper));
+  color: white;
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: var(--Chef-Profile-shadow-lg);
+}
+
+/* ===========================
+   DROPDOWN MENU
+   =========================== */
+.Chef-Profile-dropdown-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background: var(--Chef-Profile-bg-card);
+  min-width: 180px;
+  border-radius: var(--Chef-Profile-radius-md);
+  padding: var(--Chef-Profile-spacing-xs) 0;
+  box-shadow: var(--Chef-Profile-shadow-lg);
+  border: 2px solid var(--Chef-Profile-accent-gold);
+  animation: Chef-Profile-dropdownSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 100;
+}
+
+@keyframes Chef-Profile-dropdownSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.Chef-Profile-dropdown-item {
+  padding: var(--Chef-Profile-spacing-sm) var(--Chef-Profile-spacing-md);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--Chef-Profile-spacing-sm);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: var(--Chef-Profile-font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--Chef-Profile-text-primary);
+  transition: all var(--Chef-Profile-transition-fast);
+  text-align: left;
+}
+
+.Chef-Profile-dropdown-item:hover {
+  background: var(--Chef-Profile-bg-hover);
+  padding-left: calc(var(--Chef-Profile-spacing-md) + 4px);
+}
+
+.Chef-Profile-dropdown-item:last-child {
+  color: var(--Chef-Profile-error);
+  border-top: 1px solid var(--Chef-Profile-border-color);
+}
+
+.Chef-Profile-dropdown-item:last-child:hover {
+  background: rgba(220, 38, 38, 0.05);
+}
+
+/* ===========================
+   RESPONSIVE BREAKPOINTS
+   =========================== */
+
+/* Large Desktop (1920px+) */
+@media (min-width: 1920px) {
+  .Chef-Profile-heading h2 {
+    font-size: 2.5rem;
+  }
+  
+  .Chef-Profile-container {
+    padding: var(--Chef-Profile-spacing-3xl);
+  }
+}
+
+/* Laptop (1024px - 1439px) */
+@media (max-width: 1439px) and (min-width: 1024px) {
+  .Chef-Profile-container {
+    grid-template-columns: 1.5fr 1fr;
+  }
+  
+  .Chef-Profile-heading h2 {
+    font-size: 1.75rem;
+  }
+}
+
+/* Tablet Landscape (768px - 1023px) */
+@media (max-width: 1023px) {
+  .Chef-Profile-container {
+    grid-template-columns: 1fr;
+    gap: var(--Chef-Profile-spacing-xl);
+  }
+  
+  .Chef-Profile-picture {
+    order: -1;
+    padding-top: 0;
+  }
+  
+  .Chef-Profile-heading {
+    padding: var(--Chef-Profile-spacing-md);
+  }
+  
+  .Chef-Profile-heading h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Tablet Portrait & Mobile Landscape (481px - 767px) */
+@media (max-width: 767px) {
+  .Chef-Profile-heading {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .Chef-Profile-container {
+    padding: var(--Chef-Profile-spacing-lg);
+  }
+  
+  .Chef-Profile-section {
+    padding: var(--Chef-Profile-spacing-md);
+  }
+  
+  .Chef-Profile-action-buttons {
+    flex-direction: column;
+  }
+  
+  .Chef-Profile-action-buttons .Chef-Profile-btn {
+    width: 100%;
+  }
+}
+
+/* Mobile (320px - 480px) */
+@media (max-width: 480px) {
+  .Chef-Profile-heading h2 {
+    font-size: 1.25rem;
+  }
+  
+  .Chef-Profile-container {
+    padding: var(--Chef-Profile-spacing-md);
+  }
+  
+  .Chef-Profile-section {
+    padding: var(--Chef-Profile-spacing-sm);
+  }
+  
+  .Chef-Profile-section-title {
+    font-size: 1.1rem;
+  }
+  
+  .Chef-Profile-label span {
+    font-size: 0.8rem;
+  }
+  
+  .Chef-Profile-input {
+    padding: var(--Chef-Profile-spacing-xs) var(--Chef-Profile-spacing-sm);
+    font-size: 0.9rem;
+  }
+  
+  .Chef-Profile-btn {
+    padding: var(--Chef-Profile-spacing-xs) var(--Chef-Profile-spacing-md);
+    font-size: 0.85rem;
+  }
+}
+
+/* ===========================
+   PRINT STYLES
+   =========================== */
+@media print {
+  .Chef-Profile-menu-container,
+  .Chef-Profile-action-buttons,
+  .Chef-Profile-password-box {
+    display: none !important;
+  }
+  
+  .Chef-Profile-container {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+  
+  .Chef-Profile-input {
+    border: 1px solid #ddd;
+  }
+}
+
+/* ===========================
+   ACCESSIBILITY
+   =========================== */
+.Chef-Profile-input:focus-visible,
+.Chef-Profile-btn:focus-visible,
+.Chef-Profile-menu-button:focus-visible,
+.Chef-Profile-dropdown-item:focus-visible {
+  outline: 3px solid var(--Chef-Profile-accent-gold);
+  outline-offset: 2px;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .Chef-Profile-page,
+  .Chef-Profile-image-wrapper,
+  .Chef-Profile-dropdown-menu,
+  .Chef-Profile-btn,
+  .Chef-Profile-menu-button {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .Chef-Profile-container,
+  .Chef-Profile-section,
+  .Chef-Profile-circle-img {
+    border: 2px solid var(--Chef-Profile-text-primary);
+  }
+  
+  .Chef-Profile-btn {
+    border: 2px solid currentColor;
   }
 }
