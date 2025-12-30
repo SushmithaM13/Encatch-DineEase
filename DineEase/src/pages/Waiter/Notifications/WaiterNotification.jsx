@@ -7,7 +7,7 @@ export default function WaiterNotification({ smallView = false, onCountChange })
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 🔐 Auth details
+  //  Auth details
   const token = localStorage.getItem("token");
   const waiterId = Number(localStorage.getItem("waiterId"));
 
@@ -27,13 +27,13 @@ export default function WaiterNotification({ smallView = false, onCountChange })
       setError("");
 
       const data = await getWaiterNotifications(waiterId, token);
-      console.log("🔔 Notifications API Data:", data);
+      console.log("Notifications API Data:", data);
 
       const list = Array.isArray(data) ? data : [];
 
       setNotifications(list);
 
-      // 🔔 Correct notification count (order items count)
+      // Correct notification count (order items count)
       if (onCountChange) {
         const count = list.reduce(
           (total, n) =>
@@ -99,7 +99,7 @@ export default function WaiterNotification({ smallView = false, onCountChange })
                       key={iIndex}
                       className="waiter-notifications-item"
                     >
-                      ✅ {item.itemName} × {item.quantity}
+                       {item.itemName} × {item.quantity}
                     </p>
                   ))}
                 </div>

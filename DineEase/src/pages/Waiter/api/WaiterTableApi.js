@@ -45,13 +45,13 @@ export async function getAssignedTables(waiterEmail) {
     return []; // prevent crash
   }
 
-  // ❗ If backend returns error object, NOT array → return empty list
+  //  If backend returns error object, NOT array → return empty list
   if (!Array.isArray(data)) {
     console.error("Backend returned NON-ARRAY:", data);
     return [];
   }
 
-  // 🧹 Clean null values
+  //  Clean null values
   const cleanData = data.map((t) => ({
     ...t,
     reservedTableSource: t.reservedTableSource ?? "NONE"
@@ -112,7 +112,6 @@ export const updateTableStatus = async (
   token
 ) => {
   if (!token) throw new Error("No token provided");
-
   const url = `${API_BASE}/restaurant-tables/update/status?organizationId=${organizationId}&tableNumber=${tableNumber}&status=${newStatus}`;
 
   const res = await fetch(url, {
@@ -139,7 +138,7 @@ export async function updateCustomerDetails(
   const res = await fetch(
     `${API_BASE}/customer-table-assignments/update/customer-details`,
     {
-      method: "PUT",    // ✔ Correct method
+      method: "PUT",    
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -148,7 +147,7 @@ export async function updateCustomerDetails(
         sessionId,
         organizationId: orgId,
         customerId,
-        reservedTableSource,  // ✔ Correct field name
+        reservedTableSource, 
       }),
     }
   );

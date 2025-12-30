@@ -4,9 +4,12 @@ import { Minus, Plus, X } from "lucide-react";
 
 import {
   getCart,
-  addItemToCart,
+  // addItemToCart,
   removeCartItem,
   clearCartAPI,
+  changeCartQuantity,
+
+  validateCartAPI,
 } from "../api/WaiterCartApi";
 
 import { checkoutOrder } from "../api/WaiterOrderApi";
@@ -19,11 +22,13 @@ export default function WaiterCart({
 }) {
   const [searchParams] = useSearchParams();
 
-  // ✅ SINGLE SOURCE OF TRUTH (DO NOT MODIFY)
+  //  SINGLE SOURCE OF TRUTH (DO NOT MODIFY)
   const sessionId = searchParams.get("sessionId");
   const tableNumber = searchParams.get("tableNumber");
 
   const [cart, setCart] = useState([]);
+  const [summary, setSummary] = useState(null);
+
   const [clearCartModal, setClearCartModal] = useState(false);
   const [checkoutModal, setCheckoutModal] = useState({
     open: false,
@@ -53,77 +58,82 @@ export default function WaiterCart({
           unitPrice: item.unitPrice,
           totalPrice: item.totalPrice,
           variantId: item.variantId,
+          variantName: item.variantName,
           addons: item.addons || [],
           customizations: item.customizations || [],
         }))
       );
+
+      // Extract summary directly from GET CART response
+      setSummary({
+        totalItems: data.totalItems,
+        totalQuantity: data.totalQuantity,
+        totalDiscount: data.totalDiscount,
+        grandTotal: data.grandTotal
+      });
+
     } catch (err) {
-      console.error("❌ Fetch cart failed:", err.message);
+      console.error(" Fetch cart failed:", err.message);
     }
   }, [organizationId, sessionId, tableNumber, token]);
 
   useEffect(() => {
-    fetchCart();
-    window.addEventListener("openCart", fetchCart);
-    return () => window.removeEventListener("openCart", fetchCart);
+    const handler = () => fetchCart();
+    window.addEventListener("cartUpdated", handler);
+
+    return () => window.removeEventListener("cartUpdated", handler);
   }, [fetchCart]);
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
+
 
   // ---------------------------------------------
   // UPDATE QUANTITY
   // ---------------------------------------------
   const updateItemQuantity = async (item, type) => {
     try {
+      let newQty = item.qty;
+
       if (type === "INC") {
-        await addItemToCart(
-          organizationId,
-          {
-            menuItemVariantId: item.variantId,
-            quantity: 1,
-
-            // ✅ IDs ONLY (derived from cart item)
-            addonIds: item.addons.map(a => a.addonId),
-            customizationOptionIds: item.customizations.map(
-              c => c.customizationOptionId
-            ),
-
-
-            sessionId,   // from URL
-            tableNumber,
-          },
-          token
-        );
+        newQty = item.qty + 1;
       }
-
-
-
 
       if (type === "DEC") {
-        await removeCartItem(organizationId, item.id, sessionId, token);
+        newQty = item.qty - 1;
+
+        // If qty becomes 0 → remove item
+        if (newQty <= 0) {
+          await removeCartItem(organizationId, item.id, sessionId, token);
+          await fetchCart();
+          return;
+        }
       }
+
+      // Use new API
+      await changeCartQuantity(item.id, newQty, token);
 
       await fetchCart();
     } catch (err) {
-      console.error("❌ Quantity update failed:", err.message);
+      console.error(" Quantity update failed:", err.message);
     }
   };
-
-
   // ---------------------------------------------
   // REMOVE ITEM
   // ---------------------------------------------
-  const handleRemoveItem = async (cartItemId) => {
-    try {
-      await removeCartItem(
-        organizationId,
-        cartItemId,
-        sessionId,
-        token
-      );
-      await fetchCart();
-    } catch (err) {
-      console.error("❌ Remove failed:", err.message);
-    }
-  };
+  // const handleRemoveItem = async (cartItemId) => {
+  //   try {
+  //     await removeCartItem(
+  //       organizationId,
+  //       cartItemId,
+  //       sessionId,
+  //       token
+  //     );
+  //     await fetchCart();
+  //   } catch (err) {
+  //     console.error(" Remove failed:", err.message);
+  //   }
+  // };
 
   // ---------------------------------------------
   // CLEAR CART
@@ -138,12 +148,15 @@ export default function WaiterCart({
       setCart([]);
       setClearCartModal(false);
     } catch (err) {
-      console.error("❌ Clear cart failed:", err.message);
+      console.error(" Clear cart failed:", err.message);
     }
   };
 
   // ---------------------------------------------
   // CHECKOUT
+  // ---------------------------------------------
+  // ---------------------------------------------
+  // CHECKOUT (WITH CART VALIDATION)
   // ---------------------------------------------
   const handleCheckout = async () => {
     if (!sessionId || !tableNumber) {
@@ -154,9 +167,29 @@ export default function WaiterCart({
       });
       return;
     }
-    console.log("✅ Initiating checkout...", { organizationId, sessionId, tableNumber });
+
+    console.log(" Starting checkout… VALIDATING CART FIRST");
 
     try {
+      //  Validate cart
+      const validation = await validateCartAPI(organizationId, sessionId, token);
+
+      if (!validation.ok) {
+        console.error(" Cart validation failed:", validation.message);
+
+        // Show backend error message
+        setCheckoutModal({
+          open: true,
+          type: "error",
+          message: validation.message,
+        });
+
+        return; //  STOP checkout
+      }
+
+      console.log(" Cart validation success!");
+
+      //  Proceed with checkout since cart is valid
       await checkoutOrder(
         organizationId,
         {
@@ -174,20 +207,23 @@ export default function WaiterCart({
       });
 
       setCart([]);
-    } catch {
+
+    } catch (err) {
+      console.error(" Checkout error:", err);
+
       setCheckoutModal({
         open: true,
         type: "error",
         message: "Checkout failed. Please try again.",
       });
-      
     }
   };
 
-  const subtotal = cart.reduce(
-    (sum, item) => sum + (item.totalPrice || 0),
-    0
-  );
+
+  // const subtotal = cart.reduce(
+  //   (sum, item) => sum + (item.totalPrice || 0),
+  //   0
+  // );
 
   // ---------------------------------------------
   // UI
@@ -207,34 +243,75 @@ export default function WaiterCart({
         ) : (
           cart.map((item) => (
             <div className="waiter-cart-item" key={item.id}>
-              <strong>{item.name}</strong>
+  <div className="waiter-cart-main">
+    {/* Quantity + Name + Price Inline */}
+    <div className="waiter-cart-inline">
+      <button onClick={() => updateItemQuantity(item, "DEC")}>-</button>
+      <span className="cart-qty">{item.qty}</span>
+      <button onClick={() => updateItemQuantity(item, "INC")}>+</button>
 
-              <div className="waiter-cart-controls">
-                <button onClick={() => updateItemQuantity(item, "DEC")}>
-                  <Minus size={14} />
-                </button>
+      <span className="cart-name">{item.name}</span>
+      <span className="cart-price">₹{item.totalPrice}</span>
+    </div>
 
-                <span>{item.qty}</span>
+    {/* Optional Variant */}
+    {item.variantName && (
+      <div className="waiter-cart-variant">
+        Variant: <span>{item.variantName}</span>
+      </div>
+    )}
 
-                <button onClick={() => updateItemQuantity(item, "INC")}>
-                  <Plus size={14} />
-                </button>
+    {/* Optional Addons */}
+    {item.addons && item.addons.length > 0 && (
+      <div className="waiter-cart-addon-list">
+        {item.addons.map((a) => (
+          <div key={a.addonId} className="waiter-cart-addon-item">
+            {a.addonName} (₹{a.addonPrice})
+          </div>
+        ))}
+      </div>
+    )}
 
-                <span>₹{item.totalPrice}</span>
+    {/* Optional Customizations */}
+    {item.customizations && item.customizations.length > 0 && (
+      <div className="waiter-cart-custom-list">
+        {item.customizations.map((c) => (
+          <div key={c.customizationId} className="waiter-cart-custom-item">
+            {c.customizationName}: {c.customizationValue} (+₹{c.additionalCharge})
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</div>
 
-                <button onClick={() => handleRemoveItem(item.id)}>
-                  <X size={14} />
-                </button>
-              </div>
-            </div>
+
           ))
         )}
       </div>
 
-      <div className="waiter-cart-summary">
+      {/* <div className="waiter-cart-summary">
         <span>Subtotal</span>
         <span>₹{subtotal}</span>
-      </div>
+      </div> */}
+
+      {summary && (
+        <div className="waiter-cart-summary-extra">
+          <div>
+            <strong>Items:</strong> {summary.totalItems}
+          </div>
+          <div>
+            <strong>Total Qty:</strong> {summary.totalQuantity}
+          </div>
+          <div>
+            <strong>Discount:</strong> ₹{summary.totalDiscount}
+          </div>
+          <div>
+            <strong>Grand Total:</strong> ₹{summary.grandTotal}
+          </div>
+        </div>
+      )}
+
 
       <div className="waiter-cart-actions">
         <button onClick={handleCheckout} disabled={!cart.length}>
@@ -273,4 +350,4 @@ export default function WaiterCart({
       )}
     </div>
   );
-}
+} 

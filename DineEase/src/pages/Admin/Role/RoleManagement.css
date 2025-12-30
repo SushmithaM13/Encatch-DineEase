@@ -85,8 +85,8 @@
 
 .admin-role-add-table th,
 .admin-role-add-table td {
-  padding: 12px;
-  text-align: left;
+  padding: 12px!important;
+  text-align: left!important;
   border-bottom: 1px solid #e2e8f0;
   font-size: 0.95rem;
   color: #1e293b;
@@ -117,7 +117,17 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  width: 100%;
 }
+.admin-role-add-table td:last-child {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+.admin-role-add-table th:last-child {
+  text-align: center !important;
+}
+
+
 
 .admin-role-add-edit,
 .admin-role-add-delete {

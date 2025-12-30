@@ -26,7 +26,7 @@ export const getWaiterNotifications = async (waiterId, token) => {
 
     return await response.json();
   } catch (error) {
-    console.error("❌ Error fetching waiter notifications:", error);
+    console.error(" Error fetching waiter notifications:", error);
     throw error;
   }
 };

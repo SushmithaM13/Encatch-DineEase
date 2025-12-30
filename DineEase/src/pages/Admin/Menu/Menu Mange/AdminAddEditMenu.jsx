@@ -23,6 +23,7 @@ export default function AdminAddEditMenu() {
 
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+ 
 
   const [menu, setMenu] = useState({
     organizationId: "",
@@ -395,21 +396,33 @@ export default function AdminAddEditMenu() {
 
   // ---------------- ADDONS ----------------
   const addAddon = (addon) => {
-    if (!menu.addons.some((a) => a.addonId === addon.addonId)) {
-      setMenu((prev) => ({
-        ...prev,
-        addons: [
-          ...prev.addons,
-          {
-            addonId: addon.addonId ?? addon.id,
-            addonName: addon.addonName ?? addon.name,
-            isDefault: addon.isDefault ?? false,
-            maxQuantity: addon.maxQuantity ?? 1,
-          },
-        ],
-      }));
-    }
+    const newAddon = {
+      addonId: addon.addonId ?? addon.id,
+      addonName: addon.addonName ?? addon.name,
+      isDefault: addon.isDefault ?? false,
+      maxQuantity: addon.maxQuantity ?? 1,
+    };
+
+    setMenu((prev) => {
+      let updatedAddons = [...prev.addons];
+
+      // Avoid duplicates
+      if (!updatedAddons.some((a) => a.addonId === newAddon.addonId)) {
+        updatedAddons.push(newAddon);
+      }
+
+      // If the added addon is default → remove default from all others
+      if (newAddon.isDefault) {
+        updatedAddons = updatedAddons.map((a) => ({
+          ...a,
+          isDefault: a.addonId === newAddon.addonId,
+        }));
+      }
+
+      return { ...prev, addons: updatedAddons };
+    });
   };
+
 
   const removeAddon = (addon) => {
     setMenu((prev) => ({
@@ -417,6 +430,16 @@ export default function AdminAddEditMenu() {
       addons: prev.addons.filter((a) => a.addonId !== addon.addonId),
     }));
   };
+
+  const markAddonAsDefault = (id) => {
+  setMenu((prev) => ({
+    ...prev,
+    addons: prev.addons.map((a) => ({
+      ...a,
+      isDefault: a.addonId === id,
+    })),
+  }));
+};
 
   // ---------------- GROUPS ----------------
   const addGroup = (groupName) => {
@@ -450,7 +473,7 @@ export default function AdminAddEditMenu() {
           ...menu,
           organizationId: menu.organizationId || orgId,
 
-          // ✅ SEND IDS (THIS FIXES YOUR ERROR)
+          //  SEND IDS (THIS FIXES YOUR ERROR)
           categoryId: menu.category.id,
           itemTypeId: menu.itemType.id,
           foodTypeId: menu.foodType.id,
@@ -733,36 +756,78 @@ export default function AdminAddEditMenu() {
         </div>
 
         {/* ADDONS */}
-        <div className="admin-add-edit-menu-section-card">
-          <h3>Addons</h3>
-          <select
-            value=""
-            onChange={(e) => {
-              const obj = dropdowns.addons.find(
-                (a) => String(a.id ?? a.addOnId ?? a.addonId) === e.target.value
-              );
-              if (obj) addAddon(obj);
-            }}
-          >
+<div className="admin-add-edit-menu-section-card">
+  <h3>Addons</h3>
 
-            <option value="">Select Addon</option>
-            {dropdowns.addons.map((a) => (
-              <option key={a.id ?? a.addOnId ?? a.addonId} value={a.id ?? a.addOnId ?? a.addonId}>
-                {a.addonName}
-              </option>
-            ))}
-          </select>
+  {/* Addon Dropdown */}
+  <select
+    value=""
+    onChange={(e) => {
+      const obj = dropdowns.addons.find(
+        (a) =>
+          String(a.id ?? a.addOnId ?? a.addonId) === e.target.value
+      );
+      if (obj) addAddon(obj);
+    }}
+  >
+    <option value="">Select Addon</option>
 
-          <div className="admin-addon-box">
-            {menu.addons.map((a) => (
-              <span key={a.addonId} className="admin-addon-tag">
-                {a.addonName}
-                <button onClick={() => removeAddon(a)}>✕</button>
-              </span>
-            ))}
-          </div>
+    {dropdowns.addons.map((a) => (
+      <option
+        key={a.id ?? a.addOnId ?? a.addonId}
+        value={a.id ?? a.addOnId ?? a.addonId}
+      >
+        {a.addonName}
+      </option>
+    ))}
+  </select>
 
-        </div>
+  {/* Selected Addons List */}
+  <div className="admin-addon-box">
+    {menu.addons.map((a) => (
+      <div
+        key={a.addonId}
+        className="admin-addon-tag"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+          padding: "4px 8px",
+          border: "1px solid #ddd",
+          borderRadius: "6px",
+          marginBottom: "6px",
+        }}
+      >
+        {/* Radio for Default Addon */}
+        <input
+          type="radio"
+          name="defaultAddon"
+          checked={a.isDefault}
+          onChange={() => markAddonAsDefault(a.addonId)}
+        />
+
+        {/* Addon Name */}
+        <span>{a.addonName}</span>
+
+        {/* Remove Button */}
+        <button
+          onClick={() => removeAddon(a)}
+          style={{
+            marginLeft: "auto",
+            cursor: "pointer",
+            border: "none",
+            background: "transparent",
+            color: "red",
+            fontSize: "16px",
+          }}
+        >
+          ✕
+        </button>
+      </div>
+    ))}
+  </div>
+</div>
+
 
         {/* GROUPS */}
         <div className="admin-add-edit-menu-section-card">

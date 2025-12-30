@@ -10,6 +10,16 @@
   height: 100vh;
   overflow-x: auto;
 }
+.waiter-orders-new-orders-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+
+  height: calc(100vh - 120px); /* Adjust based on header height */
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
 
 /* ===============================
    COLUMN
@@ -23,6 +33,26 @@
   flex-direction: column;
   overflow-y: auto;
 }
+.waiter-orders-new-orders-column {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 12px;
+  height: 100%;
+  overflow-y: auto; 
+}
+
+
+.no-orders-message {
+  padding: 20px;
+  text-align: center;
+  color: #475569; 
+  font-weight: 500;
+  font-size: 0.95rem;
+  background: #f8fafc; 
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
 
 /* ===============================
    STICKY COLUMN TITLE
@@ -159,7 +189,7 @@
 }
 
 .waiter-orders-item-status.ACCEPTED {
-  color: #0d6efd;
+  color: #0dfd21;
 }
 
 .waiter-orders-item-status.PREPARING {
@@ -234,4 +264,112 @@
     font-size: 14px;
     text-align: center;
   }
+}
+.waiter-table-filter-bar {
+  display: flex;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.waiter-table-filter-bar button {
+  padding: 6px 14px;
+  background: #e5e5e5;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.waiter-table-filter-bar button.active-filter {
+  background: #007bff;
+  color: white;
+}
+
+.item-details-popup {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+
+
+.clickable {
+  cursor: pointer;
+  color: black;
+  font-weight: 600;
+}
+
+/* Dropdown container */
+.waiter-order-item-dropdown-details {
+  background: #f8fafc;
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border-left: 3px solid green; /* Indigo highlight */
+  font-size: 13px;
+  animation: slideDown 0.2s ease-out;
+}
+
+/* Slide animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Titles inside dropdown */
+.waiter-order-item-dropdown-details h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-bottom: 6px;
+  color: #334155;
+}
+
+/* Details paragraphs */
+.waiter-order-item-dropdown-details p {
+  margin: 3px 0;
+  color: #475569;
+}
+
+/* Bold items */
+.waiter-order-item-dropdown-details p b {
+  color: #1e293b;
+}
+
+/* Addons & customization price styling */
+.waiter-order-item-dropdown-details p span.price {
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Arrow clickable item */
+.waiter-orders-item-name.clickable {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+  margin-left: 6px;
+  color: #64748b;
+}
+
+/* Hover effect for item title */
+.waiter-orders-item-name.clickable:hover {
+  color: black;
 }

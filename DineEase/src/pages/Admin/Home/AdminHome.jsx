@@ -187,7 +187,7 @@ export default function AdminHome() {
                   className="admin-home-menu-image"
                 />
                 <div
-                  className={`badge ${item.itemType?.toUpperCase() === "VEG" ? "veg" : "non-veg"
+                  className={`admin-home-badge ${item.itemType?.toUpperCase() === "VEG" ? "veg" : "non-veg"
                     }`}
                 >
                   {item.itemType || "N/A"}

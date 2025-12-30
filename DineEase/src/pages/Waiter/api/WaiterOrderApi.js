@@ -68,8 +68,8 @@ export const updateOrderItemStatus = async (
       }),
     }
   );
-   console.log("✅ Order item status updated to SERVED:", res);
-console.log("➡️ order-itemid :", orderItemId);
+   console.log(" Order item status updated to SERVED:", res);
+console.log(" order-itemid :", orderItemId);
   if (!res.ok) {
     const err = await res.text();
     throw new Error(err || "Failed to update item status");
@@ -79,7 +79,6 @@ console.log("➡️ order-itemid :", orderItemId);
   return res.json();
  
 };
-
 
 // ------------------------------------------------------
 // CHECKOUT / PLACE ORDER
@@ -99,11 +98,45 @@ export const checkoutOrder = async (organizationId, body, token) => {
       body: JSON.stringify(body),
     }
   );
-  console.log("➡️ CHECKOUT RESPONSE STATUS:", body);
+  console.log(" CHECKOUT RESPONSE STATUS:", body);
 
   if (!res.ok) {
     const err = await res.text();
+    console.error("Checkout raw error :", res.text());
     throw new Error(err || "Checkout failed");
+  }
+
+  return res.json();
+};
+
+// ------------------------------------------------------
+// FETCH ALL WAITER ORDERS BY DATE RANGE (WITH PAGINATION)
+// GET /waiter-orders/all/dates?startDate=DD/MM/YYYY&endDate=DD/MM/YYYY&page=0&size=10
+// ------------------------------------------------------
+export const fetchWaiterOrdersByDate = async (
+  startDate,
+  endDate,
+  page = 0,
+  size = 10
+) => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No token provided");
+
+  const url = `${BASE_URL}/waiter-orders/all/dates?startDate=${encodeURIComponent(
+    startDate
+  )}&endDate=${encodeURIComponent(endDate)}&page=${page}&size=${size}`;
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "*/*",
+    },
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(err || "Failed to fetch date-wise waiter orders");
   }
 
   return res.json();

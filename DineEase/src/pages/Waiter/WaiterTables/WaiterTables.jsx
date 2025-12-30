@@ -27,6 +27,7 @@ export default function WaiterTableReservation() {
   const [messageType, setMessageType] = useState("success");
   
 
+
   // Fetch waiter profile
   useEffect(() => {
     const token =
@@ -123,10 +124,19 @@ export default function WaiterTableReservation() {
   };
 
   // Filter tables
-  const filteredTables = tables.filter((table) => {
-    if (filterStatus === "New") return true;
-    return table.tableStatus?.toUpperCase() === filterStatus.toUpperCase();
-  });
+  // Sort tables numerically: T-1, T-2, T-3...
+const sortedTables = [...tables].sort((a, b) => {
+  const numA = parseInt(a.tableNumber.replace(/[^0-9]/g, ""));
+  const numB = parseInt(b.tableNumber.replace(/[^0-9]/g, ""));
+  return numA - numB;
+});
+
+// Apply filter AFTER sorting
+const filteredTables = sortedTables.filter((table) => {
+  if (filterStatus === "New") return true;
+  return table.tableStatus?.toUpperCase() === filterStatus.toUpperCase();
+});
+
 
   return (
     <div className="waiter-table-container">

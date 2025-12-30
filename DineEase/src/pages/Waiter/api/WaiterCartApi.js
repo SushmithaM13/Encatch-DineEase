@@ -25,13 +25,14 @@ export const getCart = async (
     organizationId,
     sessionId,
   });
+  
 
   if (tableNumber) {
     params.append("tableNumber", tableNumber);
   }
 
   const url = `${API_BASE}/cart/get?${params.toString()}`;
-  console.log("➡️ GET CART URL:", url);
+  console.log(" GET CART URL:", url);
 
   const res = await fetch(url, {
     method: "GET",
@@ -56,32 +57,36 @@ export const addItemToCartFromMenu = async (
     quantity = 1,
     addons = [],
     customizations = [],
+    specialInstructions = "",
     sessionId,
-    tableNumber,
+    tableNumber
   },
   token
 ) => {
+
   if (!organizationId) throw new Error("organizationId missing");
-  if (!menuItemVariantId) throw new Error("variantId missing");
+  if (!menuItemVariantId) throw new Error("menuItemVariantId missing");
   if (!sessionId) throw new Error("sessionId missing");
   if (!tableNumber) throw new Error("tableNumber missing");
 
- const body = {
-  menuItemVariantId,
-  quantity,
+  const body = {
+    menuItemVariantId,
+    quantity,
+    addons: addons.map(a => ({
+      addonId: a.addonId,
+      additionalCharge: a.additionalCharge ?? 0,
+    })),
+    customizations: customizations.map(c => ({
+      customizationOptionId: c.customizationOptionId,
+      customizationOptionName: c.customizationOptionName,
+      additionalCharge: c.additionalCharge ?? 0,
+    })),
+    specialInstructions,
+    sessionId,
+    tableNumber
+  };
 
-  // ✅ BACKEND-SUPPORTED FORMAT
-  addonIds: addons.map(a => a.addonId ?? a),
-  customizationOptionIds: customizations.map(
-    c => c.customizationOptionId ?? c
-  ),
-
-  sessionId,
-  tableNumber,
-};
-
-
-  console.log("📦 MENU ADD BODY:", body);
+  console.log(" NEW MENU ADD BODY:", body);
 
   const res = await fetch(
     `${API_BASE}/cart/add-items/${organizationId}`,
@@ -98,22 +103,35 @@ export const addItemToCartFromMenu = async (
 
   return true;
 };
-
 // ---------------------------------------------
 // ADD ITEM FROM CART (+ button)
 // IDs ONLY
 // ---------------------------------------------
 export const addItemToCart = async (
   organizationId,
-  body,
+  {
+    menuItemVariantId,
+    quantity = 1,
+    sessionId,
+    tableNumber
+  },
   token
 ) => {
-  // 🚫 HARD GUARD (IMPORTANT)
-  if (body.addons || body.customizations) {
-    throw new Error(
-      "Cart payload invalid: use addonIds/customizationOptionIds only"
-    );
-  }
+
+  if (!organizationId) throw new Error("organizationId missing");
+  if (!menuItemVariantId) throw new Error("menuItemVariantId missing");
+  if (!sessionId) throw new Error("sessionId missing");
+  if (!tableNumber) throw new Error("tableNumber missing");
+
+  const body = {
+    menuItemVariantId,
+    quantity,
+    addons: [],
+    customizations: [],
+    specialInstructions: "",
+    sessionId,
+    tableNumber
+  };
 
   const res = await fetch(
     `${API_BASE}/cart/add-items/${organizationId}`,
@@ -121,6 +139,33 @@ export const addItemToCart = async (
       method: "POST",
       headers: authHeaders(token),
       body: JSON.stringify(body),
+    }
+  );
+
+  if (!res.ok) throw new Error(await res.text());
+
+  return true;
+};
+
+
+// ---------------------------------------------
+// CHANGE QUANTITY (PUT)
+// PUT /v1/cart/change-quantity
+// ---------------------------------------------
+export const changeCartQuantity = async (cartItemId, newQuantity, token) => {
+  if (!cartItemId) throw new Error("cartItemId missing");
+  if (newQuantity == null) throw new Error("newQuantity missing");
+
+  const params = new URLSearchParams({
+    cartItemId,
+    newQuantity,
+  });
+
+  const res = await fetch(
+    `${API_BASE}/cart/change-quantity?${params.toString()}`,
+    {
+      method: "PUT",
+      headers: authHeaders(token),
     }
   );
 
@@ -178,4 +223,38 @@ export const clearCartAPI = async (
   }
 
   return true;
+};
+
+// ---------------------------------------------
+// VALIDATE CART
+// POST /v1/cart/{organizationId}/{sessionId}/validate
+// ---------------------------------------------
+export const validateCartAPI = async (organizationId, sessionId, token) => {
+  if (!organizationId) throw new Error("organizationId missing");
+  if (!sessionId) throw new Error("sessionId missing");
+
+  const url = `${API_BASE}/cart/${organizationId}/${sessionId}/validate`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: authHeaders(token),
+  });
+
+  // Return backend message even if 500
+  const text = await res.text();
+
+  let json;
+  try {
+    json = JSON.parse(text);
+  } catch {
+    json = { message: text };
+  }
+
+  if (!res.ok) {
+    //  Return { ok: false, message: "...error..." }
+    return { ok: false, message: json.message || "Validation failed" };
+  }
+
+  // Return SUCCESS
+  return { ok: true, message: json.message || "Cart valid" };
 };
