@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { fetchProfile, getMenuById, getMenuDropdowns, addMenu, updateMenu } from "./Api/menuApi";
 
-import { Minus } from "lucide-react";
+import { X } from "lucide-react";
 import "./AdminAddEditMenu.css";
 
 export default function AdminAddEditMenu() {
@@ -23,7 +23,7 @@ export default function AdminAddEditMenu() {
 
   const [imagePreview, setImagePreview] = useState(null);
   const [imageFile, setImageFile] = useState(null);
- 
+
 
   const [menu, setMenu] = useState({
     organizationId: "",
@@ -98,163 +98,69 @@ export default function AdminAddEditMenu() {
   }, [orgId]);
 
   // ---------------- LOAD MENU FOR EDIT ----------------
-  useEffect(() => {
-    if (
-      !isEdit ||
-      !orgId ||
-      !dropdowns.categories.length ||
-      !dropdowns.itemTypes.length ||
-      !dropdowns.foodTypes.length ||
-      !dropdowns.cuisines.length
-    )
-      return;
+ useEffect(() => {
+  async function loadEditData() {
+    if (!isEdit || !orgId) return;
 
-    async function loadEditData() {
-      try {
-        const data = await getMenuById(menuId);
-        if (!data) return;
+    // Wait until dropdowns are loaded
+    if (!dropdowns.categories.length ||
+        !dropdowns.itemTypes.length ||
+        !dropdowns.foodTypes.length ||
+        !dropdowns.cuisines.length) return;
 
-        // image preview
-        setImagePreview(
-          data.imageData
-            ? `data:image/jpeg;base64,${data.imageData}`
-            : data.imageUrl ?? null
-        );
+    try {
+      const data = await getMenuById(menuId);
+      if (!data) return;
 
-        /* -----------------------------
-           🔥 RESOLVE DROPDOWN IDS
-        ------------------------------ */
+      const findByIdOrName = (arr, id, name, idKey, nameKey) =>
+        arr.find(x => String(x[idKey]) === String(id) || x[nameKey] === name) || {};
 
-        const resolvedCategory =
-          dropdowns.categories.find(
-            c =>
-              c.id === data.category?.id ||
-              c.categoryName === data.categoryName
-          ) || {};
+      const resolvedCategory = findByIdOrName(dropdowns.categories, data.category?.id, data.categoryName, "id", "categoryName");
+      const resolvedItemType = findByIdOrName(dropdowns.itemTypes, data.itemType?.id, data.itemTypeName, "id", "itemTypeName");
+      const resolvedFoodType = findByIdOrName(dropdowns.foodTypes, data.foodType?.id, data.foodTypeName, "id", "foodTypeName");
+      const resolvedCuisine = findByIdOrName(dropdowns.cuisines, data.cuisine?.id, data.cuisineTypeName, "id", "cuisineTypeName");
 
-        const resolvedItemType =
-          dropdowns.itemTypes.find(
-            t =>
-              t.id === data.itemType?.id ||
-              t.itemTypeName === data.itemTypeName
-          ) || {};
+      setMenu(prev => ({
+        ...prev,
+        menuItemId: data.menuItemId,
+        organizationId: data.organizationId || orgId,
 
-        const resolvedFoodType =
-          dropdowns.foodTypes.find(
-            f =>
-              f.id === data.foodType?.id ||
-              f.foodTypeName === data.foodTypeName
-          ) || {};
+        category: { id: resolvedCategory.id || "", categoryName: resolvedCategory.categoryName || data.categoryName || "" },
+        categoryName: resolvedCategory.categoryName || data.categoryName || "",
 
-        const resolvedCuisine =
-          dropdowns.cuisines.find(
-            c =>
-              c.id === data.cuisine?.id ||
-              c.cuisineTypeName === data.cuisineTypeName
-          ) || {};
+        itemType: { id: resolvedItemType.id || "", itemTypeName: resolvedItemType.itemTypeName || data.itemTypeName || "" },
+        itemTypeName: resolvedItemType.itemTypeName || data.itemTypeName || "",
 
-        /* -----------------------------
-           ✅ SET MENU STATE
-        ------------------------------ */
+        foodType: { id: resolvedFoodType.id || "", foodTypeName: resolvedFoodType.foodTypeName || data.foodTypeName || "" },
+        foodTypeName: resolvedFoodType.foodTypeName || data.foodTypeName || "",
 
-        setMenu(prev => ({
-          ...prev,
-          menuItemId: data.menuItemId,
-          organizationId: data.organizationId || orgId,
+        cuisine: { id: resolvedCuisine.id || "", cuisineTypeName: resolvedCuisine.cuisineTypeName || data.cuisineTypeName || "" },
+        cuisineTypeName: resolvedCuisine.cuisineTypeName || data.cuisineTypeName || "",
 
-          // CATEGORY
-          category: {
-            id: resolvedCategory.id || "",
-            categoryName:
-              resolvedCategory.categoryName || data.categoryName || "",
-          },
-          categoryName:
-            resolvedCategory.categoryName || data.categoryName || "",
+        itemName: data.itemName || "",
+        description: data.description || "",
+        spiceLevel: data.spiceLevel || 1,
+        preparationTime: data.preparationTime || 1,
+        allergenInfo: data.allergenInfo || "",
+        isAvailable: data.isAvailable ?? true,
+        isRecommended: data.isRecommended ?? false,
+        isBestseller: data.isBestseller ?? false,
+        chefSpecial: data.chefSpecial ?? false,
 
-          // ITEM TYPE
-          itemType: {
-            id: resolvedItemType.id || "",
-            itemTypeName:
-              resolvedItemType.itemTypeName || data.itemTypeName || "",
-          },
-          itemTypeName:
-            resolvedItemType.itemTypeName || data.itemTypeName || "",
-
-          // FOOD TYPE
-          foodType: {
-            id: resolvedFoodType.id || data.foodTypeId || "", // fallback to backend ID
-            foodTypeName: resolvedFoodType.foodTypeName || data.foodTypeName || "",
-          },
-          foodTypeName: resolvedFoodType.foodTypeName || data.foodTypeName || "",
-
-
-          // CUISINE
-          cuisine: {
-            id: resolvedCuisine.id || "",
-            cuisineTypeName:
-              resolvedCuisine.cuisineTypeName || data.cuisineTypeName || "",
-          },
-          cuisineTypeName:
-            resolvedCuisine.cuisineTypeName || data.cuisineTypeName || "",
-
-          // BASIC FIELDS
-          itemName: data.itemName ?? "",
-          description: data.description ?? "",
-          spiceLevel: data.spiceLevel ?? 1,
-          preparationTime: data.preparationTime ?? 1,
-          allergenInfo: data.allergenInfo ?? "",
-
-          isAvailable: data.isAvailable ?? true,
-          isRecommended: data.isRecommended ?? false,
-          isBestseller: data.isBestseller ?? false,
-          chefSpecial: data.chefSpecial ?? false,
-
-          // VARIANTS
-          variants: (data.variants || []).map(v => ({
-            variantId: v.variantId ?? v.id ?? "",
-            variantName: v.variantName ?? "",
-            variantType: v.variantType ?? "",
-            quantityUnit: v.quantityUnit ?? "",
-            displayOrder: v.displayOrder ?? 0,
-            price: v.price ?? 0,
-            discountPrice: v.discountPrice ?? 0,
-            isDefault: v.isDefault ?? false,
-            isAvailable: v.isAvailable ?? true,
-          })),
-
-          // ADDONS
-          addons: (data.addons || []).map(a => ({
-            addonId: a.addonId ?? a.id ?? a.addOnId ?? "",
-            addonName: a.addonName ?? a.name ?? a.addOnName ?? "",
-            isDefault: a.isDefault ?? false,
-            maxQuantity: a.maxQuantity ?? 1,
-          })),
-
-          // CUSTOMIZATION GROUPS
-          customizationGroupNames:
-            (data.customizationGroups ||
-              data.customizationGroupNames ||
-              []).map(g => g.groupName ?? g.name ?? g),
-        }));
-      } catch (err) {
-        console.error("Error loading menu:", err);
-        alert("Failed to load menu");
-      }
+        variants: data.variants || [],
+        addons: data.addons || [],
+        customizationGroupNames: data.customizationGroups || [],
+        imageData: data.imageData ?? null,
+      }));
+    } catch (err) {
+      console.error("Error loading menu:", err);
     }
+  }
 
-    loadEditData();
-  }, [
-    isEdit,
-    menuId,
-    orgId,
-    dropdowns.categories,
-    dropdowns.itemTypes,
-    dropdowns.foodTypes,
-    dropdowns.cuisines,
-  ]);
+  loadEditData();
+}, [isEdit, orgId, menuId, dropdowns]);
 
-
-
+ 
   // =============== DROPDOWN HANDLERS =====================
   const handleCategoryChange = (e) => {
     const val = e.target.value;
@@ -373,7 +279,7 @@ export default function AdminAddEditMenu() {
           quantityUnit: "",
           displayOrder: 0,
           price: 0,
-          discountPrice: 0,
+          discountPercentage: 0,
           isDefault: false,
           isAvailable: true,
         },
@@ -386,6 +292,15 @@ export default function AdminAddEditMenu() {
     updated[i] = { ...updated[i], [field]: value };
     setMenu((prev) => ({ ...prev, variants: updated }));
   };
+  const variantTypeInfo = {
+    SIZE: "Examples: Small, Medium, Large, Half, Full, 250ml, 500ml, 1L, Single Scoop, Double Scoop",
+    PORTION: "Examples: 1 piece, 2 pieces, 1 plate, 2 plates, Extra portion",
+    TEMPERATURE: "Examples: Hot, Cold, Iced, Warm, Room Temperature",
+    QUANTITY: "Examples: 1kg, 2kg, 5kg, 6 pcs, 12 pcs, 100g, 250g",
+    PACKAGING: "Examples: Dine-in, Takeaway, Parcel, Box, Bag, Eco pack",
+    CUSTOM: "Examples: Sweetness level, Spice level, Cooking style, Bread type",
+  };
+
 
   const removeVariant = (i) => {
     setMenu((prev) => ({
@@ -431,15 +346,25 @@ export default function AdminAddEditMenu() {
     }));
   };
 
-  const markAddonAsDefault = (id) => {
-  setMenu((prev) => ({
-    ...prev,
-    addons: prev.addons.map((a) => ({
-      ...a,
-      isDefault: a.addonId === id,
-    })),
-  }));
-};
+  const updateAddon = (addonId, field, value) => {
+    const updated = [...menu.addons];
+    updated.forEach((a) => {
+      if (a.addonId === addonId) {
+        a[field] = value;
+      }
+    });
+
+    // SPECIAL CASE → only ONE default allowed
+    if (field === "isDefault" && value === true) {
+      updated.forEach((a) => {
+        if (a.addonId !== addonId) a.isDefault = false;
+      });
+    }
+
+    setMenu((prev) => ({ ...prev, addons: updated }));
+  };
+
+
 
   // ---------------- GROUPS ----------------
   const addGroup = (groupName) => {
@@ -460,53 +385,75 @@ export default function AdminAddEditMenu() {
   };
 
   // ---------------- SUBMIT ADD/UPDATE ----------------
+  // ---------------- SUBMIT ADD/UPDATE ----------------
   const handleSubmit = async () => {
     try {
-      if (isEdit) {
-        // 🔥 VALIDATION (OPTIONAL BUT SAFE)
-        // if (!menu.foodType.id) {
-        //   alert("Food Type is required");
-        //   return;
-        // }
+      // ✅ VALIDATE REQUIRED DROPDOWNS
+      if (!menu.category?.id) return alert("Please select a valid Category");
+      if (!menu.itemType?.id) return alert("Please select a valid Item Type");
+      if (!menu.foodType?.id) return alert("Please select a valid Food Type");
+      if (!menu.cuisine?.id) return alert("Please select a valid Cuisine");
 
-        const payload = {
-          ...menu,
-          organizationId: menu.organizationId || orgId,
+      const payload = {
+        menuItemId: menu.menuItemId || null,
+        organizationId: menu.organizationId || orgId,
+        categoryId: menu.category.id,
+        itemTypeId: menu.itemType.id,
+        foodTypeId: menu.foodType.id,
+        cuisineTypeId: menu.cuisine.id,
 
-          //  SEND IDS (THIS FIXES YOUR ERROR)
-          categoryId: menu.category.id,
-          itemTypeId: menu.itemType.id,
-          foodTypeId: menu.foodType.id,
-          cuisineTypeId: menu.cuisine.id,
+        categoryName: menu.categoryName || menu.category.categoryName,
+        itemTypeName: menu.itemTypeName || menu.itemType.itemTypeName,
+        foodTypeName: menu.foodTypeName || menu.foodType.foodTypeName,
+        cuisineTypeName: menu.cuisineTypeName || menu.cuisine.cuisineTypeName,
 
-          categoryName: menu.category.categoryName,
-          itemTypeName: menu.itemType.itemTypeName,
-          foodTypeName: menu.foodType.foodTypeName,
-          cuisineTypeName: menu.cuisine.cuisineTypeName,
+        itemName: menu.itemName,
+        description: menu.description,
+        spiceLevel: Number(menu.spiceLevel) || 1,
+        preparationTime: Number(menu.preparationTime) || 1,
+        allergenInfo: menu.allergenInfo || "",
 
-          imageData: imageFile?._base64 || null,
-        };
+        isAvailable: Boolean(menu.isAvailable),
+        isRecommended: Boolean(menu.isRecommended),
+        isBestseller: Boolean(menu.isBestseller),
+        chefSpecial: Boolean(menu.chefSpecial),
 
+        variants: (menu.variants || []).map(v => ({
+          variantId: v.variantId || null,
+          variantName: v.variantName,
+          variantType: v.variantType,
+          quantityUnit: v.quantityUnit || "",
+          displayOrder: Number(v.displayOrder) || 0,
+          price: Number(v.price) || 0,
+          discountPercentage: Number(v.discountPercentage) || 0,
+          isDefault: Boolean(v.isDefault),
+          isAvailable: Boolean(v.isAvailable),
+        })),
+
+        addons: (menu.addons || []).map(a => ({
+          addonName: a.addonName,
+          isDefault: Boolean(a.isDefault),
+          maxQuantity: Number(a.maxQuantity) || 1,
+        })),
+
+        customizationGroupNames: menu.customizationGroupNames || [],
+        imageData: imageFile?._base64 || menu.imageData || null,
+      };
+
+      if (menu.menuItemId) {
         await updateMenu(payload);
-        alert("Menu updated!");
+        alert("Menu updated successfully!");
       } else {
-        await addMenu(
-          { ...menu, organizationId: menu.organizationId || orgId },
-          imageFile
-        );
-        alert("Menu added!");
+        await addMenu(payload, imageFile);
+        alert("Menu added successfully!");
       }
 
       navigate("/AdminDashboard/menu");
     } catch (err) {
       console.error(err);
-      alert("Failed to save menu");
+      alert("Failed to submit menu.");
     }
   };
-
-
-
-
   // ---------------- UI ----------------
   return (
     <div className="admin-add-edit-menu-page">
@@ -614,26 +561,27 @@ export default function AdminAddEditMenu() {
             <div>
               <label>Spice Level (1–5)</label>
               <input
-                type="number"
+                type="text"
                 name="spiceLevel"
-                min="1"
-                max="5"
-                value={menu.spiceLevel}
+                placeholder="Enter spice level (1–5)"
+                value={menu.spiceLevel === 1 ? "" : menu.spiceLevel}
                 onChange={handleInput}
               />
+
             </div>
 
             {/* Preparation Time */}
             <div>
               <label>Preparation Time (mins)</label>
               <input
-                type="number"
+                type="text"
                 name="preparationTime"
-                min="1"
-                value={menu.preparationTime}
+                placeholder="Enter time in minutes"
+                value={menu.preparationTime === 1 ? "" : menu.preparationTime}
                 onChange={handleInput}
               />
             </div>
+
 
             {/* Allergen Info */}
             <div className="admin-add-edit-full">
@@ -698,14 +646,33 @@ export default function AdminAddEditMenu() {
           <h4>Variants</h4>
           {menu.variants.map((v, i) => (
             <div key={i} className="admin-menu-variant-row">
+              <button
+                className="admin-add-edit-menu-add-variant-remove-btn"
+                onClick={() => removeVariant(i)}
+              >
+                <X size={25} />
+              </button>
               <div className="variant-input">
                 <label>Variant Name</label>
                 <input value={v.variantName} onChange={(e) => updateVariant(i, "variantName", e.target.value)} />
               </div>
+              <div className="admin-add-edit-menu-variant-input">
+                <label style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                  Variant Type
+                  {v.variantType && (
+                    <span
+                      className="variant-info-icon"
+                      title={variantTypeInfo[v.variantType]}
+                    >
+                      ⓘ
+                    </span>
+                  )}
+                </label>
 
-              <div className="variant-input">
-                <label>Variant Type</label>
-                <select value={v.variantType} onChange={(e) => updateVariant(i, "variantType", e.target.value)}>
+                <select
+                  value={v.variantType}
+                  onChange={(e) => updateVariant(i, "variantType", e.target.value)}
+                >
                   <option value="">Select</option>
                   <option value="SIZE">Size</option>
                   <option value="PORTION">Portion</option>
@@ -715,38 +682,65 @@ export default function AdminAddEditMenu() {
                   <option value="CUSTOM">Custom</option>
                 </select>
               </div>
+              <div className="admin-add-edit-menu-variant-input">
+                <label>Quantity / Unit</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 500 grams, 250 ml, 5 liters"
+                  value={v.quantityUnit}
+                  onChange={(e) => updateVariant(i, "quantityUnit", e.target.value)}
+                />
 
-              <div className="variant-input">
-                <label>Qty Unit</label>
-                <input value={v.quantityUnit} onChange={(e) => updateVariant(i, "quantityUnit", e.target.value)} />
               </div>
-
-              <div className="variant-input">
+              <div className="admin-add-edit-menu-variant-input">
                 <label>Price</label>
-                <input type="number" value={v.price} onChange={(e) => updateVariant(i, "price", Number(e.target.value))} />
+                <input
+                  type="text"
+                  placeholder="Price in Rs"
+                  value={v.price === 0 ? "" : v.price}
+                  onChange={(e) => updateVariant(i, "price", e.target.value)}
+                />
               </div>
 
-              <div className="variant-input">
+              <div className="admin-add-edit-menu-variant-input">
                 <label>Discount</label>
                 <input
-                  type="number"
-                  value={v.discountPrice}
-                  onChange={(e) => updateVariant(i, "discountPrice", Number(e.target.value))}
+                  type="text"
+                  placeholder="Discount %"
+                  value={v.discountPercentage === 0 ? "" : v.discountPercentage}
+                  onChange={(e) => updateVariant(i, "discountPercentage", e.target.value)}
                 />
               </div>
 
-              <div className="variant-input">
+              <div className="admin-add-edit-menu-variant-input">
                 <label>Order</label>
                 <input
-                  type="number"
-                  value={v.displayOrder}
-                  onChange={(e) => updateVariant(i, "displayOrder", Number(e.target.value))}
+                  type="text"
+                  placeholder="Display order"
+                  value={v.displayOrder === 0 ? "" : v.displayOrder}
+                  onChange={(e) => updateVariant(i, "displayOrder", e.target.value)}
+                />
+              </div>
+              <div className="admin-add-edit-menu-variant-input-checkbox">
+                <label>is Default</label>
+                <input
+                  type="checkbox"
+                  checked={v.isDefault}
+                  onChange={(e) => updateVariant(i, "isDefault", e.target.checked)}
+                />
+              </div>
+              <div className="admin-add-edit-menu-variant-input-checkbox">
+                <label>is Available</label>
+                <input
+                  type="checkbox"
+                  checked={v.isAvailable}
+                  onChange={(e) => updateVariant(i, "isAvailable", e.target.checked)}
                 />
               </div>
 
-              <button onClick={() => removeVariant(i)}>
-                <Minus size={14} />
-              </button>
+
+
+
             </div>
           ))}
 
@@ -756,77 +750,93 @@ export default function AdminAddEditMenu() {
         </div>
 
         {/* ADDONS */}
-<div className="admin-add-edit-menu-section-card">
-  <h3>Addons</h3>
+        <div className="admin-add-edit-menu-section-card">
+          <h3>Addons</h3>
 
-  {/* Addon Dropdown */}
-  <select
-    value=""
-    onChange={(e) => {
-      const obj = dropdowns.addons.find(
-        (a) =>
-          String(a.id ?? a.addOnId ?? a.addonId) === e.target.value
-      );
-      if (obj) addAddon(obj);
-    }}
-  >
-    <option value="">Select Addon</option>
+          {/* Addon Dropdown */}
+          <select
+            value=""
+            onChange={(e) => {
+              const obj = dropdowns.addons.find(
+                (a) => String(a.id ?? a.addOnId ?? a.addonId) === e.target.value
+              );
+              if (obj) addAddon(obj);
+            }}
+          >
+            <option value="">Select Addon</option>
 
-    {dropdowns.addons.map((a) => (
-      <option
-        key={a.id ?? a.addOnId ?? a.addonId}
-        value={a.id ?? a.addOnId ?? a.addonId}
-      >
-        {a.addonName}
-      </option>
-    ))}
-  </select>
+            {dropdowns.addons.map((a) => (
+              <option
+                key={a.id ?? a.addOnId ?? a.addonId}
+                value={a.id ?? a.addOnId ?? a.addonId}
+              >
+                {a.addonName}
+              </option>
+            ))}
+          </select>
 
-  {/* Selected Addons List */}
-  <div className="admin-addon-box">
-    {menu.addons.map((a) => (
-      <div
-        key={a.addonId}
-        className="admin-addon-tag"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          padding: "4px 8px",
-          border: "1px solid #ddd",
-          borderRadius: "6px",
-          marginBottom: "6px",
-        }}
-      >
-        {/* Radio for Default Addon */}
-        <input
-          type="radio"
-          name="defaultAddon"
-          checked={a.isDefault}
-          onChange={() => markAddonAsDefault(a.addonId)}
-        />
+          {/* Selected Addons List */}
+          <div className="admin-addon-box">
+            {menu.addons.map((a) => (
+              <div
+                key={a.addonId}
+                className="admin-addon-tag"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "8px 10px",
+                  border: "1px solid #ddd",
+                  borderRadius: "6px",
+                  marginBottom: "8px",
+                }}
+              >
+                {/* Addon Name */}
+                <strong>{a.addonName}</strong>
 
-        {/* Addon Name */}
-        <span>{a.addonName}</span>
+                {/* Default Checkbox */}
+                <label style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <input
+                    type="checkbox"
+                    checked={a.isDefault}
+                    onChange={(e) => updateAddon(a.addonId, "isDefault", e.target.checked)}
+                  />
+                  Default
+                </label>
 
-        {/* Remove Button */}
-        <button
-          onClick={() => removeAddon(a)}
-          style={{
-            marginLeft: "auto",
-            cursor: "pointer",
-            border: "none",
-            background: "transparent",
-            color: "red",
-            fontSize: "16px",
-          }}
-        >
-          ✕
-        </button>
-      </div>
-    ))}
-  </div>
-</div>
+                {/* Max Quantity Input */}
+                <label style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  Max Qty:
+                  <input
+                    type="number"
+                    min="0"
+                    style={{ width: "55px" }}
+                    value={a.maxQuantity ?? "" }
+                    onChange={(e) =>
+                      updateAddon(a.addonId, "maxQuantity", Number(e.target.value))
+                    }
+                  />
+                </label>
+
+                {/* Remove Button */}
+                <button
+                  onClick={() => removeAddon(a)}
+                  style={{
+                    marginLeft: "auto",
+                    cursor: "pointer",
+                    border: "none",
+                    background: "transparent",
+                    color: "red",
+                    fontSize: "18px",
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
 
 
         {/* GROUPS */}
