@@ -132,32 +132,104 @@
 /* -------------------- VARIANTS -------------------- */
 .admin-menu-variant-row {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 10px;
+  flex-direction: column;   /* ⬅ each field one below another */
+  gap: 12px;
+  padding: 15px;
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  margin-bottom: 15px;
 }
 
-.variant-input {
+/* Each input block */
+.variant-input,
+.admin-add-edit-menu-variant-input,
+.admin-add-edit-menu-variant-input-checkbox {
   display: flex;
   flex-direction: column;
-  min-width: 120px;
-  flex: 1;
+  width: 100%;              /* full width */
 }
 
-.admin-add-edit-menu-add-variant-btn {
-  background-color: #4CAF50;
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
+/* Labels */
+.variant-input label,
+.admin-add-edit-menu-variant-input label,
+.admin-add-edit-menu-variant-input-checkbox label {
   font-size: 14px;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+/* Text & select inputs */
+.admin-add-edit-menu-variant-input input,
+.variant-input input,
+.admin-add-edit-menu-variant-input select {
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+/* Checkbox row styling */
+.admin-add-edit-menu-variant-input-checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.admin-add-edit-menu-add-variant-btn {
+  background: transparent;
+  color: #444;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1.5px dashed #999;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+  font-size: 14px;
+  transition: all 0.25s ease;
 }
 
 .admin-add-edit-menu-add-variant-btn:hover {
-  background-color: #45a049;
+  border-color: #333;
+  color: #222;
+  background: #f2f2f2;
 }
+.admin-menu-variant-row {
+  position: relative;     /* Enables absolute positioning inside */
+  padding-top: 25px;      /* Avoid overlap with the X */
+}
+
+.admin-add-edit-menu-add-variant-remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 10px;
+  color: #475569;           /* default gray */
+  transition: all 0.25s ease;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.admin-add-edit-menu-add-variant-remove-btn:hover {
+  color: #dc2626;           /* red on hover */
+  transform: scale(1.15);   /* optional hover effect */
+}
+.variant-info-icon {
+  cursor: pointer;
+  color: #475569; /* grey */
+  font-size: 20px;
+}
+
+.variant-info-icon:hover {
+  color: #0f52ba; /* blue */
+  transform: scale(1.15);
+  transition: 0.2s;
+}
+
+
+
 
 /* -------------------- ADDONS & GROUPS -------------------- */
 .admin-addon-section,
@@ -197,13 +269,14 @@
   margin-top: 15px;
   background-color: #007BFF;
   color: #fff;
-  padding: 10px 16px;
-  font-size: 15px;
+  padding: 8px 10px; /* reduced left-right padding */
+  font-size: 14px;
   font-weight: 500;
   border: none;
-  border-radius: 6px;
+  border-radius: 16px; /* slightly smaller radius to match size */
   cursor: pointer;
 }
+
 
 .admin-add-edit-menu-save-btn:hover {
   background-color: #006ae6;

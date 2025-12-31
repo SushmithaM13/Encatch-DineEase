@@ -1,9 +1,9 @@
 /* ---------------- Root Variables ---------------- */
 :root {
   /* Primary Purple Shades */
-  --primary: #6d28d9!important;        /* deep purple */
+  --primary: #7F00FF!important;        /* deep purple */
   --primary-light: #f3e8ff;  /* very light lavender */
-  --primary-dark: #4c1d95!important;   /* dark purple */
+  --primary-dark: #7F00FF!important;   /* dark purple */
 
   /* Backgrounds */
   --bg-white: #ffffff;

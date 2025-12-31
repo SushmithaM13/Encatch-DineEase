@@ -293,7 +293,7 @@ export default function AdminDashboard() {
 
           <div className="admin-header-center">
             <div className="admin-restaurant-display">
-              <Utensils size={20} color="blue" />
+              <Utensils size={20} color="#7F00FF" />
               <span>{restaurantName || "Restaurant"}</span>
             </div>
           </div>

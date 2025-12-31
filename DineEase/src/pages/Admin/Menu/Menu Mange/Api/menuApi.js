@@ -32,19 +32,19 @@ export async function fetchProfile() {
 // ------------------------------------------------------
 // UPDATE MENU (with FormData for images)
 // ------------------------------------------------------
+// UPDATE MENU (with FormData for images)
 export async function updateMenu(menu) {
   const formData = new FormData();
 
-  // IDs (only append if truthy)
-  if (menu.menuItemId) formData.append("menuItemId", menu.menuItemId);
+  // Basic IDs
+  formData.append("menuItemId", menu.menuItemId);
+  formData.append("organizationId", menu.organizationId);
   if (menu.categoryId) formData.append("categoryId", menu.categoryId);
   if (menu.itemTypeId) formData.append("itemTypeId", menu.itemTypeId);
   if (menu.foodTypeId) formData.append("foodTypeId", menu.foodTypeId);
   if (menu.cuisineTypeId) formData.append("cuisineTypeId", menu.cuisineTypeId);
 
-  formData.append("organizationId", menu.organizationId);
-
-  // Basic
+  // Basic Info
   formData.append("itemName", menu.itemName || "");
   formData.append("description", menu.description || "");
   formData.append("spiceLevel", menu.spiceLevel ?? 1);
@@ -65,13 +65,13 @@ export async function updateMenu(menu) {
 
   // Variants
   (menu.variants || []).forEach((v, i) => {
-    if (v.variantId) formData.append(`variants[${i}].variantId`, v.variantId);
+    formData.append(`variants[${i}].variantId`, v.variantId ?? "");
     formData.append(`variants[${i}].variantName`, v.variantName || "");
     formData.append(`variants[${i}].variantType`, v.variantType || "");
     formData.append(`variants[${i}].quantityUnit`, v.quantityUnit || "");
     formData.append(`variants[${i}].displayOrder`, v.displayOrder ?? 0);
     formData.append(`variants[${i}].price`, v.price ?? 0);
-    formData.append(`variants[${i}].discountPrice`, v.discountPrice ?? 0);
+    formData.append(`variants[${i}].discountPercentage`, v.discountPercentage ?? 0);
     formData.append(`variants[${i}].isDefault`, v.isDefault ? "true" : "false");
     formData.append(`variants[${i}].isAvailable`, v.isAvailable ? "true" : "false");
   });
@@ -83,7 +83,7 @@ export async function updateMenu(menu) {
     formData.append(`addons[${i}].maxQuantity`, a.maxQuantity ?? 1);
   });
 
-  // Groups
+  // Customization Groups
   (menu.customizationGroupNames || []).forEach((g, i) => {
     formData.append(`customizationGroupNames[${i}]`, g);
   });
@@ -93,9 +93,9 @@ export async function updateMenu(menu) {
     formData.append("image", menu.imageFile.file);
   } else if (menu.imageData) {
     const byteCharacters = atob(menu.imageData);
-    const byteNumbers = new Array(byteCharacters.length)
-      .fill(0)
-      .map((_, i) => byteCharacters.charCodeAt(i));
+    const byteNumbers = Array.from(byteCharacters).map((c) =>
+      c.charCodeAt(0)
+    );
     const blob = new Blob([new Uint8Array(byteNumbers)], { type: "image/jpeg" });
     formData.append("image", blob);
   }
@@ -109,8 +109,6 @@ export async function updateMenu(menu) {
   if (!res.ok) throw new Error(await res.text());
   return res.text();
 }
-
-
 
 
 // ------------------------------------------------------
@@ -140,7 +138,7 @@ export async function addMenu(menu, imageFile) {
     formData.append(`variants[${i}].variantName`, v.variantName);
     formData.append(`variants[${i}].variantType`, v.variantType);
     formData.append(`variants[${i}].price`, v.price);
-    formData.append(`variants[${i}].discountPrice`, v.discountPrice ?? "");
+    formData.append(`variants[${i}].discountPercentage`, v.discountPercentage ?? "");
     formData.append(`variants[${i}].isDefault`, v.isDefault);
     formData.append(`variants[${i}].isAvailable`, v.isAvailable);
     formData.append(`variants[${i}].displayOrder`, v.displayOrder);
@@ -285,7 +283,7 @@ export function normalizeMenuResponse(data) {
       quantityUnit: v.quantityUnit,
       displayOrder: v.displayOrder,
       price: v.price,
-      discountPrice: v.discountPrice,
+      discountPercentage: v.discountPercentage,
       isDefault: v.isDefault ?? false,
       isAvailable: v.isAvailable ?? true,
     })),
